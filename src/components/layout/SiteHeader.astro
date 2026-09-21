@@ -1,0 +1,47 @@
+---
+import DossierCount from './DossierCount';
+import MotionToggle from './MotionToggle';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const isActive = (path: string) => currentPath === path || (path !== '/' && currentPath.startsWith(path));
+const navItems = [
+  ['/por-que-lavalleja/', 'Por qué Lavalleja'],
+  ['/oportunidades/', 'Oportunidades'],
+  ['/territorio/', 'Territorio'],
+  ['/como-invertir/', 'Cómo invertir'],
+] as const;
+---
+
+<header class="site-header" transition:name="site-header">
+  <div class="nav-shell glass">
+    <a class="wordmark" href="/" aria-label="Invest Lavalleja, inicio" data-astro-prefetch>
+      <svg class="brand-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M5 35 17 13l9 14 7-10 10 18H5Z" stroke="currentColor" stroke-width="1.5" />
+        <path d="m12 35 11-17 13 17M5 40h38" stroke="currentColor" stroke-width="1.1" />
+        <circle cx="36" cy="9" r="3" fill="currentColor" />
+      </svg>
+      <span class="brand-name"><b>INVEST</b><small>LAVALLEJA</small></span>
+    </a>
+    <nav class="nav-links" id="primary-nav" aria-label="Principal" data-mobile-nav>
+      {navItems.map(([href, label]) => <a href={href} class:list={{ active: isActive(href) }} data-astro-prefetch>{label}</a>)}
+    </nav>
+    <div class="nav-tools">
+      <a class="btn square nav-search" href="/recursos/#buscar" data-open-search aria-label="Buscar información">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-search" /></svg>
+      </a>
+      <a class="btn square dossier-link" href="/mi-dossier/" aria-label="Abrir mi dossier" data-astro-prefetch>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-bookmark" /></svg>
+        <DossierCount client:load transition:persist="dossier-count" />
+      </a>
+      <a class="btn primary small nav-project" href="/tu-proyecto/" data-astro-prefetch>Tu proyecto <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-up" /></svg></a>
+      <button class="btn square mobile-toggle" type="button" data-menu-toggle aria-label="Abrir menú" aria-expanded="false" aria-controls="primary-nav">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-menu" /></svg>
+      </button>
+    </div>
+  </div>
+  <MotionToggle client:load transition:persist="motion-toggle" />
+</header>

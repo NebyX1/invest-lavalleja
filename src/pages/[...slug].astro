@@ -1,0 +1,18 @@
+---
+import ReferencePage from '../components/editorial/ReferencePage.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { pages } from '../data/site';
+import type { GetStaticPaths } from 'astro';
+import type { EditorialPage } from '../types';
+
+export const getStaticPaths: GetStaticPaths = () => pages.filter((page) => page.path !== '/').map((page) => ({
+  params: { slug: page.path.replace(/^\//, '').replace(/\/$/, '') },
+  props: { page },
+}));
+
+const { page } = Astro.props as { page: EditorialPage };
+---
+
+<SiteLayout title={page.title} description={page.description} currentPath={page.path}>
+  <ReferencePage page={page} />
+</SiteLayout>

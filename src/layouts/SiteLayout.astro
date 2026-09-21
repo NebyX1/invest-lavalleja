@@ -1,0 +1,53 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import GlobalSearch from '../components/islands/GlobalSearch';
+import Footer from '../components/layout/Footer.astro';
+import IconSprite from '../components/layout/IconSprite.astro';
+import SiteChrome from '../components/layout/SiteChrome.astro';
+import SiteHeader from '../components/layout/SiteHeader.astro';
+import { searchIndex } from '../data/site';
+import '../styles/app.css';
+
+interface Props {
+  title: string;
+  description: string;
+  currentPath: string;
+  image?: string;
+  noIndex?: boolean;
+}
+
+const { title, description, currentPath, image = '/media/serrano-conceptual.webp', noIndex = import.meta.env.PUBLIC_INDEXING !== 'true' } = Astro.props;
+const configuredSite = import.meta.env.PUBLIC_SITE_URL?.trim();
+const canonical = configuredSite ? new URL(currentPath, configuredSite).toString() : undefined;
+---
+
+<!doctype html>
+<html lang="es" transition:name="root" transition:animate="none">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#071A18" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <ClientRouter fallback="animate" />
+  </head>
+  <body>
+    <IconSprite />
+    <a class="skip" href="#main">Saltar al contenido</a>
+    <SiteHeader currentPath={currentPath} />
+    <slot />
+    <Footer />
+    <GlobalSearch client:load entries={searchIndex} transition:persist="global-search" />
+    <SiteChrome />
+    <div class="route-announcer" aria-live="polite" aria-atomic="true"></div>
+  </body>
+</html>

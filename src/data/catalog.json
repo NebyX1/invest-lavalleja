@@ -1,0 +1,769 @@
+{
+  "edition": "2026-09-20",
+  "slogan": "Lavalleja: Un lugar para invertir, crecer y disfrutar",
+  "sectors": [
+    {
+      "id": "industria",
+      "name": "Industria y materiales",
+      "short": "Industria",
+      "tagline": "Tu especialidad, cerca de la producción.",
+      "icon": "industry",
+      "color": "mint",
+      "description": "Mantenimiento, automatización, materiales y servicios que ayudan a producir con más continuidad y precisión.",
+      "fact": "US$ 40 M",
+      "factLabel": "Integración de Cementos Artigas en Minas · memoria 2022–2023",
+      "sources": [
+        "artigas",
+        "xxi"
+      ],
+      "angles": [
+        [
+          "Mantenimiento especializado",
+          "Electromecánica, instrumentación, repuestos y asistencia programada para plantas y operadores de equipos."
+        ],
+        [
+          "Materiales con mayor elaboración",
+          "Prefabricados, piezas y soluciones para construcción donde la terminación y el cumplimiento sean parte del producto."
+        ],
+        [
+          "Tecnología aplicada a procesos",
+          "Medición, trazabilidad, control de calidad y tableros que conviertan datos de operación en decisiones."
+        ]
+      ],
+      "customers": "Industrias, contratistas, constructoras, distribuidores y operadores de equipos. La existencia de estas actividades no implica una convocatoria de proveedores.",
+      "checks": [
+        "Homologación de clientes y requisitos de seguridad industrial",
+        "Potencia eléctrica, acceso de carga y compatibilidad del suelo",
+        "Alcance de taller, equipamiento, personal y contratos de servicio"
+      ]
+    },
+    {
+      "id": "alimentos",
+      "name": "Alimentos y agroindustria",
+      "short": "Alimentos",
+      "tagline": "Transformar el origen. Llegar más lejos.",
+      "icon": "grain",
+      "color": "gold",
+      "description": "Arroz, alimentos diferenciados, frío y servicios que conectan la producción con nuevos canales comerciales.",
+      "fact": "1937",
+      "factLabel": "Inicio de la trayectoria de Casarone en José Pedro Varela",
+      "sources": [
+        "casarone",
+        "xxi"
+      ],
+      "angles": [
+        [
+          "Arroz y granos",
+          "Calidad, acondicionamiento, envases, automatización y logística alrededor de una cadena productiva con trayectoria."
+        ],
+        [
+          "Alimentos con identidad",
+          "Elaboración, conservación y presentación para comercios, gastronomía y hospitalidad. La diferenciación empieza por un canal definido."
+        ],
+        [
+          "Servicios a varias marcas",
+          "Frío, etiquetado, distribución y control de calidad como negocios independientes de la producción primaria."
+        ]
+      ],
+      "customers": "Productores, molinos, comercios, distribuidores, restaurantes y alojamientos. Los acuerdos de abastecimiento y compra se negocian de forma específica.",
+      "checks": [
+        "Suministro, especificaciones y continuidad de materia prima",
+        "Requisitos sanitarios, RUNAEV y habilitaciones de proceso",
+        "Vida útil, cadena de frío, escala y canales de venta"
+      ]
+    },
+    {
+      "id": "turismo",
+      "name": "Turismo y hospitalidad",
+      "short": "Turismo",
+      "tagline": "Un paisaje que puede ser parte de tu marca.",
+      "icon": "mountain",
+      "color": "mint",
+      "description": "Hospitalidad de pequeña escala, gastronomía de destino y experiencias que dan una razón para quedarse.",
+      "fact": "201.000 ha",
+      "factLabel": "Geoparque Mundial UNESCO Manantiales Serranos · designación 2026",
+      "sources": [
+        "unesco",
+        "xxi"
+      ],
+      "angles": [
+        [
+          "Alojamiento con una idea propia",
+          "Posadas y estadías de diseño que articulen descanso, atención y actividades, sin competir sólo por cantidad de camas."
+        ],
+        [
+          "Experiencias reservables",
+          "Geoturismo, interpretación del paisaje y propuestas rurales que complementen a varios alojamientos."
+        ],
+        [
+          "Servicios para quienes reciben",
+          "Gestión de reservas, mantenimiento, limpieza, eventos y gastronomía con una cartera de operadores."
+        ]
+      ],
+      "customers": "Viajeros, operadores turísticos, alojamientos y organizaciones que buscan encuentros fuera de la ciudad. La demanda y la estacionalidad requieren un estudio comercial.",
+      "checks": [
+        "Uso admisible del suelo y restricciones de conservación",
+        "Accesos, agua, saneamiento y gestión de residuos",
+        "Ocupación, tarifa y estacionalidad con datos de operadores"
+      ]
+    },
+    {
+      "id": "madera",
+      "name": "Madera y construcción",
+      "short": "Madera",
+      "tagline": "De la materia prima a una solución.",
+      "icon": "wood",
+      "color": "gold",
+      "description": "Componentes, carpintería, terminaciones y transformación selectiva para construcción y equipamiento.",
+      "fact": "US$ 33 M",
+      "factLabel": "Madera y productos de madera · exportaciones FOB 2025, redondeadas",
+      "sources": [
+        "xxi"
+      ],
+      "angles": [
+        [
+          "Componentes y terminaciones",
+          "Aberturas, revestimientos, mobiliario y piezas para obra que compitan por calidad, diseño y plazos."
+        ],
+        [
+          "Equipamiento para hospitalidad",
+          "Sistemas y componentes para alojamientos y espacios de servicio con especificaciones técnicas comprobables."
+        ],
+        [
+          "Aprovechamiento de materiales",
+          "Clasificación y acondicionamiento de flujos que cuenten con suministro contratado, calidad conocida y un comprador."
+        ]
+      ],
+      "customers": "Constructoras, carpinterías, distribuidores, arquitectos y operadores de hospitalidad. El dato exportador no demuestra disponibilidad local de una especie determinada.",
+      "checks": [
+        "Especie, humedad, calidad y continuidad del suministro",
+        "Seguridad contra incendios, polvo, emisiones y permisos",
+        "Normas del producto terminado y salida comercial"
+      ]
+    },
+    {
+      "id": "servicios-rurales",
+      "name": "Servicios al medio rural",
+      "short": "Servicios rurales",
+      "tagline": "Estar más cerca también crea valor.",
+      "icon": "rural",
+      "color": "mint",
+      "description": "Asistencia móvil, maquinaria, agua y datos para empresas y establecimientos distribuidos en el territorio.",
+      "fact": "Base agropecuaria",
+      "factLabel": "Ganadería y producción rural documentadas por Uruguay XXI",
+      "sources": [
+        "xxi"
+      ],
+      "angles": [
+        [
+          "Talleres que llegan al cliente",
+          "Reparaciones programadas, asistencia electromecánica y mantenimiento de equipos con una base territorial."
+        ],
+        [
+          "Agua y equipamiento rural",
+          "Bombeo, monitoreo e instalaciones dimensionadas a las condiciones de cada establecimiento."
+        ],
+        [
+          "Servicios de gestión",
+          "Registros, sensores y organización de tareas donde la mejora pueda explicarse y medirse."
+        ]
+      ],
+      "customers": "Establecimientos ganaderos, productores, contratistas y operadores de maquinaria. La densidad de clientes y los recorridos definen la escala de atención.",
+      "checks": [
+        "Cartera de clientes y frecuencia de intervenciones",
+        "Caminos, tiempos operativos y cobertura de comunicaciones",
+        "Habilitaciones, seguridad y disponibilidad de repuestos"
+      ]
+    },
+    {
+      "id": "tecnologia",
+      "name": "Tecnología y servicios",
+      "short": "Tecnología",
+      "tagline": "Resolver aquí. Crecer hacia otros mercados.",
+      "icon": "tech",
+      "color": "violet",
+      "description": "Software y servicios profesionales conectados con necesidades de industrias, turismo y actividad rural.",
+      "fact": "+2.000 m²",
+      "factLabel": "Infraestructura de la sede UTEC Minas · información institucional",
+      "sources": [
+        "utec",
+        "xxi"
+      ],
+      "angles": [
+        [
+          "Software para producir",
+          "Mantenimiento, inventarios, reservas y documentación convertidos en soluciones que puedan mantenerse y replicarse."
+        ],
+        [
+          "Servicios para comercializar",
+          "Comercio electrónico, contenido audiovisual y gestión de canales para empresas que necesitan continuidad."
+        ],
+        [
+          "Vinculación y formación",
+          "Explorar problemas aplicados con la infraestructura educativa de Minas. Los acuerdos y los perfiles se construyen para cada caso."
+        ]
+      ],
+      "customers": "Empresas locales y clientes de otros mercados atendidos de forma remota. No se presenta a Lavalleja como un clúster tecnológico ya consolidado.",
+      "checks": [
+        "Conectividad y redundancia en el inmueble elegido",
+        "Disponibilidad real de perfiles y protección de datos",
+        "Modelo recurrente, soporte y propiedad intelectual"
+      ]
+    },
+    {
+      "id": "eficiencia",
+      "name": "Eficiencia y circularidad",
+      "short": "Eficiencia",
+      "tagline": "Hacer mejor lo que ya existe.",
+      "icon": "energy",
+      "color": "violet",
+      "description": "Ingeniería, medición y soluciones para energía, agua y materiales dentro de operaciones existentes.",
+      "fact": "40 %",
+      "factLabel": "Reducción aproximada de electricidad en molienda informada por Cementos Artigas",
+      "sources": [
+        "artigas"
+      ],
+      "angles": [
+        [
+          "Energía útil",
+          "Diagnóstico, medición, automatización y recuperación de calor con una línea de base definida."
+        ],
+        [
+          "Agua en el proceso",
+          "Detección de pérdidas, tratamiento y recirculación donde la calidad requerida y la normativa lo permitan."
+        ],
+        [
+          "Materiales que vuelven a usarse",
+          "Valorización de flujos caracterizados, con disponibilidad contractual y un uso admitido."
+        ]
+      ],
+      "customers": "Operaciones industriales, agroindustriales y establecimientos con consumos identificables. El ahorro de un caso histórico no es una garantía para otro proyecto.",
+      "checks": [
+        "Medición de la situación inicial y alcance del servicio",
+        "Permisos para el tratamiento, transporte o uso de materiales",
+        "Modelo contractual, desempeño esperado y costos de operación"
+      ]
+    }
+  ],
+  "zones": [
+    {
+      "id": "minas",
+      "name": "Minas y su entorno",
+      "short": "Minas",
+      "eyebrow": "INDUSTRIA · CONOCIMIENTO · SERVICIOS",
+      "summary": "Una base urbana para estar cerca de operaciones industriales, servicios empresariales y formación tecnológica.",
+      "sectors": [
+        "industria",
+        "tecnologia",
+        "eficiencia",
+        "madera",
+        "alimentos"
+      ],
+      "sources": [
+        "artigas",
+        "utec",
+        "xxi"
+      ],
+      "position": [
+        40,
+        68
+      ],
+      "strengths": [
+        "Trayectoria cementera y operaciones ligadas a recursos locales",
+        "Sede de UTEC y entorno urbano de servicios",
+        "Articulación por Ruta 8 con el sur y el este"
+      ],
+      "opportunity": "Un taller especializado, una solución de control o un producto para construcción pueden encontrar aquí una relación directa entre cliente, servicio y localización.",
+      "checks": [
+        "Uso del suelo del padrón y distancias operativas a clientes",
+        "Potencia disponible y acceso de carga",
+        "Perfiles técnicos y disponibilidad efectiva de inmuebles"
+      ]
+    },
+    {
+      "id": "solis-aguas-blancas",
+      "name": "Solís de Mataojo y Aguas Blancas",
+      "short": "Solís / Aguas Blancas",
+      "eyebrow": "ALIMENTOS · CORREDOR SUR",
+      "summary": "Producción, distribución y experiencias rurales para estudiar una operación conectada con el corredor sur del departamento.",
+      "sectors": [
+        "alimentos",
+        "turismo",
+        "servicios-rurales"
+      ],
+      "sources": [
+        "xxi",
+        "folleto"
+      ],
+      "position": [
+        24,
+        87
+      ],
+      "strengths": [
+        "Relación con el corredor de Ruta 8",
+        "Actividades alimentarias y producción rural",
+        "Entornos de paisaje para experiencias complementarias"
+      ],
+      "opportunity": "Transformación alimentaria, frío, distribución y hospitalidad rural son entradas comerciales diferentes. La selección del predio debe responder al negocio elegido.",
+      "checks": [
+        "Cadena de frío y volúmenes mínimos del canal",
+        "Agua, efluentes y registros sanitarios",
+        "Compatibilidad de actividades productivas y turísticas"
+      ]
+    },
+    {
+      "id": "villa-serrana-penitente",
+      "name": "Villa Serrana, Penitente y Marco de los Reyes",
+      "short": "Villa Serrana / Penitente",
+      "eyebrow": "HOSPITALIDAD · NATURALEZA",
+      "summary": "Un entorno para crear estadías, gastronomía y experiencias con identidad serrana.",
+      "sectors": [
+        "turismo",
+        "madera",
+        "tecnologia"
+      ],
+      "sources": [
+        "unesco",
+        "xxi",
+        "folleto"
+      ],
+      "position": [
+        69,
+        67
+      ],
+      "strengths": [
+        "Paisaje y reconocimiento del territorio del geoparque",
+        "Posibilidad de articular alojamiento, gastronomía y actividades",
+        "Modelos de servicios a una cartera de operadores"
+      ],
+      "opportunity": "Una estadía puede empezar por el paisaje y diferenciarse por el diseño de la experiencia. También hay modelos de negocio sin adquirir un hotel: reservas, mantenimiento y actividades.",
+      "checks": [
+        "Usos y condiciones de construcción por padrón",
+        "Agua, saneamiento y acceso durante todo el año",
+        "Estacionalidad y capacidades de operación"
+      ]
+    },
+    {
+      "id": "mariscala-piraraja",
+      "name": "Mariscala y Pirarajá",
+      "short": "Mariscala / Pirarajá",
+      "eyebrow": "SERVICIOS RURALES · CADENAS PRODUCTIVAS",
+      "summary": "Localizaciones para acercar asistencia y soluciones a establecimientos y cadenas productivas.",
+      "sectors": [
+        "servicios-rurales",
+        "madera",
+        "alimentos",
+        "turismo"
+      ],
+      "sources": [
+        "xxi",
+        "folleto"
+      ],
+      "position": [
+        67,
+        38
+      ],
+      "strengths": [
+        "Relación con actividades agropecuarias",
+        "Bases posibles para servicios móviles",
+        "Hospitalidad rural como modalidad complementaria"
+      ],
+      "opportunity": "Un servicio técnico periódico, una solución para flotas o una transformación de madera pueden plantearse desde una base local y crecer por cartera de clientes.",
+      "checks": [
+        "Suministros contratados y especies de madera disponibles",
+        "Recorridos de atención y continuidad del servicio",
+        "Accesos, seguridad y requisitos de la actividad"
+      ]
+    },
+    {
+      "id": "jose-pedro-varela",
+      "name": "José Pedro Varela",
+      "short": "José Pedro Varela",
+      "eyebrow": "ARROZ · GRANOS · AGROINDUSTRIA",
+      "summary": "Una trayectoria arrocera para explorar negocios especializados alrededor de la producción y transformación de granos.",
+      "sectors": [
+        "alimentos",
+        "industria",
+        "servicios-rurales",
+        "eficiencia"
+      ],
+      "sources": [
+        "casarone",
+        "xxi"
+      ],
+      "position": [
+        75,
+        13
+      ],
+      "strengths": [
+        "Historia industrial de Casarone desde 1937",
+        "Relación entre producción, acondicionamiento y transformación",
+        "Aplicaciones para calidad, mantenimiento y logística"
+      ],
+      "opportunity": "El negocio no exige reproducir toda la cadena arrocera. Puede estar en medir calidad, mantener equipos, mejorar envases o desarrollar una transformación con suministro y comprador definidos.",
+      "checks": [
+        "Homologación y requerimientos de los compradores",
+        "Continuidad de materia prima y especificaciones",
+        "Agua, energía, efluentes y permisos industriales"
+      ]
+    },
+    {
+      "id": "batlle-zapican",
+      "name": "José Batlle y Ordóñez y Zapicán",
+      "short": "Batlle y Ordóñez / Zapicán",
+      "eyebrow": "GANADERÍA · OFICIOS · SERVICIOS",
+      "summary": "Bases para organizar servicios a establecimientos ganaderos y operaciones rurales.",
+      "sectors": [
+        "servicios-rurales",
+        "eficiencia",
+        "tecnologia"
+      ],
+      "sources": [
+        "xxi",
+        "folleto"
+      ],
+      "position": [
+        23,
+        23
+      ],
+      "strengths": [
+        "Relación con producción agropecuaria",
+        "Atención territorial y talleres móviles",
+        "Posibilidad de combinar oficios con monitoreo y datos"
+      ],
+      "opportunity": "Una base de mantenimiento, instalaciones de agua o un servicio de registros productivos pueden conectar clientes dispersos sin concentrar toda la inversión en un establecimiento.",
+      "checks": [
+        "Densidad de clientes y recorridos",
+        "Conectividad de campo y respuesta ante fallas",
+        "Disponibilidad de perfiles y repuestos"
+      ]
+    },
+    {
+      "id": "arequita-polanco-barriga-negra",
+      "name": "Arequita, Polanco y Barriga Negra",
+      "short": "Arequita / Polanco / Barriga Negra",
+      "eyebrow": "EXPERIENCIAS RURALES · IDENTIDAD",
+      "summary": "Ámbitos rurales distintos para explorar experiencias, interpretación y productos vinculados al lugar.",
+      "sectors": [
+        "turismo",
+        "servicios-rurales",
+        "alimentos"
+      ],
+      "sources": [
+        "unesco",
+        "xxi",
+        "folleto"
+      ],
+      "position": [
+        38,
+        46
+      ],
+      "strengths": [
+        "Paisaje rural e identidad territorial",
+        "Modelos de agroturismo y servicios al visitante",
+        "Posible articulación con productores y operadores"
+      ],
+      "opportunity": "Experiencias reservables, visitas interpretativas y productos de origen pueden complementar actividades existentes. Estas áreas no forman un corredor continuo ni una zona habilitada en conjunto.",
+      "checks": [
+        "Restricciones de conservación y acceso autorizado",
+        "Condiciones del padrón y seguridad del visitante",
+        "Servicios, agua, residuos y capacidad de atención"
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "id": "exportaciones",
+      "value": "US$ 74 M",
+      "label": "Exportaciones de bienes",
+      "period": "2025 · FOB · cifras redondeadas",
+      "source": "xxi",
+      "scope": "Origen departamental. No es PIB ni inversión recibida."
+    },
+    {
+      "id": "industria",
+      "value": "US$ 40 M",
+      "label": "Una transformación industrial",
+      "period": "Cementos Artigas · memoria 2022–2023",
+      "source": "artigas",
+      "scope": "Integración productiva en Minas. Dato informado por la empresa."
+    },
+    {
+      "id": "geoparque",
+      "value": "201.000 ha",
+      "label": "Geoparque Mundial UNESCO",
+      "period": "Manantiales Serranos · designación 2026",
+      "source": "unesco",
+      "scope": "Superficie delimitada del geoparque, no de todo Lavalleja."
+    },
+    {
+      "id": "conocimiento",
+      "value": "+2.000 m²",
+      "label": "Infraestructura UTEC en Minas",
+      "period": "Sede Minas · información institucional",
+      "source": "utec",
+      "scope": "No equivale a disponibilidad garantizada de trabajadores."
+    }
+  ],
+  "cases": [
+    {
+      "id": "cementos-artigas",
+      "name": "Cementos Artigas",
+      "location": "MINAS",
+      "title": "La industria también elige transformarse aquí.",
+      "metric": "US$ 40 M",
+      "label": "Integración industrial",
+      "source": "artigas",
+      "text": "La memoria 2022–2023 documenta una inversión de aproximadamente US$ 40 millones para integrar la producción en Minas. Incluyó molienda vertical, almacenamiento y despacho automatizado.",
+      "lesson": "Una industria instalada no es sólo producción: también permite explorar necesidades de mantenimiento, materiales y mejora de procesos.",
+      "limit": "La reducción cercana al 40% informada por la empresa corresponde a electricidad en molienda, no a toda la planta. No existe una oferta de contratación implícita."
+    },
+    {
+      "id": "casarone",
+      "name": "Casarone",
+      "location": "JOSÉ PEDRO VARELA",
+      "title": "Del origen local a una cadena productiva.",
+      "metric": "1937",
+      "label": "Inicio de su historia en Varela",
+      "source": "casarone",
+      "text": "La trayectoria comienza con una fábrica de aceite de girasol en José Pedro Varela. En la década de 1950 se incorporó un molino arrocero y luego se desarrollaron nuevas capacidades.",
+      "lesson": "La especialización puede abrir una entrada al negocio del grano: calidad, equipos, acondicionamiento y servicios asociados.",
+      "limit": "Las cifras y capacidades generales del grupo no se atribuyen exclusivamente a Lavalleja. No se presume demanda insatisfecha."
+    },
+    {
+      "id": "salus",
+      "name": "Salus",
+      "location": "SIERRAS DE MINAS",
+      "title": "Cuando el origen forma parte del producto.",
+      "metric": "1.300 ha",
+      "label": "Reserva Natural Salus",
+      "source": "salus",
+      "text": "Salus describe una reserva de pradera y monte serrano al sur de Minas y la relaciona con el origen de su agua. Su sitio informa trabajos de renovación de la experiencia de visita desde 2024.",
+      "lesson": "Una procedencia reconocible puede complementar la calidad del producto y conectar marca, entorno y experiencia.",
+      "limit": "La reserva no es un activo ofrecido para inversión. La mención no implica patrocinio, aval ni vinculación comercial con este sitio."
+    }
+  ],
+  "steps": [
+    {
+      "id": "actividad",
+      "title": "Definí qué querés desarrollar",
+      "text": "Actividad, cliente, escala, localización y necesidades operativas. Un proyecto bien delimitado permite identificar qué información falta y quién puede resolverla.",
+      "result": "Un resumen de proyecto con sus supuestos.",
+      "source": "vui"
+    },
+    {
+      "id": "localizacion",
+      "title": "Confirmá una localización apta",
+      "text": "El padrón, los títulos, el uso del suelo, los accesos y la factibilidad de servicios deben ser compatibles con la operación antes de comprometer la inversión.",
+      "result": "Consulta territorial y técnica por inmueble.",
+      "source": "suelo"
+    },
+    {
+      "id": "empresa",
+      "title": "Organizá la forma de operar",
+      "text": "Las alternativas incluyen sociedades y otras formas de actividad. La estructura, representación, registros tributarios, seguridad social y banca requieren revisión profesional.",
+      "result": "Estructura jurídica y administrativa definida.",
+      "source": "empresa"
+    },
+    {
+      "id": "permisos",
+      "title": "Prepará permisos e incentivos",
+      "text": "Relacioná habilitaciones edilicias, ambientales y sectoriales con el cronograma. Los beneficios de promoción se solicitan y evalúan; no sustituyen las autorizaciones.",
+      "result": "Ruta de requisitos y consultas aplicables.",
+      "source": "comap"
+    },
+    {
+      "id": "operacion",
+      "title": "Conectá tu proyecto con la operación",
+      "text": "Equipo, proveedores, contratos, costos laborales y, cuando corresponda, comercio exterior. Convertí cada supuesto clave en información comprobada.",
+      "result": "Plan de instalación con responsables y próximos pasos.",
+      "source": "vuce"
+    }
+  ],
+  "faqs": [
+    {
+      "q": "¿Las oportunidades son proyectos que ya están a la venta?",
+      "a": "No. Las fichas presentan potencial sectorial y modelos a explorar. No anuncian inmuebles disponibles, contratos, rentabilidad ni aprobaciones. Los activos concretos necesitan una ficha autorizada y vigente.",
+      "sources": [
+        "folleto"
+      ]
+    },
+    {
+      "q": "¿El reconocimiento UNESCO permite construir un hotel?",
+      "a": "No. El geoparque tiene un territorio delimitado. El uso del suelo, las restricciones ambientales y las autorizaciones del padrón deben revisarse con los organismos competentes.",
+      "sources": [
+        "unesco",
+        "suelo"
+      ]
+    },
+    {
+      "q": "¿Qué muestra el dato de US$ 74 millones?",
+      "a": "Exportaciones de bienes de 2025 atribuidas al departamento, en valores FOB redondeados. No mide inversión extranjera, PIB departamental ni ventas de todas las empresas.",
+      "sources": [
+        "xxi"
+      ]
+    },
+    {
+      "q": "¿Puedo estudiar la información sin registrarme?",
+      "a": "Sí. El contenido, los documentos y las fichas son de acceso libre. El dossier se guarda sólo en este navegador cuando elegís guardar una zona; no crea una cuenta. No guardes información confidencial en un equipo compartido.",
+      "sources": []
+    },
+    {
+      "q": "¿Cómo sé si un predio sirve para mi actividad?",
+      "a": "Necesitás el padrón y la descripción de la actividad para revisar suelo, afectaciones, construcciones, accesos y factibilidad de servicios. Un mapa de oportunidades no reemplaza esa revisión.",
+      "sources": [
+        "suelo",
+        "vui"
+      ]
+    },
+    {
+      "q": "¿Puedo obtener una exoneración automática?",
+      "a": "No. Los instrumentos de promoción se aplican según el proyecto, la normativa vigente, sus indicadores y las condiciones de cumplimiento. Este sitio no calcula un beneficio fiscal vinculante.",
+      "sources": [
+        "comap"
+      ]
+    },
+    {
+      "q": "¿La sede de UTEC garantiza personal disponible?",
+      "a": "No. Es una capacidad educativa e institucional documentada. Oferta académica, acuerdos y disponibilidad de perfiles deben confirmarse para la sede y el proyecto concreto.",
+      "sources": [
+        "utec"
+      ]
+    },
+    {
+      "q": "¿A dónde se envía mi proyecto?",
+      "a": "En esta versión no se envía a ningún organismo. El configurador genera un resumen local que podés descargar. La página de contacto enlaza a canales institucionales publicados.",
+      "sources": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "xxi",
+      "title": "Uruguay XXI · Informe de Lavalleja 2026",
+      "url": "https://www.uruguayxxi.gub.uy/es/centro-informacion/articulo/informe-de-lavalleja-2026/?download=es",
+      "scope": "Exportaciones de bienes: 2025. Perfiles económicos y oportunidades: edición 2026.",
+      "type": "Fuente nacional",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "unesco",
+      "title": "UNESCO · Manantiales Serranos",
+      "url": "https://www.unesco.org/en/iggp/manantiales-serranos-unesco-global-geopark",
+      "scope": "Designación 2026. La superficie corresponde al geoparque, no a todo Lavalleja.",
+      "type": "Fuente internacional",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "artigas",
+      "title": "Cementos Artigas · Memoria 2022–2023",
+      "url": "https://www.cementosartigas.com.uy/pdf_sostenibilidad/Cementos-Artigas-Memoria-Actividad-Sostenible-2022-2023.pdf",
+      "scope": "US$ 40 millones en integración industrial. El ahorro del 40% se refiere a electricidad en molienda.",
+      "type": "Fuente empresarial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "casarone",
+      "title": "Casarone · Nuestra empresa",
+      "url": "https://www.casarone.com.uy/espanol/nuestra-empresa-2",
+      "scope": "Historia desde 1937 en José Pedro Varela. Los resultados del grupo no se atribuyen a una sola planta.",
+      "type": "Fuente empresarial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "salus",
+      "title": "Salus · Reserva Natural",
+      "url": "https://www.salus.com.uy/reserva.html",
+      "scope": "La empresa informa 1.300 ha de pradera y monte serrano al sur de Minas.",
+      "type": "Fuente empresarial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "utec",
+      "title": "UTEC · Región Este y sede Minas",
+      "url": "https://utec.edu.uy/es/sobre-utec/utec-en-territorio/este/",
+      "scope": "Infraestructura de Minas: más de 2.000 m², cuatro áreas para laboratorios y auditorio para 150 personas.",
+      "type": "Fuente educativa",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "suelo",
+      "title": "Intendencia de Lavalleja · Ordenamiento territorial",
+      "url": "https://www.gub.uy/intendencia-lavalleja/ordenamiento-territorial",
+      "scope": "Los instrumentos y la situación del padrón determinan usos admisibles.",
+      "type": "Consulta por proyecto",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "empresa",
+      "title": "Uruguay XXI · Establecer una empresa",
+      "url": "https://www.uruguayxxi.gub.uy/es/quiero-invertir/guias-inversor/establecer-una-empresa/",
+      "scope": "Alternativas societarias. Los tiempos y requisitos se revisan para cada estructura.",
+      "type": "Guía nacional",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "comap",
+      "title": "MEF · Comisión de Aplicación (COMAP)",
+      "url": "https://www.gub.uy/ministerio-economia-finanzas/comap",
+      "scope": "Normativa, criterios y presentación de proyectos. No se calculan exoneraciones automáticamente.",
+      "type": "Consulta normativa",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "vui",
+      "title": "Ventanilla Única de Inversiones",
+      "url": "https://vui.gub.uy/",
+      "scope": "Herramientas nacionales para las etapas de una inversión.",
+      "type": "Canal oficial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "vuce",
+      "title": "Ventanilla Única de Comercio Exterior",
+      "url": "https://vuce.gub.uy/",
+      "scope": "Trámites y documentos según producto y operación.",
+      "type": "Canal oficial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "idl",
+      "title": "Intendencia Departamental de Lavalleja",
+      "url": "https://www.gub.uy/intendencia-lavalleja/",
+      "scope": "Portal institucional, trámites y canales de contacto.",
+      "type": "Canal oficial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "laboral",
+      "title": "Uruguay XXI · Guía laboral",
+      "url": "https://www.uruguayxxi.gub.uy/es/quiero-invertir/guias-inversor/guia-laboral/",
+      "scope": "Contratación, seguridad social y condiciones por actividad.",
+      "type": "Guía nacional",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "runaev",
+      "title": "Congreso de Intendentes · RUNAEV",
+      "url": "https://www.gub.uy/congreso-intendentes/RUNAEV",
+      "scope": "Registro de empresas, alimentos y vehículos vinculados a la actividad alimentaria.",
+      "type": "Canal oficial",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "ambiente",
+      "title": "IMPO · Decreto 349/005",
+      "url": "https://www.impo.com.uy/bases/decretos/349-2005",
+      "scope": "Evaluación de impacto y autorizaciones ambientales. Consultar texto actualizado y alcance aplicable.",
+      "type": "Normativa",
+      "consulted": "2026-09-20"
+    },
+    {
+      "id": "folleto",
+      "title": "Invest Lavalleja · Folleto editorial 2026",
+      "url": "/documentos/folleto-invest-lavalleja.pdf",
+      "scope": "Material producido en este proyecto. Perfiles comerciales interpretativos e imágenes conceptuales.",
+      "type": "Documento de base",
+      "consulted": "2026-09-20"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+---
+import Explorer from '../islands/Explorer';
+import SaveZone from '../islands/SaveZone';
+import ProjectWizard from '../islands/ProjectWizard';
+import DossierIsland from '../islands/DossierIsland';
+import ResourceSearch from '../islands/ResourceSearch';
+import type { Catalog, EditorialPart } from '../../types';
+
+interface Props { part: EditorialPart; catalog: Catalog }
+const { part, catalog } = Astro.props;
+const htmlContent = part.type === 'html'
+  ? part.content.replace(/<article class="resource-card"[\s\S]*?<\/article>/g, (article) => article.replaceAll('<h3>', '<h2>').replaceAll('</h3>', '</h2>'))
+  : '';
+---
+
+{part.type === 'html' && <div class="reference-html" set:html={htmlContent} />}
+{part.type === 'explorer' && <Explorer client:visible={{ rootMargin: '240px' }} zones={catalog.zones} sectors={catalog.sectors} />}
+{part.type === 'save' && <SaveZone client:load zoneId={part.id} zoneName={catalog.zones.find((zone) => zone.id === part.id)?.name ?? part.id} />}
+{part.type === 'wizard' && <ProjectWizard client:load />}
+{part.type === 'dossier' && <DossierIsland client:load />}
+{part.type === 'inline-search' && <ResourceSearch client:visible={{ rootMargin: '160px' }} sources={catalog.sources} faqs={catalog.faqs} />}

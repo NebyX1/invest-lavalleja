@@ -1,0 +1,21 @@
+---
+import ReferencePart from './ReferencePart.astro';
+import { catalog } from '../../data/site';
+import type { EditorialPage } from '../../types';
+
+interface Props { page: EditorialPage }
+const { page } = Astro.props;
+const isHome = page.path === '/';
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': isHome ? 'WebSite' : 'WebPage',
+  name: page.title,
+  description: page.description,
+  ...(import.meta.env.PUBLIC_SITE_URL ? { url: new URL(page.path, import.meta.env.PUBLIC_SITE_URL).toString() } : {}),
+};
+---
+
+<main id="main" tabindex="-1" transition:animate="fade">
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
+  {page.parts.map((part) => <ReferencePart part={part} catalog={catalog} />)}
+</main>

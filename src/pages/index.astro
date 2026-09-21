@@ -1,0 +1,11 @@
+---
+import ReferencePage from '../components/editorial/ReferencePage.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { getPage } from '../data/site';
+
+const page = getPage('/')!;
+---
+
+<SiteLayout title={page.title} description={page.description} currentPath={page.path}>
+  <ReferencePage page={page} />
+</SiteLayout>

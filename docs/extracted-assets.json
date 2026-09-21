@@ -1,0 +1,27 @@
+[
+  {
+    "publicPath": "/media/agro-conceptual.webp",
+    "mime": "image/webp",
+    "bytes": 104530
+  },
+  {
+    "publicPath": "/media/hospitalidad-conceptual.webp",
+    "mime": "image/webp",
+    "bytes": 107716
+  },
+  {
+    "publicPath": "/media/serrano-conceptual.webp",
+    "mime": "image/webp",
+    "bytes": 111324
+  },
+  {
+    "publicPath": "/documentos/folleto-invest-lavalleja.pdf",
+    "mime": "application/pdf",
+    "bytes": 1876444
+  },
+  {
+    "publicPath": "/documentos/guia-invest-lavalleja.pdf",
+    "mime": "application/pdf",
+    "bytes": 822829
+  }
+]
