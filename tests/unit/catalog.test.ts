@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { catalog, normalizePath, pages, routeManifest } from '../../src/data/site';
+import { mapLocations, mapViewBox } from '../../src/data/map-locations';
 
 describe('catálogo Invest Lavalleja', () => {
   it('conserva las 30 rutas de la referencia sin duplicados', () => {
@@ -28,5 +29,18 @@ describe('catálogo Invest Lavalleja', () => {
     expect(normalizePath('/zonas/minas')).toBe('/zonas/minas/');
     expect(normalizePath('/')).toBe('/');
     expect('José Pedro Varela'.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()).toBe('jose pedro varela');
+  });
+
+  it('vincula las seis localidades del SVG a perfiles territoriales válidos', () => {
+    const zoneIds = new Set(catalog.zones.map((zone) => zone.id));
+    expect(mapLocations).toHaveLength(6);
+    expect(new Set(mapLocations.map((location) => location.id)).size).toBe(mapLocations.length);
+    for (const location of mapLocations) {
+      expect(zoneIds.has(location.zoneId)).toBe(true);
+      expect(location.x).toBeGreaterThanOrEqual(0);
+      expect(location.x).toBeLessThanOrEqual(mapViewBox.width);
+      expect(location.y).toBeGreaterThanOrEqual(0);
+      expect(location.y).toBeLessThanOrEqual(mapViewBox.height);
+    }
   });
 });

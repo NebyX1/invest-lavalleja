@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 713 779" role="img" aria-labelledby="title desc">
+  <title id="title">Mapa limpio de Lavalleja</title>
+  <desc id="desc">Mapa vectorial limpio del departamento de Lavalleja, Uruguay, con puntos marcados para José Batlle y Ordóñez, José Pedro Varela, Pirarajá, Mariscala, Minas y Solís de Mataojo.</desc>
+  <defs>
+    <style>
+      .outline { fill: #f7f7f5; stroke: #1f2937; stroke-width: 1.6; stroke-linejoin: round; }
+      .city-label { fill: #1f2937; font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif; dominant-baseline: middle; }
+    </style>
+  </defs>
+
+  <path class="outline" d="M 687,113 L 684,115 L 676,114 L 670,106 L 659,108 L 655,104 L 655,100 L 644,94 L 639,87 L 636,87 L 630,76 L 624,74 L 621,64 L 614,60 L 607,60 L 605,63 L 589,68 L 580,80 L 570,79 L 563,75 L 559,75 L 558,82 L 550,94 L 550,110 L 546,111 L 545,108 L 542,107 L 534,109 L 518,109 L 514,104 L 494,103 L 487,96 L 475,96 L 468,92 L 458,93 L 455,96 L 450,96 L 447,94 L 437,95 L 432,84 L 396,49 L 391,48 L 386,40 L 384,41 L 384,45 L 381,47 L 374,48 L 371,45 L 366,48 L 366,54 L 362,58 L 359,58 L 358,56 L 354,58 L 344,56 L 344,61 L 341,64 L 336,63 L 332,67 L 328,67 L 326,65 L 329,60 L 310,59 L 308,57 L 308,52 L 306,53 L 305,57 L 300,55 L 299,52 L 296,52 L 294,57 L 280,54 L 280,56 L 276,59 L 269,58 L 269,64 L 264,68 L 264,75 L 267,79 L 266,87 L 269,93 L 266,99 L 261,99 L 259,96 L 254,103 L 253,112 L 245,117 L 248,120 L 247,123 L 244,123 L 248,129 L 248,137 L 246,142 L 240,143 L 233,137 L 224,141 L 217,141 L 213,145 L 213,157 L 209,165 L 209,173 L 206,179 L 202,183 L 183,185 L 166,192 L 163,195 L 162,203 L 155,206 L 154,212 L 157,215 L 157,222 L 162,228 L 161,238 L 172,241 L 177,245 L 171,255 L 175,268 L 179,273 L 174,283 L 172,299 L 160,309 L 158,319 L 154,327 L 153,341 L 148,347 L 139,352 L 137,361 L 131,368 L 130,378 L 124,387 L 122,394 L 117,397 L 114,402 L 117,410 L 114,418 L 106,422 L 100,428 L 90,427 L 82,430 L 82,434 L 77,441 L 77,447 L 70,455 L 68,460 L 70,470 L 62,476 L 59,476 L 54,484 L 51,484 L 51,488 L 47,491 L 47,497 L 36,509 L 38,511 L 38,516 L 59,586 L 64,587 L 67,596 L 71,600 L 71,603 L 76,604 L 77,615 L 75,617 L 76,624 L 73,633 L 75,638 L 74,643 L 67,650 L 71,654 L 71,662 L 80,672 L 93,681 L 93,693 L 96,696 L 95,706 L 101,719 L 100,730 L 108,726 L 113,734 L 121,734 L 125,730 L 132,728 L 140,731 L 142,729 L 155,727 L 171,732 L 167,728 L 165,720 L 165,708 L 169,701 L 182,702 L 184,697 L 193,692 L 199,685 L 211,685 L 211,679 L 214,674 L 220,671 L 225,665 L 231,665 L 243,659 L 248,659 L 253,662 L 258,669 L 263,669 L 267,664 L 272,664 L 279,660 L 279,657 L 282,654 L 288,653 L 294,648 L 301,639 L 308,635 L 313,626 L 319,627 L 326,631 L 335,623 L 338,617 L 344,617 L 346,621 L 350,621 L 351,619 L 355,620 L 359,614 L 363,614 L 367,610 L 374,613 L 378,596 L 378,588 L 386,568 L 390,549 L 395,547 L 399,550 L 404,539 L 404,518 L 409,508 L 406,503 L 407,496 L 415,487 L 418,487 L 417,476 L 420,473 L 429,470 L 428,464 L 432,460 L 433,433 L 445,421 L 450,423 L 454,419 L 459,419 L 465,424 L 470,420 L 480,421 L 484,416 L 490,415 L 493,405 L 507,393 L 505,388 L 508,384 L 505,379 L 510,375 L 512,367 L 523,361 L 526,363 L 533,362 L 535,348 L 539,344 L 548,343 L 551,341 L 550,338 L 553,334 L 556,324 L 556,317 L 560,309 L 555,302 L 555,299 L 558,296 L 558,289 L 563,282 L 566,283 L 571,276 L 576,274 L 575,267 L 581,260 L 576,252 L 577,245 L 575,241 L 575,220 L 577,218 L 577,207 L 581,200 L 585,198 L 586,194 L 598,193 L 600,195 L 606,190 L 613,188 L 615,184 L 620,181 L 629,170 L 630,160 L 636,156 L 642,157 L 644,155 L 642,150 L 650,144 L 646,136 L 652,127 L 663,124 L 670,125 L 675,123 L 686,123 Z" />
+
+  <circle cx="244" cy="122" r="3.4" fill="#1f2937" />
+    <text x="250" y="124" text-anchor="start" class="city-label" font-size="18" font-weight="500">José Batlle y Ordóñez</text>
+    <circle cx="514" cy="122" r="3.4" fill="#1f2937" />
+    <text x="520" y="124" text-anchor="start" class="city-label" font-size="18" font-weight="500">José Pedro Varela</text>
+    <circle cx="417" cy="261" r="3.4" fill="#1f2937" />
+    <text x="425" y="267" text-anchor="start" class="city-label" font-size="18" font-weight="500">Pirarajá</text>
+    <circle cx="405" cy="421" r="3.4" fill="#1f2937" />
+    <text x="397" y="427" text-anchor="end" class="city-label" font-size="18" font-weight="500">Mariscala</text>
+    <circle cx="203" cy="595" r="3.4" fill="#1f2937" />
+    <text x="203" y="586" text-anchor="middle" class="city-label" font-size="36" font-weight="700">Minas</text>
+    <circle cx="100" cy="721" r="3.4" fill="#1f2937" />
+    <text x="108" y="713" text-anchor="start" class="city-label" font-size="17" font-weight="500"><tspan x="108" y="713">Solís de</tspan><tspan x="108" y="733">Mataojo</tspan></text>
+</svg>

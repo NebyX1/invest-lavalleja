@@ -7,6 +7,7 @@ export default tseslint.config(
     ignores: [
       'dist/**',
       '.astro/**',
+      'jobkler-ai/**',
       'node_modules/**',
       'playwright-report/**',
       'test-results/**',

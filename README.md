@@ -49,7 +49,7 @@ Para actualizar la referencia, ejecutar el extractor y revisar el diff de los JS
 
 ## Interacciones
 
-El buscador global usa Fuse.js. El explorador territorial filtra por sector y ofrece una alternativa de lista. El dossier permite guardar hasta tres zonas, compararlas en tres perspectivas, imprimir y descargar Markdown. El wizard conserva sus respuestas durante la sesión y puede descargar un resumen Markdown. El estado almacenado se valida con Zod.
+El buscador global usa Fuse.js. El explorador territorial muestra el mapa SVG con seis localidades seleccionables vinculadas a perfiles editoriales; los siete perfiles también se pueden elegir desde la lista. El mapa conserva su proporción y la vista se apila en pantallas estrechas. El dossier permite guardar hasta tres zonas, compararlas en tres perspectivas, imprimir y descargar Markdown. El wizard conserva sus respuestas durante la sesión y puede descargar un resumen Markdown. El estado almacenado se valida con Zod.
 
 Las advertencias editoriales distinguen datos de fuente, interpretación comercial y preguntas aún no verificadas; no se inventan predios, beneficios fiscales, contactos ni disponibilidad.
 
