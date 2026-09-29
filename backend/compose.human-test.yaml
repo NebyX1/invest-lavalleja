@@ -1,0 +1,13 @@
+# LOCAL HUMAN TEST ONLY. Use with compose.yaml, never in Coolify/production.
+# Separate project name creates separate SQLite and Qdrant volumes.
+name: gianna-invest-human-test
+services:
+  api:
+    environment:
+      APP_ENV: development
+      GIANNA_HUMAN_TEST_MODE: 'true'
+      PROXY_HOPS: '0'
+      TRUSTED_HOSTS: localhost,127.0.0.1
+      PUBLIC_ORIGINS: http://localhost:4321,http://127.0.0.1:4321,http://localhost:8001,http://127.0.0.1:8001
+    ports:
+      - '127.0.0.1:8001:8000'

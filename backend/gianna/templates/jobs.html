@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% from 'macros.html' import heading,jobs_table with context %}{% block title %}Trabajos{% endblock %}{% block content %}{{ heading('OPERACIONES','Trabajos y conversiones','Una cola persistente, un trabajo a la vez. La versión pública no cambia durante la indexación.') }}<section class="card">{{ jobs_table(jobs) }}</section>{% endblock %}

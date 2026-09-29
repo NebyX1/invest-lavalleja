@@ -27,5 +27,13 @@ const structuredData = {
 
 <main id="main" tabindex="-1" transition:animate="fade">
   <script type="application/ld+json" set:html={JSON.stringify(structuredData)}></script>
-  {pageParts.map((part) => <ReferencePart part={part} catalog={catalog} pagePath={page.path} />)}
+  {pageParts.map((part, index) => <>
+    <ReferencePart part={part} catalog={catalog} pagePath={page.path} />
+    {isHome && index === 0 && <section class="gianna-promo" aria-labelledby="gianna-promo-title">
+      <div class="wrap gianna-promo-inner">
+        <div><p class="eyebrow"><span class="dot" aria-hidden="true"></span> Conocé a Gianna</p><h2 id="gianna-promo-title">Tu proyecto empieza con una buena pregunta.</h2><p>Explorá actividades, zonas y pasos para invertir en Lavalleja con un asistente que muestra las fuentes de sus respuestas.</p></div>
+        <a class="btn primary" href="/gianna/">Preguntale a Gianna <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-up" /></svg></a>
+      </div>
+    </section>}
+  </>)}
 </main>

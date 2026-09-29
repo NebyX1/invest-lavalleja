@@ -1,0 +1,45 @@
+---
+import GiannaChat from '../components/islands/GiannaChat';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import '../styles/gianna.css';
+
+// PUBLIC_GIANNA_API_BASE is the public Flask origin. Credentials stay on the backend.
+const configuredBase = import.meta.env.PUBLIC_GIANNA_API_BASE?.trim();
+const apiBase = configuredBase || (import.meta.env.DEV ? 'http://localhost:8000' : '');
+let validBase = '';
+try {
+  const url = new URL(apiBase);
+  if ((url.protocol === 'https:' || (import.meta.env.DEV && url.protocol === 'http:')) &&
+      !url.username && !url.password && (url.pathname === '/' || url.pathname === '') &&
+      !url.search && !url.hash) {
+    validBase = url.origin;
+  }
+} catch {
+  // Without a configured public API origin, the editorial fallback remains available.
+}
+---
+
+<SiteLayout
+  title="Gianna | Asistente de inversiones en Lavalleja"
+  description="Consultá la información publicada para explorar un proyecto de inversión en Lavalleja y revisar las fuentes de cada respuesta."
+  currentPath="/gianna/"
+>
+  <main id="main" tabindex="-1" class="gianna-page">
+    <div class="wrap">
+      <nav class="breadcrumbs" aria-label="Ruta de navegación"><a href="/">Inicio</a><span aria-hidden="true">/</span><span>Gianna</span></nav>
+      <div class="gianna-page-intro">
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> Asistente de inversiones</p>
+        <h1>Conocé Lavalleja con Gianna.</h1>
+        <p>Preguntá por actividades, zonas y pasos para preparar tu proyecto. Gianna consulta la base de conocimiento publicada y muestra los fragmentos que respaldan cada respuesta.</p>
+      </div>
+      <aside class="gianna-scope" aria-label="Alcance del asistente">
+        <strong>Orientación para explorar, con fuentes a la vista.</strong>
+        <p>Las respuestas pueden estar incompletas o desactualizadas. No son asesoramiento financiero, legal ni una oferta de inversión. Confirmá condiciones y disponibilidad con las fuentes y organismos correspondientes antes de tomar decisiones.</p>
+        <div class="gianna-scope-links"><a href="/fuentes/">Ver fuentes editoriales</a><a href="/contacto/">Consultar vías de contacto</a></div>
+      </aside>
+      {validBase
+        ? <GiannaChat apiBase={validBase} client:load />
+        : <div class="gianna-unavailable" role="status"><h2>Gianna no está disponible en este momento.</h2><p>Podés consultar las <a href="/fuentes/">fuentes</a> y preparar tu proyecto en <a href="/tu-proyecto/">Tu proyecto</a>.</p></div>}
+    </div>
+  </main>
+</SiteLayout>

@@ -1,0 +1,63 @@
+name: validate-gianna-backend
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.12', '3.13']
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r requirements-test.txt
+      - run: python -m compileall -q gianna scripts
+      # El corpus privado no se versiona; estas pruebas no lo necesitan.
+      - run: python -m pytest --junitxml=ci-tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-tests-${{ matrix.python }}
+          path: backend/ci-tests.xml
+
+  compose-config:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose syntax and build context
+        env:
+          SECRET_KEY: ci-only
+          ENCRYPTION_KEY: ci-only
+          TRUSTED_HOSTS: localhost
+          QDRANT_API_KEY: ci-only
+        run: |
+          test -f Dockerfile && test -f requirements.txt
+          docker compose --env-file /dev/null -f compose.yaml config --quiet
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pip-audit
+      - run: pip-audit -r requirements.txt

@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+data/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.sqlite*
+*.db
+*.log
+reports/preview/
+samples/Invest_Lavalleja_2026.gianna.json
+# Knowledge may contain institutional internal material. Import it in the admin; don't publish it accidentally.
+knowledge/
+backups/

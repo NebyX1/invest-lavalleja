@@ -1,0 +1,10 @@
+# Local-only override. Do not use this override in production.
+services:
+  api:
+    environment:
+      APP_ENV: development
+      PROXY_HOPS: '0'
+      TRUSTED_HOSTS: localhost,127.0.0.1
+      PUBLIC_ORIGINS: http://localhost:8000,http://127.0.0.1:8000,http://localhost:4321,http://127.0.0.1:4321
+    ports:
+      - '127.0.0.1:8000:8000'

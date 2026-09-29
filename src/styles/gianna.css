@@ -1,0 +1,98 @@
+.gianna-page {
+  padding: clamp(135px, 13vw, 190px) 0 100px;
+  background: radial-gradient(ellipse at 85% 7%, rgba(92, 145, 105, .17), transparent 42%);
+}
+
+.gianna-page .breadcrumbs { margin-bottom: 30px; }
+.gianna-page-intro { max-width: 870px; }
+.gianna-page-intro .eyebrow { color: var(--mint); margin-bottom: 18px; }
+.gianna-page-intro h1 { font-size: clamp(2.5rem, 5.2vw, 4.7rem); font-weight: 400; line-height: 1.08; letter-spacing: -.045em; }
+.gianna-page-intro > p:last-child { max-width: 740px; margin-top: 20px; color: var(--muted); font-size: clamp(.95rem, 1.5vw, 1.08rem); line-height: 1.8; }
+
+.gianna-scope { display: grid; gap: 10px; max-width: 1050px; margin: 34px 0 26px; padding: 20px 24px; border: 1px solid rgba(220, 195, 148, .34); border-radius: 15px; background: rgba(220, 195, 148, .07); }
+.gianna-scope strong { color: var(--gold); font-weight: 500; }
+.gianna-scope p { max-width: 880px; color: var(--muted); font-size: .87rem; line-height: 1.7; }
+.gianna-scope-links { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: .82rem; }
+.gianna-scope-links a, .gianna-unavailable a { color: var(--mint); text-decoration: underline; text-underline-offset: 3px; }
+
+.gianna-chat { display: flex; flex-direction: column; max-width: 1050px; min-width: 0; min-height: min(660px, 75dvh); border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(150deg, #102a26, #081b18); overflow: hidden; }
+.gianna-chat-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 22px; border-bottom: 1px solid var(--line); }
+.gianna-chat-header > div { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.gianna-chat-avatar { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 12px; background: var(--mint); color: var(--deep); font-size: 1.1rem; }
+.gianna-chat-header strong { display: block; font-size: 1rem; font-weight: 600; }
+.gianna-chat-header p { color: var(--muted); font-size: .73rem; }
+.gianna-clear { flex: none; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--text); font-size: .78rem; }
+.gianna-clear:hover, .gianna-feedback button:hover { border-color: var(--mint); }
+.gianna-test-notice { margin: 16px 20px 0; padding: 12px 15px; border: 1px solid rgba(220, 195, 148, .55); border-radius: 10px; background: rgba(220, 195, 148, .1); color: var(--text); font-size: .82rem; line-height: 1.55; }
+.gianna-test-notice strong { color: var(--gold); }
+
+.gianna-conversation { display: flex; flex: 1; flex-direction: column; gap: 20px; min-width: 0; padding: clamp(17px, 3vw, 30px); }
+.gianna-welcome { display: grid; align-content: center; justify-items: center; flex: 1; min-height: 250px; padding: 25px; text-align: center; }
+.gianna-welcome > span { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 15px; color: var(--mint); font-size: 1.5rem; }
+.gianna-welcome h2 { max-width: 640px; font-size: clamp(1.35rem, 3vw, 2rem); font-weight: 400; line-height: 1.2; }
+.gianna-welcome p { max-width: 520px; margin-top: 12px; color: var(--muted); font-size: .88rem; line-height: 1.7; }
+.gianna-starters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 650px; margin-top: 18px; }
+.gianna-starters button { min-height: 42px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(182, 244, 199, .07); color: var(--text); font-size: .78rem; text-align: left; }
+.gianna-starters button:hover { border-color: var(--mint); }
+.gianna-exchange { display: grid; gap: 14px; min-width: 0; }
+.gianna-bubble { min-width: 0; max-width: 90%; padding: 15px 18px; border: 1px solid var(--line); border-radius: 15px; overflow-wrap: anywhere; }
+.gianna-bubble-user { justify-self: end; background: rgba(182, 244, 199, .13); }
+.gianna-bubble-answer { justify-self: start; background: rgba(6, 23, 20, .8); }
+.gianna-speaker { display: block; margin-bottom: 5px; color: var(--mint); font-size: .72rem; font-weight: 600; }
+.gianna-bubble > p { white-space: pre-wrap; line-height: 1.7; font-size: .92rem; }
+.gianna-citations { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); }
+.gianna-citations h3 { margin-bottom: 8px; color: var(--mint); font-size: .8rem; font-weight: 600; }
+.gianna-citations details { padding: 10px 0; border-top: 1px solid var(--line); font-size: .81rem; }
+.gianna-citations summary { color: var(--text); cursor: pointer; font-weight: 600; }
+.gianna-citations details p { margin: 10px 0; color: var(--muted); white-space: pre-wrap; line-height: 1.65; }
+.gianna-citations small { display: block; color: var(--muted); }
+.gianna-citations a { display: block; width: fit-content; margin-top: 9px; color: var(--mint); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.gianna-reply-notice { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: .76rem !important; }
+.gianna-feedback { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; color: var(--muted); font-size: .75rem; }
+.gianna-feedback button { min-height: 40px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--text); }
+
+.gianna-status { min-height: 25px; margin: 0 26px; color: var(--gold); font-size: .8rem; }
+.gianna-composer { display: grid; gap: 8px; margin: 0 20px 10px; }
+.gianna-composer label { font-size: .83rem; font-weight: 600; }
+.gianna-captcha { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; min-width: 0; margin-bottom: 8px; padding: 14px 16px; border: 1px solid rgba(220, 195, 148, .5); border-radius: 11px; background: rgba(220, 195, 148, .08); }
+.gianna-captcha > div:first-child { min-width: 0; }
+.gianna-captcha label { display: block; color: var(--gold); }
+.gianna-captcha p { margin-top: 4px; color: var(--muted); font-size: .72rem; line-height: 1.45; }
+.gianna-captcha-controls { display: flex; align-items: center; flex: none; gap: 8px; }
+.gianna-captcha input { width: 64px; min-height: 44px; padding: 7px; border: 1px solid var(--line); border-radius: 8px; background: var(--deep); color: var(--text); text-align: center; }
+.gianna-captcha button { min-height: 44px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--text); font-size: .78rem; }
+.gianna-captcha button:hover { border-color: var(--mint); }
+.gianna-composer-row { display: flex; align-items: flex-end; gap: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: rgba(4, 17, 15, .8); }
+.gianna-composer textarea { flex: 1; min-width: 0; min-height: 54px; max-height: 30dvh; padding: 9px; resize: vertical; border: 0; background: transparent; color: var(--text); }
+.gianna-composer textarea::placeholder { color: var(--muted); opacity: .8; }
+.gianna-composer-row button { flex: none; min-width: 85px; min-height: 44px; padding: 8px 12px; border: 0; border-radius: 8px; background: var(--mint); color: var(--deep); font-weight: 600; font-size: .82rem; }
+.gianna-composer small, .gianna-data-note { color: var(--muted); font-size: .72rem; line-height: 1.55; }
+.gianna-data-note { margin: 0 20px 17px; }
+.gianna-unavailable { max-width: 1050px; padding: 36px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.gianna-unavailable h2 { font-size: 1.4rem; font-weight: 400; }
+.gianna-unavailable p { margin-top: 10px; color: var(--muted); }
+
+@media (max-width: 600px) {
+  .gianna-page { padding: 135px 0 65px; }
+  .gianna-page-intro h1 { letter-spacing: -.03em; }
+  .gianna-scope { margin: 26px 0 18px; padding: 18px; }
+  .gianna-chat { min-height: 560px; border-radius: 15px; }
+  .gianna-chat-header { align-items: flex-start; flex-wrap: wrap; padding: 15px; }
+  .gianna-clear { margin-left: 50px; }
+  .gianna-welcome { min-height: 200px; padding: 12px; }
+  .gianna-bubble { max-width: 100%; }
+  .gianna-status { margin: 0 17px; }
+  .gianna-composer { margin: 0 12px 10px; }
+  .gianna-composer-row button { min-width: 70px; padding-inline: 8px; }
+  .gianna-data-note { margin-inline: 13px; }
+}
+
+@media (max-width: 480px) {
+  .gianna-captcha { align-items: stretch; flex-direction: column; }
+  .gianna-captcha-controls { width: 100%; }
+  .gianna-captcha button { flex: 1; }
+  .gianna-composer-row { align-items: stretch; flex-direction: column; }
+  .gianna-composer-row button { width: 100%; }
+}
+
+@media print { .gianna-chat { display: none; } }

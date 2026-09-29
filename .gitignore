@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+venv/
+.venv/
 
 # Astro and production output
 .astro/
@@ -16,6 +18,20 @@ test-results/
 playwright-report/
 reports/captures/
 reports/playwright/
+backend/reports/*
+!backend/reports/*.md
+
+# Python caches and local state
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+*.sqlite*
+*.db
 
 # Logs and local OS files
 *.log

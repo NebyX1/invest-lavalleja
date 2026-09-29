@@ -1,0 +1,84 @@
+name: gianna-invest
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    init: true
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?Define SECRET_KEY}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Define ENCRYPTION_KEY}
+      TRUSTED_HOSTS: ${TRUSTED_HOSTS:?Define TRUSTED_HOSTS}
+      PUBLIC_ORIGINS: ${PUBLIC_ORIGINS:-}
+      PROXY_HOPS: ${PROXY_HOPS:-1}
+      DATA_DIR: /app/data
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_API_KEY: ${QDRANT_API_KEY:?Define QDRANT_API_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-https://ollama.com}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+      E5_REVISION: ${E5_REVISION:-main}
+      E5_MODEL_FILE: ${E5_MODEL_FILE:-onnx/model.onnx}
+      EMBEDDING_THREADS: ${EMBEDDING_THREADS:-2}
+      EMBEDDING_BATCH_SIZE: ${EMBEDDING_BATCH_SIZE:-8}
+      MAX_CONCURRENT_CHAT: ${MAX_CONCURRENT_CHAT:-3}
+      WORKER_ENABLED: ${WORKER_ENABLED:-true}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-12}
+      MAX_RECORDS: ${MAX_RECORDS:-10000}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-2}
+      OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-1}
+      MKL_NUM_THREADS: ${MKL_NUM_THREADS:-1}
+      TOKENIZERS_PARALLELISM: 'false'
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_MODE: ${SMTP_MODE:-starttls}
+    expose:
+      - '8000'
+    volumes:
+      - gianna_data:/app/data
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 2g
+    cpus: 2.0
+    depends_on:
+      - qdrant
+    stop_grace_period: 35s
+    healthcheck:
+      test: ['CMD','python','-c',"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live',timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    restart: unless-stopped
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?Define QDRANT_API_KEY in .env}
+      QDRANT__TELEMETRY_DISABLED: 'true'
+    expose:
+      - '6333'
+    volumes:
+      - qdrant_data:/qdrant/storage
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 768m
+    cpus: 1.0
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+volumes:
+  gianna_data:
+  qdrant_data:
