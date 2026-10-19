@@ -1,10 +1,11 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import Footer from '../components/common/Footer';
+import ResponsiveNav from '../components/common/ResponsiveNav';
 import GlobalSearch from '../components/islands/GlobalSearch';
-import Footer from '../components/layout/Footer.astro';
 import IconSprite from '../components/layout/IconSprite.astro';
 import SiteChrome from '../components/layout/SiteChrome.astro';
-import SiteHeader from '../components/layout/SiteHeader.astro';
+import MotionToggle from '../components/layout/MotionToggle';
 import { searchIndex } from '../data/site';
 import '../styles/app.css';
 
@@ -43,11 +44,12 @@ const canonical = configuredSite ? new URL(currentPath, configuredSite).toString
   <body>
     <IconSprite />
     <a class="skip" href="#main">Saltar al contenido</a>
-    <SiteHeader currentPath={currentPath} />
+    <ResponsiveNav client:load currentPath={currentPath} />
     <slot />
-    <Footer />
+    <Footer client:load />
     <GlobalSearch client:load entries={searchIndex} transition:persist="global-search" />
     <SiteChrome />
+    <MotionToggle client:load transition:persist="motion-toggle" />
     <div class="route-announcer" aria-live="polite" aria-atomic="true"></div>
   </body>
 </html>

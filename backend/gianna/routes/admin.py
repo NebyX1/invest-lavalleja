@@ -294,6 +294,13 @@ def evaluate(version_id):
         if not isinstance(t,dict) or not isinstance(t.get('question'),str) or not 1<=len(t['question'])<=2500:raise DomainError('Cada prueba debe incluir una pregunta válida.')
         ids=t.get('expected_any_record_ids',[])
         if not isinstance(ids,list) or len(ids)>50 or any(not isinstance(i,str) or len(i)>140 for i in ids):raise DomainError('Referencias de prueba inválidas.')
+        groups=t.get('expected_groups',[])
+        if not isinstance(groups,list) or len(groups)>20:raise DomainError('Grupos de cobertura inválidos.')
+        for group in groups:
+            group_ids=group.get('any_record_ids',[]) if isinstance(group,dict) else None
+            if (not isinstance(group_ids,list) or not 1<=len(group_ids)<=50
+                    or any(not isinstance(i,str) or len(i)>140 for i in group_ids)):
+                raise DomainError('Referencias de grupo inválidas.')
     v=s.db.one('SELECT * FROM versions WHERE id=?',(version_id,))
     if not v or v['status']!='ready':raise DomainError('La versión no está lista.',409)
     job=s.jobs.enqueue('evaluation',{'tests':tests},base_id=v['base_id'],version_id=version_id)

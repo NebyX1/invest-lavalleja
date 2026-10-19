@@ -9,6 +9,9 @@ graceful_timeout=30
 keepalive=5
 max_requests=0
 worker_tmp_dir='/tmp'
+# Gunicorn 26 enables a control socket under $HOME by default. The container is
+# intentionally read-only and this deployment does not use that interface.
+control_socket_disable=True
 # Health/admin access logs can expose query-string contents; application audit is the primary trace.
 accesslog=None
 errorlog='-'

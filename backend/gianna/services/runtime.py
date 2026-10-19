@@ -100,7 +100,7 @@ class Qdrant:
         self.request('PUT','/collections/'+name,json={'vectors':{'dense':{'size':384,'distance':'Cosine'}},
             'sparse_vectors':{'bm25':{'modifier':'idf'}},'shard_number':1,
             'hnsw_config':{'m':8},'optimizers_config':{'default_segment_number':1}})
-        for field in ('audience','record_id','topic'):
+        for field in ('audience','record_id','topic','zones','opportunity_id','record_type'):
             self.request('PUT',f'/collections/{name}/index',params={'wait':'true'},json={'field_name':field,'field_schema':'keyword'})
 
     def upsert(self,name,chunks,dense,sparse):
@@ -108,14 +108,20 @@ class Qdrant:
         for c,d,s in zip(chunks,dense,sparse,strict=True):
             points.append({'id':c['id'],'vector':{'dense':d,'bm25':s},'payload':{
                 'record_id':c['record_id'],'audience':'public','topic':c['topic'],'title':c['title'],
+                'section':c.get('section',''),'zones':c.get('zones',[]),
+                'opportunity_id':c.get('opportunity_id'),'record_type':c.get('record_type','fact'),
                 'evidence_type':c['evidence_type'],'cutoff_date':c['cutoff_date'],'source_refs':c['source_refs']}})
         self.request('PUT',f'/collections/{name}/points',params={'wait':'true'},json={'points':points})
 
     def count(self,name):
         return self.request('POST',f'/collections/{name}/points/count',json={'exact':True})['count']
 
-    def search(self,name,dense,sparse,candidates=20,limit=8):
-        filters={'must':[{'key':'audience','match':{'value':'public'}}]}
+    def search(self,name,dense,sparse,candidates=20,limit=8,zones=None,opportunity_ids=None,record_types=None):
+        must=[{'key':'audience','match':{'value':'public'}}]
+        if zones:must.append({'key':'zones','match':{'any':list(zones)}})
+        if opportunity_ids:must.append({'key':'opportunity_id','match':{'any':list(opportunity_ids)}})
+        if record_types:must.append({'key':'record_type','match':{'any':list(record_types)}})
+        filters={'must':must}
         payload={'prefetch':[{'query':dense,'using':'dense','limit':candidates,'filter':filters},
                     {'query':sparse,'using':'bm25','limit':candidates,'filter':filters}],
                  'query':{'fusion':'rrf'},'limit':limit,'with_payload':True,'with_vector':False}
@@ -160,9 +166,7 @@ class Ollama:
                 response.raise_for_status(); data=response.json()
                 text=data.get('message',{}).get('content','')
                 if not isinstance(text,str) or not text.strip():
-                    if attempt==0:
-                        payload['options']['num_predict']=min(2000,max(1000,settings.max_output_tokens*2))
-                        continue
+                    if attempt==0:continue
                     raise ValueError('empty response')
                 return text[:18000],{'prompt_tokens':data.get('prompt_eval_count'),'output_tokens':data.get('eval_count')}
             except httpx.HTTPStatusError as exc:

@@ -98,7 +98,10 @@ def chat():
         history=json.loads(s.security.unseal(current['history_encrypted'])) if current['history_encrypted'] else []
     try:
         result=s.rag.answer(question,settings,history=history,session_hash=row['id_hash'])
-        updated=(history+[{'role':'user','content':question},{'role':'assistant','content':result['answer'],'mode':result.get('mode','knowledge')}])[-12:]
+        state=result.pop('_conversation_state',None)
+        assistant={'role':'assistant','content':result['answer'],'mode':result.get('mode','knowledge')}
+        if isinstance(state,dict):assistant['state']=state
+        updated=(history+[{'role':'user','content':question},assistant])[-12:]
         s.db.execute('UPDATE chat_sessions SET history_encrypted=? WHERE id_hash=?',
             (s.security.seal(dumps(updated)),row['id_hash']))
         return jsonify(result)

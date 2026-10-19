@@ -3,10 +3,17 @@ import hashlib
 import re
 import uuid
 from .errors import DomainError
+from .services.catalog import record_type,retrieval_context
+
+
+CONTEXTUALIZER_VERSION='catalog-context-v1'
 
 
 def input_prefix(record):
-    return f"passage: {record['title'][:200]}\nTema: {record['topic'][:100]}\n"
+    # This is a deterministic search representation, not a rewrite of the
+    # source.  It resolves section/zone/opportunity metadata that would
+    # otherwise be invisible to both dense and lexical retrieval.
+    return 'passage: '+retrieval_context(record)+'\nContenido:\n'
 
 
 def pack_record(record,counter,limit=420,overlap=40):
@@ -38,7 +45,8 @@ def pack_record(record,counter,limit=420,overlap=40):
         if body:
             embedded=prefix+body
             if counter(embedded)>limit:raise DomainError('Fragmento fuera del presupuesto de tokens.')
-            spans.append({'text':body,'embedding_text':embedded,'char_start':start,'char_end':end,'token_count':counter(embedded)})
+            spans.append({'text':body,'embedding_text':embedded,'sparse_text':retrieval_context(record)+'\n'+body,
+                          'char_start':start,'char_end':end,'token_count':counter(embedded)})
         if end>=len(text):break
         new_start=end
         if overlap:
@@ -58,9 +66,12 @@ def chunks_for_record(version_id,record,counter,limit,overlap):
     items=pack_record(record,counter,limit,overlap)
     result=[]
     for i,item in enumerate(items):
-        digest=hashlib.sha256(item['embedding_text'].encode()).hexdigest()
+        digest=hashlib.sha256((CONTEXTUALIZER_VERSION+'\0'+item['embedding_text']+'\0'+item['sparse_text']).encode()).hexdigest()
         id=str(uuid.uuid5(uuid.NAMESPACE_URL,f'gianna:{version_id}:{record["id"]}:{i}:{digest}'))
         result.append({'id':id,'record_id':record['id'],'position':i,'title':record['title'],'topic':record['topic'],
             'audience':'public','evidence_type':record['evidence_type'],'cutoff_date':record.get('cutoff_date'),
-            'source_refs':record.get('source_refs',[]),'zones':record.get('zones',[]),'embedding_hash':digest,**item})
+            'section':record.get('section',''),'opportunity_id':record.get('opportunity_id'),
+            'record_type':record_type(record),'source_refs':record.get('source_refs',[]),
+            'zones':record.get('zones',[]),'contextualizer_version':CONTEXTUALIZER_VERSION,
+            'embedding_hash':digest,**item})
     return result

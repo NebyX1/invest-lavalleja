@@ -12,6 +12,7 @@ __pycache__/
 *.log
 reports/preview/
 samples/Invest_Lavalleja_2026.gianna.json
+docs/Invest_Lavalleja_2026.gianna.json
 # Knowledge may contain institutional internal material. Import it in the admin; don't publish it accidentally.
 knowledge/
 backups/

@@ -13,12 +13,24 @@ for r in public:
             {'question':f'¿Qué plantea la ficha {r.opportunity_id}, {r.title}?','expected_any_record_ids':[r.id]},
             {'question':f'¿Qué condiciones y motivos para no avanzar menciona la guía sobre {r.title.split(" · ",1)[-1]}?','expected_any_record_ids':[r.id]}])
 for z in range(1,8):
-    candidates=[r for r in public if r.zones==[f'Z{z}'] and not r.opportunity_id]
-    if candidates:
-        title=candidates[0].section
+    zone_id=f'Z{z}'
+    profiles=[r for r in public if zone_id in r.zones and not r.opportunity_id]
+    opportunities=[r for r in public if zone_id in r.zones and r.opportunity_id]
+    if profiles:
+        title=profiles[0].section
+        groups=[{'name':f'perfil-{zone_id}','any_record_ids':[r.id for r in profiles]}]
+        if opportunities:
+            groups.append({'name':f'oportunidad-{zone_id}','any_record_ids':[r.id for r in opportunities]})
         tests.extend([
-            {'question':f'¿Qué oportunidades describe la zona Z{z}, {title}?','expected_any_record_ids':[r.id for r in candidates]},
-            {'question':f'¿Qué comprobaciones exige la guía antes de instalarse en {title.split(":",1)[0]}?','expected_any_record_ids':[r.id for r in candidates]}])
+            {'question':f'¿Qué oportunidades describe la zona {zone_id}, {title}?','expected_groups':groups},
+            {'question':f'¿Qué comprobaciones exige la guía antes de instalarse en {title.split(":",1)[0]}?','expected_any_record_ids':[r.id for r in profiles]}])
+north_groups=[]
+for zone_id in ('Z5','Z6'):
+    candidates=[r.id for r in public if r.opportunity_id and zone_id in r.zones]
+    if candidates:north_groups.append({'name':f'oportunidad-{zone_id}','any_record_ids':candidates})
+if len(north_groups)==2:
+    tests.append({'question':'Quiero invertir en el norte de Lavalleja. ¿Qué oportunidades concretas debería explorar?',
+                  'expected_groups':north_groups})
 queries=[
  ('EVIDENCIA','¿Qué diferencia hay entre el dato de exportaciones y el PIB de Lavalleja?'),
  ('EVIDENCIA','¿A qué año y universo corresponde el dato de población de la guía?'),

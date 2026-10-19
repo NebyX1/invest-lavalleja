@@ -7,7 +7,7 @@ from pathlib import Path
 from ..db import uid,dumps
 from ..errors import DomainError,Cancelled
 from ..corpus import load_corpus
-from ..chunking import chunks_for_record
+from ..chunking import CONTEXTUALIZER_VERSION,chunks_for_record
 from .settings import get_settings
 
 LOG=logging.getLogger(__name__)
@@ -155,7 +155,7 @@ class Jobs:
                     dense[i]=json.loads(cached['dense_json']);sparse[i]=json.loads(cached['sparse_json']);reused+=1
                 else:missing.append(i)
             if missing:
-                d,s=self.embeddings.documents([batch[i]['embedding_text'] for i in missing],[batch[i]['title']+'\n'+batch[i]['text'] for i in missing])
+                d,s=self.embeddings.documents([batch[i]['embedding_text'] for i in missing],[batch[i]['sparse_text'] for i in missing])
                 for i,dv,sv in zip(missing,d,s,strict=True):dense[i]=dv;sparse[i]=sv
             self.qdrant.upsert(version['collection_name'],batch,dense,sparse)
             with self.db.tx(immediate=True) as db:
@@ -170,7 +170,8 @@ class Jobs:
         self.progress(id,'Validación terminada; lista para prueba y publicación',total,total)
         report={'chunks':total,'reused_embeddings':reused,'build_seconds':round(time.perf_counter()-started,3),
             'max_tokens':self.db.one('SELECT MAX(token_count) n FROM chunks WHERE version_id=?',(vid,))['n'],
-            'projection':projection,'public_only':True,'semantic_accuracy_evaluated':False}
+            'projection':projection,'public_only':True,'contextualizer_version':CONTEXTUALIZER_VERSION,
+            'semantic_accuracy_evaluated':False}
         self.db.execute("UPDATE versions SET status='ready',chunk_count=?,report_json=? WHERE id=?",(total,dumps(report),vid))
         return report
 
@@ -210,16 +211,24 @@ class Jobs:
         if not tests or len(tests)>200:raise DomainError('La evaluación admite entre 1 y 200 preguntas.')
         settings=get_settings(self.db,self.cfg);results=[]
         for i,test in enumerate(tests):
-            self.progress(job['id'],'Evaluando recuperación; no se llama al modelo generativo',i,len(tests))
-            found,ms=self.rag.retrieve(test['question'],settings,job['version_id'])
+            self.progress(job['id'],'Evaluando el contexto final; no se llama al modelo generativo',i,len(tests))
+            plan=self.rag.harness.retrieval_plan(test['question'],[])
+            found,ms,trace=self.rag.retrieve_plan(plan,settings,job['version_id'])
             ids=[x['record_id'] for x in found]
             expected=set(test.get('expected_any_record_ids',[]))
-            success=bool(expected&set(ids)) if expected else None
-            results.append({'question':test['question'],'expected':sorted(expected),'retrieved':ids,'hit':success,'latency_ms':round(ms,2)})
+            groups=[]
+            for index,group in enumerate(test.get('expected_groups',[]),1):
+                group_expected=set(group.get('any_record_ids',[]))
+                groups.append({'name':group.get('name') or f'grupo-{index}',
+                    'expected':sorted(group_expected),'hit':bool(group_expected & set(ids))})
+            success=(all(group['hit'] for group in groups) if groups
+                     else bool(expected&set(ids)) if expected else None)
+            results.append({'question':test['question'],'expected':sorted(expected),'expected_groups':groups,
+                'retrieved':ids,'hit':success,'latency_ms':round(ms,2),'retrieval_trace':trace})
         assessed=[r for r in results if r['hit'] is not None]
-        return {'kind':'retrieval_only','questions':len(results),'assessed':len(assessed),
+        return {'kind':'final_context_coverage','questions':len(results),'assessed':len(assessed),
                 'hit_rate':sum(r['hit'] for r in assessed)/len(assessed) if assessed else None,
-                'warning':'Encontrar un fragmento no garantiza la exactitud de una respuesta generada.', 'results':results}
+                'warning':'La cobertura del contexto final no garantiza la exactitud de una respuesta generada.', 'results':results}
 
     def maintenance(self):
         now=time.time();settings=get_settings(self.db,self.cfg)

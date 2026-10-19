@@ -2,9 +2,9 @@ import json
 import httpx
 import pytest
 from gianna.services.runtime import Qdrant,Ollama,thinking_mode
-from gianna.services.harness import parse_proposed
+from gianna.services.harness import AgentHarness,parse_proposed
 from gianna.services.settings import Settings
-from gianna.services.rag import validate_answer
+from gianna.services.response_validation import remove_uncited_lines,validate_citation_syntax
 from gianna.errors import DomainError
 
 
@@ -47,7 +47,7 @@ def test_deepseek_thinking_off_and_wrapped_router_json():
     with pytest.raises(ValueError):parse_proposed('No sé qué hacer')
 
 
-def test_empty_cloud_content_retries_once_with_larger_cap(cfg):
+def test_empty_cloud_content_retries_once_without_ignoring_configured_cap(cfg):
     captured=[]
     def handler(request):
         captured.append(json.loads(request.content))
@@ -56,19 +56,35 @@ def test_empty_cloud_content_retries_once_with_larger_cap(cfg):
     cloud=Ollama(cfg,httpx.Client(base_url='https://ollama.test',transport=httpx.MockTransport(handler)))
     answer,_=cloud.chat([{'role':'user','content':'Hola'}],Settings(model='deepseek-v4.1-flash',max_output_tokens=200),think=False)
     assert answer=='Respuesta útil' and len(captured)==2
-    assert captured[1]['options']['num_predict']>=1000
+    assert captured[1]['options']['num_predict']==200
     assert captured[1]['think'] is False
 
 
 def test_citation_guard_is_structural_not_truth_estimator():
-    assert validate_answer('Orientación [C1]',['C1'])
-    assert not validate_answer('Inventado [C99]',['C1'])
-    assert not validate_answer('Sin referencias',['C1'])
-    assert not validate_answer('Enlace https://evil.test [C1]',['C1'])
-    assert validate_answer('Una afirmación falsa [C1]',['C1']) # explicit limitation, not concealed
-    assert not validate_answer('Dato citado [C1].\n\nOtra afirmación sin respaldo.',['C1'])
-    assert not validate_answer('Dato citado [C1].\n\n1. Paso sin cita\n2. Otro paso [C1]',['C1'])
-    assert validate_answer('Dato citado [C1].\n\nPróximo paso respaldado [C1].',['C1'])
+    assert validate_citation_syntax('Orientación [C1]',['C1'])
+    assert not validate_citation_syntax('Inventado [C99]',['C1'])
+    assert not validate_citation_syntax('Sin referencias',['C1'])
+    assert not validate_citation_syntax('Enlace https://evil.test [C1]',['C1'])
+    assert validate_citation_syntax('Una afirmación falsa [C1]',['C1']) # explicit limitation, not concealed
+    assert not validate_citation_syntax('Dato citado [C1].\n\nOtra afirmación sin respaldo.',['C1'])
+    assert not validate_citation_syntax('Dato citado [C1].\n\n1. Paso sin cita\n2. Otro paso [C1]',['C1'])
+    assert validate_citation_syntax('Dato citado [C1].\n\n¿Qué actividad querés priorizar?',['C1'])
+    assert validate_citation_syntax('## Opciones\n\n**Poscosecha y medición**\n\nComparación respaldada [C1, C2]',['C1','C2'])
+    assert not validate_citation_syntax('¿Afirmación retórica?\n\nComparación respaldada [C1]',['C1'])
+    assert validate_citation_syntax('Opciones para explorar:\n\nComparación respaldada [C1]\n\nPara afinar, ¿qué priorizás?',['C1'])
+    assert not validate_citation_syntax('Afirmación factual sin respaldo.\n\nComparación respaldada [C1]',['C1'])
+    cleaned,removed=remove_uncited_lines('Opciones:\n\nAfirmación sin cita.\n- Evidencia válida [C1]\n\n¿En cuál querés profundizar?')
+    assert removed==[3] and 'Afirmación sin cita' not in cleaned and '[C1]' in cleaned
+
+
+def test_router_suggestions_cannot_broaden_grounded_entity_scope():
+    proposed=parse_proposed('{"action":"rag","intent":"requirements","zones":["Z1"],"opportunity_ids":["O01"]}')
+    plan=AgentHarness.retrieval_plan('¿Y qué debería validar?',[
+        {'role':'user','content':'Quiero invertir en el norte de Lavalleja.'},
+        {'role':'assistant','content':'Opciones respaldadas. [C1]','mode':'knowledge',
+         'state':{'zones':['Z5','Z6'],'opportunity_ids':['O03','O12']}},
+    ],proposed)
+    assert plan.zones==('Z5','Z6') and plan.opportunity_ids==('O03','O12')
 
 
 def test_provider_error_does_not_expose_body(cfg):

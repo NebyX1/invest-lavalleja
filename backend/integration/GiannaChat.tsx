@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import './gianna-chat.css';
 
 type Source = { id: string; title: string; url: string };
@@ -48,7 +48,7 @@ export default function GiannaChat({ apiBase }: Props) {
     return () => { mounted.current = false; controller.abort(); };
   }, [base]);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     const message = question.trim();
     if (!message || busy) return;

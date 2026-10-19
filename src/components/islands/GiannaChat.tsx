@@ -1,24 +1,19 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type SyntheticEvent } from 'react';
+import AnswerContent from './gianna/AnswerContent';
+import Sources from './gianna/Sources';
+import type { Config, Exchange, Reply } from './gianna/types';
 
-type Source = { id: string; title: string; url: string };
-type Citation = { id: string; title: string; excerpt: string; cutoff_date: string | null; evidence_type?: string; locator?: string; sources: Source[] };
-type Reply = { id: string; answer: string; citations: Citation[]; status: string; notice: string };
-type Exchange = { question: string; reply: Reply };
-type Config = { name: string; greeting: string; notice: string; enabled: boolean; available: boolean; test_mode?: boolean };
 type CaptchaResponse = { id: string; question: string; expires_in: number };
 type Captcha = { id: string; question: string; expiresAt: number };
 
+const PROGRESS_STEPS = [
+  'Analizando tu consulta y el contexto del proyecto…',
+  'Buscando fichas, zonas y requisitos en la guía publicada…',
+  'Verificando citas y elaborando la orientación con fuentes…',
+];
+
 class ApiRequestError extends Error {
   constructor(message: string, readonly code?: string) { super(message); }
-}
-
-function publicLink(value: string): string | undefined {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 export default function GiannaChat({ apiBase }: { apiBase: string }) {
@@ -28,6 +23,7 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
   const form = useRef<HTMLFormElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
   const captchaField = useRef<HTMLInputElement>(null);
+  const conversation = useRef<HTMLDivElement>(null);
   const mounted = useRef(true);
   const inputId = useId();
   const hintId = useId();
@@ -37,6 +33,8 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
   const [challenge, setChallenge] = useState<Captcha | null>(null);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
+  const [pendingQuestion, setPendingQuestion] = useState('');
+  const [progressStep, setProgressStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
   const [rated, setRated] = useState<Set<string>>(new Set());
@@ -77,6 +75,28 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
     if (challenge && !busy) captchaField.current?.focus();
   }, [challenge, busy]);
 
+  useEffect(() => {
+    // Scroll only the message list so the newest question is visible; never the whole page.
+    const list = conversation.current;
+    const latest = list?.lastElementChild as HTMLElement | null | undefined;
+    if (!list || !latest || (!exchanges.length && !pendingQuestion)) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.requestAnimationFrame(() => list.scrollTo({ top: Math.max(0, latest.offsetTop - 12), behavior: reduced ? 'auto' : 'smooth' }));
+  }, [exchanges, pendingQuestion]);
+
+  useEffect(() => {
+    if (!pendingQuestion) {
+      setProgressStep(0);
+      return;
+    }
+    const first = window.setTimeout(() => setProgressStep(1), 1100);
+    const second = window.setTimeout(() => setProgressStep(2), 2800);
+    return () => {
+      window.clearTimeout(first);
+      window.clearTimeout(second);
+    };
+  }, [pendingQuestion]);
+
   async function loadChallenge() {
     const response = await call<CaptchaResponse>('/api/captcha');
     if (typeof response.id !== 'string' || typeof response.question !== 'string' || !Number.isFinite(response.expires_in) || response.expires_in <= 0) {
@@ -114,15 +134,18 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
           throw error;
         }
       }
-      setStatus('Buscando información publicada y preparando una respuesta con fuentes…');
+      setPendingQuestion(message);
+      setStatus(PROGRESS_STEPS[0]);
       setQuestion('');
       const reply = await call<Reply>('/api/chat', { method: 'POST', body: JSON.stringify({ message }) });
       if (mounted.current) {
+        setPendingQuestion('');
         setExchanges((old) => [...old, { question: message, reply }]);
         setStatus('');
       }
     } catch (error) {
       if (mounted.current) {
+        setPendingQuestion('');
         setQuestion(message);
         setStatus(error instanceof Error ? error.message : 'No se pudo conectar con Gianna.');
       }
@@ -146,6 +169,7 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
       token.current = null;
       setChallenge(null);
       setCaptchaAnswer('');
+      setPendingQuestion('');
       setExchanges([]);
       setRated(new Set());
       setStatus('Conversación borrada. Podés empezar otra.');
@@ -187,27 +211,31 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
     </header>
     {config?.test_mode && <p className="gianna-test-notice" role="note"><strong>Modo de prueba local.</strong> La guía todavía no tiene revisión editorial final. Contrastá cada respuesta con sus fuentes; no la uses para tomar decisiones de inversión.</p>}
 
-    <div className="gianna-conversation" role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text">
-      {exchanges.length === 0 && <div className="gianna-welcome"><span aria-hidden="true">✦</span><h2>{config?.greeting ?? '¿Qué proyecto tenés en mente?'}</h2><p>Podés saludarme o contarme tu idea. Cuando consultemos datos de la guía, te mostraré las fuentes que respaldan la respuesta.</p><div className="gianna-starters" aria-label="Ideas para empezar">
+    <div ref={conversation} className="gianna-conversation" role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text">
+      {exchanges.length === 0 && !pendingQuestion && <div className="gianna-welcome"><span aria-hidden="true">✦</span><h2>{config?.greeting ?? '¿Qué proyecto tenés en mente?'}</h2><p>Podés saludarme o contarme tu idea. Cuando consultemos datos de la guía, te mostraré las fuentes que respaldan la respuesta.</p><div className="gianna-starters" aria-label="Ideas para empezar">
         {['Hola, ¿cómo estás?', '¿Qué podés hacer?', '¿Qué debería revisar antes de invertir en Lavalleja?'].map((prompt) => <button key={prompt} type="button" onClick={() => { setQuestion(prompt); field.current?.focus(); }} disabled={!available || busy}>{prompt}</button>)}
       </div></div>}
       {exchanges.map(({ question: asked, reply }, index) => <div className="gianna-exchange" key={`${reply.id}-${index}`}>
         <article className="gianna-bubble gianna-bubble-user"><span className="gianna-speaker">Tu pregunta</span><p>{asked}</p></article>
-        <article className="gianna-bubble gianna-bubble-answer"><span className="gianna-speaker">Gianna</span><p>{reply.answer}</p>
-          {reply.citations?.length > 0 && <div className="gianna-citations"><h3>Fuentes de esta respuesta</h3>
-            {reply.citations.map((citation) => <details key={citation.id}><summary>[{citation.id}] {citation.title}</summary>
-              <p>{citation.excerpt}</p>
-              <small>{[citation.evidence_type, citation.cutoff_date && `Corte: ${citation.cutoff_date}`, citation.locator].filter(Boolean).join(' · ')}</small>
-              {citation.sources?.map((source) => {
-                const href = publicLink(source.url);
-                return href ? <a key={source.id} href={href} target="_blank" rel="noopener noreferrer">{source.id} · {source.title} ↗</a> : null;
-              })}
-            </details>)}
-          </div>}
+        <article className="gianna-bubble gianna-bubble-answer"><span className="gianna-speaker">Gianna</span><AnswerContent text={reply.answer} />
+          <Sources citations={reply.citations ?? []} opportunities={reply.opportunity_ids} />
           {reply.notice && <p className="gianna-reply-notice">{reply.notice}</p>}
           {reply.id && <div className="gianna-feedback">{rated.has(reply.id) ? <small>Gracias por tu valoración.</small> : <><span>¿Te resultó útil?</span><button type="button" onClick={() => rate(reply.id, 1)}>Sí</button><button type="button" onClick={() => rate(reply.id, -1)}>Necesita mejorar</button></>}</div>}
         </article>
       </div>)}
+      {pendingQuestion && <div className="gianna-exchange gianna-exchange-pending" aria-busy="true">
+        <article className="gianna-bubble gianna-bubble-user"><span className="gianna-speaker">Tu pregunta</span><p>{pendingQuestion}</p></article>
+        <article className="gianna-bubble gianna-bubble-answer gianna-bubble-pending" aria-label="Gianna está preparando una respuesta">
+          <span className="gianna-speaker">Gianna</span>
+          <div className="gianna-thinking">
+            <span className="gianna-thinking-dots" aria-hidden="true"><span /><span /><span /></span>
+            <p className="gianna-thinking-step">{PROGRESS_STEPS[progressStep]}</p>
+          </div>
+          <ol className="gianna-thinking-stages" aria-hidden="true">
+            {PROGRESS_STEPS.map((label, idx) => <li key={label} className={idx < progressStep ? 'is-done' : idx === progressStep ? 'is-active' : ''}>{label}</li>)}
+          </ol>
+        </article>
+      </div>}
     </div>
 
     <p className="gianna-status" role="status">{status || (config && !available ? (config.enabled ? 'La base de conocimiento aún no está disponible.' : 'El chat está pausado temporalmente.') : '')}</p>
@@ -220,6 +248,6 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
       <div className="gianna-composer-row"><textarea id={inputId} ref={field} aria-describedby={hintId} value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={onQuestionKeyDown} placeholder="¿Qué debería revisar para invertir en Lavalleja?" maxLength={2500} rows={2} required disabled={!available || busy} /><button type="submit" disabled={!available || busy || !question.trim()}>{busy ? 'Consultando…' : token.current ? 'Enviar' : challenge ? 'Verificar y enviar' : 'Iniciar consulta'}</button></div>
       <small id={hintId}>Enter para enviar · Shift+Enter para otra línea. Evitá compartir datos confidenciales.</small>
     </form>
-    <p className="gianna-data-note">Tu pregunta y los fragmentos documentales necesarios se envían a Ollama Cloud para generar la respuesta. La conversación visible se conserva solo mientras esta página está abierta.</p>
+    <p className="gianna-data-note">Tu pregunta se envía a nuestro modelo de IA para generar la respuesta. La conversación visible se conserva solo mientras esta página está abierta.</p>
   </section>;
 }

@@ -1,5 +1,27 @@
 # Informe de validación de la entrega
 
+## Corrección de recuperación territorial y respuestas RAG · 29/09/2026
+
+Se preparó este checkout nuevo para pruebas locales: `backend/.env` fue generado con secretos aleatorios, `.env.local` del portal apunta a `http://127.0.0.1:8001`, y la pila aislada `gianna-invest-human-test` quedó levantada con API Flask y Qdrant. Ambos archivos de entorno están ignorados por Git.
+
+Antes de modificar el código se reprodujo el defecto señalado por la auditoría con la consulta «Quiero invertir en el norte de Lavalleja. ¿Qué oportunidades concretas debería explorar?». La API respondía `answered`, pero negaba que hubiera oportunidades concretas y adjuntaba cinco registros generales no pertinentes. El corpus sí contenía perfiles Z5/Z6 y las fichas O03/O12. Este resultado de base quedó sustituido por una nueva versión indexada; no se alteró el texto de los registros fuente.
+
+La corrección incorpora un catálogo determinista de zonas y fichas, contexto enriquecido antes de E5/BM25, filtros de metadatos en Qdrant, planificación acotada, hasta tres búsquedas más una reparación de cobertura, contexto final con registros completos y una guarda que exige oportunidad citada por cada zona solicitada. El router no puede ampliar zonas o fichas propuestas por el modelo, y un seguimiento solo hereda estado de una respuesta documental validada. La API entrega únicamente citas usadas; las trazas conservan IDs, rondas, cobertura y resultados estructurales del validador, sin texto de la pregunta o de la respuesta. Las líneas factuales sin cita que sobrevivan al único intento de reparación se eliminan de forma determinista antes de la validación final.
+
+La interfaz React muestra títulos, párrafos y listas mediante componentes seguros, agrupa las fuentes efectivamente citadas y conserva foco/desplazamiento accesible. La evaluación por lote ahora mide grupos obligatorios sobre el **contexto final** y no solo la aparición de cualquier ID entre candidatos crudos. Cambiar la representación documental fuerza reindexado; una versión con perfil anterior falla cerrada. Gunicorn 26 dejó de intentar crear su socket de control en el `HOME` de solo lectura.
+
+Comprobaciones de esta sesión:
+
+- Docker Compose: configuración válida; API `healthy`, Qdrant activo. `/health/live` respondió `alive`, `/health/ready` respondió `ready`.
+- API real con `Origin: http://127.0.0.1:4321`: `/api/config` respondió HTTP 200 y CORS reflejó el origen permitido. Tras activar la prueba humana, el chat informa `enabled: true`, `test_mode: true`, `available: true`.
+- Portal: `npm run check` sin errores ni hints tras actualizar el tipo obsoleto del componente de integración; lint correcto; 5 tests unitarios pasaron; build correcto con 32 páginas.
+- Playwright: 31 pruebas pasaron y una captura móvil se omitió intencionalmente; incluye los casos de Gianna desktop/móvil con la API interceptada por el test.
+- Backend Python 3.12: `107 passed, 3 skipped`. Los tres casos omitidos buscan el paquete documental privado en la ubicación no versionada de la distribución original. El corpus aportado se validó además en la pila real.
+
+El corpus local `backend/docs/Invest_Lavalleja_2026.gianna.json` se cargó primero como borrador sin aprobar. En la pila humana aislada, el activador documentado creó y activó la versión `a0c9653d5e6e4a7989a7008b55e01a35` con E5/BM25 en CPU y Qdrant: 196 registros públicos en 196 chunks; los 75 internos quedaron excluidos. La selección está marcada como prueba técnica, no como aprobación editorial, y no se publicó en producción.
+
+La consulta real del norte, mediante CAPTCHA y sesión pública, terminó en `answered`; citó O03, O12, O02 y los perfiles Z5/Z6. El seguimiento «¿Y qué debería validar antes de avanzar?» heredó únicamente Z5/Z6, terminó en `answered`, tuvo cobertura completa y devolvió solo O03/O12/O02 porque fueron las fuentes usadas. En ambos turnos: cero citas desconocidas, cero líneas finales sin respaldo, cobertura de plan válida y ausencia de `_conversation_state` en la respuesta pública. Esta comprobación confirma el circuito técnico y las invariantes observables, no la exactitud factual exhaustiva de cada afirmación; la revisión humana editorial sigue pendiente. No se modificó Coolify ni se hizo push.
+
 **Actualización local · 29/09/2026. No desplegada en producción.**
 
 ## DeepSeek, diálogo natural y evaluación adversarial · 29/09/2026

@@ -8,7 +8,7 @@ test('Gianna conserva orientación y enlaces editoriales sin JavaScript', async 
   await page.locator('.gianna-promo').getByRole('link', { name: /preguntale a gianna/i }).click();
   await expect(page).toHaveURL(/\/gianna\/$/);
   await expect(page.getByRole('heading', { level: 1, name: /conocé lavalleja con gianna/i })).toBeVisible();
-  await expect(page.getByText(/no son asesoramiento financiero, legal/i)).toBeVisible();
+  await expect(page.getByText(/no es asesoramiento financiero: cada persona es responsable/i)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Ver fuentes editoriales' })).toHaveAttribute('href', '/fuentes/');
   await context.close();
 });

@@ -11,7 +11,9 @@ async function waitForIsland(page: import('@playwright/test').Page, componentNam
 }
 
 test('todas las rutas del manifiesto responden con contenido propio', async ({ page }) => {
-  test.setTimeout(60_000);
+  // This deliberately visits the complete manifest. On Windows the parallel
+  // run can be I/O-bound even though every individual navigation succeeds.
+  test.setTimeout(120_000);
   for (const route of routeManifest) {
     const response = await page.goto(route.path, { waitUntil: 'domcontentloaded' });
     expect(response?.status(), route.path).toBe(200);
@@ -183,6 +185,7 @@ test('el mapa selecciona localidades y perfiles en escritorio y móvil', async (
 
 test('genera capturas de referencia del portal', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Las capturas se generan una vez en escritorio');
+  test.setTimeout(60_000);
   const captureDir = 'reports/captures';
   fs.mkdirSync(captureDir, { recursive: true });
 

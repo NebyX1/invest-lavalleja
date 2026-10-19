@@ -5,6 +5,7 @@ import hashlib
 from ..db import uid,dumps
 from ..corpus import Corpus,Record,Source,DocumentInfo
 from ..errors import DomainError
+from ..chunking import CONTEXTUALIZER_VERSION
 
 
 class Knowledge:
@@ -105,7 +106,9 @@ class Knowledge:
             if pending:raise DomainError(f'Falta revisar y aprobar {pending} registros públicos.',409,'review_required')
             rows=db.execute("SELECT * FROM records WHERE base_id=? AND audience='public' AND approved=1 AND enabled=1 ORDER BY id",(base_id,)).fetchall()
             if not rows:raise DomainError('No hay contenido público aprobado para indexar.')
-            profile={'chunk_tokens':settings.chunk_tokens,'overlap_tokens':settings.overlap_tokens,'model':'intfloat/multilingual-e5-small','sparse':'Qdrant/bm25','language':'spanish','dim':384}
+            profile={'chunk_tokens':settings.chunk_tokens,'overlap_tokens':settings.overlap_tokens,
+                'contextualizer_version':CONTEXTUALIZER_VERSION,'model':'intfloat/multilingual-e5-small',
+                'sparse':'Qdrant/bm25','language':'spanish','dim':384}
             db.execute('INSERT INTO versions(id,base_id,revision,collection_name,profile_json,created_at) VALUES(?,?,?,?,?,?)',
                 (version_id,base_id,base['revision'],'gianna_'+version_id,dumps(profile),now))
             for r in rows:

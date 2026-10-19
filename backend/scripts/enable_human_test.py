@@ -14,6 +14,7 @@ from gianna.db import Database
 from gianna.services.knowledge import Knowledge
 from gianna.services.runtime import Qdrant
 from gianna.services.settings import get_settings
+from gianna.chunking import CONTEXTUALIZER_VERSION
 
 
 ACTOR = 'local-human-test-not-editorial-review'
@@ -50,25 +51,31 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
     announce('corpus', public_records=public_count, internal_excluded=internal_count)
 
     active = knowledge.active()
-    if active:
-        if active['base_id'] != base_id:
-            raise RuntimeError('Hay otra base activa en este entorno de prueba.')
+    if active and active['base_id'] != base_id:
+        raise RuntimeError('Hay otra base activa en este entorno de prueba.')
+    active_profile = json.loads(active['profile_json']) if active else {}
+    requires_reindex = bool(active and active_profile.get('contextualizer_version') != CONTEXTUALIZER_VERSION)
+    if active and not requires_reindex:
         version_id = active['id']
     else:
         knowledge.approve_public(base_id, ACTOR)
         base = knowledge.require_base(base_id)
-        ready = db.one("""SELECT * FROM versions WHERE base_id=? AND revision=?
-            AND status='ready' ORDER BY created_at DESC LIMIT 1""", (base_id, base['revision']))
+        ready = next((candidate for candidate in db.all("""SELECT * FROM versions WHERE base_id=? AND revision=?
+            AND status='ready' ORDER BY created_at DESC""", (base_id, base['revision']))
+            if json.loads(candidate['profile_json']).get('contextualizer_version') == CONTEXTUALIZER_VERSION), None)
         if ready:
             version_id = ready['id']
         else:
-            pending = db.one("""SELECT version_id,id FROM jobs WHERE base_id=? AND kind='build'
-                AND status IN ('queued','running') ORDER BY created_at DESC LIMIT 1""", (base_id,))
+            pending = next((candidate for candidate in db.all("""SELECT j.version_id,j.id,v.profile_json
+                FROM jobs j JOIN versions v ON v.id=j.version_id
+                WHERE j.base_id=? AND j.kind='build' AND j.status IN ('queued','running')
+                ORDER BY j.created_at DESC""", (base_id,))
+                if json.loads(candidate['profile_json']).get('contextualizer_version') == CONTEXTUALIZER_VERSION), None)
             if pending:
                 job_id, version_id = pending['id'], pending['version_id']
             else:
                 job_id, version_id = knowledge.enqueue_build(base_id, get_settings(db, cfg), ACTOR)
-            announce('indexing', job_id=job_id)
+            announce('indexing', job_id=job_id, reason='contextualizer_changed' if requires_reindex else 'no_ready_version')
             deadline = time.monotonic() + timeout
             while time.monotonic() < deadline:
                 job = db.one('SELECT status,error FROM jobs WHERE id=?', (job_id,))
@@ -90,7 +97,7 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
         raise RuntimeError('La versión no contiene exactamente los registros públicos esperados.')
     if Qdrant(cfg).count(version['collection_name']) != version['chunk_count']:
         raise RuntimeError('El índice vectorial de prueba está incompleto.')
-    if not active:
+    if not active or active['id'] != version_id:
         knowledge.activate(version_id, ACTOR)
     announce('active_for_local_human_test', version_id=version_id,
              public_records=public_count, chunks=version['chunk_count'], editorially_approved=False)
