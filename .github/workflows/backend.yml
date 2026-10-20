@@ -44,7 +44,6 @@ jobs:
           SECRET_KEY: ci-only
           ENCRYPTION_KEY: ci-only
           TRUSTED_HOSTS: localhost
-          QDRANT_API_KEY: ci-only
         run: |
           test -f Dockerfile && test -f requirements.txt
           docker compose --env-file /dev/null -f compose.yaml config --quiet

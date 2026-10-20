@@ -1,0 +1,680 @@
+{
+  "version_id": "a0c9653d5e6e4a7989a7008b55e01a35",
+  "profile": {
+    "model": "intfloat/multilingual-e5-small",
+    "revision_resolved": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    "model_file": "onnx/model.onnx",
+    "fingerprint": "3a30c10f00af12ad41a9a9ff33dcd21fde4560479b45ebf904399d4b250204ce",
+    "dim": 384,
+    "pooling": "mean",
+    "normalize": true,
+    "query_prefix": "query: ",
+    "passage_prefix": "passage: ",
+    "runtime": "CPUExecutionProvider",
+    "fastembed": "0.8.1",
+    "sparse": "Qdrant/bm25",
+    "sparse_language": "spanish",
+    "sparse_avg_len": 256
+  },
+  "passed": 2,
+  "total": 8,
+  "group_coverage": 0.42857142857142855,
+  "scope": "Public corpus retrieval/context coverage; not a factual generation benchmark.",
+  "results": [
+    {
+      "id": "boliche",
+      "question": "Quiero invertir poniendo un boliche, ¿qué me recomendás?",
+      "record_ids": [
+        "s09-01-02",
+        "s09-01-03",
+        "s09-01-04",
+        "s09-01-05",
+        "s09-01-06",
+        "s09-01-07",
+        "s09-01-08",
+        "s06-06-01"
+      ],
+      "groups_covered": [
+        false,
+        false
+      ],
+      "pass": false,
+      "ms": 324.04,
+      "trace": {
+        "intent": "explore",
+        "zones": [],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [
+          "s09-01-02",
+          "s09-01-03",
+          "s09-01-04",
+          "s09-01-05",
+          "s09-01-06",
+          "s09-01-07",
+          "s09-01-08"
+        ],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s06-06-01",
+              "s36-03-01",
+              "s17-03-01",
+              "s34-03-01",
+              "s27-03-01",
+              "s36-06-01",
+              "s31-02-01",
+              "s05-01-02"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "O08",
+              "s34-03-01",
+              "s31-02-01",
+              "s06-06-01",
+              "O11",
+              "s36-03-01",
+              "s12-05-01",
+              "s27-03-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "s09-01-02",
+          "s09-01-03",
+          "s09-01-04",
+          "s09-01-05",
+          "s09-01-06",
+          "s09-01-07",
+          "s09-01-08",
+          "s06-06-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "bar",
+      "question": "Quiero abrir un bar con comida en Minas. ¿Qué debería revisar antes de alquilar?",
+      "record_ids": [
+        "O02",
+        "O06",
+        "O04",
+        "O13",
+        "O11",
+        "O09",
+        "O08",
+        "s09-01-02"
+      ],
+      "groups_covered": [
+        false,
+        false
+      ],
+      "pass": false,
+      "ms": 532.35,
+      "trace": {
+        "intent": "requirements",
+        "zones": [
+          "Z1"
+        ],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [
+          "O02",
+          "O06",
+          "O04",
+          "O13",
+          "O11",
+          "O09",
+          "O08",
+          "s09-01-02"
+        ],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [
+              "Z1"
+            ],
+            "candidate_ids": [
+              "O16",
+              "s10-04-01",
+              "s10-02-01",
+              "O10",
+              "O06",
+              "O02",
+              "s10-01-01",
+              "O14"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s11-05-01",
+              "O16",
+              "s12-05-01",
+              "s12-04-01",
+              "O10",
+              "s10-04-01",
+              "O05",
+              "s26-03-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "O02",
+          "O06",
+          "O04",
+          "O13",
+          "O11",
+          "O09",
+          "O08",
+          "s09-01-02"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "bailable",
+      "question": "Quiero abrir una discoteca con música y baile. ¿Qué permisos y riesgos debería verificar?",
+      "record_ids": [
+        "s29-01-10",
+        "s17-03-01",
+        "s34-01-03",
+        "s29-01-07",
+        "s29-01-03",
+        "s29-01-06",
+        "s29-01-08",
+        "s29-01-09"
+      ],
+      "groups_covered": [
+        true,
+        false
+      ],
+      "pass": false,
+      "ms": 220.03,
+      "trace": {
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-10",
+              "s17-03-01",
+              "s34-01-03",
+              "s29-01-07",
+              "s29-01-03",
+              "s29-01-06",
+              "s29-01-08",
+              "s29-01-09"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-10",
+              "O11",
+              "s29-01-07",
+              "O08",
+              "s29-01-03",
+              "O16",
+              "s29-01-06",
+              "s17-03-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "s29-01-10",
+          "s17-03-01",
+          "s34-01-03",
+          "s29-01-07",
+          "s29-01-03",
+          "s29-01-06",
+          "s29-01-08",
+          "s29-01-09"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "north",
+      "question": "Quiero invertir en el norte de Lavalleja. ¿Qué oportunidades concretas debería explorar?",
+      "record_ids": [
+        "O03",
+        "O12",
+        "O02",
+        "O11",
+        "O09",
+        "O07",
+        "s09-01-06",
+        "s09-01-07"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 411.24,
+      "trace": {
+        "intent": "explore",
+        "zones": [
+          "Z5",
+          "Z6"
+        ],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "O03",
+          "O12",
+          "O02",
+          "O11",
+          "O09",
+          "O07",
+          "s09-01-06",
+          "s09-01-07"
+        ],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [
+              "Z5",
+              "Z6"
+            ],
+            "candidate_ids": [
+              "s09-01-06",
+              "O16",
+              "s09-01-07",
+              "s15-02-01",
+              "s15-01-01",
+              "s14-04-01",
+              "s14-06-01",
+              "s14-02-01"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s09-01-07",
+              "s15-02-01",
+              "O16",
+              "s09-01-06",
+              "s14-02-01",
+              "s15-04-01",
+              "s15-06-01",
+              "s15-05-01"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "O16",
+              "s09-01-06",
+              "s09-01-07",
+              "s15-05-01",
+              "s15-02-01",
+              "s14-06-01",
+              "s15-06-01",
+              "s15-01-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "O03",
+          "O12",
+          "O02",
+          "O11",
+          "O09",
+          "O07",
+          "s09-01-06",
+          "s09-01-07"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "cabins",
+      "question": "Quiero poner cabañas en Villa Serrana. ¿Cómo pruebo si el negocio funciona?",
+      "record_ids": [
+        "O05",
+        "O15",
+        "O10",
+        "O06",
+        "O14",
+        "O16",
+        "s09-01-04",
+        "s12-05-01"
+      ],
+      "groups_covered": [
+        true,
+        false
+      ],
+      "pass": false,
+      "ms": 408.88,
+      "trace": {
+        "intent": "explore",
+        "zones": [
+          "Z3"
+        ],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "O05",
+          "O15",
+          "O10",
+          "O06",
+          "O14",
+          "O16",
+          "s09-01-04"
+        ],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [
+              "Z3"
+            ],
+            "candidate_ids": [
+              "s09-01-04",
+              "O15",
+              "O06",
+              "s12-05-01",
+              "O05",
+              "s12-01-01",
+              "O16",
+              "s12-04-01"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s09-01-04",
+              "s12-01-01",
+              "s12-05-01",
+              "s12-03-01",
+              "O05",
+              "O06",
+              "s12-04-01",
+              "O15"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s09-01-04",
+              "O15",
+              "O06",
+              "O05",
+              "s12-05-01",
+              "O16",
+              "s16-02-01",
+              "s12-01-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "O05",
+          "O15",
+          "O10",
+          "O06",
+          "O14",
+          "O16",
+          "s09-01-04",
+          "s12-05-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "water",
+      "question": "¿Cómo verifico agua y tratamiento de efluentes antes de instalar una empresa?",
+      "record_ids": [
+        "O10",
+        "O11",
+        "s09-01-02",
+        "s09-01-03",
+        "s29-01-04",
+        "s10-04-01",
+        "s07-04-01",
+        "s28-05-01"
+      ],
+      "groups_covered": [
+        true
+      ],
+      "pass": true,
+      "ms": 195.77,
+      "trace": {
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [
+          "O10",
+          "O11",
+          "s09-01-02",
+          "s09-01-03"
+        ],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-04",
+              "O10",
+              "s10-04-01",
+              "s07-04-01",
+              "s28-05-01",
+              "s14-06-01",
+              "s08-02-01",
+              "s35-01-08"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-04",
+              "O10",
+              "O11",
+              "s14-06-01",
+              "s10-04-01",
+              "O08",
+              "s31-02-01",
+              "s10-05-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "O10",
+          "O11",
+          "s09-01-02",
+          "s09-01-03",
+          "s29-01-04",
+          "s10-04-01",
+          "s07-04-01",
+          "s28-05-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "land",
+      "question": "Encontré un terreno barato para instalar mi empresa. ¿Qué debo comprobar antes de comprar?",
+      "record_ids": [
+        "s10-04-01",
+        "s04-03-01",
+        "s26-02-01",
+        "s26-03-01",
+        "s13-03-01",
+        "s36-03-01",
+        "s26-01-01",
+        "s15-05-01"
+      ],
+      "groups_covered": [
+        false,
+        true
+      ],
+      "pass": false,
+      "ms": 188.5,
+      "trace": {
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s10-04-01",
+              "s04-03-01",
+              "s26-02-01",
+              "s26-03-01",
+              "s13-03-01",
+              "s36-03-01",
+              "s26-01-01",
+              "s15-05-01"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s10-04-01",
+              "s26-03-01",
+              "s04-03-01",
+              "s26-02-01",
+              "O11",
+              "s36-03-01",
+              "s15-05-01",
+              "s13-03-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "s10-04-01",
+          "s04-03-01",
+          "s26-02-01",
+          "s26-03-01",
+          "s13-03-01",
+          "s36-03-01",
+          "s26-01-01",
+          "s15-05-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "permits",
+      "question": "¿Con registrar mi sociedad ya puedo abrir el local?",
+      "record_ids": [
+        "s28-02-01",
+        "s06-03-01",
+        "s26-03-01",
+        "O16",
+        "s27-01-05",
+        "s10-03-01",
+        "s17-03-01",
+        "s26-01-02"
+      ],
+      "groups_covered": [
+        false
+      ],
+      "pass": false,
+      "ms": 184.6,
+      "trace": {
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [],
+        "rounds": [
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s28-02-01",
+              "s06-03-01",
+              "s26-03-01",
+              "O16",
+              "s27-01-05",
+              "s10-03-01",
+              "s17-03-01",
+              "s26-01-02"
+            ]
+          },
+          {
+            "channel": "hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s26-03-01",
+              "O08",
+              "O16",
+              "s06-03-01",
+              "s26-01-02",
+              "O11",
+              "s15-06-01",
+              "s28-02-01"
+            ]
+          }
+        ],
+        "selected_record_ids": [
+          "s28-02-01",
+          "s06-03-01",
+          "s26-03-01",
+          "O16",
+          "s27-01-05",
+          "s10-03-01",
+          "s17-03-01",
+          "s26-01-02"
+        ],
+        "coverage": {
+          "ok": true,
+          "missing": []
+        }
+      }
+    }
+  ]
+}

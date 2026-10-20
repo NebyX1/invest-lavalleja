@@ -1,0 +1,132 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 6,
+  "total": 6,
+  "results": [
+    {
+      "question": "Quiero información sobre eficiencia energética en Lavalleja.",
+      "id": "e41a5e2958e44cff81616003bdfaff0f",
+      "status": "answered",
+      "answer": "La guía incluye una ficha sobre eficiencia energética como servicio, planteada como hipótesis y no como oferta ni recomendación. Abarca empresas con consumos medidos y medidas de mejora técnicamente viables, con auditoría, ejecución y mantenimiento, y ahorro compartido solo bajo reglas verificables [C1].\n\nLas zonas de referencia son Minas y entorno, Solís de Mataojo–Aguas Blancas, y José Pedro Varela y entorno, además de clientes de otras zonas [C1]. La fuente indica medir ahorro neto, consumo específico, fallas, cumplimiento y recuperación contractual, y no avanzar si el retorno depende de una tarifa supuesta o de un ahorro estimado sin medición [C1].",
+      "citation_record_ids": [
+        "O09"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": true,
+        "answered": true
+      },
+      "timings": {
+        "generation_ms": 1469.45,
+        "retrieval_ms": 7306.06
+      },
+      "total_ms": 9077.54
+    },
+    {
+      "question": "¿En qué zonas la menciona la guía?",
+      "id": "6efe873a347147bdb363920d440c724d",
+      "status": "answered",
+      "answer": "La guía menciona eficiencia energética como servicio en Minas y entorno, Solís de Mataojo–Aguas Blancas, José Pedro Varela y entorno, y clientes de otras zonas [C1].",
+      "citation_record_ids": [
+        "O09"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": true,
+        "documented_zones": true
+      },
+      "timings": {
+        "generation_ms": 2288.77,
+        "retrieval_ms": 593.85
+      },
+      "total_ms": 3132.14
+    },
+    {
+      "question": "En dónde puedo invertir en energías renovables en Lavalleja?",
+      "id": "a22b3fedadb343ee8f756343b68226c0",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con ubicaciones documentadas para instalar proyectos de generación de energía renovable en Lavalleja.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true
+      },
+      "timings": null,
+      "total_ms": 469.84
+    },
+    {
+      "question": "¿Cuáles son los padrones disponibles para instalar un parque eólico?",
+      "id": "3bba2567e34247f2a439e89db7f013d7",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con un listado verificado de predios o padrones disponibles para ese proyecto.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true,
+        "abstains": true,
+        "no_unrelated_sources": true
+      },
+      "timings": null,
+      "total_ms": 539.25
+    },
+    {
+      "question": "Quiero información sobre poscosecha en José Pedro Varela.",
+      "id": "d984174b60ed4f58bda9d4d721b97382",
+      "status": "answered",
+      "answer": "La zona de José Pedro Varela y entorno figura con una tesis comercial a investigar en arroz, granos, poscosecha, calidad y eficiencia, junto con la pregunta sobre quién garantiza abastecimiento, compra y capacidad de pago [C1].\n\nAdemás, existe una ficha de oportunidad sobre poscosecha, medición y eficiencia en granos para esa zona, registrada como hipótesis y no como oferta de activos: plantea como cliente a productores y operadores que necesitan control, reducción de pérdidas o servicios específicos, con tarifa por tonelada, análisis o servicio y contratos estacionales con estándares [C2]. La entrada y prueba propuesta incluye instrumentos y servicio especializado, o uso acordado de infraestructura existente, y obtener datos de campaña [C2].",
+      "citation_record_ids": [
+        "s09-01-06",
+        "O03"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "grain_source": true,
+        "no_other_business": true
+      },
+      "timings": {
+        "generation_ms": 1825.94,
+        "retrieval_ms": 5245.65
+      },
+      "total_ms": 7399.57
+    },
+    {
+      "question": "¿Me asegurás una rentabilidad del 20%?",
+      "id": "8b7f52df5e6b4ad4af894edc7be131c9",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con cifras verificadas de rentabilidad para responder esa consulta. No puedo asegurar un rendimiento.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true
+      },
+      "timings": null,
+      "total_ms": 473.11
+    }
+  ]
+}

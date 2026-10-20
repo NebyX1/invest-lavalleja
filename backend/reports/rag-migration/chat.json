@@ -1,0 +1,64 @@
+{
+  "scope": "Two public API dialogue regressions; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 2,
+  "total": 2,
+  "results": [
+    {
+      "question": "Quiero invertir poniendo un boliche, ¿qué me recomendás?",
+      "id": "15bbaf83779c4fc78a7a78b0ab54388c",
+      "status": "answered",
+      "answer": "### Local de ocio\n\nPara un local de ocio en Lavalleja, lo primero es ordenar el proyecto antes de buscar el inmueble: conviene definir la actividad y la escala que querés habilitar y pedir un informe vigente por padrón sobre normativa y condiciones de obra, porque de eso depende si el sitio admite lo que proponés [C1]. En paralelo, la ruta de seguridad e incendios pasa por Bomberos y técnicos habilitados, con proyecto, medidas e inspecciones verificadas antes de ocupar u operar; los detalles y plazos hay que confirmarlos en cada caso [C2].\n\nEn lo económico, compará el costo total de cinco años bajo los mismos volúmenes: adquisición o renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora, separando lo cotizado de lo estimado y con fecha [C3]. Un local barato puede salir caro si exige obras o conexiones no previstas [C3]. También conviene arrancar con un formato chico y sostenible antes que con una gran implantación, sin tomar ninguna etapa como promesa de permiso o plazo [C5].\n\nSobre el mercado, no alcanza con afirmar que hay público cerca: identificá quién consume, por qué canal llega y con qué margen, y validalo con un piloto o una cartera concreta [C6]. Esta edición no trae un inventario certificado de locales disponibles, así que la búsqueda de inmueble hay que hacerla con información verificada de uso y servicios [C7]. Y si el proyecto no cierra por impedimento territorial, comprador inexistente o costos omitidos, la decisión correcta puede ser cambiar de zona, escala o diseño [C6].\n\nEl límite puntual: no hay una ficha específica para bar/pub o local bailable, así que los requisitos propios de esa actividad quedan por confirmar con la autoridad y los técnicos correspondientes [C2].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s27-03-01",
+        "s34-02-01",
+        "s36-03-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 2921.45,
+        "retrieval_ms": 12076.69
+      },
+      "total_ms": 15313.01
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "18b54f6e5369444ebfeee009bcf30bb8",
+      "status": "answered",
+      "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\n**Uso y edificación**\nAntes de alquilar, pedí un informe vigente por padrón sobre normativa, uso admitido, dimensiones, obras, ampliación, ocupación y protección aplicable, y confirmá alcance y procedimiento con la Intendencia (Arquitectura / ordenamiento territorial) [C1][C7]. La pregunta de decisión es concreta: ¿ese padrón admite la actividad y la escala que proponés? [C7].\n\n**Incendios y seguridad**\nLa ruta es la Dirección Nacional de Bomberos y técnicos habilitados, con alcance a confirmar: proyecto, medidas, inspecciones y condiciones antes de ocupar u operar [C2]. No hay en la evidencia costos ni plazos de resolución, así que no los des por sentados [C1][C2].\n\n**Números y operación**\nCompará el costo total de cinco años bajo los mismos volúmenes: renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora, separando costos cotizados de estimados y con fecha [C3]. La factibilidad de servicios depende del inmueble y del prestador, no del departamento en abstracto [C3].\n\n**Debida diligencia del local**\nComprobá compatibilidad de uso, circulación de cargas, vecinos sensibles, potencia eléctrica, conectividad efectiva, tratamiento de residuos y posibilidad de expansión [C4]. Para un local bailable, la potencia eléctrica y los vecinos sensibles son puntos críticos a verificar en el inmueble concreto.\n\n**Sobre la inversión**\nLa guía propone una agenda de 90 días con entrevistas, cotización y evaluación del contrato y del inmueble, pero aclara que esos plazos no implican obtener permisos ni ejecutar obra [C4][C5]. Y el criterio general es empezar por el proyecto y el servicio, no por el edificio [C6].\n\nLímite: la evidencia no trae una ficha específica de local bailable ni requisitos propios de habilitación nocturna, así que eso queda por confirmar con la Intendencia y Bomberos [C1][C2].\n\n¿Querés que ordenemos esto como checklist de visita al local o como plan de números para comparar dos o tres opciones?",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s26-02-01",
+        "s10-05-01",
+        "s10-06-01",
+        "s10-02-01",
+        "s26-01-03"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 3623.64,
+        "retrieval_ms": 7657.64
+      },
+      "total_ms": 11670.99
+    }
+  ]
+}

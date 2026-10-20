@@ -12,9 +12,9 @@ Esta lista contiene trabajo real pendiente. No marcarla como cumplida por haber 
 ## Datos e indexación
 
 - Importar el JSON canónico. Confirmar 271 registros y 50 fuentes; revisar la separación 196/75 antes de aprobar.
-- Comprobar descarga de E5, 384 dimensiones, pooling y normalización, prefijos y tokenización. Revisar que ningún chunk indexado supere el límite.
-- Guardar la revisión resuelta en `E5_REVISION` y repetir carga/reinicio sin cambios inesperados de huella.
-- Confirmar que Qdrant contiene exclusivamente contenido público aprobado y los puntos coinciden con la versión SQLite.
+- Preparar y verificar Bekko/Horizon; comprobar 384 dimensiones, pooling, normalización y tokenización sin prefijos E5. Revisar que ningún chunk indexado supere el límite.
+- Comprobar revisiones fijadas en `services/neural.py` y repetir carga/reinicio sin cambios inesperados de huella.
+- Confirmar que LanceDB contiene exclusivamente contenido público aprobado y los puntos coinciden con la versión SQLite.
 - Interrumpir una construcción en un entorno de prueba, reiniciar, reintentar y verificar que no duplica puntos ni cambia la versión activa. Confirmar cancelación entre lotes.
 
 ## Recuperación y generación
@@ -22,7 +22,7 @@ Esta lista contiene trabajo real pendiente. No marcarla como cumplida por haber 
 - Ejecutar las 62 preguntas y registrar resultados reales. El umbral de aceptación lo fija el equipo con evidencia; no hay un porcentaje precalculado de acierto.
 - Configurar Ollama y completar las 12 situaciones de revisión humana. Comprobar referencias, fecha, condiciones, rechazo de premisas falsas y abstención cuando corresponda.
 - Probar continuidad de conversación, pregunta fuera de tema, inyección de instrucciones, intento de usar el anexo interno, mensaje excesivo y límite de uso.
-- Validar errores al apagar Qdrant o simular fallo del proveedor: sin inventar respuesta, sin publicar borradores y sin filtrar secretos.
+- Validar errores al hacer indisponible el índice LanceDB en un entorno aislado de prueba o simular fallo del proveedor: sin inventar respuesta, sin publicar borradores y sin filtrar secretos.
 
 ## Administración y capacidad
 

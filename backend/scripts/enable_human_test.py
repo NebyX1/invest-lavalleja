@@ -12,9 +12,10 @@ from gianna.config import Config
 from gianna.corpus import load_corpus
 from gianna.db import Database
 from gianna.services.knowledge import Knowledge
-from gianna.services.runtime import Qdrant
+from gianna.services.runtime import LanceStore
 from gianna.services.settings import get_settings
 from gianna.chunking import CONTEXTUALIZER_VERSION
+from gianna.services.neural import ENGINE_VERSION
 
 
 ACTOR = 'local-human-test-not-editorial-review'
@@ -54,7 +55,8 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
     if active and active['base_id'] != base_id:
         raise RuntimeError('Hay otra base activa en este entorno de prueba.')
     active_profile = json.loads(active['profile_json']) if active else {}
-    requires_reindex = bool(active and active_profile.get('contextualizer_version') != CONTEXTUALIZER_VERSION)
+    requires_reindex = bool(active and (active_profile.get('contextualizer_version') != CONTEXTUALIZER_VERSION
+                                       or active_profile.get('engine') != ENGINE_VERSION))
     if active and not requires_reindex:
         version_id = active['id']
     else:
@@ -62,7 +64,8 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
         base = knowledge.require_base(base_id)
         ready = next((candidate for candidate in db.all("""SELECT * FROM versions WHERE base_id=? AND revision=?
             AND status='ready' ORDER BY created_at DESC""", (base_id, base['revision']))
-            if json.loads(candidate['profile_json']).get('contextualizer_version') == CONTEXTUALIZER_VERSION), None)
+            if json.loads(candidate['profile_json']).get('contextualizer_version') == CONTEXTUALIZER_VERSION
+            and json.loads(candidate['profile_json']).get('engine') == ENGINE_VERSION), None)
         if ready:
             version_id = ready['id']
         else:
@@ -70,7 +73,8 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
                 FROM jobs j JOIN versions v ON v.id=j.version_id
                 WHERE j.base_id=? AND j.kind='build' AND j.status IN ('queued','running')
                 ORDER BY j.created_at DESC""", (base_id,))
-                if json.loads(candidate['profile_json']).get('contextualizer_version') == CONTEXTUALIZER_VERSION), None)
+                if json.loads(candidate['profile_json']).get('contextualizer_version') == CONTEXTUALIZER_VERSION
+                and json.loads(candidate['profile_json']).get('engine') == ENGINE_VERSION), None)
             if pending:
                 job_id, version_id = pending['id'], pending['version_id']
             else:
@@ -95,7 +99,7 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
         FROM version_records WHERE version_id=?""", (version_id,))
     if records['total'] != public_count or records['internal']:
         raise RuntimeError('La versión no contiene exactamente los registros públicos esperados.')
-    if Qdrant(cfg).count(version['collection_name']) != version['chunk_count']:
+    if LanceStore(cfg).count(version['collection_name']) != version['chunk_count']:
         raise RuntimeError('El índice vectorial de prueba está incompleto.')
     if not active or active['id'] != version_id:
         knowledge.activate(version_id, ACTOR)

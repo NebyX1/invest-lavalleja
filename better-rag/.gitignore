@@ -1,0 +1,8 @@
+# Source and consolidated knowledge include an institutional internal appendix.
+# Keep the local delivery out of Git/public hosting; scripts/tests are versionable.
+/*.docx
+/*.json
+/_work/
+/consolidated/
+__pycache__/
+*.pyc

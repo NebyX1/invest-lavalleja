@@ -39,8 +39,8 @@ DOMAIN_WORDS = re.compile(
     r'actividad\w*|instalar\w*|emprend\w*|permiso\w*|habilit\w*|requisit\w*|'
     r'rentab\w*|terreno\w*|galpon\w*|sector\w*|zona\w*|localidad\w*|comerci\w*|local\w*|'
     r'hotel\w*|hostel\w*|hostal\w*|hospedaj\w*|posada\w*|caban\w*|alojamient\w*|camping\w*|glamping\w*|estancia\w*|chacra\w*|'
-    r'restaur\w*|parador\w*|bar|bares|cafe|cafeteria\w*|panader\w*|cervecer\w*|gastronom\w*|turism\w*|'
-    r'planta\w*|fabric\w*|taller\w*|bodega\w*|vined\w*|agro\w*|ganad\w*|forest\w*|mader\w*|logisti\w*|frigorific\w*)\b'
+    r'boliche\w*|discoteca\w*|bailable\w*|pub|restaur\w*|parador\w*|bar|bares|cafe|cafeteria\w*|panader\w*|cervecer\w*|gastronom\w*|turism\w*|'
+    r'planta\w*|fabric\w*|taller\w*|bodega\w*|vined\w*|agro\w*|ganad\w*|forest\w*|mader\w*|logisti\w*|frigorific\w*|energi\w*|renovabl\w*|eolic\w*|fotovolta\w*|poscosecha)\b'
 )
 EXPLORE_WORDS = re.compile(
     r'\b(?:oportunidad\w*|idea\w*|opcion\w*|alternativa\w*|explor\w*|que (?:puedo|podria)|'

@@ -2,6 +2,8 @@
 .env.*
 !.env.example
 data/
+!tests/data/
+!tests/data/retrieval_cases.json
 .venv/
 venv/
 __pycache__/

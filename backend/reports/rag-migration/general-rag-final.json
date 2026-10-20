@@ -1,0 +1,1937 @@
+{
+  "scope": "Small real-provider regression and isolated synthetic corpus pairs, not a factual certification.",
+  "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+  "model": "deepseek-v4.1-flash:1017",
+  "public_session_deleted": true,
+  "public_snapshot_unchanged": true,
+  "evaluator_sha256": "cc6ba58a1d1c80acc70a2888965131fc82dc685edf36dfec5e857f8e1d5fdb46",
+  "source_hashes": {
+    "harness.py": "56b34ac1aa7713220aa8b05a5c421fb107126abdee43e70baa6d56dba76f876e",
+    "rag.py": "d46e72278024d64609cafd2f1fc55a53db8fcd89b44ce6fe4c67a170aa4e4c23",
+    "information.py": "5face249b286a87f5d2172f466688f7f84bea5ec62e509964d14caadbf82af3e",
+    "context_builder.py": "c4691bf583a9131b45abe2b1aa99c5a36f84b1c9d4ff71a55958e41d807f80c9",
+    "response_policy.py": "13583b80c266195f6102d158f55564c8a22d7b0e4e2091935abb1f7b927784d3",
+    "response_validation.py": "9baaa57bcad8f883ae353541fade64647a66487f0d170e21126e4e6a71396dcb",
+    "project_memory.py": "f3f573e0efba767e6e7951c87ab1ad2702b1c68e433779cbb2a39da7733c6a39"
+  },
+  "public": [
+    {
+      "status": "answered",
+      "answer": "La documentación consultada no incluye una ficha específica de proyecto de generación de energías renovables. Sí clasifica la \"energía para venta a red\" dentro del nivel de alta complejidad o dependencia, con la condición de contar con estudios, contratos, acceso a recursos, permisos y financiación específica antes de promoverla; esa priorización es un juicio estratégico propuesto por la guía y no un ranking de rentabilidad [C2].\n\nComo línea vinculada al uso de energía, figura la eficiencia energética como servicio, planteada como hipótesis para empresas con consumos medidos y medidas de mejora técnicamente viables, con la advertencia de no garantizar venta a red y de no avanzar si el retorno depende de una tarifa supuesta o de un ahorro sin medición [C1]. Esta edición tampoco publica tarifas de energía [C3].",
+      "citation_record_ids": [
+        "O09",
+        "s17-01-04",
+        "s32-04-01"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 1,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "s36-03-01",
+          "s36-06-01",
+          "s27-03-01",
+          "s32-04-01",
+          "O09",
+          "s34-01-04",
+          "s06-03-01",
+          "s17-03-01",
+          "s05-01-02",
+          "O16",
+          "s32-02-04",
+          "s14-04-01",
+          "s26-01-01",
+          "s14-03-01",
+          "s16-02-01",
+          "s17-01-04"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "s36-03-01",
+              "s36-06-01",
+              "s27-03-01",
+              "s32-04-01",
+              "O09",
+              "s34-01-04",
+              "s06-03-01",
+              "s17-03-01",
+              "s05-01-02",
+              "O16",
+              "s32-02-04",
+              "s14-04-01",
+              "s26-01-01",
+              "s14-03-01",
+              "s16-02-01",
+              "s17-01-04",
+              "s34-03-01",
+              "s11-03-01",
+              "s26-02-01",
+              "s15-03-01"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 3760.25,
+        "reranked": [
+          {
+            "record_id": "O09",
+            "score": 0.062151
+          },
+          {
+            "record_id": "s17-01-04",
+            "score": 0.032695
+          },
+          {
+            "record_id": "s32-04-01",
+            "score": 0.020465
+          },
+          {
+            "record_id": "s36-06-01",
+            "score": 0.019546
+          },
+          {
+            "record_id": "s14-04-01",
+            "score": 0.016626
+          },
+          {
+            "record_id": "s36-03-01",
+            "score": 0.011571
+          },
+          {
+            "record_id": "s27-03-01",
+            "score": 0.01097
+          },
+          {
+            "record_id": "s16-02-01",
+            "score": 0.010411
+          },
+          {
+            "record_id": "s34-01-04",
+            "score": 0.00992
+          },
+          {
+            "record_id": "s06-03-01",
+            "score": 0.005428
+          },
+          {
+            "record_id": "s05-01-02",
+            "score": 0.005387
+          },
+          {
+            "record_id": "s26-01-01",
+            "score": 0.004796
+          },
+          {
+            "record_id": "s32-02-04",
+            "score": 0.004679
+          },
+          {
+            "record_id": "s17-03-01",
+            "score": 0.004393
+          },
+          {
+            "record_id": "s14-03-01",
+            "score": 0.001971
+          },
+          {
+            "record_id": "O16",
+            "score": 0.001114
+          }
+        ],
+        "selected_record_ids": [
+          "O09",
+          "s17-01-04",
+          "s32-04-01",
+          "s36-06-01",
+          "s14-04-01",
+          "s36-03-01",
+          "s27-03-01",
+          "s16-02-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C2",
+              "C1",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C2",
+              "C1",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C2",
+              "C1",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C2",
+          "C1",
+          "C3"
+        ],
+        "used_record_ids": [
+          "O09",
+          "s17-01-04",
+          "s32-04-01"
+        ]
+      },
+      "question": "Quiero invertir en energías renovables",
+      "elapsed_ms": 11325
+    },
+    {
+      "status": "answered",
+      "answer": "La guía contiene una ficha de oportunidad sobre soluciones de agua y efluentes, planteada como hipótesis y no como oferta de activos ni recomendación financiera. Se refiere a operaciones con necesidad de tratamiento, monitoreo o reducción de consumo, con diseño, suministro, operación y seguimiento bajo parámetros contratados, en zonas como Minas y entorno, Solís de Mataojo–Aguas Blancas, Villa Serrana–Marco de los Reyes–Penitente y José Pedro Varela y entorno [C1].\n\nLa ficha propone diagnóstico técnico y piloto del proceso, midiendo caudal y calidad, variación estacional, destino y costo total de operación, y menciona entre sus condiciones derechos de uso, permisos, descarga y normativa vigente, con consulta a DINAGUA y DINACEA [C1]. En permisos, el frente de agua y descarga remite al Ministerio de Ambiente, DINAGUA y prestadores, para verificar derecho y disponibilidad de uso, obras, calidad, destino y tratamiento de efluentes [C3].",
+      "citation_record_ids": [
+        "O10",
+        "s29-01-04"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "expected_source": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "O10",
+          "s29-01-04",
+          "s32-02-03",
+          "s11-05-01",
+          "s12-04-01",
+          "s10-06-01",
+          "s09-01-02",
+          "s34-01-04",
+          "s11-06-01",
+          "s26-01-01",
+          "s09-01-03",
+          "s35-01-12",
+          "s34-01-08",
+          "s31-02-01",
+          "O11",
+          "s05-01-08"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "O10",
+              "s29-01-04",
+              "s32-02-03",
+              "s11-05-01",
+              "s12-04-01",
+              "s34-01-04",
+              "s09-01-02",
+              "s02-03-01",
+              "s10-06-01",
+              "s35-01-12",
+              "s26-01-01",
+              "s11-06-01",
+              "s35-01-08",
+              "s16-05-01",
+              "s08-02-01",
+              "s16-03-01",
+              "s34-01-08",
+              "s31-02-01",
+              "s28-03-01",
+              "O11"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "O10",
+              "s29-01-04",
+              "s32-02-03",
+              "s11-05-01",
+              "s12-04-01",
+              "s10-06-01",
+              "s11-02-01",
+              "s09-01-02",
+              "s04-02-01",
+              "s34-01-04",
+              "O05",
+              "s09-01-03",
+              "s34-01-08",
+              "s11-06-01",
+              "O09",
+              "O11",
+              "s31-02-01",
+              "s26-01-01",
+              "s32-04-01",
+              "s08-04-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "s05-01-08",
+              "s05-01-02",
+              "s05-01-03",
+              "O10",
+              "s35-01-11",
+              "s05-01-05",
+              "s36-04-01",
+              "s29-01-04",
+              "s35-01-02",
+              "s05-01-07",
+              "s05-01-06",
+              "s05-01-04",
+              "s36-05-01",
+              "s07-04-01",
+              "s32-02-03",
+              "s11-05-01",
+              "s09-01-03",
+              "s30-03-01",
+              "s04-01-01",
+              "s35-01-12"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 4384.51,
+        "reranked": [
+          {
+            "record_id": "O10",
+            "score": 0.833516
+          },
+          {
+            "record_id": "s32-02-03",
+            "score": 0.542892
+          },
+          {
+            "record_id": "s29-01-04",
+            "score": 0.527504
+          },
+          {
+            "record_id": "s11-05-01",
+            "score": 0.104009
+          },
+          {
+            "record_id": "s34-01-04",
+            "score": 0.035274
+          },
+          {
+            "record_id": "s09-01-03",
+            "score": 0.029932
+          },
+          {
+            "record_id": "s12-04-01",
+            "score": 0.02121
+          },
+          {
+            "record_id": "s26-01-01",
+            "score": 0.012941
+          },
+          {
+            "record_id": "s05-01-08",
+            "score": 0.00954
+          },
+          {
+            "record_id": "s09-01-02",
+            "score": 0.006896
+          },
+          {
+            "record_id": "s34-01-08",
+            "score": 0.005975
+          },
+          {
+            "record_id": "O11",
+            "score": 0.003596
+          },
+          {
+            "record_id": "s10-06-01",
+            "score": 0.003364
+          },
+          {
+            "record_id": "s35-01-12",
+            "score": 0.002872
+          },
+          {
+            "record_id": "s31-02-01",
+            "score": 0.002366
+          },
+          {
+            "record_id": "s11-06-01",
+            "score": 0.000617
+          }
+        ],
+        "selected_record_ids": [
+          "O10",
+          "s32-02-03",
+          "s29-01-04",
+          "s11-05-01",
+          "s34-01-04",
+          "s09-01-03",
+          "s12-04-01",
+          "s26-01-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": true,
+          "initial": {
+            "used_citation_ids": [
+              "C1",
+              "C3",
+              "C2",
+              "C5"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": false,
+            "quality_issues": [
+              "too_long"
+            ]
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C1",
+          "C3"
+        ],
+        "used_record_ids": [
+          "O10",
+          "s29-01-04"
+        ]
+      },
+      "question": "¿Qué información figura sobre soluciones de agua y efluentes?",
+      "elapsed_ms": 9977
+    },
+    {
+      "status": "answered",
+      "answer": "La guía presenta \"Equipos digitales para problemas productivos\" como una ficha de oportunidad en estado de hipótesis, para Minas y entorno y equipos distribuidos, orientada a empresas con procesos repetitivos, información dispersa o tareas cuya mejora se pueda medir [C1]. Propone un equipo pequeño, conectividad comprobada y un caso de uso, con un piloto pagado y medición antes/después [C1]. No es una oferta de activos ni una recomendación financiera individualizada [C1].",
+      "citation_record_ids": [
+        "O08"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "expected_source": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "O08",
+          "s04-02-01",
+          "s10-02-01",
+          "s04-03-01",
+          "s17-01-02",
+          "s09-01-02",
+          "s06-03-01",
+          "s10-01-01",
+          "s10-05-01",
+          "s10-06-01",
+          "s08-04-01",
+          "s07-02-01",
+          "s05-02-01",
+          "O13",
+          "O01",
+          "s08-03-01"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "O08",
+              "s10-01-01",
+              "s10-02-01",
+              "s04-02-01",
+              "s06-03-01",
+              "s10-05-01",
+              "s10-06-01",
+              "s04-03-01",
+              "s17-01-02",
+              "s09-01-02",
+              "O13",
+              "O01",
+              "s02-01-01",
+              "s02-01-03",
+              "s05-02-01",
+              "s06-02-01",
+              "s07-02-01",
+              "s02-01-05",
+              "s07-04-01",
+              "s02-03-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "O08",
+              "s04-02-01",
+              "s10-02-01",
+              "s10-05-01",
+              "s10-06-01",
+              "s10-01-01",
+              "s10-03-01",
+              "s08-04-01",
+              "s04-03-01",
+              "s10-04-01",
+              "s17-01-02",
+              "s09-01-02",
+              "O13",
+              "O01",
+              "s15-02-01",
+              "s06-03-01",
+              "s08-03-01",
+              "O12",
+              "s06-05-01",
+              "s15-06-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "s04-02-01",
+              "O08",
+              "s10-02-01",
+              "s04-03-01",
+              "s07-02-01",
+              "s08-04-01",
+              "s05-02-01",
+              "s06-06-01",
+              "s05-01-06",
+              "s09-01-02",
+              "s17-01-02",
+              "s27-03-01",
+              "s14-02-01",
+              "s12-02-01",
+              "s08-03-01",
+              "s07-01-01",
+              "s05-01-04",
+              "s06-05-01",
+              "s17-01-03",
+              "s06-03-01"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 5303.75,
+        "reranked": [
+          {
+            "record_id": "O08",
+            "score": 0.928328
+          },
+          {
+            "record_id": "s09-01-02",
+            "score": 0.291338
+          },
+          {
+            "record_id": "s04-02-01",
+            "score": 0.135823
+          },
+          {
+            "record_id": "s10-02-01",
+            "score": 0.108665
+          },
+          {
+            "record_id": "s10-01-01",
+            "score": 0.085788
+          },
+          {
+            "record_id": "s17-01-02",
+            "score": 0.080507
+          },
+          {
+            "record_id": "s08-04-01",
+            "score": 0.043489
+          },
+          {
+            "record_id": "s04-03-01",
+            "score": 0.034409
+          },
+          {
+            "record_id": "O13",
+            "score": 0.006839
+          },
+          {
+            "record_id": "s06-03-01",
+            "score": 0.006536
+          },
+          {
+            "record_id": "s07-02-01",
+            "score": 0.005845
+          },
+          {
+            "record_id": "s10-05-01",
+            "score": 0.00518
+          },
+          {
+            "record_id": "s05-02-01",
+            "score": 0.004772
+          },
+          {
+            "record_id": "O01",
+            "score": 0.00276
+          },
+          {
+            "record_id": "s10-06-01",
+            "score": 0.001862
+          },
+          {
+            "record_id": "s08-03-01",
+            "score": 0.001615
+          }
+        ],
+        "selected_record_ids": [
+          "O08",
+          "s09-01-02",
+          "s04-02-01",
+          "s10-02-01",
+          "s10-01-01",
+          "s17-01-02",
+          "s08-04-01",
+          "s04-03-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": true,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": false,
+            "quality_issues": [
+              "too_long"
+            ]
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C1"
+        ],
+        "used_record_ids": [
+          "O08"
+        ]
+      },
+      "question": "¿Qué dice la guía sobre equipos digitales para problemas productivos?",
+      "elapsed_ms": 10727
+    },
+    {
+      "status": "insufficient_evidence",
+      "answer": "No encontré en la documentación consultada referencias a micropropagación de orquídeas ni a protocolos de cultivo in vitro de esas plantas.\n\nTambién puedo informarte sobre estos temas de la documentación: Primero el proyecto. Después el padrón.; Plazos y cumplimiento; Banca y documentación.",
+      "citation_record_ids": [],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "s28-04-01",
+          "s07-01-01",
+          "s33-01-02",
+          "s26-01-01",
+          "s33-01-08",
+          "s09-01-05",
+          "s13-04-01",
+          "s33-01-05",
+          "s05-02-01",
+          "s05-01-08",
+          "s31-04-01",
+          "s05-01-03",
+          "s26-01-03",
+          "s05-01-02",
+          "s05-01-06",
+          "s09-01-09"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "s28-04-01",
+              "s31-04-01",
+              "s33-01-02",
+              "s07-01-01",
+              "s09-01-09",
+              "s08-03-01",
+              "s09-01-05",
+              "s28-03-01",
+              "s26-01-01",
+              "s33-01-08",
+              "s13-04-01",
+              "s13-06-01",
+              "s35-01-09",
+              "s33-01-05",
+              "s09-01-08",
+              "s05-02-01",
+              "s06-03-01",
+              "s36-03-01",
+              "s34-02-01",
+              "O07"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "s07-01-01",
+              "s28-04-01",
+              "s26-01-03",
+              "s26-01-01",
+              "s33-01-02",
+              "s36-08-01",
+              "s26-01-04",
+              "s33-01-08",
+              "s13-04-01",
+              "s26-01-05",
+              "s26-01-02",
+              "s09-01-05",
+              "s33-01-05",
+              "s26-01-07",
+              "s26-01-06",
+              "s11-04-01",
+              "s27-01-06",
+              "s33-01-07",
+              "s02-01-05",
+              "s14-04-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "s05-01-08",
+              "s05-01-03",
+              "s05-01-02",
+              "s05-01-06",
+              "s35-01-11",
+              "s05-01-05",
+              "s36-04-01",
+              "s07-04-01",
+              "s04-01-01",
+              "s35-01-02",
+              "s05-01-07",
+              "s36-05-01",
+              "s05-01-04",
+              "s30-03-01",
+              "s05-02-01",
+              "s35-01-03",
+              "s35-01-04",
+              "s27-01-10",
+              "s35-01-12",
+              "O04"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 3016.11,
+        "reranked": [
+          {
+            "record_id": "s26-01-03",
+            "score": 0.008178
+          },
+          {
+            "record_id": "s26-01-01",
+            "score": 0.004423
+          },
+          {
+            "record_id": "s31-04-01",
+            "score": 0.003133
+          },
+          {
+            "record_id": "s13-04-01",
+            "score": 0.001716
+          },
+          {
+            "record_id": "s28-04-01",
+            "score": 0.001679
+          },
+          {
+            "record_id": "s05-01-08",
+            "score": 0.00164
+          },
+          {
+            "record_id": "s33-01-02",
+            "score": 0.001386
+          },
+          {
+            "record_id": "s33-01-05",
+            "score": 0.000891
+          },
+          {
+            "record_id": "s05-01-03",
+            "score": 0.00073
+          },
+          {
+            "record_id": "s05-01-02",
+            "score": 0.000607
+          },
+          {
+            "record_id": "s33-01-08",
+            "score": 0.000595
+          },
+          {
+            "record_id": "s07-01-01",
+            "score": 0.000481
+          },
+          {
+            "record_id": "s05-01-06",
+            "score": 0.000295
+          },
+          {
+            "record_id": "s09-01-05",
+            "score": 0.000274
+          },
+          {
+            "record_id": "s05-02-01",
+            "score": 0.000156
+          },
+          {
+            "record_id": "s09-01-09",
+            "score": 9.6e-05
+          }
+        ],
+        "selected_record_ids": [
+          "s26-01-03",
+          "s26-01-01",
+          "s31-04-01",
+          "s13-04-01",
+          "s28-04-01",
+          "s05-01-08",
+          "s33-01-02",
+          "s33-01-05"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [],
+        "used_record_ids": []
+      },
+      "question": "¿Qué documentación hay sobre micropropagación de orquídeas?",
+      "elapsed_ms": 6214
+    },
+    {
+      "status": "answered",
+      "answer": "La documentación trata la eficiencia energética como una oportunidad en estado de hipótesis: un servicio de auditoría, ejecución y mantenimiento para empresas con consumos medidos y medidas de mejora técnicamente viables, con ahorro compartido solo bajo reglas verificables, en Minas y entorno, Solís de Mataojo–Aguas Blancas y José Pedro Varela y entorno [C1]. Plantea medir el ahorro neto y el consumo específico, y no avanzar cuando el retorno depende de una tarifa supuesta o de un ahorro estimado sin medición [C1].\n\nEn José Pedro Varela, el costo energético efectivo figura entre las condiciones e indicadores a evaluar [C2], y la energía aparece como riesgo cuya señal temprana es la potencia no confirmada [C3].",
+      "citation_record_ids": [
+        "O09",
+        "s14-06-01",
+        "s34-01-04"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "expected_source": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 2,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "O09",
+          "O03",
+          "s14-06-01",
+          "s07-03-01",
+          "s34-01-04",
+          "s17-01-02",
+          "s08-03-01",
+          "s09-01-06",
+          "s14-01-01",
+          "s28-04-01",
+          "s30-02-01",
+          "s26-01-04",
+          "s31-04-01",
+          "s30-04-01",
+          "s09-01-09",
+          "s02-03-01"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "O09",
+              "s28-04-01",
+              "O03",
+              "s14-06-01",
+              "s26-01-04",
+              "s34-01-04",
+              "s08-03-01",
+              "s07-03-01",
+              "s31-04-01",
+              "s09-01-09",
+              "s02-03-01",
+              "s28-03-01",
+              "s05-03-01",
+              "s26-02-01",
+              "s17-01-02",
+              "s34-03-01",
+              "s09-01-06",
+              "s14-01-01",
+              "s07-01-01",
+              "s13-06-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "O09",
+              "O03",
+              "s14-06-01",
+              "s30-02-01",
+              "s17-01-02",
+              "s07-03-01",
+              "s09-01-06",
+              "s14-01-01",
+              "s30-04-01",
+              "s34-01-04",
+              "s33-01-06",
+              "O04",
+              "s08-03-01",
+              "s33-02-01",
+              "s04-02-01",
+              "s33-01-07",
+              "s33-01-05",
+              "s31-03-01",
+              "s31-02-01",
+              "s30-05-01"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 4059.05,
+        "reranked": [
+          {
+            "record_id": "O09",
+            "score": 0.266481
+          },
+          {
+            "record_id": "s14-06-01",
+            "score": 0.07572
+          },
+          {
+            "record_id": "s34-01-04",
+            "score": 0.057883
+          },
+          {
+            "record_id": "s07-03-01",
+            "score": 0.033368
+          },
+          {
+            "record_id": "s26-01-04",
+            "score": 0.016616
+          },
+          {
+            "record_id": "O03",
+            "score": 0.016154
+          },
+          {
+            "record_id": "s08-03-01",
+            "score": 0.005117
+          },
+          {
+            "record_id": "s09-01-06",
+            "score": 0.003213
+          },
+          {
+            "record_id": "s28-04-01",
+            "score": 0.003118
+          },
+          {
+            "record_id": "s17-01-02",
+            "score": 0.002908
+          },
+          {
+            "record_id": "s14-01-01",
+            "score": 0.001688
+          },
+          {
+            "record_id": "s30-02-01",
+            "score": 0.001639
+          },
+          {
+            "record_id": "s02-03-01",
+            "score": 0.000892
+          },
+          {
+            "record_id": "s31-04-01",
+            "score": 0.000744
+          },
+          {
+            "record_id": "s30-04-01",
+            "score": 0.000668
+          },
+          {
+            "record_id": "s09-01-09",
+            "score": 0.000501
+          }
+        ],
+        "selected_record_ids": [
+          "O09",
+          "s14-06-01",
+          "s34-01-04",
+          "s07-03-01",
+          "s26-01-04",
+          "O03",
+          "s08-03-01",
+          "s09-01-06"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": true,
+          "initial": {
+            "used_citation_ids": [
+              "C1",
+              "C2",
+              "C6",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": false,
+            "quality_issues": [
+              "too_long"
+            ]
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1",
+              "C2",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1",
+              "C2",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C1",
+          "C2",
+          "C3"
+        ],
+        "used_record_ids": [
+          "O09",
+          "s14-06-01",
+          "s34-01-04"
+        ]
+      },
+      "question": "¿Qué dice la documentación sobre eficiencia energética?",
+      "elapsed_ms": 8650
+    }
+  ],
+  "synthetic": [
+    {
+      "status": "answered",
+      "answer": "La documentación consultada incluye un documento técnico de prueba que describe instalaciones que transforman la luz del sol en electricidad, ubicadas en una zona ficticia denominada Alfa; el propio documento aclara que no se trata de una oferta comercial real [C1].",
+      "citation_record_ids": [
+        "synthetic-public"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "changes_with_evidence": true,
+        "no_private_citation": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 1,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "synthetic-public"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 106.52,
+        "reranked": [
+          {
+            "record_id": "synthetic-public",
+            "score": 0.050583
+          }
+        ],
+        "selected_record_ids": [
+          "synthetic-public"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              3
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [
+            3
+          ],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C1"
+        ],
+        "used_record_ids": [
+          "synthetic-public"
+        ]
+      },
+      "question": "¿Qué información hay sobre generación de electricidad con energías renovables?",
+      "relevant_source_present": true,
+      "elapsed_ms": 1498
+    },
+    {
+      "status": "insufficient_evidence",
+      "answer": "No encontré en la documentación consultada información sobre generación de electricidad con energías renovables en Lavalleja.\n\nTambién puedo informarte sobre estos temas de la documentación: Documento técnico de prueba.",
+      "citation_record_ids": [],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "changes_with_evidence": true,
+        "no_private_citation": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 1,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "synthetic-public"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 77.5,
+        "reranked": [
+          {
+            "record_id": "synthetic-public",
+            "score": 0.001076
+          }
+        ],
+        "selected_record_ids": [
+          "synthetic-public"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [],
+        "used_record_ids": []
+      },
+      "question": "¿Qué información hay sobre generación de electricidad con energías renovables?",
+      "relevant_source_present": false,
+      "elapsed_ms": 1170
+    },
+    {
+      "status": "answered",
+      "answer": "La documentación consultada incluye un documento técnico de prueba que describe la micropropagación como un procedimiento en el que un laboratorio multiplica plantas a partir de tejidos en recipientes estériles, realizado in vitro [C1]. Ese mismo documento aclara que no describe una oferta comercial real [C1].",
+      "citation_record_ids": [
+        "synthetic-public"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "changes_with_evidence": true,
+        "no_private_citation": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "synthetic-public"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 95.01,
+        "reranked": [
+          {
+            "record_id": "synthetic-public",
+            "score": 0.026003
+          }
+        ],
+        "selected_record_ids": [
+          "synthetic-public"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C1"
+        ],
+        "used_record_ids": [
+          "synthetic-public"
+        ]
+      },
+      "question": "¿Qué documentación hay sobre micropropagación?",
+      "relevant_source_present": true,
+      "elapsed_ms": 2558
+    },
+    {
+      "status": "insufficient_evidence",
+      "answer": "No encontré en la documentación consultada referencias a micropropagación ni a materiales técnicos sobre esa actividad.",
+      "citation_record_ids": [],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "changes_with_evidence": true,
+        "no_private_citation": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "explore",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "synthetic-public"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 61.46,
+        "reranked": [
+          {
+            "record_id": "synthetic-public",
+            "score": 0.015721
+          }
+        ],
+        "selected_record_ids": [
+          "synthetic-public"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [],
+        "used_record_ids": []
+      },
+      "question": "¿Qué documentación hay sobre micropropagación?",
+      "relevant_source_present": false,
+      "elapsed_ms": 2559
+    },
+    {
+      "status": "answered",
+      "answer": "La documentación consultada incluye un catálogo sintético de evaluación que menciona una propuesta de prueba abierta a capital privado para generar electricidad a partir de la luz del sol, con ubicación ficticia en Alfa, Lavalleja, y etapa ficticia de estudio de factibilidad. El mismo registro aclara que no hay permisos ni rentabilidad garantizados y que los datos son exclusivamente sintéticos, no una oferta real [C1].",
+      "citation_record_ids": [
+        "synthetic-public"
+      ],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "changes_with_evidence": true,
+        "no_private_citation": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 1,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "synthetic-public"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 107.56,
+        "reranked": [
+          {
+            "record_id": "synthetic-public",
+            "score": 0.008576
+          }
+        ],
+        "selected_record_ids": [
+          "synthetic-public"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              3
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [
+            3
+          ],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [
+          "C1"
+        ],
+        "used_record_ids": [
+          "synthetic-public"
+        ]
+      },
+      "question": "Quiero invertir en energías renovables",
+      "relevant_source_present": true,
+      "elapsed_ms": 1833
+    },
+    {
+      "status": "insufficient_evidence",
+      "answer": "No encontré en la documentación consultada información sobre inversiones en energías renovables en Lavalleja ni sobre proyectos o programas vinculados a ese rubro.\n\nTambién puedo informarte sobre estos temas de la documentación: Documento técnico de prueba.",
+      "citation_record_ids": [],
+      "checks": {
+        "searched": true,
+        "reranked": true,
+        "generator_used": true,
+        "valid_status": true,
+        "citations_from_context": true,
+        "no_private_state": true,
+        "changes_with_evidence": true,
+        "no_private_citation": true
+      },
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "fact",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 1,
+        "catalog_record_ids": [],
+        "recommendation_ids": [],
+        "focus_opportunities": [],
+        "next_step": false,
+        "candidate_record_ids": [
+          "synthetic-public"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "global_public_search": true,
+            "candidate_ids": [
+              "synthetic-public"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 52.46,
+        "reranked": [
+          {
+            "record_id": "synthetic-public",
+            "score": 0.000481
+          }
+        ],
+        "selected_record_ids": [
+          "synthetic-public"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [
+              1
+            ],
+            "contains_url": false,
+            "citation_syntax_ok": false,
+            "plan_coverage_ok": false,
+            "quality_issues": []
+          }
+        },
+        "used_citation_ids": [],
+        "used_record_ids": []
+      },
+      "question": "Quiero invertir en energías renovables",
+      "relevant_source_present": false,
+      "elapsed_ms": 5829
+    }
+  ],
+  "passed": 11,
+  "total": 11
+}

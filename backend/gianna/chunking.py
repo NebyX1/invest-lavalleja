@@ -6,14 +6,14 @@ from .errors import DomainError
 from .services.catalog import record_type,retrieval_context
 
 
-CONTEXTUALIZER_VERSION='catalog-context-v1'
+CONTEXTUALIZER_VERSION='bekko-context-v2'
 
 
 def input_prefix(record):
     # This is a deterministic search representation, not a rewrite of the
     # source.  It resolves section/zone/opportunity metadata that would
     # otherwise be invisible to both dense and lexical retrieval.
-    return 'passage: '+retrieval_context(record)+'\nContenido:\n'
+    return retrieval_context(record)+'\nContenido:\n'
 
 
 def pack_record(record,counter,limit=420,overlap=40):

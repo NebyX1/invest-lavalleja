@@ -196,7 +196,7 @@ def publish(version_id):
     if not v or v['status']!='ready':raise DomainError('La versión no está lista.',409)
     if s.embeddings.model is None:raise DomainError('Prepará el motor antes de publicar.',409)
     if json.loads(v['profile_json']).get('fingerprint')!=s.embeddings.profile['fingerprint']:raise DomainError('La versión pertenece a otro perfil de embeddings.',409)
-    if s.qdrant.count(v['collection_name'])!=v['chunk_count']:raise DomainError('La cantidad de puntos no coincide. No se puede publicar.',409)
+    if s.vector_store.count(v['collection_name'])!=v['chunk_count']:raise DomainError('La cantidad de puntos no coincide. No se puede publicar.',409)
     s.knowledge.activate(version_id,g.user['id'],request.form.get('rollback')=='yes')
     flash('Versión publicada. Las nuevas consultas usarán esta base.','success')
     return redirect(url_for('admin.version_detail',version_id=version_id))
@@ -334,12 +334,12 @@ def models():
 def diagnostics():
     import psutil
     s=services();s.security.rate_limit('diagnostics:'+g.user['id'],10,60)
-    qdrant_ok=False
-    try:s.qdrant.health();qdrant_ok=True
+    vector_store_ok=False
+    try:s.vector_store.health();vector_store_ok=True
     except DomainError:pass
     disk=psutil.disk_usage(str(s.cfg.data_dir))
     return jsonify(model_loaded=s.embeddings.model is not None,profile=s.embeddings.profile,
-        qdrant_ok=qdrant_ok,ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
+        vector_store_ok=vector_store_ok,ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
         worker_alive=bool(s.jobs.thread and s.jobs.thread.is_alive()),
         process_rss_mib=round(psutil.Process().memory_info().rss/1024**2,1),data_disk_free_mib=round(disk.free/1024**2,1),
         sqlite_mib=round(s.cfg.db_path.stat().st_size/1024**2,2),note='RAM del proceso, no de todo el VPS. No se realizó una generación de pago.')

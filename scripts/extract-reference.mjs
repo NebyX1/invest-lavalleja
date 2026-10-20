@@ -22,12 +22,35 @@ function writeJson(relativePath, value) {
 const catalog = readJsonScript('catalog-data');
 const pages = readJsonScript('pages-data');
 const assets = readJsonScript('asset-data');
+const bannerNames = ['agro-conceptual.webp', 'hospitalidad-conceptual.webp', 'serrano-conceptual.webp'];
+const bannerPaths = new Map(bannerNames.map((name) => [`/media/${name}`, `/media/block-banners/${name}`]));
+
+// These images are edited derivatives, not the source's narrow panoramas.
+// Never overwrite them when re-extracting the immutable reference document.
+for (const publicPath of bannerPaths.values()) {
+  if (!fs.existsSync(path.resolve(projectRoot, `public${publicPath}`))) {
+    throw new Error(`Falta el banner 16:9 ${publicPath}. Restauralo desde Git o agregá un reemplazo de 1600 × 900 antes de extraer.`);
+  }
+}
+for (const page of pages) {
+  for (const part of page.parts) {
+    if (typeof part.content !== 'string') continue;
+    part.content = part.content.replace(/<img\b[^>]*>/g, (tag) => {
+      for (const [originalPath, publicPath] of bannerPaths) {
+        if (!tag.includes(`src="${originalPath}"`)) continue;
+        return tag.replace(originalPath, publicPath).replace(/\bwidth="\d+"/, 'width="1600"').replace(/\bheight="\d+"/, 'height="900"');
+      }
+      return tag;
+    });
+  }
+}
 
 writeJson('src/data/catalog.json', catalog);
 writeJson('src/data/pages.json', pages);
 
 const extracted = [];
-for (const [publicPath, dataUrl] of Object.entries(assets)) {
+for (const [referencePath, dataUrl] of Object.entries(assets)) {
+  const publicPath = bannerPaths.get(referencePath) ?? referencePath;
   const match = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl);
   if (!match) throw new Error(`Asset no base64: ${publicPath}`);
   const target = path.resolve(projectRoot, `public${publicPath}`);
@@ -35,8 +58,9 @@ for (const [publicPath, dataUrl] of Object.entries(assets)) {
     throw new Error(`Asset fuera de public/: ${publicPath}`);
   }
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, Buffer.from(match[2], 'base64'));
-  extracted.push({ publicPath, mime: match[1], bytes: fs.statSync(target).size });
+  if (!bannerPaths.has(referencePath)) fs.writeFileSync(target, Buffer.from(match[2], 'base64'));
+  extracted.push({ publicPath, mime: match[1], bytes: fs.statSync(target).size,
+    ...(bannerPaths.has(referencePath) ? { referencePath, width: 1600, height: 900, derivative: true } : {}) });
 }
 
 const routeManifest = pages.map(({ path: routePath, title }) => ({ path: routePath, title }));

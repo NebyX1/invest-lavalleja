@@ -12,9 +12,7 @@ def main():
     root=Path(__file__).resolve().parents[1];dest=root/'.env'
     if dest.exists():raise SystemExit('.env ya existe. No se sobrescribió ni se rotaron claves.')
     content=(root/'.env.example').read_text(encoding='utf8')
-    qdrant=secrets.token_urlsafe(40)
-    values={'SECRET_KEY':secrets.token_urlsafe(64),'ENCRYPTION_KEY':base64.urlsafe_b64encode(secrets.token_bytes(32)).decode(),
-        'QDRANT_API_KEY':qdrant,'QDRANT__SERVICE__API_KEY':qdrant}
+    values={'SECRET_KEY':secrets.token_urlsafe(64),'ENCRYPTION_KEY':base64.urlsafe_b64encode(secrets.token_bytes(32)).decode()}
     if args.local:values.update(APP_ENV='development',DATA_DIR='./data',TRUSTED_HOSTS='localhost,127.0.0.1',PROXY_HOPS='0',
         PUBLIC_ORIGINS='http://localhost:8000,http://127.0.0.1:8000,http://localhost:4321,http://127.0.0.1:4321')
     lines=[]

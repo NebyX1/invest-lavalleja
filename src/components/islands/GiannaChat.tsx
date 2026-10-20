@@ -8,8 +8,8 @@ type Captcha = { id: string; question: string; expiresAt: number };
 
 const PROGRESS_STEPS = [
   'Analizando tu consulta y el contexto del proyecto…',
-  'Buscando fichas, zonas y requisitos en la guía publicada…',
-  'Verificando citas y elaborando la orientación con fuentes…',
+  'Buscando oportunidades, zonas y requisitos en mi base de conocimiento…',
+  'Armando una respuesta clara con sus fuentes…',
 ];
 
 class ApiRequestError extends Error {
@@ -206,14 +206,14 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
 
   return <section className="gianna-chat" aria-label="Conversación con Gianna">
     <header className="gianna-chat-header">
-      <div><span className="gianna-chat-avatar" aria-hidden="true">G</span><div><strong>{config?.name ?? 'Gianna'}</strong><p>Asistente de inversiones de Lavalleja</p></div></div>
+      <div><span className="gianna-chat-avatar" aria-hidden="true">G</span><div><strong>{config?.name ?? 'Gianna'}</strong><p>Información sobre inversiones en Lavalleja</p></div></div>
       <button type="button" className="gianna-clear" onClick={clear} disabled={busy}>Borrar conversación</button>
     </header>
-    {config?.test_mode && <p className="gianna-test-notice" role="note"><strong>Modo de prueba local.</strong> La guía todavía no tiene revisión editorial final. Contrastá cada respuesta con sus fuentes; no la uses para tomar decisiones de inversión.</p>}
+    {config?.test_mode && <p className="gianna-test-notice" role="note"><strong>Modo de prueba local.</strong> La base de conocimiento todavía no tiene revisión editorial final. Contrastá cada respuesta con sus fuentes; no la uses para tomar decisiones de inversión.</p>}
 
     <div ref={conversation} className="gianna-conversation" role="log" aria-label="Mensajes de la conversación" aria-live="polite" aria-relevant="additions text">
-      {exchanges.length === 0 && !pendingQuestion && <div className="gianna-welcome"><span aria-hidden="true">✦</span><h2>{config?.greeting ?? '¿Qué proyecto tenés en mente?'}</h2><p>Podés saludarme o contarme tu idea. Cuando consultemos datos de la guía, te mostraré las fuentes que respaldan la respuesta.</p><div className="gianna-starters" aria-label="Ideas para empezar">
-        {['Hola, ¿cómo estás?', '¿Qué podés hacer?', '¿Qué debería revisar antes de invertir en Lavalleja?'].map((prompt) => <button key={prompt} type="button" onClick={() => { setQuestion(prompt); field.current?.focus(); }} disabled={!available || busy}>{prompt}</button>)}
+      {exchanges.length === 0 && !pendingQuestion && <div className="gianna-welcome"><span aria-hidden="true">✦</span><h2>{config?.greeting ?? '¿Qué información sobre inversiones en Lavalleja necesitás consultar?'}</h2><p>Consultá un tema concreto. Las respuestas se basan en la base de conocimiento de Gianna y muestran sus fuentes.</p><div className="gianna-starters" aria-label="Ideas para empezar">
+        {['Hola, ¿cómo estás?', '¿Qué podés hacer?', '¿Qué oportunidades hay en eficiencia energética?'].map((prompt) => <button key={prompt} type="button" onClick={() => { setQuestion(prompt); field.current?.focus(); }} disabled={!available || busy}>{prompt}</button>)}
       </div></div>}
       {exchanges.map(({ question: asked, reply }, index) => <div className="gianna-exchange" key={`${reply.id}-${index}`}>
         <article className="gianna-bubble gianna-bubble-user"><span className="gianna-speaker">Tu pregunta</span><p>{asked}</p></article>
@@ -245,7 +245,7 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
         <div className="gianna-captcha-controls"><input id={captchaId} ref={captchaField} type="text" inputMode="numeric" pattern="[0-9]{1,2}" maxLength={2} autoComplete="off" value={captchaAnswer} onChange={(event) => setCaptchaAnswer(event.target.value)} required disabled={busy} /><button type="button" onClick={refreshChallenge} disabled={busy}>Otra suma</button></div>
       </div>}
       <label htmlFor={inputId}>Tu pregunta</label>
-      <div className="gianna-composer-row"><textarea id={inputId} ref={field} aria-describedby={hintId} value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={onQuestionKeyDown} placeholder="¿Qué debería revisar para invertir en Lavalleja?" maxLength={2500} rows={2} required disabled={!available || busy} /><button type="submit" disabled={!available || busy || !question.trim()}>{busy ? 'Consultando…' : token.current ? 'Enviar' : challenge ? 'Verificar y enviar' : 'Iniciar consulta'}</button></div>
+      <div className="gianna-composer-row"><textarea id={inputId} ref={field} aria-describedby={hintId} value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={onQuestionKeyDown} placeholder="¿Qué información necesitás sobre inversiones en Lavalleja?" maxLength={2500} rows={2} required disabled={!available || busy} /><button type="submit" disabled={!available || busy || !question.trim()}>{busy ? 'Consultando…' : token.current ? 'Enviar' : challenge ? 'Verificar y enviar' : 'Iniciar consulta'}</button></div>
       <small id={hintId}>Enter para enviar · Shift+Enter para otra línea. Evitá compartir datos confidenciales.</small>
     </form>
     <p className="gianna-data-note">Tu pregunta se envía a nuestro modelo de IA para generar la respuesta. La conversación visible se conserva solo mientras esta página está abierta.</p>

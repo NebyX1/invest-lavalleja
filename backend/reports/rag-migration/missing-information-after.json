@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-19",
+  "scope": "Local public API with CAPTCHA, session and configured DeepSeek; narrow missing-information regression, not exhaustive factual certification.",
+  "model": "deepseek-v4.1-flash:1017",
+  "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+  "snapshot_checks": {
+    "public_renewable_topic_matches": [],
+    "offered_topics_public": true,
+    "limitation": "Renewable-topic matching is the existing conservative lexical filter, not proof of exhaustive semantic absence."
+  },
+  "passed": 3,
+  "total": 3,
+  "session_deleted": true,
+  "results": [
+    {
+      "question": "Quiero invertir en energías renovables",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con información documentada suficiente sobre inversiones en energías renovables en Lavalleja para responder lo que consultás.\n\nSí puedo darte información de la guía sobre otros temas: Eficiencia energética como servicio; Hospitalidad serrana con operador; Servicios rurales y mantenimiento móvil.",
+      "citation_record_ids": [],
+      "elapsed_ms": 5584,
+      "checks": {
+        "missing_status": true,
+        "specific_missing_topic": true,
+        "no_unrelated_citations": true,
+        "separate_menu": true,
+        "only_known_menu": true,
+        "brief": true,
+        "no_advice_or_question": true
+      }
+    },
+    {
+      "question": "¿Qué padrones disponibles hay para proyectos de energía renovable?",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con un listado verificado de predios o padrones disponibles para proyectos de energía renovable en Lavalleja.\n\nSí puedo darte información de la guía sobre otros temas: Eficiencia energética como servicio; Hospitalidad serrana con operador; Servicios rurales y mantenimiento móvil.",
+      "citation_record_ids": [],
+      "elapsed_ms": 544,
+      "checks": {
+        "missing_status": true,
+        "specific_missing_topic": true,
+        "no_unrelated_citations": true,
+        "separate_menu": true,
+        "only_known_menu": true,
+        "brief": true,
+        "no_advice_or_question": true,
+        "specific_missing_detail": true
+      }
+    },
+    {
+      "question": "Quiero información sobre eficiencia energética.",
+      "status": "answered",
+      "answer": "La guía incluye una ficha sobre eficiencia energética como servicio, registrada como hipótesis y no como oferta de activos ni recomendación financiera. Describe como cliente y negocio a empresas con consumos medidos y medidas de mejora técnicamente viables, con auditoría, ejecución y mantenimiento, y ahorro compartido solo con reglas verificables [C1].\n\nLas zonas de referencia que menciona son Minas y entorno, Solís de Mataojo–Aguas Blancas, José Pedro Varela y entorno, y clientes de otras zonas, con prioridad estratégica A y estado de hipótesis [C1].",
+      "citation_record_ids": ["O09"],
+      "elapsed_ms": 2560,
+      "checks": {
+        "answered": true,
+        "appropriate_source": true,
+        "no_unrequested_menu": true,
+        "no_recommendation": true
+      }
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 # LOCAL HUMAN TEST ONLY. Use with compose.yaml, never in Coolify/production.
-# Separate project name creates separate SQLite and Qdrant volumes.
+# Separate project name creates a separate volume for SQLite, LanceDB and models.
 name: gianna-invest-human-test
 services:
   api:

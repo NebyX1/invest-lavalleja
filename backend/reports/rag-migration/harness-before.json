@@ -1,0 +1,85 @@
+{
+  "scope": "Two public API dialogue regressions; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 1,
+  "total": 3,
+  "results": [
+    {
+      "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+      "id": "e89341dfd809497391affd76735813a3",
+      "status": "answered",
+      "answer": "### Local de ocio\n\nPara estudiar un local de ocio en Lavalleja, el orden que sugiere la guía es empezar por el proyecto y el padrón antes de entusiasmarte con un inmueble: conviene pedir un informe vigente por padrón sobre normativa y condiciones de obra, y responder si ese sitio admite la actividad y la escala que proponés [C1]. Ese paso define mucho más que el precio del alquiler.\n\nEn paralelo, armá una comparación económica honesta a cinco años con los mismos volúmenes: adquisición o renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora, separando lo cotizado de lo estimado y con fecha [C3]. Un local barato puede salir caro si necesita obras o potencia que no previste [C3].\n\nSobre habilitaciones, la guía es clara en que una autorización no reemplaza a otra: constituir sociedad no habilita obra, y los permisos de uso de suelo, seguridad e instalaciones se tramitan por separado [C8]. Para incendios y seguridad, la ruta de consulta es Bomberos y técnicos habilitados, verificando proyecto, medidas e inspecciones antes de ocupar u operar, sin dar por sentados costos ni plazos [C2].\n\nY antes de comprometer capital, respondé la objeción del mercado con evidencia: quién es tu público, qué canal y qué margen, idealmente con un piloto o una cartera concreta en lugar de una afirmación genérica [C7]. Si el expediente muestra un impedimento territorial crítico o costos esenciales omitidos, la decisión válida puede ser cambiar de zona, escala o diseño [C7].\n\nEl límite: la guía no trae una ficha específica para bar/pub ni para local bailable, así que los requisitos propios de tu formato (aforo, horarios, sonido, seguridad) quedan a confirmar con la autoridad competente [C2][C8].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s34-02-01",
+        "s29-01-10"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": false,
+        "named_places": false,
+        "no_sector_reset": true,
+        "conditional": false
+      },
+      "timings": {
+        "generation_ms": 3187.45,
+        "retrieval_ms": 5938.49
+      },
+      "total_ms": 9616.7
+    },
+    {
+      "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+      "id": "a6df735931164843ba195e55487bd1da",
+      "status": "insufficient_evidence",
+      "answer": "No encontré en la guía información suficiente para responder eso con seguridad, y prefiero no inventar. Para orientarte mejor contame el rubro (por ejemplo turismo y alojamiento, alimentos, madera, servicios rurales o industriales) o la zona que te interesa: Minas, Solís de Mataojo, Villa Serrana, Mariscala, José Pedro Varela, José Batlle y Ordóñez o Arequita.",
+      "citation_record_ids": [],
+      "checks": {
+        "answered": false,
+        "sources": false,
+        "private_state_absent": true,
+        "activity_preserved": false,
+        "territorial_sources": false,
+        "named_places": true,
+        "no_sector_reset": false,
+        "conditional": false
+      },
+      "timings": {
+        "generation_ms": 6546.53,
+        "retrieval_ms": 6264.44
+      },
+      "total_ms": 13086.67
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "dd1cf05111e242fda2f3fcaf8cd364ec",
+      "status": "answered",
+      "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\n**Uso y edificación**\n- Pedí a la Intendencia (Arquitectura / ordenamiento territorial) un informe vigente por padrón que confirme si la actividad y la escala propuesta están admitidas, y qué condiciones de obra, ampliación, ocupación y protección aplican [C1][C7].\n- Ese informe es el punto de partida: sin compatibilidad de uso confirmada, el resto queda en el aire [C7].\n\n**Seguridad e incendios**\n- La ruta es la Dirección Nacional de Bomberos y técnicos habilitados, con alcance y procedimiento a confirmar en cada caso [C2].\n- Antes de ocupar u operar hay que verificar proyecto, medidas, inspecciones y condiciones exigidas [C2].\n\n**Números y operación**\n- Compará el costo total de cinco años bajo los mismos volúmenes: renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento y seguros, separando lo cotizado de lo estimado y con fecha [C3].\n- La factibilidad de servicios depende del inmueble y del prestador concreto, así que conviene confirmarla antes de firmar [C3].\n- En la debida diligencia territorial del local mirá circulación, vecinos sensibles, potencia eléctrica, conectividad efectiva, residuos y posibilidad de expansión [C4].\n- Como criterio de descarte, evitá una instalación sobredimensionada que dependa de un único cliente o de un servicio que rendiría más desde una base existente [C5].\n\nUn límite honesto: la guía no trae una ficha específica de local bailable, así que los detalles propios de la actividad (aforo, horarios, requisitos particulares de habilitación) quedan pendientes de confirmar con la Intendencia y Bomberos [C1][C2].\n\n¿Querés que armemos una lista de verificación para llevar a la consulta con la Intendencia, o preferís enfocarla primero en el análisis de costos del alquiler?",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s26-02-01",
+        "s10-05-01",
+        "s10-06-01",
+        "s26-01-03"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 3059.52,
+        "retrieval_ms": 6867.89
+      },
+      "total_ms": 10307.44
+    }
+  ]
+}

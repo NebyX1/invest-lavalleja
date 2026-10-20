@@ -1,0 +1,110 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 1,
+  "total": 5,
+  "results": [
+    {
+      "question": "Hola",
+      "id": "7c31eae1fca547d2a1e7e9b8345a80ae",
+      "status": "conversation",
+      "answer": "Hola, soy la asistente de inversiones de Lavalleja. Te puedo orientar sobre oportunidades, zonas, sectores, requisitos y pasos para desarrollar proyectos de inversión en el departamento.",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 1440.62
+    },
+    {
+      "question": "¿Cómo estás?",
+      "id": "6f68229dcf744b90bcadffbd409028d0",
+      "status": "conversation",
+      "answer": "Bien, gracias por preguntar. Estoy para orientarte en temas de inversión y proyectos en Lavalleja: oportunidades, zonas, sectores, requisitos y pasos. ¿Qué tipo de proyecto tenés en mente?",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": false
+      },
+      "timings": null,
+      "total_ms": 1236.37
+    },
+    {
+      "question": "¿Qué me recomendás para invertir en el norte?",
+      "id": "8dfa12ed35744542b13e987321a0be78",
+      "status": "answered",
+      "answer": "Para el norte, con el corte documental disponible, no hay una recomendación única: la guía plantea hipótesis de oportunidad para validar, no ofertas de activos ni recomendaciones financieras individualizadas [C1][C2][C8].\n\n- **José Pedro Varela y entorno — poscosecha, medición y eficiencia en granos.** La hipótesis es atender productores y operadores que necesitan control, reducción de pérdidas o servicios específicos, cobrando por tonelada, análisis o servicio, con contratos estacionales [C1]. La tesis de zona es arroz, granos, poscosecha, calidad y eficiencia, y la primera pregunta es quién garantiza abastecimiento, compra y capacidad de pago [C3]. Prueba inicial: pedir datos de una campaña completa, contrastar volumen y calidad, determinar quién paga y quién asume pérdidas por humedad, rechazo o demora, y probar a escala acotada con indicadores acordados [C5].\n\n- **José Batlle y Ordóñez–Zapicán — servicios rurales y mantenimiento móvil.** La hipótesis es trabajar con productores y contratistas con trabajos recurrentes y tiempos de inactividad costosos, mediante rutas programadas, intervenciones, abonos o alquiler operado cuando corresponda [C2]. La tesis de zona es servicios ganaderos, reparación, oficios y reutilización de activos, y la primera pregunta es si la densidad de clientes sostiene el equipo y los desplazamientos [C4]. Prueba inicial: unidad móvil y agenda reservada, precontratar jornadas, medir desplazamientos y contrastar varias épocas del año; base fija solo después de probar densidad de clientes [C2]. La forma de entrada puede ser empresa itinerante, alianza de profesionales u operador que usa un inmueble existente; reutilizar un activo exige revisar su estado y sus pasivos [C6].\n\n- **José Pedro Varela y entorno — eficiencia energética como servicio.** La hipótesis es atender empresas con consumos medidos y medidas de mejora técnicamente viables, con auditoría, ejecución y mantenimiento; ahorro compartido solo con reglas verificables [C8]. Prueba inicial: medición y mejora acotada antes de inversiones mayores, línea base ajustada por producción y clima, y medición del ahorro neto y funcionamiento [C8]. No avanzar si el retorno depende de una tarifa supuesta o de un ahorro estimado sin medición [C8].\n\nMi lectura documental es comparar estas hipótesis con una prueba comercial acotada antes de comprometer inversión [C1][C2][C5]. Si tu ventaja está en datos y contratos de campaña, miraría primero poscosecha en José Pedro Varela [C1][C5]. Si tu ventaja está en oficios, equipos y recorridas, miraría primero servicio móvil en José Batlle y Ordóñez–Zapicán [C2][C6]. Si tu ventaja está en medición y gestión de consumos, eficiencia energética en José Pedro Varela es una hipótesis con prueba acotada [C8].\n\n¿Querés que te lo ordene como comparación de tres pruebas comerciales acotadas o como ficha de una sola opción?",
+      "citation_record_ids": [
+        "O03",
+        "O12",
+        "s09-01-06",
+        "s09-01-07",
+        "s14-04-01",
+        "s15-03-01",
+        "O09"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": false,
+        "clear_recommendation": false,
+        "no_distractors": false,
+        "single_question": true,
+        "north_choices": true
+      },
+      "timings": {
+        "generation_ms": 13652.61,
+        "retrieval_ms": 11916.97
+      },
+      "total_ms": 26051.56
+    },
+    {
+      "question": "Profundiza con Varela",
+      "id": "5713d84576594441a4de5608e2f62275",
+      "status": "answered",
+      "answer": "Para profundizar en José Pedro Varela y entorno, el corte documental del 18/09/2026 muestra una tesis comercial a investigar, no una recomendación cerrada: arroz, granos, poscosecha, calidad y eficiencia, con primera pregunta sobre quién garantiza abastecimiento, compra y capacidad de pago [C1]. La segmentación es funcional propuesta, no zonificación legal, y no corresponde dibujar suelo disponible sin padrón, permiso del titular y datos urbanísticos vigentes [C1].\n\n**Qué miraría primero en Varela**\n- Poscosecha, medición y eficiencia en granos: la guía lo plantea como hipótesis para productores y operadores que necesitan control, reducción de pérdidas o servicios específicos, con tarifa por tonelada, análisis o servicio y contratos estacionales con estándares [C5]. La entrada sería con instrumentos y servicio especializado, o uso acordado de infraestructura existente; primero hay que obtener datos de campaña, evaluar resultados del servicio y contratar volumen mínimo [C5].\n- Condiciones de esa línea: revisar polvo, seguridad, energía y autorizaciones según la operación; no atribuir capacidad libre a una planta existente sin validación [C5]. No avanzar si una sola campaña o un solo cliente explica toda la recuperación; medir costo por tonelada, rechazos, rendimiento, utilización y caja de campaña [C5].\n- Servicio especializado: puede reducir pérdidas y evitar inversiones duplicadas; un producto con mayor elaboración puede captar otra demanda, pero debe demostrar capacidad comercial y cumplimiento alimentario; la valorización de subproductos solo es oportunidad con balance de masa, uso admisible, estabilidad del suministro y comprador dispuesto a pagar [C3].\n- Prueba comercial: pedir datos de una campaña completa y contrastar escenarios de volumen y calidad; determinar quién paga, cuándo paga y quién asume pérdidas por humedad, rechazo o demora; probar un servicio o lote a escala acotada y acordar indicadores antes de invertir; la carta de intención debe distinguir volumen indicativo de compromiso vinculante [C2].",
+      "citation_record_ids": [
+        "s09-01-06",
+        "s14-04-01",
+        "s14-02-01",
+        "O03"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": false,
+        "clear_recommendation": false,
+        "no_distractors": true,
+        "single_question": true,
+        "grain_focus": true
+      },
+      "timings": {
+        "generation_ms": 15284.78,
+        "retrieval_ms": 5019.42
+      },
+      "total_ms": 20717.7
+    },
+    {
+      "question": "¿Cómo arranco?",
+      "id": "902553225c5a4f1fa57b5d724dd3770e",
+      "status": "clarify",
+      "answer": "No pude interpretar tu consulta con suficiente seguridad. ¿Podés reformularla o contarme qué necesitás saber? Si es sobre un proyecto en Lavalleja, buscaré la información en la guía y te mostraré las fuentes.",
+      "citation_record_ids": [],
+      "checks": {
+        "answered": false,
+        "sources": false,
+        "concise": true,
+        "clear_recommendation": false,
+        "no_distractors": true,
+        "single_question": true,
+        "grain_focus": false
+      },
+      "timings": null,
+      "total_ms": 2429.58
+    }
+  ]
+}

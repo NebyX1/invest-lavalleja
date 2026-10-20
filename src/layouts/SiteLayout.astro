@@ -17,7 +17,7 @@ interface Props {
   noIndex?: boolean;
 }
 
-const { title, description, currentPath, image = '/media/serrano-conceptual.webp', noIndex = import.meta.env.PUBLIC_INDEXING !== 'true' } = Astro.props;
+const { title, description, currentPath, image = '/media/block-banners/serrano-conceptual.webp', noIndex = import.meta.env.PUBLIC_INDEXING !== 'true' } = Astro.props;
 const configuredSite = import.meta.env.PUBLIC_SITE_URL?.trim();
 const canonical = configuredSite ? new URL(currentPath, configuredSite).toString() : undefined;
 ---

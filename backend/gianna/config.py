@@ -11,8 +11,7 @@ class Config:
     encryption_key: str
     production: bool = True
     human_test_mode: bool = False
-    qdrant_url: str = 'http://qdrant:6333'
-    qdrant_api_key: str = ''
+    embedding_backend: str = 'openvino'
     ollama_url: str = 'https://ollama.com'
     ollama_api_key: str = ''
     ollama_model: str = ''
@@ -25,8 +24,6 @@ class Config:
     smtp_password: str = ''
     smtp_from: str = ''
     smtp_mode: str = 'starttls'
-    e5_revision: str = 'main'
-    e5_model_file: str = 'onnx/model.onnx'
     embedding_threads: int = 2
     embedding_batch_size: int = 8
     max_upload_mb: int = 12
@@ -42,6 +39,10 @@ class Config:
     def model_dir(self):
         return self.data_dir / 'models'
 
+    @property
+    def lance_dir(self):
+        return self.data_dir / 'lance'
+
     @classmethod
     def from_env(cls, overrides=None):
         from dotenv import load_dotenv
@@ -55,8 +56,7 @@ class Config:
             encryption_key=env.get('ENCRYPTION_KEY', ''),
             production=env.get('APP_ENV', 'production') == 'production',
             human_test_mode=truth('GIANNA_HUMAN_TEST_MODE', 'false'),
-            qdrant_url=env.get('QDRANT_URL', 'http://qdrant:6333').rstrip('/'),
-            qdrant_api_key=env.get('QDRANT_API_KEY', ''),
+            embedding_backend=env.get('EMBEDDING_BACKEND','openvino'),
             ollama_url=env.get('OLLAMA_BASE_URL', 'https://ollama.com').rstrip('/'),
             ollama_api_key=env.get('OLLAMA_API_KEY', ''),
             ollama_model=env.get('OLLAMA_MODEL', ''),
@@ -66,8 +66,6 @@ class Config:
             smtp_host=env.get('SMTP_HOST',''), smtp_port=int(env.get('SMTP_PORT','587')),
             smtp_username=env.get('SMTP_USERNAME',''), smtp_password=env.get('SMTP_PASSWORD',''),
             smtp_from=env.get('SMTP_FROM',''), smtp_mode=env.get('SMTP_MODE','starttls'),
-            e5_revision=env.get('E5_REVISION','main'),
-            e5_model_file=env.get('E5_MODEL_FILE','onnx/model.onnx'),
             embedding_threads=int(env.get('EMBEDDING_THREADS','2')),
             embedding_batch_size=int(env.get('EMBEDDING_BATCH_SIZE','8')),
             max_upload_mb=int(env.get('MAX_UPLOAD_MB','12')),
@@ -108,6 +106,8 @@ class Config:
             raise ValueError('Perfil de CPU fuera de rango.')
         if not 1 <= cfg.max_concurrent_chat <= 16:
             raise ValueError('MAX_CONCURRENT_CHAT fuera de rango.')
+        if cfg.embedding_backend not in {'openvino','onnx'}:
+            raise ValueError('EMBEDDING_BACKEND debe ser openvino u onnx.')
         cfg.data_dir.mkdir(parents=True, exist_ok=True)
         for sub in ('uploads','exports','models'):
             (cfg.data_dir/sub).mkdir(exist_ok=True)

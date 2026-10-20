@@ -20,7 +20,7 @@
   function answer(result){
     const el=bubble('assistant','');el.append(text('p',result.answer,'answer-text'));
     for(const cite of result.citations || []){
-      const details=document.createElement('details');details.className='chunk';details.append(text('summary',`[${cite.id}] ${cite.title}`));details.append(text('p',cite.excerpt,'answer-text'));details.append(text('small',`${cite.evidence_type} · corte ${cite.cutoff_date || 'no especificado'}`));
+      const details=document.createElement('details');details.className='chunk';details.append(text('summary',cite.title));details.append(text('p',cite.excerpt,'answer-text'));details.append(text('small',`${cite.evidence_type} · corte ${cite.cutoff_date || 'no especificado'}`));
       for(const source of cite.sources || []){
         try{const url=new URL(source.url);if(!['https:','http:'].includes(url.protocol))continue;
           const link=text('a',`${source.id} · ${source.title} ↗`);link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';const p=document.createElement('p');p.append(link);details.append(p);
@@ -50,7 +50,7 @@
         }
         captchaBox.hidden=true;send.textContent='Enviar →';
       }
-      status.textContent='Buscando en la guía y preparando una respuesta con fuentes…';
+      status.textContent='Buscando en la base de conocimiento y preparando una respuesta…';
       userBubble=bubble('user',question);field.value='';
       const result=await api('/api/chat',{method:'POST',body:JSON.stringify({message:question})});answer(result);status.textContent='';
     }catch(error){status.textContent=error.message;field.value=question;if(userBubble)userBubble.remove();}

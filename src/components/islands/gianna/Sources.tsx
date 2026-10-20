@@ -19,9 +19,9 @@ function cleanCitationTitle(title: string): string {
 export default function Sources({ citations }: { citations: Citation[]; opportunities?: string[] }) {
   if (!citations.length) return null;
   return <div className="gianna-citations">
-    <h3>Fuentes citadas en esta respuesta</h3>
+    <h3>Fuentes de esta respuesta</h3>
     {citations.map((citation) => <details key={citation.id}>
-      <summary>[{citation.id}] {cleanCitationTitle(citation.title)}</summary>
+      <summary>{cleanCitationTitle(citation.title)}</summary>
       <p>{citation.excerpt}</p>
       <small>{[citation.evidence_type, citation.cutoff_date && `Corte: ${citation.cutoff_date}`, citation.locator].filter(Boolean).join(' · ')}</small>
       {citation.sources?.map((source) => {

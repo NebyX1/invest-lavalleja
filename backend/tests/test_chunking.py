@@ -12,7 +12,8 @@ def test_budget_and_complete_character_coverage(corpus):
     coverage=set()
     for c in chunks:coverage.update(range(c['char_start'],c['char_end']))
     assert coverage==set(range(len(record['text'])))
-    assert all(c['embedding_text'].startswith('passage: ') for c in chunks)
+    assert all(c['embedding_text'].startswith('Título: ') for c in chunks)
+    assert all(not c['embedding_text'].startswith('passage: ') for c in chunks)
 
 
 def test_ids_idempotent_per_version(corpus):

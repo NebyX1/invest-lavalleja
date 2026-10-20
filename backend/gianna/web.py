@@ -20,7 +20,7 @@ from .db import Database
 from .errors import DomainError
 from .security import Security
 from .services.knowledge import Knowledge
-from .services.runtime import Embeddings, Qdrant, Ollama
+from .services.runtime import Embeddings, LanceStore, Ollama
 from .services.jobs import Jobs
 from .services.rag import RAG
 from .services.settings import get_settings
@@ -59,11 +59,11 @@ def create_app(overrides=None):
         app.wsgi_app=ProxyFix(app.wsgi_app,x_for=cfg.proxy_hops,x_proto=cfg.proxy_hops,x_host=0,x_port=0,x_prefix=0)
     db=Database(cfg.db_path);db.migrate()
     security=Security(db,cfg,smtp_sender(cfg));knowledge=Knowledge(db,cfg)
-    embeddings=Embeddings(cfg);qdrant=Qdrant(cfg);ollama=Ollama(cfg)
-    rag=RAG(db,cfg,knowledge,embeddings,qdrant,ollama,security)
-    jobs=Jobs(db,cfg,knowledge,embeddings,qdrant,rag)
+    embeddings=Embeddings(cfg);vector_store=LanceStore(cfg);ollama=Ollama(cfg)
+    rag=RAG(db,cfg,knowledge,embeddings,vector_store,ollama,security)
+    jobs=Jobs(db,cfg,knowledge,embeddings,vector_store,rag)
     app.extensions['gianna']=SimpleNamespace(cfg=cfg,db=db,security=security,knowledge=knowledge,
-        embeddings=embeddings,qdrant=qdrant,ollama=ollama,rag=rag,jobs=jobs)
+        embeddings=embeddings,vector_store=vector_store,ollama=ollama,rag=rag,jobs=jobs)
 
     @app.before_request
     def request_security():

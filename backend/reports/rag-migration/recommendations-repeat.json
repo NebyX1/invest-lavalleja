@@ -1,0 +1,379 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 5,
+  "total": 5,
+  "results": [
+    {
+      "question": "Hola",
+      "id": "a9f35f7d3bee4b9f91a54b6ce9733677",
+      "status": "conversation",
+      "answer": "¡Hola! ¿En qué puedo orientarte sobre inversiones y proyectos en Lavalleja?",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 1072.82,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 11,
+      "trace": {
+        "intent": null,
+        "zones": null,
+        "inherited_context": null,
+        "recommendation_ids": null,
+        "focus_opportunities": null,
+        "next_step": null,
+        "selected_record_ids": null,
+        "coverage": null,
+        "response_validation": null
+      }
+    },
+    {
+      "question": "¿Cómo estás?",
+      "id": "d1613efa5e6448ce8fece79289f21688",
+      "status": "conversation",
+      "answer": "Todo bien por acá, gracias. ¿Tenés alguna consulta sobre oportunidades de inversión en Lavalleja?",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 804.78,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 14,
+      "trace": {
+        "intent": null,
+        "zones": null,
+        "inherited_context": null,
+        "recommendation_ids": null,
+        "focus_opportunities": null,
+        "next_step": null,
+        "selected_record_ids": null,
+        "coverage": null,
+        "response_validation": null
+      }
+    },
+    {
+      "question": "¿Qué me recomendás para invertir en el norte?",
+      "id": "23bcbb7724c34f9e83514561de0a88f2",
+      "status": "answered",
+      "answer": "Empezaría por José Pedro Varela con un servicio de poscosecha y medición de granos, porque la guía lo plantea como hipótesis y porque el antecedente industrial de SAMAN sirve como punto de partida verificable, sin suponer acceso a sus instalaciones [C1][C6]. El negocio sería control, reducción de pérdidas o análisis; pagarían productores y operadores por tonelada, análisis o contrato estacional [C1]. Antes de invertir, pediría datos de una campaña completa y probaría un lote o servicio acotado con indicadores acordados [C3]. Sería preferible si tenés instrumentos, servicio especializado o un acuerdo para usar infraestructura existente [C1].\n\nEn José Batlle y Ordóñez–Zapicán, la ruta documentada es servicios rurales y mantenimiento móvil: una unidad que visita productores y contratistas con trabajos recurrentes, cobrando por jornada, abono o alquiler operado [C2]. La guía sugiere precontratar jornadas y probar densidad antes de una base fija [C2]. El primer paso sería entrevistar productores y empresas, registrar qué servicios se contratan fuera y armar una ruta piloto con reservas previas [C5]. Conviene si tenés oficio, unidad móvil o red de contactos; si no, es más pesado.\n\n¿Tenés experiencia o recursos en medición de granos o en oficios y mantenimiento rural?",
+      "citation_record_ids": [
+        "O03",
+        "O12",
+        "s14-04-01",
+        "s15-04-01",
+        "s14-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "clear_recommendation": true,
+        "no_distractors": true,
+        "single_question": true,
+        "north_choices": true
+      },
+      "timings": {
+        "generation_ms": 15936.01,
+        "retrieval_ms": 9403.48
+      },
+      "total_ms": 26024.09,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 194,
+      "trace": {
+        "intent": "recommend",
+        "zones": [
+          "Z5",
+          "Z6"
+        ],
+        "inherited_context": false,
+        "recommendation_ids": [
+          "O03",
+          "O12"
+        ],
+        "focus_opportunities": [],
+        "next_step": false,
+        "selected_record_ids": [
+          "O03",
+          "O12",
+          "s14-04-01",
+          "s15-01-01",
+          "s15-04-01",
+          "s14-01-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1",
+              "C6",
+              "C3",
+              "C2",
+              "C5"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1",
+              "C6",
+              "C3",
+              "C2",
+              "C5"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1",
+              "C6",
+              "C3",
+              "C2",
+              "C5"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        }
+      }
+    },
+    {
+      "question": "Profundiza con Varela",
+      "id": "36cc5a39d2004321acbcf2607bb00230",
+      "status": "answered",
+      "answer": "Empezaría por un servicio de medición de calidad y control de pérdidas en granos, para productores y operadores de José Pedro Varela que necesiten reducir mermas o mejorar el secado y la trazabilidad. La guía lo plantea como posibilidad a validar, no como demanda comprobada, y propone cobrar por tonelada, análisis o servicio, con contratos estacionales y estándares acordados [C1][C3].\n\nAntes de comprar equipos o asumir un local, haría una prueba comercial chica: pediría datos de una campaña completa, compararía escenarios de volumen y calidad, y preguntaría quién paga, cuándo paga y quién asume pérdidas por humedad, rechazo o demora. Conviene probar un servicio o lote acotado y fijar indicadores antes de invertir; una carta de intención debe distinguir volumen indicativo de compromiso vinculante [C2]. También verificaría con operadores la capacidad realmente disponible, sin dar por hecho el acceso a instalaciones existentes [C3].\n\nEl riesgo que puede frenar este primer paso es que una sola campaña o un solo cliente explique toda la recuperación de la inversión [C1]. ¿Tenés experiencia o contactos con productores o acopios de la zona como para conseguir datos de una campaña y hacer esa prueba?",
+      "citation_record_ids": [
+        "O03",
+        "s14-04-01",
+        "s14-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "clear_recommendation": true,
+        "no_distractors": true,
+        "single_question": true,
+        "grain_focus": true
+      },
+      "timings": {
+        "generation_ms": 4520.07,
+        "retrieval_ms": 1402.26
+      },
+      "total_ms": 6317.07,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 190,
+      "trace": {
+        "intent": "develop",
+        "zones": [
+          "Z5"
+        ],
+        "inherited_context": true,
+        "recommendation_ids": [
+          "O03"
+        ],
+        "focus_opportunities": [
+          "O03"
+        ],
+        "next_step": false,
+        "selected_record_ids": [
+          "O03",
+          "s14-04-01",
+          "s14-01-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1",
+              "C3",
+              "C2"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1",
+              "C3",
+              "C2"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1",
+              "C3",
+              "C2"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        }
+      }
+    },
+    {
+      "question": "¿Cómo arranco?",
+      "id": "9cc919107fcc43ddae4e27500f1b8226",
+      "status": "answered",
+      "answer": "Empezá por hablar con productores y operadores de granos de José Pedro Varela y pedirles datos de una campaña completa: escenarios de volumen y calidad, quién paga, cuándo paga y quién asume las pérdidas por humedad, rechazo o demora [C1][C2].\n\nCon esa información, definí un servicio o un lote a escala acotada y acordá los indicadores antes de invertir [C2]. No arranques comprando equipos ni suponiendo un local.\n\nAntes de probar, validá con el operador el volumen realmente disponible, la capacidad usada y libre, y las condiciones contractuales; no des por hecho el acceso a instalaciones sin acuerdo [C2][C3].\n\nEl obstáculo concreto es que, sin datos de campaña, no podés saber si el volumen justifica el servicio [C2].\n\n¿Tenés algún productor u operador para pedirle esos datos, o querés que veamos cómo identificar a quién contactar?",
+      "citation_record_ids": [
+        "O03",
+        "s14-04-01",
+        "s14-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "no_distractors": true,
+        "single_question": true,
+        "grain_focus": true,
+        "action_first": true,
+        "short_next_step": true
+      },
+      "timings": {
+        "generation_ms": 5023.92,
+        "retrieval_ms": 1557.63
+      },
+      "total_ms": 6901.34,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 136,
+      "trace": {
+        "intent": "develop",
+        "zones": [
+          "Z5"
+        ],
+        "inherited_context": true,
+        "recommendation_ids": [
+          "O03"
+        ],
+        "focus_opportunities": [
+          "O03"
+        ],
+        "next_step": true,
+        "selected_record_ids": [
+          "O03",
+          "s14-04-01",
+          "s14-01-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1",
+              "C2",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1",
+              "C2",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1",
+              "C2",
+              "C3"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        }
+      }
+    }
+  ],
+  "parameters": {
+    "model": "deepseek-v4.1-flash:1017",
+    "think": "low",
+    "temperature": 0.1,
+    "max_output_tokens": 4096
+  },
+  "source_hashes": {
+    "harness.py": "b6e7e1d7286977af60007f294b0cf2a78d2cfc48092f0b9f60af2cd1bba05bf4",
+    "rag.py": "1adcd598e727f0cf83e2e898f517f9fc7446e3a5c6134072b0f3b2f070660d0c",
+    "recommendations.py": "2f382ea2155af175b85cf6a3062ed8ff9ea02b478e8852b2e59040bd4b1d5f7e",
+    "project_memory.py": "f3f573e0efba767e6e7951c87ab1ad2702b1c68e433779cbb2a39da7733c6a39",
+    "planning.py": "3c965a2dcf2ded62337bcbc193d9eb52d8a7eb21365af0cc302f0cb932dec497",
+    "response_policy.py": "d88cc162b70fd78a9764a4d5444c0f094ec2112bede96f7860d26364a4beed43",
+    "response_validation.py": "d288ebfb88b2c5d5e970268cadc948c54cfd7597c08720b550516a13b329e6d3",
+    "conversation.py": "178c7b87a8c9887c2938bdd963113a7284aae382278344abdc7bde1b0a506376"
+  }
+}

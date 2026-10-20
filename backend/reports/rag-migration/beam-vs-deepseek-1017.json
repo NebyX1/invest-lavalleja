@@ -1,0 +1,430 @@
+{
+  "scope": "One fresh three-turn public API session per model, in listed order. Synthetic known cases; not factual certification or a statistically controlled benchmark. Cache/order/load can affect latency.",
+  "parameters": {
+    "temperature": 0.1,
+    "max_output_tokens": 4096,
+    "scenario": "locations"
+  },
+  "source_hashes": {
+    "harness.py": "3fcb698d6f7d6513aaf4b2fe0e901ad79bbb290f7d80afcd3665820c50cf9dd4",
+    "rag.py": "867f9fcab3334eed0145420ce432f978f35dbbbcae06f5252485eaaecb001a98",
+    "planning.py": "e49b84a000fdb775ede5e327e2b6365e18a26d429f68c51b6e196f6a5ef6ce40",
+    "response_policy.py": "f7b6236b387196d7a8f21cd786330fbdcba6347d4d6f18c469876c82a7135c90",
+    "response_validation.py": "ef42b8eb308617c7a905ad5d44a666960e39ac4b13f0c535b59ddf65a97e2a63",
+    "runtime.py": "d2974df2a126cf104ca020481a38cb93919a5f5d9c603ac31a5c3f22e705bec5"
+  },
+  "models": [
+    {
+      "model": "beam",
+      "think": "low",
+      "summary": {
+        "answered": 3,
+        "total": 3,
+        "checks_passed": 2,
+        "mean_http_ms": 15231.64,
+        "median_http_ms": 15681.97,
+        "mean_generation_ms": 5420.74,
+        "mean_retrieval_ms": 9169.93,
+        "repairs": 2,
+        "output_tokens_total": 6756
+      },
+      "report": {
+        "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+        "passed": 2,
+        "total": 3,
+        "results": [
+          {
+            "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+            "id": "d2a21db3aca14a25be3e1eeaf12ba345",
+            "status": "answered",
+            "answer": "### Local de ocio\n\n**Minas y entorno** [C1]\n- Principal condición a validar: uso y construcción por padrón (¿admite la actividad y la escala propuesta?) [C5]; incendios y seguridad antes de operar [C6].\n\n**Solís de Mataojo–Aguas Blancas** [C2]\n- Principal condición a validar: accesos, ruido, agua, saneamiento y compatibilidad de usos [C2].\n\n**Villa Serrana–Marco de los Reyes–Penitente** [C3][C4]\n- Principal condición a validar: respuesta técnica por padrón con normas vigentes; acceso todo el año, agua suficiente, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística [C4].\n\nPara comparar económicamente, conviene proyectar el costo total de cinco años bajo los mismos volúmenes (adquisición o renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora), separando costos cotizados de estimados y mostrando la fecha [C7].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+            "citation_record_ids": [
+              "s10-01-01",
+              "s11-02-01",
+              "s12-01-01",
+              "s12-04-01",
+              "s26-01-03",
+              "s29-01-07",
+              "s26-02-01"
+            ],
+            "checks": {
+              "answered": true,
+              "sources": true,
+              "private_state_absent": true,
+              "activity_preserved": true,
+              "territorial_sources": true,
+              "named_places": true,
+              "no_sector_reset": true,
+              "conditional": false
+            },
+            "timings": {
+              "generation_ms": 5991.84,
+              "retrieval_ms": 12410.34
+            },
+            "total_ms": 19107.45,
+            "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+            "usage": {
+              "prompt_tokens": 8242,
+              "output_tokens": 2540
+            },
+            "trace": {
+              "intent": "locations",
+              "activity": "local de ocio (bar/pub o local bailable; formato sin confirmar)",
+              "inherited_context": false,
+              "selected_record_ids": [
+                "s10-01-01",
+                "s11-02-01",
+                "s12-01-01",
+                "s12-04-01",
+                "s26-01-03",
+                "s29-01-07",
+                "s26-02-01",
+                "s12-02-01"
+              ],
+              "coverage": {
+                "ok": true,
+                "complete": true,
+                "missing": []
+              },
+              "repair_attempted": true,
+              "removed_uncited_lines": [
+                1,
+                4,
+                5,
+                9,
+                10,
+                14,
+                15
+              ],
+              "removed_attribution_paragraphs": []
+            }
+          },
+          {
+            "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+            "id": "5b2cd24b94cb43718a9cabddf1265de3",
+            "status": "answered",
+            "answer": "### Local de ocio\n\n**Minas y entorno** [C1]\n- Característica territorial documentada: primera puerta de entrada propuesta para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o base de servicios; zona comercial propuesta: ciudad, accesos y entorno productivo [C1].\n- Hipótesis de encaje: un bar/pub o experiencia gastronómica podría aprovechar la base de servicios y los accesos urbanos; un local bailable requeriría validar ruido, horarios y compatibilidad de usos en zona comercial [C1].\n- Principal condición a validar: informe vigente por padrón que admita la actividad y la escala propuesta [C5].\n\n**Villa Serrana – Marco de los Reyes – Penitente** [C3][C4]\n- Característica territorial documentada: oportunidad propuesta de crear experiencias por las que el visitante elija quedarse, regresar y recomendar; hospitalidad de diseño, guías, gastronomía, observación e interpretación pueden combinarse [C3].\n- Hipótesis de encaje: un bar/experiencia gastronómica articulada con operadores turísticos es la línea más coherente; un local bailable no se sostiene con la evidencia disponible y choca con la compatibilidad paisajística [C3][C4].\n- Principal condición a validar: respuesta técnica por padrón con normas vigentes, más relevo de acceso todo el año, agua suficiente, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística [C4].\n\nLa comparación económica debe hacerse sobre costo total de cinco años bajo los mismos volúmenes, separando costos cotizados de estimados y mostrando la fecha [C7]. Para incendios y seguridad, la ruta es Dirección Nacional de Bomberos y técnicos habilitados, a confirmar [C6].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+            "citation_record_ids": [
+              "s10-01-01",
+              "s12-01-01",
+              "s12-04-01",
+              "s26-01-03",
+              "s29-01-07",
+              "s26-02-01"
+            ],
+            "checks": {
+              "answered": true,
+              "sources": true,
+              "private_state_absent": true,
+              "activity_preserved": true,
+              "territorial_sources": true,
+              "named_places": true,
+              "no_sector_reset": true,
+              "conditional": true
+            },
+            "timings": {
+              "generation_ms": 7279.9,
+              "retrieval_ms": 7731.69
+            },
+            "total_ms": 15681.97,
+            "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+            "usage": {
+              "prompt_tokens": 8245,
+              "output_tokens": 3232
+            },
+            "trace": {
+              "intent": "locations",
+              "activity": "local de ocio (bar/pub o local bailable; formato sin confirmar)",
+              "inherited_context": true,
+              "selected_record_ids": [
+                "s10-01-01",
+                "s11-02-01",
+                "s12-01-01",
+                "s12-04-01",
+                "s26-01-03",
+                "s29-01-07",
+                "s26-02-01",
+                "s12-02-01"
+              ],
+              "coverage": {
+                "ok": true,
+                "complete": true,
+                "missing": []
+              },
+              "repair_attempted": true,
+              "removed_uncited_lines": [],
+              "removed_attribution_paragraphs": [
+                {
+                  "paragraph": 1,
+                  "citation_ids": [
+                    "C2"
+                  ],
+                  "missing_concepts": [
+                    "property_inventory"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+            "id": "200f217343d342139203c615b74d5993",
+            "status": "answered",
+            "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\nAntes de alquilar un local bailable en Minas, conviene verificar estos puntos documentados:\n\n- **Compatibilidad de uso y escala con el padrón.** Solicitá un informe vigente por padrón que indique normativa y condiciones de obra, y respondé si la actividad y la escala propuestas son admisibles [C1].\n- **Seguridad e incendios.** Confirmá proyecto, medidas, inspecciones y condiciones antes de ocupar u operar, con la Dirección Nacional de Bomberos y técnicos habilitados; la ruta concreta debe confirmarse [C2].\n- **Debida diligencia territorial.** Comprobá compatibilidad de uso, circulación de cargas, vecinos sensibles, potencia eléctrica, conectividad efectiva, tratamiento de residuos y posibilidad de expansión [C7].\n- **Comparación económica a cinco años.** Compará costo total bajo los mismos volúmenes: renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora; separá costos cotizados de estimados y mostrá la fecha [C3].\n\n**Límite importante:** la tesis comercial documentada para Minas y entorno es servicios industriales, equipos digitales y servicios empresariales, y la segmentación es funcional, no zonificación legal [C8]. El encaje de un local bailable es una hipótesis a validar con el padrón y la autoridad competente, no una compatibilidad garantizada.\n\n¿Tenés un padrón o dirección concreta para empezar la verificación?",
+            "citation_record_ids": [
+              "s26-01-03",
+              "s29-01-07",
+              "s26-02-01",
+              "s10-05-01",
+              "s09-01-02"
+            ],
+            "checks": {
+              "answered": true,
+              "sources": true,
+              "fire_source": true,
+              "premises_source": true,
+              "private_state_absent": true,
+              "activity_preserved": true,
+              "clarification": true
+            },
+            "timings": {
+              "generation_ms": 2990.48,
+              "retrieval_ms": 7367.75
+            },
+            "total_ms": 10905.51,
+            "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+            "usage": {
+              "prompt_tokens": 3311,
+              "output_tokens": 984
+            },
+            "trace": {
+              "intent": "requirements",
+              "activity": "local bailable o de ocio nocturno",
+              "inherited_context": true,
+              "selected_record_ids": [
+                "s26-01-03",
+                "s29-01-07",
+                "s26-02-01",
+                "s10-02-01",
+                "O11",
+                "s10-04-01",
+                "s10-05-01",
+                "s09-01-02"
+              ],
+              "coverage": {
+                "ok": true,
+                "complete": true,
+                "missing": []
+              },
+              "repair_attempted": false,
+              "removed_uncited_lines": [],
+              "removed_attribution_paragraphs": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "model": "deepseek-v4.1-flash:1017",
+      "think": "low",
+      "summary": {
+        "answered": 3,
+        "total": 3,
+        "checks_passed": 3,
+        "mean_http_ms": 20784.83,
+        "median_http_ms": 22440.86,
+        "mean_generation_ms": 9926.87,
+        "mean_retrieval_ms": 10158.08,
+        "repairs": 0,
+        "output_tokens_total": 6179
+      },
+      "report": {
+        "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+        "passed": 3,
+        "total": 3,
+        "results": [
+          {
+            "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+            "id": "2995c40abc2149678078c4618552a218",
+            "status": "answered",
+            "answer": "### Local de ocio\n\nPara un local de ocio, miraría tres escenarios documentados: Minas, Villa Serrana–Penitente y Solís–Aguas Blancas [C1][C3][C2]. No hay una ficha literal de “boliche”; comparo atributos documentados y marco el encaje como hipótesis.\n\n- **Minas.** Territorio documentado: se propone como primera puerta de entrada para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o una base de servicios; la zona comercial propuesta es ciudad, accesos y entorno productivo [C1]. Hipótesis de encaje: un bar/pub con espacio para encuentros o para después de actividades de formación podría encajar mejor que un bailable grande, porque la evidencia habla de coordinación y servicios, no de demanda nocturna [C1]. Condición principal: validar por padrón que el inmueble admita la actividad y la escala, con informe vigente de normativa y condiciones de obra [C5], y comparar el costo total a cinco años bajo los mismos volúmenes [C7].\n\n- **Villa Serrana–Penitente.** Territorio documentado: la oportunidad propuesta es crear experiencias de hospitalidad, guías, gastronomía, observación e interpretación; la rentabilidad depende de la operación y la distribución comercial, no de la vista [C3]. Hay instrumentos de planificación y categorías diferenciadas, y cada subámbito requiere revisión propia; no se afirma oferta de suelo habilitado, ocupación ni precios [C4]. Hipótesis de encaje: un bar/experiencia gastronómica o pub pequeño articulado a alojamiento y actividades encaja mejor como hipótesis que un local bailable; una tesis turística no prueba que admita discoteca [C3][C4]. Condición principal: respuesta técnica por padrón y relevar acceso todo el año, agua, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística; una vivienda existente no acredita ampliación o explotación turística [C4]. Sumar verificación de proyecto, medidas e inspecciones antes de ocupar u operar con Bomberos y técnicos habilitados, ruta a confirmar [C6].\n\n- **Solís de Mataojo–Aguas Blancas.** Territorio documentado: Aguas Blancas y el entorno rural pueden explorarse desde experiencias y hospitalidad selectiva, compatibles con paisaje y servicios; no corresponde mezclar tesis industrial y turística en un mismo predio sin analizar accesos, ruido, agua, saneamiento y compatibilidad de usos [C2]. Hipótesis de encaje: un bar/pub o experiencia gastronómica selectiva podría explorarse; un bailable requiere validar especialmente ruido, accesos y compatibilidad, y la cercanía a un corredor no basta [C2]. Condición principal: confirmar uso admitido y condiciones de operación por padrón [C5], y costos completos de adecuación, conexiones, energía, agua, transporte y seguros [C7].\n\nLa diferencia práctica: un bar/pub se juega más en experiencia gastronómica y operación; un local bailable exige validar ruido, seguridad e inspecciones antes de invertir [C2][C6].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+            "citation_record_ids": [
+              "s10-01-01",
+              "s11-02-01",
+              "s12-01-01",
+              "s12-04-01",
+              "s26-01-03",
+              "s29-01-07",
+              "s26-02-01"
+            ],
+            "checks": {
+              "answered": true,
+              "sources": true,
+              "private_state_absent": true,
+              "activity_preserved": true,
+              "territorial_sources": true,
+              "named_places": true,
+              "no_sector_reset": true,
+              "conditional": true
+            },
+            "timings": {
+              "generation_ms": 16812.14,
+              "retrieval_ms": 6939.08
+            },
+            "total_ms": 24665.67,
+            "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+            "usage": {
+              "prompt_tokens": 3457,
+              "output_tokens": 3833
+            },
+            "trace": {
+              "intent": "locations",
+              "activity": "local de ocio (bar/pub o local bailable; formato sin confirmar)",
+              "inherited_context": false,
+              "selected_record_ids": [
+                "s10-01-01",
+                "s11-02-01",
+                "s12-01-01",
+                "s12-04-01",
+                "s26-01-03",
+                "s29-01-07",
+                "s26-02-01",
+                "s12-02-01"
+              ],
+              "coverage": {
+                "ok": true,
+                "complete": true,
+                "missing": []
+              },
+              "repair_attempted": false,
+              "removed_uncited_lines": [],
+              "removed_attribution_paragraphs": []
+            }
+          },
+          {
+            "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+            "id": "0c47183d0ece428ca69a02411b0713a3",
+            "status": "answered",
+            "answer": "### Local de ocio\n\n**Minas (ciudad, accesos y entorno productivo)**\n- Característica documentada: se la propone como primera puerta de entrada para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o una base de servicios [C1].\n- Hipótesis de encaje: para un bar/pub con eje gastronómico, una ciudad con servicios y accesos puede ser un punto de partida razonable; la tesis de la guía es empresarial y de servicios, así que no prueba demanda nocturna ni clientela [C1].\n- Condición principal a validar: informe vigente por padrón sobre si admite la actividad y la escala propuesta [C5], más proyecto, medidas e inspecciones de seguridad antes de operar [C6].\n\n**Solís de Mataojo–Aguas Blancas**\n- Característica documentada: el entorno rural y Aguas Blancas se exploran desde experiencias y hospitalidad selectiva, compatibles con paisaje y servicios [C2].\n- Hipótesis de encaje: un bar/pub o experiencia gastronómica puede dialogar con esa lógica de hospitalidad; un local bailable exigiría una validación específica, porque la propia fuente advierte no mezclar tesis industrial y turística sin analizar accesos, ruido, agua, saneamiento y compatibilidad de usos [C2].\n- Condición principal a validar: esos cinco puntos (accesos, ruido, agua, saneamiento y compatibilidad de usos) antes de definir capacidad [C2], y la respuesta por padrón [C5].\n\n**Villa Serrana–Marco de los Reyes–Penitente**\n- Característica documentada: hay instrumentos de planificación y categorías diferenciadas, y el agrupamiento comercial de la guía no implica el mismo plan para todo Penitente [C4].\n- Hipótesis de encaje: la fuente propone investigar una experiencia gastronómica o un producto reconocible con programa concreto [C8]; eso no habilita por sí solo un bailable, que requiere compatibilidad de usos y ruido [C4].\n- Condición principal a validar: respuesta técnica por padrón con normas vigentes, más relevamiento de acceso todo el año, agua, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística [C4].\n\nEn los tres casos conviene comparar el costo total a cinco años bajo los mismos volúmenes —renta o adquisición, adecuación, conexiones, energía, agua, personal, seguros y riesgos de demora— separando cotizado de estimado [C7].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+            "citation_record_ids": [
+              "s10-01-01",
+              "s11-02-01",
+              "s12-04-01",
+              "s26-01-03",
+              "s29-01-07",
+              "s26-02-01",
+              "s12-02-01"
+            ],
+            "checks": {
+              "answered": true,
+              "sources": true,
+              "private_state_absent": true,
+              "activity_preserved": true,
+              "territorial_sources": true,
+              "named_places": true,
+              "no_sector_reset": true,
+              "conditional": true
+            },
+            "timings": {
+              "generation_ms": 6457.42,
+              "retrieval_ms": 8026.1
+            },
+            "total_ms": 15247.97,
+            "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+            "usage": {
+              "prompt_tokens": 3467,
+              "output_tokens": 1328
+            },
+            "trace": {
+              "intent": "locations",
+              "activity": "local de ocio (bar/pub o local bailable; formato sin confirmar)",
+              "inherited_context": true,
+              "selected_record_ids": [
+                "s10-01-01",
+                "s11-02-01",
+                "s12-01-01",
+                "s12-04-01",
+                "s26-01-03",
+                "s29-01-07",
+                "s26-02-01",
+                "s12-02-01"
+              ],
+              "coverage": {
+                "ok": true,
+                "complete": true,
+                "missing": []
+              },
+              "repair_attempted": false,
+              "removed_uncited_lines": [
+                1
+              ],
+              "removed_attribution_paragraphs": []
+            }
+          },
+          {
+            "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+            "id": "009ea2eaa52349829ac1bf9c18ef515f",
+            "status": "answered",
+            "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\nPara un local bailable en Minas no tengo una ficha específica en la evidencia disponible, así que te paso el método de verificación documentado y te marco el límite: la habilitación concreta de la actividad y la escala depende del inmueble y de la normativa vigente, que hay que confirmar caso por caso [C1].\n\n**Antes de firmar el alquiler, pedí y revisá:**\n\n- Informe vigente por padrón, normativa aplicable y condiciones de obra del inmueble: la pregunta de decisión es si admite la actividad y la escala que proponés [C1].\n- Ruta de Bomberos y técnicos habilitados: proyecto, medidas, inspecciones y condiciones antes de ocupar u operar; el alcance y procedimiento vigente hay que confirmarlos [C2].\n- Compatibilidad de uso, vecinos sensibles, potencia eléctrica, conectividad efectiva, tratamiento de residuos y posibilidad de expansión del local [C7]. Son verificaciones de debida diligencia territorial planteadas como hipótesis de trabajo, no como zonificación legal [C7][C8].\n- Costo total a cinco años bajo los mismos volúmenes: renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora; separá lo cotizado de lo estimado y anotá la fecha [C3].\n- Que el arrendador o titular te permita acceder a los datos urbanísticos y al padrón: no conviene decidir sobre mapas de “suelo disponible” sin padrón, permiso del titular y datos vigentes [C8].\n\n**Límite a tener presente:** la guía no trae una ficha de local bailable ni confirma compatibilidad normativa para ocio nocturno; eso se resuelve con el informe por padrón y la consulta a Bomberos, no con una tesis sectorial [C1][C2]. Tampoco hay que trasladar al bailable permisos o plazos pensados para otros rubros [C2][C4].\n\n¿Qué formato y capacidad estimás (pista de baile con bar, salón para eventos, otro), para orientar mejor la verificación del local?",
+            "citation_record_ids": [
+              "s26-01-03",
+              "s29-01-07",
+              "s26-02-01",
+              "s10-02-01",
+              "s10-05-01",
+              "s09-01-02"
+            ],
+            "checks": {
+              "answered": true,
+              "sources": true,
+              "fire_source": true,
+              "premises_source": true,
+              "private_state_absent": true,
+              "activity_preserved": true,
+              "clarification": true
+            },
+            "timings": {
+              "generation_ms": 6511.06,
+              "retrieval_ms": 15509.06
+            },
+            "total_ms": 22440.86,
+            "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+            "usage": {
+              "prompt_tokens": 3223,
+              "output_tokens": 1018
+            },
+            "trace": {
+              "intent": "requirements",
+              "activity": "local bailable o de ocio nocturno",
+              "inherited_context": true,
+              "selected_record_ids": [
+                "s26-01-03",
+                "s29-01-07",
+                "s26-02-01",
+                "s10-02-01",
+                "O11",
+                "s10-04-01",
+                "s10-05-01",
+                "s09-01-02"
+              ],
+              "coverage": {
+                "ok": true,
+                "complete": true,
+                "missing": []
+              },
+              "repair_attempted": false,
+              "removed_uncited_lines": [],
+              "removed_attribution_paragraphs": []
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "same_context_ids_by_turn": [
+    true,
+    true,
+    true
+  ],
+  "final_model": "deepseek-v4.1-flash:1017"
+}

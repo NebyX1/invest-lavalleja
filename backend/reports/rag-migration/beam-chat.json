@@ -1,0 +1,96 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 2,
+  "total": 3,
+  "results": [
+    {
+      "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+      "id": "b73fc53410874ea18cabc2f267aa7cdb",
+      "status": "answered",
+      "answer": "### Local de ocio\n\nTres lugares documentados para estudiar:\n\n**Minas (ciudad y entorno productivo)**\n- Característica territorial documentada: primera puerta de entrada propuesta para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o base de servicios; zona comercial propuesta con ciudad, accesos y entorno productivo [C1].\n- Principal condición a validar: que el padrón admita la actividad y la escala propuesta [C5]; incendios y seguridad antes de operar [C6].\n\n**Solís de Mataojo / Aguas Blancas (entorno rural)**\n- Característica territorial documentada: experiencias y hospitalidad selectiva, compatibles con paisaje y servicios; la cercanía a un corredor no basta por sí sola [C2].\n- Principal condición a validar: accesos, ruido, agua, saneamiento y compatibilidad de usos, sin mezclar tesis industrial y turística en un mismo predio [C2].\n\n**Villa Serrana / Marco de los Reyes / Penitente (sierras)**\n- Característica territorial documentada: vender una experiencia, no metros cuadrados; gastronomía y hospitalidad de diseño como parte de la oferta; cada subámbito requiere revisión propia [C3].\n- Principal condición a validar: respuesta técnica por padrón con normas vigentes; acceso todo el año, agua suficiente, solución de saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística [C4].\n\nEn todos los casos, compará el costo total de cinco años bajo los mismos volúmenes: adquisición o renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora; separá costos cotizados de estimados y mostrá la fecha [C7].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": true,
+        "named_places": true,
+        "no_sector_reset": true,
+        "conditional": false
+      },
+      "timings": {
+        "generation_ms": 6268.9,
+        "retrieval_ms": 7800.61
+      },
+      "total_ms": 14870.42
+    },
+    {
+      "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+      "id": "174cb5d71069425b9202f285eb9db48d",
+      "status": "answered",
+      "answer": "### Local de ocio\n\n**Minas y entorno**\n- Característica territorial documentada: es la primera puerta de entrada propuesta para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o una base de servicios; zona comercial propuesta: ciudad, accesos y entorno productivo [C1].\n- Hipótesis de encaje: un bar/pub con base de servicios y coordinación empresarial encaja mejor que un bailable, porque la tesis documentada es de servicios y reuniones, no de demanda nocturna [C1].\n- Principal condición a validar: que el padrón admita la actividad y la escala propuesta, con informe vigente por padrón, normativa y condiciones de obra [C5].\n\n**Solís de Mataojo – Aguas Blancas y entorno rural**\n- Característica territorial documentada: experiencias y hospitalidad selectiva, compatibles con paisaje y servicios; no corresponde mezclar la tesis industrial y la turística en un mismo predio sin analizar accesos, ruido, agua, saneamiento y compatibilidad de usos [C2].\n- Hipótesis de encaje: un bar o experiencia gastronómica vinculada a hospitalidad selectiva podría encajar; un local bailable es menos compatible por ruido y compatibilidad de usos, que deben analizarse caso por caso [C2].\n- Principal condición a validar: accesos, ruido, agua, saneamiento y compatibilidad de usos del predio [C2].\n\n**Villa Serrana – Marco de los Reyes – Penitente**\n- Característica territorial documentada: oportunidad propuesta de crear experiencias por las que el visitante elija quedarse, regresar y recomendar; hospitalidad de diseño, guías, gastronomía, observación e interpretación pueden combinarse [C3]; cada subámbito requiere revisión propia y no se afirma oferta de suelo habilitado ni precios comprobados [C4].\n- Hipótesis de encaje: un bar o experiencia gastronómica articulada con operadores turísticos encaja con la tesis de experiencias; una discoteca no está respaldada por la tesis documentada [C3][C8].\n- Principal condición a validar: suelo y paisaje (acceso todo el año, agua suficiente, saneamiento, energía, prevención de incendios, evacuación, pendientes, compatibilidad paisajística) y respuesta técnica por padrón con normas vigentes [C4].\n\nPara compararlos económicamente, conviene usar el mismo método: costo total de cinco años bajo los mismos volúmenes, separando costos cotizados de estimados y mostrando la fecha [C7]. Y antes de ejecutar, verificar incendios y seguridad con la ruta correspondiente [C6].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s12-02-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": true,
+        "named_places": true,
+        "no_sector_reset": true,
+        "conditional": true
+      },
+      "timings": {
+        "generation_ms": 3741.45,
+        "retrieval_ms": 6975.71
+      },
+      "total_ms": 11370.76
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "d8468bb551a4445e80eeae8adb214124",
+      "status": "answered",
+      "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\nAntes de alquilar un local bailable en Minas, conviene verificar primero el inmueble y después el padrón: pedí un informe vigente por padrón con normativa y condiciones de obra, y confirmá si admite la actividad y la escala propuesta [C1].\n\nEn la debida diligencia territorial, comprobá compatibilidad de uso, circulación de cargas, vecinos sensibles, potencia eléctrica, conectividad efectiva, tratamiento de residuos y posibilidad de expansión [C7]. Para un bailable, los vecinos sensibles y la circulación nocturna son especialmente relevantes, aunque la guía no detalla requisitos específicos de ocio nocturno.\n\nEn incendios y seguridad, verificá proyecto, medidas, inspecciones y condiciones antes de ocupar u operar; la ruta con Bomberos y técnicos habilitados debe confirmarse, porque no se inventan costos ni plazos [C2].\n\nCompará el costo total de cinco años bajo los mismos volúmenes: renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora; separá costos cotizados de estimados y mostrá la fecha [C3].\n\nTené en cuenta que la tesis comercial documentada para Minas y entorno es servicios industriales, equipos digitales y servicios empresariales, no demanda nocturna; eso es una hipótesis a investigar, no una garantía de público para un bailable [C4][C8].\n\n¿Querés que te ayude a armar una lista de verificación para la visita al inmueble o a identificar el interlocutor correcto para confirmar esos permisos?",
+      "citation_record_ids": [
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s10-02-01",
+        "s10-05-01",
+        "s09-01-02"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 4097.26,
+        "retrieval_ms": 7607.09
+      },
+      "total_ms": 12135.48
+    }
+  ]
+}

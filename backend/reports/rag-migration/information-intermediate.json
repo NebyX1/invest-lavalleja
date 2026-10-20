@@ -1,0 +1,125 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 4,
+  "total": 6,
+  "results": [
+    {
+      "question": "Quiero información sobre eficiencia energética en Lavalleja.",
+      "id": "c7a8384632c74d5d9884d40067082b77",
+      "status": "clarify",
+      "answer": "No pude interpretar tu consulta con suficiente seguridad. ¿Podés reformularla o contarme qué necesitás saber? Si es sobre un proyecto en Lavalleja, buscaré la información en la guía y te mostraré las fuentes.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": false,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "energy_source": false,
+        "answered": false
+      },
+      "timings": null,
+      "total_ms": 2214.56
+    },
+    {
+      "question": "¿En qué zonas la menciona la guía?",
+      "id": "fe8146062fa24d018d03749b7ec41a20",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con información documentada suficiente para responder esa consulta.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": false,
+        "documented_zones": false
+      },
+      "timings": {
+        "generation_ms": 2854.74,
+        "retrieval_ms": 11852.86
+      },
+      "total_ms": 15002.91
+    },
+    {
+      "question": "En dónde puedo invertir en energías renovables en Lavalleja?",
+      "id": "e7921b27558044d8aa40a6c57f73c3df",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con ubicaciones documentadas para instalar proyectos de generación de energía renovable en Lavalleja.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true
+      },
+      "timings": null,
+      "total_ms": 376.8
+    },
+    {
+      "question": "¿Cuáles son los padrones disponibles para instalar un parque eólico?",
+      "id": "c584d94d8ee4485e9b468076ac55ec94",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con un listado verificado de predios o padrones disponibles para ese proyecto.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true,
+        "abstains": true,
+        "no_unrelated_sources": true
+      },
+      "timings": null,
+      "total_ms": 388.11
+    },
+    {
+      "question": "Quiero información sobre poscosecha en José Pedro Varela.",
+      "id": "01e6dc83a3db489f9257d4eef6c50f84",
+      "status": "answered",
+      "answer": "La guía incluye a José Pedro Varela y su entorno con una tesis comercial a investigar en arroz, granos, poscosecha, calidad y eficiencia, y plantea como primera pregunta quién garantiza abastecimiento, compra y capacidad de pago [C1].\n\nAdemás, figura una ficha sobre poscosecha, medición y eficiencia en granos para esa zona, con estado de hipótesis: se orienta a productores y operadores que necesitan control, reducción de pérdidas o servicios específicos, con tarifa por tonelada, análisis o servicio y contratos estacionales con estándares [C2]. Esa ficha no constituye una oferta de activos ni una recomendación financiera [C2].",
+      "citation_record_ids": [
+        "s09-01-06",
+        "O03"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "grain_source": true,
+        "no_other_business": true
+      },
+      "timings": {
+        "generation_ms": 1729.58,
+        "retrieval_ms": 4640.44
+      },
+      "total_ms": 6629.79
+    },
+    {
+      "question": "¿Me asegurás una rentabilidad del 20%?",
+      "id": "aaaebad5a0844caa83c53746f3f7c36e",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con cifras verificadas de rentabilidad para responder esa consulta. No puedo asegurar un rendimiento.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true
+      },
+      "timings": null,
+      "total_ms": 504.19
+    }
+  ]
+}

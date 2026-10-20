@@ -4,7 +4,9 @@
 
 Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro. No se modificaron repositorios remotos.
 
-**Estado actual:** Gianna usa `deepseek-v4.1-flash` en la pila local de prueba. Un harness distingue conversación, consulta RAG, preguntas externas, burlas, privacidad y pedidos dañinos antes de recuperar documentos. Las respuestas sobre inversión requieren fuentes; la conversación no muestra citas irrelevantes ni rechazos en tercera persona. La pila Docker de prueba humana está aislada y avisa que el contenido no fue revisado. La base operativa permanece sin publicación y no está validada para producción. Se aprobaron 106 pruebas Python, 12 pruebas de navegador de Gianna (escritorio y móvil) y una batería real de 16/16 diálogos; esos resultados no certifican exactitud factual. SMTP real y Coolify remoto no están validados. Consultar `reports/VALIDACION.md` y completar `docs/PUESTA_EN_MARCHA.md` antes de abrirla al público.
+**Motor RAG actualizado · 19/10/2026:** Bekko OpenVINO CPU + Horizon ONNX CPU + LanceDB (cosine exacto y BM25 español). Preparación explícita de modelos, versiones con huella nueva y reindexación obligatoria. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes de septiembre que siguen describen verificaciones históricas.
+
+**Estado conversacional:** Gianna usa `deepseek-v4.1-flash` en la pila local de prueba. Un harness distingue conversación, consulta RAG, preguntas externas, burlas, privacidad y pedidos dañinos antes de recuperar documentos. Las respuestas sobre inversión requieren fuentes; la conversación no muestra citas irrelevantes ni rechazos en tercera persona. La pila Docker de prueba humana está aislada y avisa que el contenido no fue revisado. La base operativa permanece sin publicación y no está validada para producción. Se aprobaron 106 pruebas Python, 12 pruebas de navegador de Gianna (escritorio y móvil) y una batería real de 16/16 diálogos; esos resultados no certifican exactitud factual. SMTP real y Coolify remoto no están validados. Consultar `reports/VALIDACION.md` y completar `docs/PUESTA_EN_MARCHA.md` antes de abrirla al público.
 
 ## Qué incluye
 
@@ -17,7 +19,7 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 - Laboratorio de recuperación y chat, evaluación de recuperación con preguntas cargables, publicación con confirmación, retorno a versiones previamente publicadas y borrado protegido de una base con sus versiones.
 - Analítica agregada de consultas, latencia, tokens informados por el proveedor, referencias, feedback y temas recuperados. No se inventan montos facturados ni porcentajes de exactitud.
 - Chat público de prueba `/chat`; isla React activa en `../src/components/islands/GiannaChat.tsx`; `AgentHarness` controla rutas, respuestas de seguridad y acceso al RAG; contexto corto cifrado de hasta seis intercambios, botón para olvidar y límites de uso. Ambos inicios de sesión exigen CAPTCHA.
-- Compose, Dockerfile, scripts de arranque, copia/restauración de SQLite, migraciones y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un volumen Qdrant.
+- Compose, Dockerfile, scripts de arranque, copia/restauración de SQLite, migraciones y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un índice LanceDB precalculado.
 
 ## Stack decidido
 
@@ -26,14 +28,14 @@ Portal Astro / isla React
         ↓
 Flask + Gunicorn + Jinja + SQLite WAL
         ↓
-FastEmbed + multilingual-E5-small ONNX (384 dimensiones, CPU)
+Bekko OpenVINO (384 dimensiones, CPU)
         ↓
-Qdrant Server: dense + BM25 español + RRF
+LanceDB: cosine + BM25 español + RRF → Horizon cross-encoder
         ↓
 Ollama Cloud API: Authorization Bearer desde OLLAMA_API_KEY
 ```
 
-Solo dos servicios persistentes de aplicación: `api` y `qdrant`. El trabajo de indexación usa un hilo supervisado dentro del único proceso de la API y una cola SQLite durable. No se agregan Redis, Celery, MariaDB, MinIO, un servidor de embeddings ni un Ollama local. Se usa Qdrant por HTTP/REST con HTTPX, no hace falta `qdrant-client`.
+Un servicio persistente de backend: `api`; LanceDB se aloja junto a SQLite en el volumen de datos. El trabajo de indexación usa un hilo supervisado dentro del único proceso de la API y una cola SQLite durable. No se agregan Redis, Celery, MariaDB, MinIO, un servidor de embeddings ni un Ollama local. Bekko y Horizon comparten el control de inferencia CPU. LanceDB se ejecuta embebido.
 
 `D:\Ai Projects\chat-onnx-local` se tomó como referencia de separación navegador → API → proveedor y de interacción conversacional. Aquí la interfaz se adapta a una isla React en Astro y la API a RAG con citas; no se trasladó su SPA ni su servidor llama.cpp local.
 
@@ -56,11 +58,11 @@ Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y 
 
 Si hay SMTP configurado y se quiere el segundo factor por correo como en el Buzón Ciudadano, crear la cuenta con `flask --app wsgi create-admin --mfa email`. Sin SMTP, conservar TOTP; nunca desactivar el segundo factor para suplir la falta de correo.
 
-El panel permite trabajar con documentos antes de configurar Ollama. Para generar respuestas se necesita una clave válida y seleccionar un modelo que exista en el catálogo real. El botón **Cargar catálogo real de Ollama** evita adivinar nombres. La primera indexación descarga la exportación E5; las siguientes reutilizan el volumen de modelos.
+El panel permite trabajar con documentos antes de configurar Ollama. Para generar respuestas se necesita una clave válida y seleccionar un modelo que exista en el catálogo real. El botón **Cargar catálogo real de Ollama** evita adivinar nombres. Antes de indexar, ejecutar `docker compose run --rm api python -m scripts.prepare_models`. Las consultas solo leen los modelos locales verificados.
 
 ### Prueba humana local del chat
 
-La instancia de prueba usa `compose.human-test.yaml`, el puerto **127.0.0.1:8001** y volúmenes SQLite/Qdrant distintos de los operativos. Nunca aplicar este override en Coolify. El modo de prueba rechaza hosts y orígenes no locales y muestra un aviso de guía no revisada en `/gianna/`. En la raíz Astro, `.env.local` debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`; no contiene secretos y está ignorado por Git. Iniciar o reiniciar `npm run dev` para que Astro lo tome.
+La instancia de prueba usa `compose.human-test.yaml`, el puerto **127.0.0.1:8001** y volúmenes SQLite/LanceDB distintos de los operativos. Nunca aplicar este override en Coolify. El modo de prueba rechaza hosts y orígenes no locales y muestra un aviso de guía no revisada en `/gianna/`. En la raíz Astro, `.env.local` debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`; no contiene secretos y está ignorado por Git. Iniciar o reiniciar `npm run dev` para que Astro lo tome.
 
 ```powershell
 # Desde backend/, con .env local configurado (incluida la clave de Ollama):
@@ -70,13 +72,13 @@ docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -
 docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env restart api
 ```
 
-Esperar a que `http://127.0.0.1:8001/api/config` indique `available: true` y `test_mode: true`; abrir `http://localhost:4321/gianna/`. El script selecciona **solo** los registros marcados públicos, verifica conteos de SQLite/Qdrant y activa exclusivamente el puntero de la pila aislada. Su marca de aprobación es técnica y **no** sustituye revisión editorial. No copiar su volumen ni su base de datos a producción. Las preguntas y fragmentos recuperados se envían a Ollama Cloud, así que no introducir datos confidenciales. Para detener solo la pila de prueba, usar `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env stop` (sin `down -v`).
+Esperar a que `http://127.0.0.1:8001/api/config` indique `available: true` y `test_mode: true`; abrir `http://localhost:4321/gianna/`. El script selecciona **solo** los registros marcados públicos, verifica conteos de SQLite/LanceDB y activa exclusivamente el puntero de la pila aislada. Su marca de aprobación es técnica y **no** sustituye revisión editorial. No copiar su volumen ni su base de datos a producción. Las preguntas y fragmentos recuperados se envían a Ollama Cloud, así que no introducir datos confidenciales. Para detener solo la pila de prueba, usar `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env stop` (sin `down -v`).
 
 La evaluación adversarial de diálogo se ejecuta **solo** por petición explícita, porque consume tokens de Ollama Cloud y usa la base técnica local: `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.evaluate_dialogue`. Cubre humor, crítica, propuestas personales, hechos externos, actualidad, actividad sensible, corrección, explotación/coerción, privacidad, inversión con seguimiento e inyección para forzar un beneficio fiscal. El script verifica rutas, ausencia de citas improcedentes y algunos fallos de redacción; no es un juez semántico ni una validación jurídica.
 
 ## Primera base de conocimiento
 
-1. Obtener la guía fuente por un canal autorizado, convertirla localmente con `python scripts/convert_guide.py <archivo.docx> --output knowledge` y cargar `knowledge/invest_lavalleja_2026.gianna.json` en **Bases**. El corpus contiene material editorial interno y no se versiona en Git.
+1. Obtener la guía fuente por un canal autorizado, convertirla localmente con `python scripts/convert_guide.py <archivo.docx> --output knowledge` y cargar `knowledge/invest_lavalleja_2026.gianna.json` en **Bases**. El JSON de trabajo queda fuera de Git (ver nota de GitHub al final).
 2. Abrir el borrador, revisar contenido y fuentes. La conversión contiene 271 registros: 196 públicos y 75 internos. Revisar y aprobar los registros públicos que correspondan.
 3. Crear la versión vectorial. Abrir su trabajo para ver progreso y errores. Esperar que finalice antes de probar o publicar.
 4. En la versión, revisar chunks, temas y mapa. Cargar `knowledge/pruebas_recuperacion.json` en la evaluación y usar el laboratorio.
@@ -91,9 +93,9 @@ Para importar la guía sin aprobarla desde la consola del contenedor, copiar el 
 
 Los secretos permanecen en `.env` local o en las variables de ejecución de Coolify. El panel no puede leer ni modificar sus valores. `SECRET_KEY` y `ENCRYPTION_KEY` son diferentes y deben conservarse. Cambiar la clave de cifrado sin migración vuelve ilegibles los secretos TOTP y el contexto cifrado.
 
-Las variables operativas completas están en `.env.example`. Nombre, saludo, tono, aviso, modelo generativo, parámetros de recuperación, tamaño/solapamiento de chunks, límites y retención se administran desde Ajustes. El modelo E5 y su espacio vectorial no se cambian con un selector genérico que pudiera mezclar vectores incompatibles.
+Las variables operativas completas están en `.env.example`. Nombre, saludo, tono, aviso, modelo generativo, parámetros de recuperación, tamaño/solapamiento de chunks, límites y retención se administran desde Ajustes. Los modelos Bekko/Horizon y su espacio vectorial no se cambian con un selector genérico que pudiera mezclar vectores incompatibles.
 
-Antes de producción, fijar `E5_REVISION` al commit resuelto que muestra el perfil de indexación. `main` facilita la primera descarga, pero no es una referencia reproducible. La aplicación detecta cambios de huella y falla de forma cerrada en lugar de mezclar modelos.
+Las revisiones y artefactos están fijados en `gianna/services/neural.py`; el preparador verifica SHA-256. La aplicación detecta cambios de huella y exige una versión nueva.
 
 ## Documentación
 
@@ -105,7 +107,7 @@ Antes de producción, fijar `E5_REVISION` al commit resuelto que muestra el perf
 - `docs/PUESTA_EN_MARCHA.md`: comprobaciones reales pendientes.
 - `integration/README.md`: contrato de conexión; la implementación activa está en `../src/pages/gianna.astro` y `../src/components/islands/GiannaChat.tsx`.
 
-**GitHub:** `backend/samples/Invest_Lavalleja_2026.gianna.json` y `knowledge/` se excluyen porque contienen material editorial interno. La mención al ZIP anterior se refiere a una entrega separada, no a este repositorio. Para recrear el corpus, obtener la guía fuente por un canal autorizado y seguir el comando local de conversión indicado arriba.
+**GitHub:** el repositorio es público. `backend/samples/Invest_Lavalleja_2026.gianna.json`, `knowledge/` y el JSON de trabajo de la raíz de `better-rag/` quedan fuera de Git. El documento sectorial (`better-rag/Conocimiento_Sectorial_Lavalleja_2026_10_19.docx`) y su versión consolidada (`better-rag/consolidated/`) se publicaron por decisión del responsable del proyecto; antes de cualquier nueva subida conviene revisar la clasificación del material. La mención al ZIP anterior se refiere a una entrega separada, no a este repositorio. Para recrear el corpus de trabajo, obtener la guía fuente por un canal autorizado y seguir el comando local de conversión indicado arriba.
 - `reports/VALIDACION.md`: qué se ejecutó y qué no.
 
 ## Pruebas en el equipo destino

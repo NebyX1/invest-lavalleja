@@ -62,4 +62,4 @@ Comprobar la ayuda del script si se cambia de versión. El panel usa las mismas 
 
 ## Pendiente antes de atención pública
 
-Revisión humana de la asignación temática y de audiencia; vigencia de normativa y canales; aprobación institucional del contenido; resultados de recuperación E5; calidad de las respuestas generadas; protección de datos y reglas de retención aplicables al servicio. No se certifica jurídicamente la guía ni se la reemplaza por conocimientos externos.
+Revisión humana de la asignación temática y de audiencia; vigencia de normativa y canales; aprobación institucional del contenido; resultados de recuperación Bekko/Horizon; calidad de las respuestas generadas; protección de datos y reglas de retención aplicables al servicio. No se certifica jurídicamente la guía ni se la reemplaza por conocimientos externos.

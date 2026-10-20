@@ -1,0 +1,93 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 3,
+  "total": 3,
+  "results": [
+    {
+      "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+      "id": "2b303ba8e72842b6bc2bd346c41cd64c",
+      "status": "answered",
+      "answer": "### Local de ocio\n\nPara un boliche miraría primero Minas, después Villa Serrana–Penitente y, en tercer lugar, Solís–Aguas Blancas. En Minas la guía propone la ciudad y su entorno como base de servicios, coordinación y accesos, lo que encaja como hipótesis para un local urbano de ocio nocturno; la condición a validar es que el padrón admita la actividad y la escala propuesta, con informe vigente de uso y construcción [C1][C5].\n\nVilla Serrana y Penitente aparecen asociados a experiencias, gastronomía y hospitalidad de diseño. Eso puede alimentar un bar con propuesta gastronómica, pero no prueba que el lugar admita un bailable: una tesis turística no autoriza discoteca. Antes de avanzar hay que revisar acceso durante todo el año, agua suficiente, saneamiento, energía, prevención de incendios, evacuación y compatibilidad paisajística por padrón [C3][C4].\n\nSolís de Mataojo y Aguas Blancas se plantean para hospitalidad selectiva compatible con paisaje y servicios; la propia fuente advierte no mezclar la lógica industrial y la turística sin analizar accesos, ruido, agua y saneamiento. Sería una opción solo si el formato es pequeño y controlado, no un bailable masivo [C2].\n\nEn los tres casos conviene comparar el costo total a cinco años bajo los mismos volúmenes, separando lo cotizado de lo estimado y con fecha [C7].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s26-02-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": true,
+        "named_places": true,
+        "no_sector_reset": true,
+        "conditional": true
+      },
+      "timings": {
+        "generation_ms": 5549.38,
+        "retrieval_ms": 6383.33
+      },
+      "total_ms": 12709.65
+    },
+    {
+      "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+      "id": "4e8fc667446343f3a0d9355cb8264a63",
+      "status": "answered",
+      "answer": "### Local de ocio\n\nEmpezaría por **Minas**, **Villa Serrana–Penitente** y **Solís de Mataojo–Aguas Blancas**; la recomendación inicial sigue siendo Minas como puerta de entrada para proyectos que necesiten coordinación y base de servicios [C1]. Para un bar/pub miraría Minas por esa concentración de actividad propuesta, como hipótesis de encaje, no porque la guía pruebe demanda nocturna [C1]. Condición a validar: informe vigente por padrón, normativa y condiciones de obra [C5], y costo total a cinco años con los mismos volúmenes [C7].\n\nVilla Serrana–Penitente lo miraría para un bar con experiencia gastronómica, no para un bailable: el planteo documentado es de experiencias, gastronomía y hospitalidad [C3][C8], y eso no habilita discoteca. Validaría acceso todo el año, agua, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística [C4]; además, no está afirmada oferta de suelo habilitado ni precios [C4].\n\nSolís–Aguas Blancas aparece desde experiencias y hospitalidad selectiva [C2]. Lo miraría para un bar/pub de perfil tranquilo, como hipótesis, y antes validaría accesos, ruido, agua, saneamiento y compatibilidad de usos, que la fuente marca al advertir no mezclar lógicas en un mismo predio [C2]. También compararía costos completos y recorridos reales [C2][C7].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s26-02-01",
+        "s12-02-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": true,
+        "named_places": true,
+        "no_sector_reset": true,
+        "conditional": true
+      },
+      "timings": {
+        "generation_ms": 11241.32,
+        "retrieval_ms": 6846.53
+      },
+      "total_ms": 18783.56
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "f03fc87a10824cb5b3fc095a255c5b57",
+      "status": "answered",
+      "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\nAntes de firmar, lo primero es confirmar que ese inmueble admite la actividad y la escala que querés: pedí un informe vigente por padrón sobre normativa y condiciones de obra, y no te quedes con lo que diga el dueño [C1]. Ese es el punto que puede voltear todo el resto.\n\nDespués, el frente de incendios y seguridad: proyecto, medidas e inspecciones antes de ocupar u operar, con Bomberos y técnicos habilitados, confirmando alcance y procedimiento vigente [C2]. En un local bailable esto suele ser determinante, así que conviene hablarlo antes del contrato, no después.\n\nSumá una revisión territorial del inmueble concreto: compatibilidad de uso, vecinos sensibles, potencia eléctrica, conectividad efectiva y tratamiento de residuos [C7]. Para ocio nocturno, los vecinos sensibles y el ruido son el riesgo obvio, pero la guía no trae una ficha específica de bailable: eso lo tenés que verificar caso por caso.\n\nEn lo económico, compará el costo total a cinco años con los mismos volúmenes: alquiler, adecuación, conexiones, energía, agua, personal, mantenimiento y seguros, separando lo cotizado de lo estimado y con fecha [C3]. Un alquiler barato puede salir caro si la adecuación es grande.\n\nUn límite claro: el perfil documentado de Minas apunta a servicios industriales y empresariales, no a demanda nocturna; que haya público para un bailable es una hipótesis a probar, no un dato [C8].\n\n¿El local que estás mirando ya tuvo un uso similar habilitado o es un espacio a acondicionar desde cero?",
+      "citation_record_ids": [
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s10-05-01",
+        "s09-01-02"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 5005.83,
+        "retrieval_ms": 7490.38
+      },
+      "total_ms": 12970.03
+    }
+  ]
+}

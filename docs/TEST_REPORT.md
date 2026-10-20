@@ -1,5 +1,22 @@
 # Reporte de verificación — Invest Lavalleja
 
+## Gianna como asistente de información · 19/10/2026
+
+Se actualizaron la presentación, el título SEO, el saludo, el encabezado del chat, el placeholder y la invitación desde portada para describir un rol informativo, no de asesoramiento. Se mantienen el aviso de alcance, las fuentes, la alternativa sin JavaScript y los controles de sesión/CAPTCHA.
+
+Check, lint, **9 pruebas unitarias** y build de **32 páginas** correctos. La suite Gianna de escritorio/móvil terminó **12/12** en su corrida final, con API interceptada. El backend pasó **166 pruebas** y el escenario informativo de seis consultas por la API/proveedor reales pasó **6/6**. Resultados, incidencia del primer lote móvil y límites en [validación del backend](../backend/reports/VALIDACION.md).
+
+## Actualización de banners y mapa · 19/10/2026
+
+- Tres banners conceptuales ampliados con edición de imágenes integrada y exportados a WebP de 1600 × 900 (16:9), en `public/media/block-banners/`.
+- SVG movido a `public/media/map/Lavalleja-Map.svg`, sin cambios de contenido. SHA-256 antes y después: `3e4bb9a838bf23c85311ae54eac73af9f990371ffaf63bccff7c06047c510f14`.
+- Rutas editoriales, dimensiones HTML e imagen Open Graph actualizadas. No se alteraron el HTML ni el CSS de referencia. Los panoramas anteriores se conservaron fuera de la carpeta pública; ver [mantenimiento y prompts](MEDIA.md).
+- El extractor preserva los banners editados y transforma rutas y dimensiones. Una prueba con referencia sintética comprueba que no sobrescribe los archivos ni modifica datos si falta un banner.
+
+Validación: `npm run check` sin errores, warnings ni hints; lint correcto; **9/9 pruebas unitarias**; build correcto con **32 páginas**. Se revisaron los 32 HTML compilados: ninguno apunta a las rutas antiguas. Playwright: **4/4 pruebas dirigidas** en escritorio y móvil, verificando carga real de todos los banners de portada/oportunidades, dimensiones naturales y declaradas, `object-fit:cover`, imagen social, ausencia de desbordamiento y selección de localidades del SVG. No se repitió toda la suite del portal ni las pruebas de chat para un cambio exclusivo de assets.
+
+## Validación histórica de la entrega inicial
+
 Fecha de cierre: 2026-09-28
 
 ## Resultado

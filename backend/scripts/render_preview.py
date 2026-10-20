@@ -26,7 +26,7 @@ def url_for(endpoint,**kwargs):
 env=Environment(loader=FileSystemLoader(root/'gianna/templates'),autoescape=select_autoescape(['html']),undefined=StrictUndefined)
 env.filters['when']=lambda x:'Sin actividad todavía' if not x else 'Vista previa'
 env.filters['pretty']=lambda x:json.dumps(json.loads(x) if isinstance(x,str) else x,ensure_ascii=False,indent=2)
-env.globals.update(url_for=url_for,csrf_token=lambda:'STATIC-PREVIEW-NOT-A-SESSION',get_flashed_messages=lambda **kw:[('info','Vista estática de las plantillas reales. No conectada a Flask, Qdrant ni Ollama.')])
+env.globals.update(url_for=url_for,csrf_token=lambda:'STATIC-PREVIEW-NOT-A-SESSION',get_flashed_messages=lambda **kw:[('info','Vista estática de las plantillas reales. No conectada a Flask, LanceDB ni Ollama.')])
 ctx=dict(user=user,settings=settings,version='1.0.0-rc1',g=SimpleNamespace(request_id='preview'),request=SimpleNamespace(endpoint='admin.dashboard'),
     active=None,stats=stats,counts={'bases':1,'records':len(c.records),'chunks':0},jobs=[],engine_ready=False,cloud_ready=False)
 params={
@@ -34,7 +34,7 @@ params={
  'base_detail.html':dict(base=base,records=rows[:30],topics=[{'topic':k,'n':v} for k,v in Counter(r.topic for r in c.records).items()],counts=counts,versions=[],sources=[s.model_dump() for s in c.sources],page=1,pages=10,count=len(c.records),filters=dict(q='',topic='',audience='',review=''),report=c.conversion_report),
  'record_edit.html':dict(base=base,record=next(r for r in c.records if r.id=='O05').model_dump(),row={'id':1},sources=[{'source_key':s.id} for s in c.sources]),
  'source_edit.html':dict(base=base,source=c.sources[0].model_dump()),
- 'version_detail.html':dict(v={'id':'preview-version','name':base['name'],'base_id':base['id'],'revision':1,'status':'queued','chunk_count':0,'published_at':None},profile={'model':'E5-small','state':'No indexado en la vista estática'},report={},chunks=[],topics=[],page=1,pages=1,q='',topic='',count=0),
+ 'version_detail.html':dict(v={'id':'preview-version','name':base['name'],'base_id':base['id'],'revision':1,'status':'queued','chunk_count':0,'published_at':None},profile={'model':'Bekko/Horizon','state':'No indexado en la vista estática'},report={},chunks=[],topics=[],page=1,pages=1,q='',topic='',count=0),
  'job_detail.html':dict(job={'id':'preview-job','kind':'build','message':'Vista de trabajo sin ejecución','status':'queued','total':0,'progress':0,'error':None,'base_id':'preview-base','version_id':None,'result_json':None}),
  'jobs.html':{},'lab.html':dict(result=None,question='',versions=[],selected=''),
  'settings.html':dict(cfg=SimpleNamespace(ollama_api_key=''),values=settings.model_dump()),

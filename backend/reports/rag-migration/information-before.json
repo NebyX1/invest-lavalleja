@@ -1,0 +1,161 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 0,
+  "total": 6,
+  "results": [
+    {
+      "question": "Quiero información sobre eficiencia energética en Lavalleja.",
+      "id": "d731ab7df9a441daa376efc703462550",
+      "status": "answered",
+      "answer": "En Lavalleja la eficiencia energética aparece documentada como una **posibilidad de negocio de servicios**, no como un subsidio ni un equipo que se compre hecho: auditoría, ejecución de mejoras y mantenimiento, con ahorro compartido solo si hay reglas verificables [C7]. Es una hipótesis de trabajo, así que conviene tratarla como idea a probar y no como demanda comprobada [C7].\n\nLo que cambia la decisión es el punto de entrada: primero medir. Armar una línea base de consumo ajustada por producción y clima, hacer una mejora acotada y recién después pensar inversiones mayores [C7]. Si el retorno depende de una tarifa supuesta o de un ahorro estimado sin medición, ahí no conviene avanzar [C7]. También hay que confirmar requisitos eléctricos y ambientales y el régimen de conexión: no se puede dar por hecho que haya venta a la red [C7].\n\n¿Dónde mirar? Minas y su entorno tiene perfil de servicios industriales y equipos digitales, con la pregunta de qué cliente paga hoy por resolver qué problema [C2]. José Pedro Varela y su entorno apunta a arroz, granos y poscosecha —los servicios sobre el grano después de la cosecha—, donde la eficiencia pesa en el costo [C1]. Solís de Mataojo–Aguas Blancas suma alimentos, frío y servicios productivos [C3]. El encaje de cada una es hipótesis, no dato observado.\n\nPróximo paso concreto: hablar con el Centro Pyme Lavalleja para orientación a pymes, confirmando antes canal y servicios actuales [C5], y listar dos o tres empresas con consumos medidos para una prueba acotada [C7].\n\n¿Buscás montar el servicio vos o aplicarlo dentro de una empresa propia?",
+      "citation_record_ids": [
+        "s09-01-06",
+        "s09-01-02",
+        "s09-01-03",
+        "s35-01-11",
+        "O09"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": false,
+        "not_adviser": true,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "energy_source": true,
+        "answered": true
+      },
+      "timings": {
+        "generation_ms": 4964.79,
+        "retrieval_ms": 10073.76
+      },
+      "total_ms": 15366.11
+    },
+    {
+      "question": "¿En qué zonas la menciona la guía?",
+      "id": "513178ddbcc847d49666aef3475bdaf2",
+      "status": "answered",
+      "answer": "La guía ubica la eficiencia energética como servicio en tres zonas concretas: **Minas y entorno**, **Solís de Mataojo–Aguas Blancas** y **José Pedro Varela y entorno**, y agrega como mercado posible a clientes de otras zonas [C1].\n\nUn alcance importante: no es un dato observado de demanda, sino una ficha de oportunidad en estado de hipótesis, con prioridad estratégica alta [C1]. Es decir, la guía propone que ahí podría haber empresas con consumos medidos y mejoras técnicamente viables, pero eso hay que confirmarlo caso por caso. El propio documento marca que no conviene avanzar si el ahorro es estimado y no medido, ni si el retorno depende de una tarifa supuesta [C1].\n\nEn José Pedro Varela, además, la guía sugiere evaluar potencia y costo energético efectivo entre las condiciones de la actividad industrial de la zona, junto con autorizaciones y seguridad [C3]. Eso es un chequeo de condiciones, no una prueba de que exista demanda para el servicio.\n\nPróximo paso concreto: elegir una de las tres zonas y verificar, con empresas de allí, si tienen medición de consumo y alguna mejora ya identificada. Eso es lo que la guía pone como entrada y prueba antes de inversiones mayores [C1].\n\n¿Querés que profundice en una zona en particular?",
+      "citation_record_ids": [
+        "O09",
+        "s14-06-01"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": false,
+        "not_adviser": true,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "energy_source": true,
+        "documented_zones": true
+      },
+      "timings": {
+        "generation_ms": 2364.78,
+        "retrieval_ms": 5078.06
+      },
+      "total_ms": 7877.18
+    },
+    {
+      "question": "En dónde puedo invertir en energías renovables en Lavalleja?",
+      "id": "5f746927ecaf4fb09a33f5ea2e865484",
+      "status": "answered",
+      "answer": "Minas aparece como primera puerta de entrada para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o una base de servicios [C1]. Si tu idea es una empresa de servicios energéticos —instalación, mantenimiento, monitoreo— más que un parque de generación, la miraría por esa base; a validar: que haya compradores concretos y relaciones de compra verificables, porque la propia guía aclara que la oportunidad no depende de un clúster ya existente [C1].\n\nVilla Serrana–Penitente: acá la energía figura explícitamente como condición a relevar antes de comprar, junto con acceso durante todo el año, agua, saneamiento, prevención de incendios y pendientes [C8]. La miraría solo si el proyecto es de autoconsumo en un predio; el encaje es hipótesis y la condición es obtener respuesta técnica por padrón con las normas vigentes [C8].\n\nJosé Pedro Varela: la tesis documentada es investigar negocios alrededor de la cadena del grano [C5]. Podría explorarse un servicio energético atado a esa operación, pero hay que validar con los operadores volumen disponible, capacidad utilizada y libre, y condiciones contractuales, sin presumir acceso a instalaciones [C5].\n\n¿Apuntás a generar para vender a la red o a autoconsumo en un predio?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s14-01-01",
+        "s12-04-01"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": false,
+        "not_adviser": false,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "explicit_limit": false,
+        "no_tourism_detour": false
+      },
+      "timings": {
+        "generation_ms": 9329.29,
+        "retrieval_ms": 4648.84
+      },
+      "total_ms": 14506.92
+    },
+    {
+      "question": "¿Cuáles son los padrones disponibles para instalar un parque eólico?",
+      "id": "46dc4900b9ed40de8b40747dbf86c747",
+      "status": "answered",
+      "answer": "Primero, precisá el padrón y la situación del predio: si es propio, arrendado o de un tercero. La consulta por padrón, uso, obra y normativa aplicable se canaliza por Arquitectura / ordenamiento, en arquitectura@lavalleja.gub.uy [C4]. Antes de enviar un expediente, confirmá que ese canal sigue vigente [C4].\n\nSegundo, esa consulta es la que define qué se puede hacer en el predio. Invest Lavalleja acompaña y coordina, pero no aprueba permisos: la decisión queda en los organismos competentes [C1][C5]. No tomes el acompañamiento como una habilitación.\n\nTercero, no uses la superficie departamental como señal de tierra libre: los 10.016 km² son escala territorial, no superficie disponible para invertir [C3].\n\nCon esas respuestas recién ahí tiene sentido encargar estudios o asumir costos. ¿Ya tenés un padrón o una zona concreta para armar la consulta?",
+      "citation_record_ids": [
+        "s27-01-10",
+        "s05-01-02",
+        "s35-01-03",
+        "s36-05-01"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "explicit_limit": false,
+        "no_tourism_detour": true,
+        "abstains": false,
+        "no_unrelated_sources": false
+      },
+      "timings": {
+        "generation_ms": 8429.3,
+        "retrieval_ms": 5772.56
+      },
+      "total_ms": 14581.0
+    },
+    {
+      "question": "Quiero información sobre poscosecha en José Pedro Varela.",
+      "id": "309683a1e1db428d92c8fb73f5152b7a",
+      "status": "answered",
+      "answer": "En José Pedro Varela la poscosecha aparece como una **hipótesis de oportunidad**, no como una demanda comprobada. Poscosecha son los servicios sobre el grano después de la cosecha: control, reducción de pérdidas, análisis o tareas específicas. El cliente posible son productores y operadores que necesitan esos servicios; el ingreso podría ser por tonelada, por análisis o por servicio, con contratos estacionales y estándares acordados [C4].\n\nLa entrada razonable es acotada: instrumentos y servicio especializado, o usar infraestructura existente con acuerdo, conseguir datos de una campaña, evaluar resultados y recién después comprometer volumen. Antes de invertir, pedí datos de una campaña completa, contrastá escenarios de volumen y calidad, y dejá claro quién paga, cuándo paga y quién absorbe pérdidas por humedad, rechazo o demora. La carta de intención debe distinguir volumen indicativo de compromiso vinculante [C4][C8].\n\nLas condiciones a revisar son polvo, seguridad, energía y autorizaciones según la operación; no des por libre la capacidad de una planta existente. Tampoco conviene avanzar si una sola campaña o un solo cliente explican toda la recuperación. Medí costo por tonelada, rechazos, rendimiento, utilización y caja de campaña [C4]. Además, hay que validar con operadores el volumen disponible, la capacidad usada y libre, la titularidad de subproductos y las condiciones contractuales; la guía no trae estadísticas locales de rendimiento agrícola verificado [C5]. Un servicio especializado puede reducir pérdidas y evitar inversiones duplicadas, pero debe probarse a escala [C6].\n\n¿Ya tenés un operador o cliente concreto para probar el servicio, o estás definiendo el formato?",
+      "citation_record_ids": [
+        "O03",
+        "s14-06-01",
+        "s14-02-01",
+        "s14-04-01"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": false,
+        "not_adviser": true,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "grain_source": true,
+        "no_other_business": true
+      },
+      "timings": {
+        "generation_ms": 3871.23,
+        "retrieval_ms": 5198.26
+      },
+      "total_ms": 9487.94
+    },
+    {
+      "question": "¿Me asegurás una rentabilidad del 20%?",
+      "id": "ea767fdd1b954eb1bc7077b2255979cd",
+      "status": "answered",
+      "answer": "No, no te puedo asegurar un 20% ni ningún rendimiento. La evidencia disponible plantea oportunidades como hipótesis a validar, no como resultados prometidos [C2][C6]. Ese 20% sería un supuesto tuyo, no un dato que surja de la guía.\n\nEn José Pedro Varela y entorno, lo que aparece vinculado a energía es la eficiencia energética como servicio: auditoría, ejecución y mantenimiento, con ahorro compartido solo bajo reglas verificables. La condición es medir una línea base ajustada por producción y clima, comprobar el ahorro neto y no dar por hecha la venta a red [C2]. Eso cambia la decisión: el retorno depende de mediciones y contrato, no de una tasa fija.\n\nPara granos y poscosecha —servicios sobre el grano después de la cosecha— la guía propone probar a escala acotada, pedir datos de una campaña completa, contrastar escenarios de volumen y calidad y acordar indicadores antes de invertir; además, una carta de intención no equivale a compromiso vinculante [C7]. Tampoco corresponde atribuir capacidad libre a una planta existente sin acuerdo [C6].\n\nPróximo paso concreto: pedir a un proveedor o socio los consumos medidos, costos, tarifa aplicable y contrato propuesto para eficiencia energética, o los datos de campaña para poscosecha, y recién ahí calcular escenarios [C2][C7]. Sin esos números, cualquier porcentaje es una estimación. ¿Querés que te arme la lista de datos que conviene pedir primero?",
+      "citation_record_ids": [
+        "O09",
+        "O03",
+        "s14-04-01"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": false,
+        "not_adviser": true,
+        "no_unsolicited_question": false,
+        "no_private_state": true,
+        "explicit_limit": false
+      },
+      "timings": {
+        "generation_ms": 6305.23,
+        "retrieval_ms": 4947.63
+      },
+      "total_ms": 11691.58
+    }
+  ]
+}

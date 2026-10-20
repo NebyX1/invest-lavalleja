@@ -46,7 +46,7 @@ export default function Explorer({ zones, sectors }: Props) {
       <div className="explorer-main">
         <div className="territory-map-wrap">
           <div className="territory-map-stage" role="group" aria-label="Localidades seleccionables en el mapa de Lavalleja" data-testid="lavalleja-map">
-            <img className="territory-map-image" src="/media/Lavalleja-Map.svg" alt="Mapa del departamento de Lavalleja con seis localidades identificadas." width={mapViewBox.width} height={mapViewBox.height} loading="lazy" draggable="false" />
+            <img className="territory-map-image" src="/media/map/Lavalleja-Map.svg" alt="Mapa del departamento de Lavalleja con seis localidades identificadas." width={mapViewBox.width} height={mapViewBox.height} loading="lazy" draggable="false" />
             {filteredLocations.map((location) => {
               const zone = zones.find((item) => item.id === location.zoneId);
               if (!zone) return null;

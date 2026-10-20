@@ -14,7 +14,7 @@ from gianna.security import Security
 from gianna.services.jobs import Jobs
 from gianna.services.knowledge import Knowledge
 from gianna.services.rag import RAG
-from gianna.services.runtime import Embeddings, Ollama, Qdrant
+from gianna.services.runtime import Embeddings, Ollama, LanceStore
 from gianna.services.settings import get_settings
 
 
@@ -40,9 +40,9 @@ def technical_smoke(corpus, cfg, evaluations_path=None, question=None, show_answ
     db = Database(cfg.data_dir / 'technical-smoke.sqlite3')
     db.migrate()
     knowledge = Knowledge(db, cfg)
-    embeddings, qdrant, ollama = Embeddings(cfg), Qdrant(cfg), Ollama(cfg)
-    rag = RAG(db, cfg, knowledge, embeddings, qdrant, ollama, Security(db, cfg))
-    jobs = Jobs(db, cfg, knowledge, embeddings, qdrant, rag)
+    embeddings, vector_store, ollama = Embeddings(cfg), LanceStore(cfg), Ollama(cfg)
+    rag = RAG(db, cfg, knowledge, embeddings, vector_store, ollama, Security(db, cfg))
+    jobs = Jobs(db, cfg, knowledge, embeddings, vector_store, rag)
     version = db.one("SELECT * FROM versions WHERE status='ready' ORDER BY created_at DESC LIMIT 1")
     if version is None:
         base_id = knowledge.import_corpus(corpus, corpus.document.title, 'technical-smoke', corpus.document.filename)

@@ -164,6 +164,37 @@ def test_backend_chat_renders_human_challenge_controls(app):
     assert 'id="refresh-captcha"' in html
 
 
+def test_project_memory_is_encrypted_private_and_survives_transcript_trimming(app):
+    from gianna.services.project_memory import state_for
+    from gianna.services.harness import AgentHarness
+    c=app.test_client();s=app.extensions['gianna'];headers={'Origin':'http://localhost'}
+    challenge,answer=public_captcha(c)
+    created=c.post('/api/sessions',json={'captcha_id':challenge.json['id'],'captcha_answer':str(answer)},headers=headers)
+    headers['Authorization']='Bearer '+created.json['token']
+    state=state_for(AgentHarness.retrieval_plan('Quiero instalar un boliche',[]))
+    received=[]
+    def reply(question,settings,**kwargs):
+        received.append(kwargs['project_state'])
+        result={'id':'test','answer':'Respuesta','status':'insufficient_evidence','mode':'knowledge','citations':[]}
+        if len(received)==1:result['_conversation_state']=state
+        return result
+    s.rag.answer=reply
+    for index in range(8):
+        # Keep rate limiting enabled; reset only this test's counters to
+        # exercise >12 retained messages without spending a minute waiting.
+        s.db.execute('DELETE FROM rate_limits')
+        response=c.post('/api/chat',json={'message':'Quiero instalar un boliche' if index==0 else 'Gracias'},headers=headers)
+        assert response.status_code==200 and '_conversation_state' not in response.json
+    assert all(item.get('activity')==state['activity'] for item in received[1:])
+    row=s.db.one('SELECT history_encrypted FROM chat_sessions')
+    assert 'boliche' not in row['history_encrypted']
+    stored=json.loads(s.security.unseal(row['history_encrypted']))
+    assert len(stored['messages'])==12 and stored['project']==state
+    assert c.post('/api/chat',json={'message':'Hola','project_state':state},headers=headers).status_code==400
+    assert c.delete('/api/sessions/current',headers=headers).status_code==200
+    assert not s.db.one('SELECT id_hash FROM chat_sessions')
+
+
 def test_admin_login_requires_fresh_captcha(app):
     c=app.test_client();s=app.extensions['gianna'];s.security.create_user('owner@example.test','Owner','a-long-test-password','owner')
     csrf_token,answer=admin_captcha(c)

@@ -20,6 +20,8 @@ reports/captures/
 reports/playwright/
 backend/reports/*
 !backend/reports/*.md
+!backend/reports/rag-migration/
+!backend/reports/rag-migration/*.json
 
 # Python caches and local state
 __pycache__/

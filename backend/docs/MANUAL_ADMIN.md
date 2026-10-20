@@ -34,7 +34,7 @@ Las modificaciones solo afectan al borrador. Una versión ya indexada contiene s
 
 ## Crear el índice
 
-Pulsar la acción de crear versión. El sistema toma una instantánea del contenido público aprobado, tokeniza con E5, corta fragmentos respetando el presupuesto configurado, genera vectores densos y BM25 y carga una colección privada Qdrant.
+Pulsar la acción de crear versión. El sistema toma una instantánea del contenido público aprobado, tokeniza con Bekko, corta fragmentos respetando el presupuesto configurado, genera vectores y crea una tabla LanceDB con búsqueda BM25 española. Horizon reordena los candidatos durante las consultas. Los modelos deben prepararse mediante `python -m scripts.prepare_models` antes de indexar.
 
 El trabajo muestra progreso y verifica la cantidad final de puntos. El modelo se carga una vez por proceso y los embeddings idénticos se reutilizan por huella. Los textos cambiados se vuelven a calcular. Un reintento mantiene identificadores estables y no duplica puntos.
 
@@ -58,7 +58,7 @@ Comprobar especialmente que no se mezclen puntos con porcentajes; propuestas con
 
 ## Publicar, volver atrás y borrar
 
-El propietario confirma las pruebas y publica con segundo factor reciente. La nueva versión pasa a ser la única activa para nuevas consultas. El cambio del puntero se guarda en una transacción SQLite. No se anuncia como una transacción distribuida entre SQLite y Qdrant.
+El propietario confirma las pruebas y publica con segundo factor reciente. La nueva versión pasa a ser la única activa para nuevas consultas. El cambio del puntero se guarda en una transacción SQLite. No se anuncia como una transacción distribuida entre SQLite y LanceDB.
 
 Para volver atrás, elegir una versión previamente publicada. Las versiones quedan preservadas hasta borrar su base. No se puede publicar una versión obsoleta frente al borrador actual como si reflejara las últimas ediciones, salvo el flujo explícito de retorno a una versión previamente publicada.
 

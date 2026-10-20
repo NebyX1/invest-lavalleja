@@ -107,8 +107,8 @@ class Knowledge:
             rows=db.execute("SELECT * FROM records WHERE base_id=? AND audience='public' AND approved=1 AND enabled=1 ORDER BY id",(base_id,)).fetchall()
             if not rows:raise DomainError('No hay contenido público aprobado para indexar.')
             profile={'chunk_tokens':settings.chunk_tokens,'overlap_tokens':settings.overlap_tokens,
-                'contextualizer_version':CONTEXTUALIZER_VERSION,'model':'intfloat/multilingual-e5-small',
-                'sparse':'Qdrant/bm25','language':'spanish','dim':384}
+                'contextualizer_version':CONTEXTUALIZER_VERSION,'model':'hotchpotch/bekko-embedding-v1-a8m',
+                'engine':'bekko-horizon-lance-v1','sparse':'lancedb/bm25-spanish','language':'spanish','dim':384}
             db.execute('INSERT INTO versions(id,base_id,revision,collection_name,profile_json,created_at) VALUES(?,?,?,?,?,?)',
                 (version_id,base_id,base['revision'],'gianna_'+version_id,dumps(profile),now))
             for r in rows:
@@ -121,10 +121,13 @@ class Knowledge:
         return job_id,version_id
 
     def activate(self,version_id,actor,rollback=False):
-        # This SQLite pointer is the ONLY activation authority; no distributed SQL/Qdrant alias update.
+        # This SQLite pointer is the ONLY activation authority; no distributed SQL/LanceStore alias update.
         with self.db.tx(immediate=True) as db:
             v=db.execute('SELECT v.*,b.revision AS current_revision,b.status AS base_status FROM versions v JOIN bases b ON b.id=v.base_id WHERE v.id=?',(version_id,)).fetchone()
             if not v or v['status']!='ready' or v['base_status']=='deleting':raise DomainError('La versión todavía no está lista.',409)
+            from .neural import ENGINE_VERSION
+            if json.loads(v['profile_json']).get('engine')!=ENGINE_VERSION:
+                raise DomainError('Esta versión pertenece al motor anterior. Creá una nueva versión antes de publicarla.',409,'index_profile_mismatch')
             if not rollback and v['revision']!=v['current_revision']:
                 raise DomainError('La base cambió desde la indexación. Generá otra versión.',409,'stale_version')
             if rollback and not v['published_at']:

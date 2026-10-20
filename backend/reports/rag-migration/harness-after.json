@@ -1,0 +1,96 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 3,
+  "total": 3,
+  "results": [
+    {
+      "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+      "id": "bad653ec94924e1ca61ac7c2424e77e9",
+      "status": "answered",
+      "answer": "### Local de ocio\n\n**Minas (ciudad y entorno)**\n- Característica territorial documentada: se propone como primera puerta de entrada para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o base de servicios [C1].\n- Hipótesis de encaje: un bar/pub con componente gastronómico y de encuentro podría apoyarse en esa base de servicios y en relaciones de compra verificables; es hipótesis, no demanda comprobada [C1].\n- Principal condición a validar: que el inmueble admita la actividad y la escala propuesta mediante informe vigente por padrón, normativa y condiciones de obra [C5].\n\n**Villa Serrana–Marco de los Reyes–Penitente**\n- Característica territorial documentada: la oportunidad propuesta es crear experiencias por las que el visitante elija quedarse, regresar y recomendar, combinando hospitalidad, gastronomía, observación e interpretación [C3].\n- Hipótesis de encaje: una experiencia gastronómica o bar con programa concreto podría encajar en esa lógica de visita; una tesis turística no prueba por sí sola que el lugar admita un local bailable [C3][C8].\n- Principal condición a validar: suelo y paisaje como condición inicial —acceso todo el año, agua, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística—, con respuesta técnica por padrón antes de comprar [C4].\n\n**Solís de Mataojo–Aguas Blancas y entorno**\n- Característica territorial documentada: Aguas Blancas y el entorno rural pueden explorarse desde experiencias y hospitalidad selectiva, compatibles con paisaje y servicios [C2].\n- Hipótesis de encaje: un formato de bar/experiencia de baja escala podría explorarse allí; no corresponde mezclar tesis industrial y turística en un mismo predio sin analizar accesos, ruido, agua, saneamiento y compatibilidad de usos [C2].\n- Principal condición a validar: esa compatibilidad de usos y las condiciones del predio, además del informe vigente por padrón [C2][C5].\n\nEn los tres casos, la comparación económica correcta es a cinco años y con los mismos volúmenes: adquisición o renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora, separando costos cotizados de estimados [C7]. Para habilitación, Bomberos y Turismo son rutas de consulta según actividad, con alcance y procedimiento vigente a confirmar [C6].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s12-02-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": true,
+        "named_places": true,
+        "no_sector_reset": true,
+        "conditional": true
+      },
+      "timings": {
+        "generation_ms": 3878.62,
+        "retrieval_ms": 12551.82
+      },
+      "total_ms": 17233.64
+    },
+    {
+      "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+      "id": "5558c6ad4ed94e998392b9f88780fd44",
+      "status": "answered",
+      "answer": "### Local de ocio\n\n**Minas (ciudad y entorno)**\n- Característica territorial documentada: se propone como primera puerta de entrada para proyectos que necesiten coordinación empresarial, reuniones técnicas, formación o una base de servicios [C1].\n- Hipótesis de encaje: un bar/pub o un local bailable urbano podría apoyarse en esa concentración de actividad y servicios, pero la guía no documenta demanda nocturna, clientela ni flujo [C1].\n- Principal condición a validar: informe vigente por padrón sobre normativa y condiciones de obra, para saber si admite la actividad y la escala propuestas [C5].\n\n**Villa Serrana–Marco de los Reyes–Penitente (sierras)**\n- Característica territorial documentada: la oportunidad propuesta es crear experiencias por las que el visitante elija quedarse, regresar y recomendar, combinando hospitalidad, gastronomía, observación e interpretación [C3].\n- Hipótesis de encaje: encaja mejor con un bar o experiencia gastronómica que con un local bailable; una tesis turística no prueba que se admita discoteca [C3].\n- Principal condición a validar: suelo y paisaje, con instrumentos de planificación y categorías diferenciadas por subámbito, y respuesta técnica por padrón antes de comprar [C4]. Además, relevar acceso durante todo el año, agua suficiente, saneamiento, energía, prevención de incendios, evacuación, pendientes y compatibilidad paisajística [C4].\n\n**Solís de Mataojo–Aguas Blancas (entorno rural)**\n- Característica territorial documentada: Aguas Blancas y el entorno rural pueden explorarse desde experiencias y hospitalidad selectiva, compatibles con paisaje y servicios [C2].\n- Hipótesis de encaje: más afín a un bar/experiencia gastronómica de perfil tranquilo que a un bailable; no corresponde mezclar la tesis industrial y la turística en un mismo predio [C2].\n- Principal condición a validar: analizar accesos, ruido, agua, saneamiento y compatibilidad de usos [C2].\n\nEn los tres casos conviene comparar el costo total de cinco años bajo los mismos volúmenes: adquisición o renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora [C7]. Para incendios y seguridad, la ruta de consulta es Bomberos y técnicos habilitados, con proyecto, medidas e inspecciones antes de ocupar u operar [C6].\n\n¿Con boliche te referís a un bar/pub o a un local bailable?",
+      "citation_record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "territorial_sources": true,
+        "named_places": true,
+        "no_sector_reset": true,
+        "conditional": true
+      },
+      "timings": {
+        "generation_ms": 6300.38,
+        "retrieval_ms": 7125.84
+      },
+      "total_ms": 14142.47
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "1348c4ef633e4e35907de5c46feda91a",
+      "status": "answered",
+      "answer": "### Local bailable o de ocio nocturno · Minas y entorno\n\nAntes de firmar un alquiler para un local bailable en Minas, lo primero es verificar que el inmueble admita esa actividad y esa escala: pedí un informe vigente por padrón sobre normativa y condiciones de obra, y confirmá compatibilidad de uso antes de avanzar [C1]. Sumá la debida diligencia territorial del inmueble concreto: circulación, vecinos sensibles, potencia eléctrica, conectividad efectiva, tratamiento de residuos y posibilidad de expansión [C7].\n\nEn seguridad e incendios, la ruta de consulta es Bomberos y técnicos habilitados, para revisar proyecto, medidas, inspecciones y condiciones antes de ocupar u operar; el alcance y procedimiento vigente hay que confirmarlos, y no hay costos ni plazos verificados en esta edición [C2].\n\nEn lo económico, compará el costo total de cinco años bajo los mismos volúmenes: renta, adecuación, conexiones, energía, agua, transporte, personal, mantenimiento, seguros y riesgos de demora, separando costos cotizados de estimados y con fecha [C3]. La conexión a servicios tiene una ruta nacional, pero la factibilidad concreta depende del inmueble y del prestador [C1].\n\nComo hipótesis de negocio, conviene probar la demanda antes de instalar: entrevistas con potenciales clientes, registro de gasto y frecuencia, y un piloto pagado con criterios definidos de antemano; una manifestación de interés sin precio, volumen y fecha no es una venta [C6]. Ojo: la tesis documentada para Minas es de servicios industriales y empresariales, no de ocio nocturno, así que el encaje de un bailable es una hipótesis a validar, no una ventaja comprobada [C8].\n\n¿Querés que ordenemos esta lista como checklist para llevar a la inmobiliaria y a los técnicos?",
+      "citation_record_ids": [
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s10-04-01",
+        "s10-05-01",
+        "s09-01-02"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 2623.97,
+        "retrieval_ms": 7051.88
+      },
+      "total_ms": 10117.99
+    }
+  ]
+}

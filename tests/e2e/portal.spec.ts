@@ -40,6 +40,24 @@ test('navegación interna conserva el documento y actualiza el contenido', async
   }
 });
 
+test('los banners cargan en 16:9 desde block-banners y la imagen social usa la nueva ruta', async ({ page }) => {
+  for (const path of ['/', '/oportunidades/']) {
+    await page.goto(path);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', '/media/block-banners/serrano-conceptual.webp');
+    const banners = page.locator('main img[src^="/media/block-banners/"]');
+    expect(await banners.count()).toBeGreaterThan(0);
+    for (const banner of await banners.all()) {
+      await banner.scrollIntoViewIfNeeded();
+      await expect(banner).toHaveAttribute('width', '1600');
+      await expect(banner).toHaveAttribute('height', '900');
+      await expect.poll(() => banner.evaluate((image: HTMLImageElement) =>
+        image.complete && image.naturalWidth === 1600 && image.naturalHeight === 900)).toBe(true);
+      expect(await banner.evaluate((image: HTMLImageElement) => getComputedStyle(image).objectFit)).toBe('cover');
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(await page.evaluate(() => window.innerWidth));
+  }
+});
+
 test('dossier persiste entre navegación y recarga', async ({ page }) => {
   await page.goto('/zonas/minas/');
   await waitForIsland(page, 'SaveZone');
@@ -158,6 +176,7 @@ test('el mapa selecciona localidades y perfiles en escritorio y móvil', async (
   await waitForIsland(page, 'Explorer');
 
   const mapImage = map.locator('img');
+  await expect(mapImage).toHaveAttribute('src', '/media/map/Lavalleja-Map.svg');
   await expect.poll(() => mapImage.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
   const mapSize = await map.boundingBox();
   expect(mapSize).not.toBeNull();

@@ -26,6 +26,6 @@ def main():
         db.execute('UPDATE active_knowledge SET version_id=NULL WHERE singleton=1')
         db.execute("UPDATE jobs SET status='cancelled',cancel_requested=1,message='Cancelado por restauración' WHERE status IN ('queued','running')")
         db.commit()
-    print('Respaldo restaurado con sesiones revocadas y sin base publicada. Verificá Qdrant/modelo y publicá o reindexá desde el panel.')
+    print('Respaldo restaurado con sesiones revocadas y sin base publicada. Verificá LanceDB/modelos y publicá o reindexá desde el panel.')
 
 if __name__=='__main__':main()

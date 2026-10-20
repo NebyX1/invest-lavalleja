@@ -1,0 +1,1682 @@
+{
+  "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+  "profile": {
+    "engine": "bekko-horizon-lance-v1",
+    "model": "hotchpotch/bekko-embedding-v1-a8m",
+    "revision_resolved": "c721113d59a1d91b447450324f51c4b3332c924a",
+    "dim": 384,
+    "pooling": "masked_mean",
+    "normalize": true,
+    "query_prefix": "",
+    "passage_prefix": "",
+    "runtime": "openvino",
+    "max_input_tokens": 512,
+    "sparse": "lancedb/bm25-spanish",
+    "reranker": "Horizon-Labs/multilingual-reranker-small",
+    "reranker_revision": "c2ec8fb3e499725b168bbed2164bfee095360f77",
+    "reranker_tokens": 384,
+    "onnxruntime": "1.31.0",
+    "openvino": "2026.4.1",
+    "artifact_hashes": {
+      "bekko": {
+        "tokenizer.json": "8bd47075711f75a143d1b78e01a41cc65c1c591b00d3cfeffc23db07adce1392",
+        "tokenizer_config.json": "2ee40d1066ac855e1ea38ac422dbe1f3ddf84c9d415e79272adce569668f3de4",
+        "config.json": "950f344b034bb96a6ac3da045b1cd5ba037c08d8e4978471d407324622f8878e",
+        "1_Pooling/config.json": "029891eaab443d10165e66e6f3d5d9008a16b712481f71ae7c938234e8fdeca1",
+        "openvino/openvino_model.xml": "087070db9d3f9fbf00b61bd672aac28f046b316db5b073a4c25086ad1ce7d9e6",
+        "openvino/openvino_model.bin": "03330e53ab0dd085ff7e24e0dceb9669177f06414657b76276c130eb9e40d53a",
+        "onnx/model.onnx": "96d8cc6199e96357b21b2fb12f6d7ffd2d4abc7b182fe94b5468fbd6dc819af7"
+      },
+      "horizon": {
+        "tokenizer.json": "7925f638b5444897efe3b4608eed56c1652f0ed39c2662c8302de1bc264c6088",
+        "tokenizer_config.json": "ea349495764b24570b4560fe2e4a557e5c0a47e6bce782c2409b1d6445cf8633",
+        "config.json": "e9fd043628cd796a364020164a7a6ca78d29b0ec5cf135464489f54110f4b1da",
+        "onnx/model_quantized.onnx": "35eb5f0667a22b372e97e43bfe4955dcba87ac882f2d887238bd6c5548416eb2"
+      }
+    },
+    "fingerprint": "b38b504d7c223459a90fa9b1c1da7a9e252249219b07d32404abcaab80e4623f"
+  },
+  "model_checks": {
+    "dimensions": 384,
+    "normalized": true,
+    "relevant_pair_first": true,
+    "rerank_scores": [
+      0.9973642230033875,
+      0.00108027970418334
+    ]
+  },
+  "source_hashes": {
+    "neural.py": "e7d0b9e1b5458528b777cae89273dfe477d32f035ef65b88dac2d2bfc9972163",
+    "vector_store.py": "01ddaf4d2f98b99231aa2be92cf9646cfb83c67c0bf25ab36f9b38134b255592",
+    "rag.py": "bc5e4635c94c79ea7504bf7fcd9f38e790a624e69496f46a3a72adfe782b213d",
+    "planning.py": "e49b84a000fdb775ede5e327e2b6365e18a26d429f68c51b6e196f6a5ef6ce40",
+    "harness.py": "264c182047be9765f57cec2d1d337a761d448f86582864e20fb1b02b0c681a21",
+    "evidence_guard.py": "68f48661d8c5ba5bb652943ae6047b94b473f389fd8e2c318ede086897f0e983",
+    "response_policy.py": "f7b6236b387196d7a8f21cd786330fbdcba6347d4d6f18c469876c82a7135c90"
+  },
+  "passed": 8,
+  "total": 8,
+  "group_coverage": 1.0,
+  "scope": "Public corpus retrieval/context coverage; not a factual generation benchmark.",
+  "results": [
+    {
+      "id": "boliche",
+      "question": "Quiero invertir poniendo un boliche, ¿qué me recomendás?",
+      "record_ids": [
+        "s10-01-01",
+        "s11-02-01",
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s27-03-01"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 10462.44,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "locations",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "local de ocio (bar/pub o local bailable; formato sin confirmar)",
+        "facets": [
+          "premises",
+          "safety",
+          "business"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "s10-01-01",
+          "s11-02-01",
+          "s12-01-01",
+          "s12-04-01",
+          "s12-02-01"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "O16",
+              "s36-03-01",
+              "s27-03-01",
+              "s17-03-01",
+              "s29-01-10",
+              "s30-05-01",
+              "s26-03-01",
+              "s10-03-01",
+              "s26-01-03",
+              "s11-05-01",
+              "s34-02-01",
+              "s16-02-01",
+              "s29-01-05",
+              "s36-02-01",
+              "O14",
+              "s36-06-01",
+              "O13",
+              "s15-01-01",
+              "s26-01-07",
+              "s26-01-06"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s26-03-01",
+              "O16",
+              "s15-04-01",
+              "O13",
+              "s10-03-01",
+              "s11-05-01",
+              "s09-01-09",
+              "O14",
+              "s34-02-01",
+              "s05-03-01",
+              "O12",
+              "s26-01-02",
+              "s04-04-01",
+              "O06",
+              "s05-01-05",
+              "s29-01-05",
+              "s29-01-06",
+              "s13-01-01",
+              "s02-01-03",
+              "s13-03-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "O05",
+              "O15",
+              "O14",
+              "s11-02-01",
+              "O11",
+              "O13",
+              "O06",
+              "s10-05-01",
+              "O02",
+              "O01",
+              "s09-01-04",
+              "O10",
+              "s12-01-01",
+              "s26-01-04",
+              "s12-04-01",
+              "O09",
+              "s11-05-01",
+              "s11-03-01",
+              "O08",
+              "s34-01-08"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 5623.26,
+        "reranked": [
+          {
+            "record_id": "s27-03-01",
+            "score": 0.045535
+          },
+          {
+            "record_id": "s36-03-01",
+            "score": 0.036042
+          },
+          {
+            "record_id": "s17-03-01",
+            "score": 0.01793
+          },
+          {
+            "record_id": "s30-05-01",
+            "score": 0.014225
+          },
+          {
+            "record_id": "s29-01-10",
+            "score": 0.008793
+          },
+          {
+            "record_id": "s26-01-03",
+            "score": 0.006776
+          },
+          {
+            "record_id": "s12-01-01",
+            "score": 0.0056
+          },
+          {
+            "record_id": "s29-01-07",
+            "score": 0.004827
+          },
+          {
+            "record_id": "s12-02-01",
+            "score": 0.004549
+          },
+          {
+            "record_id": "s26-02-01",
+            "score": 0.004271
+          },
+          {
+            "record_id": "s11-02-01",
+            "score": 0.00414
+          },
+          {
+            "record_id": "s26-03-01",
+            "score": 0.004028
+          },
+          {
+            "record_id": "s10-01-01",
+            "score": 0.003979
+          },
+          {
+            "record_id": "O16",
+            "score": 0.003944
+          },
+          {
+            "record_id": "s29-01-02",
+            "score": 0.003882
+          },
+          {
+            "record_id": "s12-04-01",
+            "score": 0.00208
+          }
+        ],
+        "selected_record_ids": [
+          "s10-01-01",
+          "s11-02-01",
+          "s12-01-01",
+          "s12-04-01",
+          "s26-01-03",
+          "s29-01-07",
+          "s26-02-01",
+          "s27-03-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "bar",
+      "question": "Quiero abrir un bar con comida en Minas. ¿Qué debería revisar antes de alquilar?",
+      "record_ids": [
+        "s29-01-02",
+        "s29-01-05",
+        "s29-01-07",
+        "s11-05-01",
+        "O02",
+        "O16",
+        "O07",
+        "s29-01-10"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 9032.6,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "requirements",
+        "zones": [
+          "Z1"
+        ],
+        "opportunity_ids": [],
+        "activity": "bar o establecimiento gastronómico",
+        "facets": [
+          "premises",
+          "food",
+          "safety"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "O02",
+          "O06",
+          "O04",
+          "O16",
+          "O13",
+          "O11",
+          "O09",
+          "s09-01-02"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [
+              "Z1"
+            ],
+            "candidate_ids": [
+              "s10-01-01",
+              "O16",
+              "s10-05-01",
+              "O10",
+              "O14",
+              "O06",
+              "s10-02-01",
+              "s36-02-01",
+              "O02",
+              "s10-04-01",
+              "s09-01-02",
+              "s10-06-01",
+              "O09",
+              "O13",
+              "O01",
+              "s10-03-01",
+              "O11",
+              "O08",
+              "O04"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-05",
+              "s11-05-01",
+              "s29-01-10",
+              "O13",
+              "s29-01-02",
+              "O07",
+              "s35-01-10",
+              "s26-03-01",
+              "s34-01-03",
+              "s09-01-09",
+              "s09-01-08",
+              "s13-03-01",
+              "O16",
+              "s04-04-01",
+              "s16-06-01",
+              "s34-02-01",
+              "s16-02-01",
+              "O02",
+              "s36-07-01",
+              "s17-01-03"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-07",
+              "s26-01-06",
+              "O01",
+              "s26-01-07",
+              "s26-01-02",
+              "s15-06-01",
+              "s29-01-10",
+              "O14",
+              "O13",
+              "O12",
+              "s13-05-01",
+              "s12-04-01",
+              "s26-01-03",
+              "s14-06-01",
+              "s26-03-01",
+              "s11-05-01",
+              "s32-02-03",
+              "s16-06-01",
+              "s26-01-04",
+              "s32-02-04"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 8235.65,
+        "reranked": [
+          {
+            "record_id": "s29-01-05",
+            "score": 0.652503
+          },
+          {
+            "record_id": "s11-05-01",
+            "score": 0.633023
+          },
+          {
+            "record_id": "s29-01-02",
+            "score": 0.625213
+          },
+          {
+            "record_id": "O02",
+            "score": 0.611763
+          },
+          {
+            "record_id": "s29-01-07",
+            "score": 0.57426
+          },
+          {
+            "record_id": "O16",
+            "score": 0.561115
+          },
+          {
+            "record_id": "O07",
+            "score": 0.557052
+          },
+          {
+            "record_id": "s29-01-10",
+            "score": 0.554672
+          },
+          {
+            "record_id": "s35-01-10",
+            "score": 0.548463
+          },
+          {
+            "record_id": "s26-01-03",
+            "score": 0.545225
+          },
+          {
+            "record_id": "s09-01-02",
+            "score": 0.544521
+          },
+          {
+            "record_id": "O11",
+            "score": 0.510209
+          },
+          {
+            "record_id": "O04",
+            "score": 0.507937
+          },
+          {
+            "record_id": "O09",
+            "score": 0.500491
+          },
+          {
+            "record_id": "O06",
+            "score": 0.493815
+          },
+          {
+            "record_id": "O13",
+            "score": 0.473339
+          }
+        ],
+        "selected_record_ids": [
+          "s29-01-02",
+          "s29-01-05",
+          "s29-01-07",
+          "s11-05-01",
+          "O02",
+          "O16",
+          "O07",
+          "s29-01-10"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "bailable",
+      "question": "Quiero abrir una discoteca con música y baile. ¿Qué permisos y riesgos debería verificar?",
+      "record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s26-02-01",
+        "s34-01-03",
+        "s26-01-06",
+        "s17-03-01",
+        "s29-01-10",
+        "s29-01-08"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 6124.29,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "local bailable o de ocio nocturno",
+        "facets": [
+          "premises",
+          "safety",
+          "business"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-10",
+              "s29-01-06",
+              "s29-01-05",
+              "s34-01-03",
+              "s29-01-07",
+              "s29-01-08",
+              "s26-01-06",
+              "s17-03-01",
+              "O06",
+              "s35-01-07",
+              "s34-02-01",
+              "s35-01-11",
+              "O16",
+              "s26-01-07",
+              "s26-03-01",
+              "s29-01-03",
+              "s32-02-02",
+              "O14",
+              "s11-05-01",
+              "s26-01-04"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-07",
+              "s12-04-01",
+              "s26-01-03",
+              "s26-03-01",
+              "O13",
+              "s26-01-06",
+              "s26-01-07",
+              "s29-01-02",
+              "s26-01-02",
+              "s16-06-01",
+              "s29-01-10",
+              "O12",
+              "O14",
+              "s13-05-01",
+              "O01",
+              "s34-01-03",
+              "O04",
+              "s09-01-09",
+              "s14-06-01",
+              "s11-05-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s26-02-01",
+              "s32-04-01",
+              "O13",
+              "s11-06-01",
+              "s11-02-01",
+              "s33-02-01",
+              "s33-01-06",
+              "s32-02-01",
+              "s13-04-01",
+              "s04-03-01",
+              "O12",
+              "s33-01-07",
+              "s34-03-01",
+              "s30-02-01",
+              "s10-03-01",
+              "s32-03-01",
+              "s13-06-01",
+              "s26-01-05",
+              "s33-01-05",
+              "s16-02-01"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 5510.16,
+        "reranked": [
+          {
+            "record_id": "s34-01-03",
+            "score": 0.078373
+          },
+          {
+            "record_id": "s26-01-06",
+            "score": 0.075828
+          },
+          {
+            "record_id": "s17-03-01",
+            "score": 0.074315
+          },
+          {
+            "record_id": "s29-01-10",
+            "score": 0.056556
+          },
+          {
+            "record_id": "s29-01-08",
+            "score": 0.04208
+          },
+          {
+            "record_id": "s29-01-07",
+            "score": 0.040444
+          },
+          {
+            "record_id": "s29-01-02",
+            "score": 0.034836
+          },
+          {
+            "record_id": "s29-01-05",
+            "score": 0.028433
+          },
+          {
+            "record_id": "s29-01-06",
+            "score": 0.022595
+          },
+          {
+            "record_id": "O16",
+            "score": 0.020699
+          },
+          {
+            "record_id": "s26-02-01",
+            "score": 0.014504
+          },
+          {
+            "record_id": "s35-01-07",
+            "score": 0.014057
+          },
+          {
+            "record_id": "s26-01-03",
+            "score": 0.013772
+          },
+          {
+            "record_id": "s35-01-11",
+            "score": 0.011227
+          },
+          {
+            "record_id": "O06",
+            "score": 0.010922
+          },
+          {
+            "record_id": "s34-02-01",
+            "score": 0.006165
+          }
+        ],
+        "selected_record_ids": [
+          "s29-01-02",
+          "s29-01-07",
+          "s26-02-01",
+          "s34-01-03",
+          "s26-01-06",
+          "s17-03-01",
+          "s29-01-10",
+          "s29-01-08"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "north",
+      "question": "Quiero invertir en el norte de Lavalleja. ¿Qué oportunidades concretas debería explorar?",
+      "record_ids": [
+        "O03",
+        "O12",
+        "s09-01-06",
+        "s09-01-07",
+        "s15-01-01",
+        "s14-02-01",
+        "s14-04-01",
+        "s15-02-01"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 7405.83,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "explore",
+        "zones": [
+          "Z5",
+          "Z6"
+        ],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "O03",
+          "O12",
+          "O02",
+          "O11",
+          "O09",
+          "O07",
+          "s09-01-06",
+          "s09-01-07"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [
+              "Z5",
+              "Z6"
+            ],
+            "candidate_ids": [
+              "s09-01-07",
+              "s09-01-06",
+              "s15-02-01",
+              "s14-04-01",
+              "O16",
+              "s14-02-01",
+              "s15-01-01",
+              "s14-01-01",
+              "s15-04-01",
+              "s14-06-01",
+              "s14-03-01",
+              "s15-06-01",
+              "s15-03-01",
+              "O11",
+              "O07",
+              "O09",
+              "O01",
+              "s15-05-01",
+              "s14-05-01",
+              "O03"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s15-02-01",
+              "s09-01-07",
+              "s09-01-06",
+              "s14-02-01",
+              "O16",
+              "s15-04-01",
+              "s14-01-01",
+              "s15-06-01",
+              "s15-01-01",
+              "s08-03-01",
+              "s15-05-01",
+              "s15-03-01",
+              "s14-03-01",
+              "s14-04-01",
+              "s14-06-01",
+              "O07",
+              "s14-05-01",
+              "O14",
+              "O12",
+              "O03"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s09-01-07",
+              "s09-01-06",
+              "s14-04-01",
+              "s15-02-01",
+              "O16",
+              "s14-06-01",
+              "s15-06-01",
+              "s14-02-01",
+              "s15-04-01",
+              "s35-01-02",
+              "s15-01-01",
+              "s14-01-01",
+              "s14-03-01",
+              "O11",
+              "s15-05-01",
+              "s30-03-01",
+              "O14",
+              "s14-05-01",
+              "s08-03-01",
+              "s15-03-01"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 6533.37,
+        "reranked": [
+          {
+            "record_id": "s09-01-07",
+            "score": 0.043446
+          },
+          {
+            "record_id": "s15-01-01",
+            "score": 0.027877
+          },
+          {
+            "record_id": "s09-01-06",
+            "score": 0.017105
+          },
+          {
+            "record_id": "s14-02-01",
+            "score": 0.014528
+          },
+          {
+            "record_id": "s14-04-01",
+            "score": 0.013614
+          },
+          {
+            "record_id": "s15-02-01",
+            "score": 0.013414
+          },
+          {
+            "record_id": "s14-06-01",
+            "score": 0.007855
+          },
+          {
+            "record_id": "s15-04-01",
+            "score": 0.004388
+          },
+          {
+            "record_id": "O03",
+            "score": 0.003486
+          },
+          {
+            "record_id": "O09",
+            "score": 0.002748
+          },
+          {
+            "record_id": "O16",
+            "score": 0.002261
+          },
+          {
+            "record_id": "s14-01-01",
+            "score": 0.001978
+          },
+          {
+            "record_id": "O11",
+            "score": 0.001339
+          },
+          {
+            "record_id": "O12",
+            "score": 0.001025
+          },
+          {
+            "record_id": "O07",
+            "score": 0.000861
+          },
+          {
+            "record_id": "O02",
+            "score": 0.000848
+          }
+        ],
+        "selected_record_ids": [
+          "O03",
+          "O12",
+          "s09-01-06",
+          "s09-01-07",
+          "s15-01-01",
+          "s14-02-01",
+          "s14-04-01",
+          "s15-02-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "cabins",
+      "question": "Quiero poner cabañas en Villa Serrana. ¿Cómo pruebo si el negocio funciona?",
+      "record_ids": [
+        "s12-01-01",
+        "s12-04-01",
+        "s26-01-03",
+        "s29-01-07",
+        "s26-02-01",
+        "s12-03-01",
+        "O05",
+        "O16"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 9767.34,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "locations",
+        "zones": [
+          "Z3"
+        ],
+        "opportunity_ids": [],
+        "activity": "alojamiento u hospitalidad",
+        "facets": [
+          "premises",
+          "safety",
+          "business"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "s12-01-01",
+          "s12-04-01",
+          "s12-02-01"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [
+              "Z3"
+            ],
+            "candidate_ids": [
+              "s09-01-04",
+              "O05",
+              "s12-04-01",
+              "s12-01-01",
+              "s12-05-01",
+              "s12-03-01",
+              "s12-02-01",
+              "O15",
+              "O06",
+              "O14",
+              "O16",
+              "O10"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "O15",
+              "O05",
+              "s26-03-01",
+              "s10-05-01",
+              "s11-02-01",
+              "s11-05-01",
+              "s33-01-02",
+              "s33-01-09",
+              "s15-04-01",
+              "s29-01-07",
+              "s10-03-01",
+              "s06-02-01",
+              "s09-01-04",
+              "s33-01-10",
+              "s09-01-09",
+              "s33-01-08",
+              "s34-03-01",
+              "s29-01-08",
+              "s17-01-03",
+              "s33-01-04"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "O05",
+              "O15",
+              "O14",
+              "s11-02-01",
+              "O11",
+              "O13",
+              "O06",
+              "s10-05-01",
+              "O02",
+              "O01",
+              "s09-01-04",
+              "O10",
+              "s12-01-01",
+              "s26-01-04",
+              "s12-04-01",
+              "O09",
+              "s11-05-01",
+              "s11-03-01",
+              "O08",
+              "s34-01-08"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 8838.6,
+        "reranked": [
+          {
+            "record_id": "s12-03-01",
+            "score": 0.173239
+          },
+          {
+            "record_id": "s12-01-01",
+            "score": 0.166555
+          },
+          {
+            "record_id": "O05",
+            "score": 0.159348
+          },
+          {
+            "record_id": "O16",
+            "score": 0.134756
+          },
+          {
+            "record_id": "O15",
+            "score": 0.120023
+          },
+          {
+            "record_id": "O10",
+            "score": 0.11998
+          },
+          {
+            "record_id": "s12-05-01",
+            "score": 0.114409
+          },
+          {
+            "record_id": "O06",
+            "score": 0.107585
+          },
+          {
+            "record_id": "O14",
+            "score": 0.105694
+          },
+          {
+            "record_id": "s26-01-03",
+            "score": 0.104706
+          },
+          {
+            "record_id": "s12-04-01",
+            "score": 0.10144
+          },
+          {
+            "record_id": "s09-01-04",
+            "score": 0.100149
+          },
+          {
+            "record_id": "s12-02-01",
+            "score": 0.085667
+          },
+          {
+            "record_id": "s29-01-07",
+            "score": 0.079442
+          },
+          {
+            "record_id": "s29-01-02",
+            "score": 0.075176
+          },
+          {
+            "record_id": "s26-02-01",
+            "score": 0.073407
+          }
+        ],
+        "selected_record_ids": [
+          "s12-01-01",
+          "s12-04-01",
+          "s26-01-03",
+          "s29-01-07",
+          "s26-02-01",
+          "s12-03-01",
+          "O05",
+          "O16"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "water",
+      "question": "¿Cómo verifico agua y tratamiento de efluentes antes de instalar una empresa?",
+      "record_ids": [
+        "s29-01-04",
+        "O10",
+        "s11-05-01",
+        "s32-02-03",
+        "O11",
+        "s10-04-01",
+        "s27-01-10",
+        "O09"
+      ],
+      "groups_covered": [
+        true
+      ],
+      "pass": true,
+      "ms": 6421.55,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [
+          "water"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [
+          "O10",
+          "O11",
+          "s09-01-02",
+          "s09-01-03"
+        ],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-04",
+              "O10",
+              "s10-04-01",
+              "s27-01-10",
+              "s11-05-01",
+              "O01",
+              "s31-02-01",
+              "O09",
+              "s10-06-01",
+              "s28-05-01",
+              "s26-03-01",
+              "s32-02-03",
+              "O05",
+              "s08-02-01",
+              "s29-01-02",
+              "s28-02-01",
+              "s07-04-01",
+              "s29-01-03",
+              "O11",
+              "O16"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-04",
+              "O10",
+              "s11-05-01",
+              "O02",
+              "s11-06-01",
+              "s32-02-03",
+              "O01",
+              "s26-01-02",
+              "s10-06-01",
+              "s34-01-04",
+              "O11",
+              "s26-02-01",
+              "O09",
+              "O05",
+              "s04-03-01",
+              "O15",
+              "O04",
+              "s11-02-01",
+              "s04-04-01",
+              "s31-02-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-04",
+              "O10",
+              "s10-04-01",
+              "s11-05-01",
+              "O11",
+              "s10-06-01",
+              "O01",
+              "s31-02-01",
+              "O09",
+              "s26-03-01",
+              "s10-05-01",
+              "s28-05-01",
+              "s29-01-02",
+              "s32-02-03",
+              "s29-01-03",
+              "s27-01-10",
+              "s15-05-01",
+              "s29-01-07",
+              "O05",
+              "O08"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 5403.95,
+        "reranked": [
+          {
+            "record_id": "s29-01-04",
+            "score": 0.966924
+          },
+          {
+            "record_id": "O10",
+            "score": 0.669148
+          },
+          {
+            "record_id": "s11-05-01",
+            "score": 0.253619
+          },
+          {
+            "record_id": "s32-02-03",
+            "score": 0.248905
+          },
+          {
+            "record_id": "O11",
+            "score": 0.101774
+          },
+          {
+            "record_id": "s10-04-01",
+            "score": 0.06211
+          },
+          {
+            "record_id": "s27-01-10",
+            "score": 0.060137
+          },
+          {
+            "record_id": "O09",
+            "score": 0.021471
+          },
+          {
+            "record_id": "s31-02-01",
+            "score": 0.013693
+          },
+          {
+            "record_id": "s26-03-01",
+            "score": 0.011357
+          },
+          {
+            "record_id": "O05",
+            "score": 0.007023
+          },
+          {
+            "record_id": "s10-06-01",
+            "score": 0.005098
+          },
+          {
+            "record_id": "s28-05-01",
+            "score": 0.00493
+          },
+          {
+            "record_id": "O01",
+            "score": 0.004584
+          },
+          {
+            "record_id": "s09-01-03",
+            "score": 0.003616
+          },
+          {
+            "record_id": "s09-01-02",
+            "score": 0.003219
+          }
+        ],
+        "selected_record_ids": [
+          "s29-01-04",
+          "O10",
+          "s11-05-01",
+          "s32-02-03",
+          "O11",
+          "s10-04-01",
+          "s27-01-10",
+          "O09"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "land",
+      "question": "Encontré un terreno barato para instalar mi empresa. ¿Qué debo comprobar antes de comprar?",
+      "record_ids": [
+        "s29-01-02",
+        "s26-02-01",
+        "s26-01-01",
+        "s13-03-01",
+        "s10-04-01",
+        "s04-03-01",
+        "s36-03-01",
+        "s26-03-01"
+      ],
+      "groups_covered": [
+        true,
+        true
+      ],
+      "pass": true,
+      "ms": 5857.55,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [
+          "premises",
+          "business"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s10-04-01",
+              "s26-02-01",
+              "s36-03-01",
+              "s26-01-01",
+              "s10-06-01",
+              "s07-04-01",
+              "s10-02-01",
+              "s04-03-01",
+              "s13-03-01",
+              "s26-03-01",
+              "s12-05-01",
+              "O13",
+              "s29-01-06",
+              "s10-05-01",
+              "s17-03-01",
+              "s27-01-10",
+              "O11",
+              "s36-09-01",
+              "s13-02-01",
+              "s15-05-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s26-02-01",
+              "O13",
+              "s29-01-02",
+              "s34-01-03",
+              "s16-06-01",
+              "s26-01-03",
+              "O04",
+              "s11-02-01",
+              "O11",
+              "s26-03-01",
+              "O12",
+              "s09-01-09",
+              "s32-02-01",
+              "s11-06-01",
+              "s26-01-04",
+              "s04-04-01",
+              "s26-01-02",
+              "s12-04-01",
+              "s13-03-01",
+              "s29-01-10"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s10-04-01",
+              "s26-03-01",
+              "s12-05-01",
+              "O11",
+              "s10-06-01",
+              "s36-03-01",
+              "s04-03-01",
+              "s10-05-01",
+              "s13-03-01",
+              "O13",
+              "s15-05-01",
+              "s29-01-06",
+              "s29-01-07",
+              "s29-01-02",
+              "s14-06-01",
+              "O08",
+              "s26-02-01",
+              "O01",
+              "s17-03-01",
+              "s29-01-04"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 5229.81,
+        "reranked": [
+          {
+            "record_id": "s26-01-01",
+            "score": 0.672824
+          },
+          {
+            "record_id": "s26-02-01",
+            "score": 0.559179
+          },
+          {
+            "record_id": "s13-03-01",
+            "score": 0.458425
+          },
+          {
+            "record_id": "s10-04-01",
+            "score": 0.352907
+          },
+          {
+            "record_id": "s04-03-01",
+            "score": 0.186718
+          },
+          {
+            "record_id": "s36-03-01",
+            "score": 0.177343
+          },
+          {
+            "record_id": "s26-03-01",
+            "score": 0.171412
+          },
+          {
+            "record_id": "s12-05-01",
+            "score": 0.139138
+          },
+          {
+            "record_id": "s07-04-01",
+            "score": 0.118319
+          },
+          {
+            "record_id": "s10-05-01",
+            "score": 0.113839
+          },
+          {
+            "record_id": "s10-02-01",
+            "score": 0.109092
+          },
+          {
+            "record_id": "s29-01-02",
+            "score": 0.063016
+          },
+          {
+            "record_id": "O13",
+            "score": 0.058057
+          },
+          {
+            "record_id": "s10-06-01",
+            "score": 0.039652
+          },
+          {
+            "record_id": "s26-01-03",
+            "score": 0.035551
+          },
+          {
+            "record_id": "s29-01-06",
+            "score": 0.03284
+          }
+        ],
+        "selected_record_ids": [
+          "s29-01-02",
+          "s26-02-01",
+          "s26-01-01",
+          "s13-03-01",
+          "s10-04-01",
+          "s04-03-01",
+          "s36-03-01",
+          "s26-03-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    },
+    {
+      "id": "permits",
+      "question": "¿Con registrar mi sociedad ya puedo abrir el local?",
+      "record_ids": [
+        "s29-01-10",
+        "s10-03-01",
+        "O16",
+        "s28-02-01",
+        "s05-03-01",
+        "s27-01-05",
+        "s13-03-01",
+        "s34-02-01"
+      ],
+      "groups_covered": [
+        true
+      ],
+      "pass": true,
+      "ms": 6064.65,
+      "trace": {
+        "engine": "bekko-horizon-lance-v1",
+        "intent": "requirements",
+        "zones": [],
+        "opportunity_ids": [],
+        "activity": "",
+        "facets": [
+          "permits"
+        ],
+        "inherited_context": false,
+        "search_count": 3,
+        "catalog_record_ids": [],
+        "rounds": [
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-10",
+              "s13-03-01",
+              "O16",
+              "s06-03-01",
+              "s27-01-05",
+              "s16-02-01",
+              "s28-02-01",
+              "s10-03-01",
+              "s10-02-01",
+              "s15-02-01",
+              "s05-03-01",
+              "s26-01-04",
+              "s34-02-01",
+              "O14",
+              "s15-06-01",
+              "s15-01-01",
+              "s04-02-01",
+              "s02-03-01",
+              "s11-02-01",
+              "O06"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s29-01-10",
+              "s28-02-01",
+              "s27-01-09",
+              "s27-01-05",
+              "s27-03-01",
+              "O10",
+              "s11-05-01",
+              "s36-07-01",
+              "s16-04-01",
+              "s02-03-01",
+              "O16",
+              "s15-05-01",
+              "s26-01-07",
+              "s32-02-07",
+              "s30-05-01",
+              "s27-01-08",
+              "s29-01-07",
+              "s28-05-01",
+              "s26-01-04",
+              "s06-04-01"
+            ]
+          },
+          {
+            "channel": "lance_hybrid",
+            "filtered_zones": [],
+            "candidate_ids": [
+              "s11-05-01",
+              "O16",
+              "s29-01-10",
+              "s06-03-01",
+              "s14-06-01",
+              "s27-01-05",
+              "s15-06-01",
+              "s26-03-01",
+              "O14",
+              "s28-02-01",
+              "s29-01-03",
+              "O08",
+              "s15-05-01",
+              "s29-01-06",
+              "s04-03-01",
+              "s29-01-05",
+              "s15-04-01",
+              "O02",
+              "s10-03-01",
+              "s13-03-01"
+            ]
+          }
+        ],
+        "reranker": "Horizon-Labs/multilingual-reranker-small",
+        "rerank_candidates": 16,
+        "rerank_ms": 5225.41,
+        "reranked": [
+          {
+            "record_id": "s29-01-10",
+            "score": 0.090716
+          },
+          {
+            "record_id": "s10-03-01",
+            "score": 0.016528
+          },
+          {
+            "record_id": "O16",
+            "score": 0.015279
+          },
+          {
+            "record_id": "s28-02-01",
+            "score": 0.013893
+          },
+          {
+            "record_id": "s05-03-01",
+            "score": 0.011328
+          },
+          {
+            "record_id": "s27-01-05",
+            "score": 0.009554
+          },
+          {
+            "record_id": "s13-03-01",
+            "score": 0.006616
+          },
+          {
+            "record_id": "s34-02-01",
+            "score": 0.006607
+          },
+          {
+            "record_id": "s15-06-01",
+            "score": 0.006014
+          },
+          {
+            "record_id": "s26-01-04",
+            "score": 0.005155
+          },
+          {
+            "record_id": "s15-01-01",
+            "score": 0.004717
+          },
+          {
+            "record_id": "s16-02-01",
+            "score": 0.003154
+          },
+          {
+            "record_id": "s10-02-01",
+            "score": 0.002886
+          },
+          {
+            "record_id": "s15-02-01",
+            "score": 0.002734
+          },
+          {
+            "record_id": "O14",
+            "score": 0.002468
+          },
+          {
+            "record_id": "s06-03-01",
+            "score": 0.001568
+          }
+        ],
+        "selected_record_ids": [
+          "s29-01-10",
+          "s10-03-01",
+          "O16",
+          "s28-02-01",
+          "s05-03-01",
+          "s27-01-05",
+          "s13-03-01",
+          "s34-02-01"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        }
+      }
+    }
+  ]
+}

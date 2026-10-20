@@ -52,7 +52,7 @@ export default function GiannaChat({ apiBase }: Props) {
     event.preventDefault();
     const message = question.trim();
     if (!message || busy) return;
-    setBusy(true); setStatus('Buscando en la guía y preparando una respuesta con fuentes…');
+    setBusy(true); setStatus('Buscando en la base de conocimiento y preparando una respuesta…');
     setMessages(old => [...old, { role: 'user', text: message }]); setQuestion('');
     try {
       if (!token.current) token.current = (await call<{token: string}>('/api/sessions', { method: 'POST', body: '{}' })).token;

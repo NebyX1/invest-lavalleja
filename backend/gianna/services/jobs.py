@@ -14,8 +14,8 @@ LOG=logging.getLogger(__name__)
 
 
 class Jobs:
-    def __init__(self,db,cfg,knowledge,embeddings,qdrant,rag=None):
-        self.db=db;self.cfg=cfg;self.knowledge=knowledge;self.embeddings=embeddings;self.qdrant=qdrant;self.rag=rag
+    def __init__(self,db,cfg,knowledge,embeddings,vector_store,rag=None):
+        self.db=db;self.cfg=cfg;self.knowledge=knowledge;self.embeddings=embeddings;self.vector_store=vector_store;self.rag=rag
         self.stop_event=threading.Event();self.thread=None;self.wake=threading.Event()
         self.token=uid();self.current_job=None
 
@@ -94,7 +94,7 @@ class Jobs:
                 path.unlink(missing_ok=True)
                 result={'base_id':base_id,'records':len(corpus.records)}
             elif kind=='warmup':
-                self.progress(id,'Preparando E5 y BM25. La primera ejecución descarga los modelos.')
+                self.progress(id,'Preparando Bekko, Horizon y LanceDB desde artefactos locales verificados.')
                 self.embeddings.load();result=self.embeddings.profile
             elif kind=='build':result=self.build(job)
             elif kind=='delete':result=self.delete(job)
@@ -118,7 +118,7 @@ class Jobs:
         if not version:raise DomainError('Versión no encontrada.',404)
         profile=json.loads(version['profile_json'])
         self.db.execute("UPDATE versions SET status='building' WHERE id=?",(vid,))
-        self.progress(id,'Preparando E5 multilingüe y el tokenizador exacto')
+        self.progress(id,'Preparando Bekko y Horizon y el tokenizador exacto')
         self.embeddings.load()
         if profile.get('fingerprint') and profile['fingerprint']!=self.embeddings.profile['fingerprint']:
             raise DomainError('Cambió el modelo durante una reanudación. Creá una versión nueva; no mezcles vectores.')
@@ -129,7 +129,7 @@ class Jobs:
             records=self.db.all('SELECT content_json FROM version_records WHERE version_id=? ORDER BY record_key',(vid,))
             all_chunks=[]
             for i,r in enumerate(records):
-                self.progress(id,'Dividiendo contenido con el tokenizador de E5',i,len(records))
+                self.progress(id,'Dividiendo contenido con el tokenizador de Bekko',i,len(records))
                 record=json.loads(r['content_json'])
                 if record['audience']!='public':raise DomainError('Se detectó contenido interno en una versión pública.')
                 all_chunks.extend(chunks_for_record(vid,record,self.embeddings.count,profile['chunk_tokens'],profile['overlap_tokens']))
@@ -142,7 +142,7 @@ class Jobs:
         total=len(rows)
         if not total:raise DomainError('No se generaron chunks.')
         self.progress(id,'Creando colección aislada de la base publicada',0,total)
-        self.qdrant.create(version['collection_name'])
+        self.vector_store.create(version['collection_name'])
         reused=0;started=time.perf_counter()
         for offset in range(0,total,self.cfg.embedding_batch_size):
             self.progress(id,'Calculando embeddings y guardando lote',offset,total)
@@ -157,7 +157,7 @@ class Jobs:
             if missing:
                 d,s=self.embeddings.documents([batch[i]['embedding_text'] for i in missing],[batch[i]['sparse_text'] for i in missing])
                 for i,dv,sv in zip(missing,d,s,strict=True):dense[i]=dv;sparse[i]=sv
-            self.qdrant.upsert(version['collection_name'],batch,dense,sparse)
+            self.vector_store.upsert(version['collection_name'],batch,dense,sparse)
             with self.db.tx(immediate=True) as db:
                 for c,dv,sv in zip(batch,dense,sparse,strict=True):
                     db.execute('UPDATE chunks SET vector_json=? WHERE id=?',(dumps(dv),c['id']))
@@ -165,7 +165,8 @@ class Jobs:
             # Release CPU between batches. Query inference shares the same model and lock.
             time.sleep(0.03)
         self.progress(id,'Comprobando cantidad de puntos y calculando visualización',total,total)
-        if self.qdrant.count(version['collection_name'])!=total:raise DomainError('El conteo de Qdrant no coincide. No se habilita la publicación.')
+        if self.vector_store.count(version['collection_name'])!=total:raise DomainError('El conteo de LanceDB no coincide. No se habilita la publicación.')
+        self.vector_store.finalize(version['collection_name'])
         projection=self.project(vid)
         self.progress(id,'Validación terminada; lista para prueba y publicación',total,total)
         report={'chunks':total,'reused_embeddings':reused,'build_seconds':round(time.perf_counter()-started,3),
@@ -200,7 +201,7 @@ class Jobs:
         versions=self.db.all('SELECT * FROM versions WHERE base_id=?',(bid,))
         for i,v in enumerate(versions):
             self.progress(job['id'],'Eliminando colección de conocimiento',i,len(versions))
-            self.qdrant.delete(v['collection_name'])
+            self.vector_store.delete(v['collection_name'])
         with self.db.tx(immediate=True) as db:
             db.execute('DELETE FROM bases WHERE id=?',(bid,))
         return {'deleted_base_id':bid}

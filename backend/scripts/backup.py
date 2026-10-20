@@ -16,6 +16,6 @@ def main():
     dest.parent.mkdir(parents=True,exist_ok=True)
     Database(cfg.db_path).backup(dest);dest.chmod(0o600)
     print(f'Respaldo SQLite creado en {dest}. Es confidencial.')
-    print('No incluye Qdrant, modelos ni .env. Leé docs/SEGURIDAD_Y_OPERACION.md para respaldo/restauración completa.')
+    print('No incluye LanceDB, modelos ni .env. Leé docs/SEGURIDAD_Y_OPERACION.md para respaldo/restauración completa.')
 
 if __name__=='__main__':main()

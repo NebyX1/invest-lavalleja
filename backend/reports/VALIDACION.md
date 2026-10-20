@@ -1,5 +1,291 @@
 # Informe de validación de la entrega
 
+## Gianna como agente con memoria (PydanticAI) · 19/10/2026
+
+**Esta sección sustituye el flujo descrito en «Respuestas coherentes y orientadas al inversor»** (planificador de búsqueda + generación de un solo paso), que se probó y resultó insuficiente.
+
+Problema observado (prueba humana, captura del responsable): ante «Quiero poner un boliche», Gianna respondió con un orden de trámites («primero conviene definir quién será el titular…», RUNAEV, habilitaciones). Causa: la intención se decidía con regex (`poner` ∈ `REQUIREMENT_WORDS` → *requisitos*), el plan arrastraba facetas de permisos que se enviaban al modelo, y el prompt no definía a quién se le habla, por lo que trataba a la persona como alguien que debía ser guiado en pasos básicos. Tampoco había memoria del hilo más allá de campos derivados por regex.
+
+Referencia estudiada: `giana-lex` (agentes PydanticAI sobre el endpoint compatible de Ollama, el modelo interpreta *todos* los turnos con salida estructurada validada, historial nativo, memoria de estado y una lectura adicional acotada). Se adoptó el patrón; no se copió su dominio.
+
+Cambios:
+
+- **`services/agents.py` (nuevo)**: intérprete de turnos (`TurnPlan`: acto, tipo de pedido, necesidad, consulta autosuficiente, búsquedas y **memoria actualizada**), agente de respuesta con `output_validator` y reintento nativo, y agente de conversación. Memoria `InvestorMemory` (proyecto, intereses, opciones presentadas, preferencias; seis ítems por lista) persistida cifrada en la sesión. Dependencia `pydantic-ai-slim[openai]==2.57.0` y transporte `Ollama.agent_model` (endpoint `/v1`, transporte por solicitud).
+- **Intención por el modelo**: el harness solo conserva las puertas de seguridad deterministas. Si el modelo falla, el plan determinista anterior actúa de respaldo y conserva la memoria.
+- **Trato y tarea**: `ANSWER_SYSTEM` define a un inversor adulto y informado (sin «primero definí…», sin pasos que no pidió) y `policy_for` pide, para «dónde», qué experiencia, público o ventaja ofrece cada zona; los trámites solo si los pide o si cambian la elección. Se retiraron las facetas de permisos del contexto del modelo y las etiquetas en inglés del corpus.
+- **Recuperación**: se fusionan con RRF la afinidad entre búsquedas y el reranker (el reranker pequeño en CPU hundió los perfiles de zona que todas las búsquedas habían encontrado: puntaje 0,04 frente a 0,28 de «Horticultura»); el reranker usa las palabras de la persona y su necesidad; para pedidos de ubicación se recuperan por tipo de registro y se reservan hasta tres perfiles de zona en el contexto. Segunda lectura (`buscar_en_la_base`) solo para datos puntuales: en pedidos amplios añadía ruido y latencia (trajo una ficha de demografía para un boliche). Las fuentes declaradas que no comparten título ni contenido con la respuesta se depuran.
+
+Verificación real (DeepSeek `deepseek-v4.1-flash:1017`, API local con CAPTCHA y sesión):
+
+- Antes de esta revisión: «Quiero poner un boliche» → trámites. Primera versión del agente → ya describía zonas, pero con evidencia ruidosa (cine, horticultura) y sin los perfiles de zona.
+- Después: «Quiero poner un boliche» abre con «Hay varias zonas…» y describe Minas, Solís–Aguas Blancas, Arequita y las localidades de los Días de los Pueblos con el perfil documentado de cada una; en tres corridas seguidas se mantuvieron los perfiles de zona. Seguimiento de la misma conversación: «Me quedo con Villa Serrana, ¿qué experiencias puedo ofrecer?» retoma el boliche, ofrece experiencias, público y la restricción lumínica del plan local; «¿Y qué permisos necesitaría para eso?» se responde para esa actividad y esa zona; «Gracias» recibe una cortesía.
+- Regresión: eólico (antecedente Minas I, EIAUPOT, prohibición en Arequita, sin atribuir aptitud a localidades que la ficha excluye), turismo, madera, fiscal, requisitos de un restaurante, clima, criptominería y premisa falsa de exoneración del 100% se respondieron con el contrato esperado.
+- Intérprete: entre 1,7 y 2,7 s por turno. Consulta completa: 16–28 s (reranker en CPU 8–10 s, intérprete 2–3 s, respuesta 6–10 s).
+- Pruebas: backend **204 pasaron y 3 se omitieron** (paquete privado ausente), sin llamadas pagas (`FunctionModel` sobre el transporte de prueba); frontend `astro check`, ESLint, Vitest y 12/12 e2e de Gianna en verde.
+
+Limitaciones: el modelo no responde idéntico en cada ejecución y algunas respuestas incluyen razonamientos de encaje débiles cuando la base no trata la actividad (p. ej. público de «Días de los Pueblos» para un boliche); no se agregó un umbral de relevancia por no estar calibrado el reranker. La latencia total sigue dominada por el reranker. Esta evidencia usa una base de pruebas locales y no sustituye la revisión editorial ni las 62 preguntas y 12 situaciones humanas del checklist.
+
+## Respuestas coherentes y orientadas al inversor · 19/10/2026
+
+**Esta sección sustituye parcialmente «Rol institucional informativo»**, que había fijado un rol sin orientación a partir de una devolución de la Dirección de Desarrollo Económico. Por pedido del responsable del proyecto, tras una prueba de uso, Gianna vuelve a orientar al inversor **con lo que respalda la base de conocimiento**, sin inventar y sin asesoramiento definitivo. Conviene confirmar este cambio de criterio con la Dirección antes de una publicación.
+
+Problema observado (prueba humana local): respuestas entrecortadas, con «según la guía» y «hipótesis 1/2», y negativas del tipo «No encontré…» ante «¿Dónde puedo instalar un parque eólico?» o «¿Dónde abrir un bar o boliche?» aunque la recuperación había traído las fuentes correctas (antecedente de 42 MW, autorización departamental y EIAUPOT, prohibición en el Parque Nacional Arequita). Causas: reglas de prompt y validadores que prohibían orientar y forzaban dos o tres frases, una política «solo lugares vinculados expresamente a la actividad», citas `[C#]` obligatorias en cada párrafo, vocabulario copiado del corpus y consultas de dominio sin interpretación previa. Contraste con el proyecto de referencia `giana-turismo`: contrato de salida único, fuentes mostradas aparte, el modelo decide si la evidencia alcanza y sin validadores regex que reescriban o rechacen respuestas.
+
+Cambios (sin tocar modelo, corpus, vectores ni reglas de seguridad previas a la generación):
+
+- Nuevo prompt y contrato (`ESTADO` + `FUENTES`), voz «mi base de conocimiento», sin «hipótesis», ventaja comparada por zona, apertura con lo útil y salvedades en una frase. Saneador de vocabulario como última salvaguarda.
+- Planificador de búsqueda con el modelo y respaldo determinista; hasta cuatro búsquedas; los últimos cuatro turnos como contexto.
+- «Boliche» ya no obliga a una pregunta de aclaración; se responde para bar, pub o local bailable.
+- Se retiraron los validadores de «voz asesora», longitud, pregunta final y cita por línea, y el encabezado automático por actividad. Se conserva el guard de atribución para nombres propios específicos.
+- Regla explícita contra la extrapolación: una referencia regional que la fuente declara no aplicable a ciertas localidades no se presenta como opción para ellas. Fue necesario añadirla: una primera versión permisiva listó Mariscala, Pirarajá y Zapicán como aptas para eólica contra lo que dice la ficha.
+- Interfaz y persona: «base de conocimiento» en lugar de «guía»; las fuentes se listan sin etiquetas `[C#]`. La persona anterior se migra por coincidencia exacta.
+
+Verificación real (DeepSeek `deepseek-v4.1-flash:1017`, API local con CAPTCHA, base `e03fdbd8…`):
+
+- Antes: eólico → `insufficient_evidence` con títulos crudos; bar/boliche → `insufficient_evidence`; turismo y madera → respuestas con «La guía…» e «hipótesis».
+- Después: eólico y bar/boliche → `answered`, abren con las opciones («Hay varias zonas…»), comparan el perfil documentado de cada zona, recuerdan las condiciones que cambian la decisión y aclaran en una frase que no hay inventario de predios; sin «guía» ni «hipótesis». Seguimiento «¿Y qué permisos necesito para el que sería en Villa Serrana?» resuelto con el contexto. Cripto y clima → «No encontré…» sin especular. La premisa falsa «exoneración del 100% sin fuentes» se corrige con la base.
+- Latencia de 15–25 s por consulta; el reranker Horizon en CPU aporta 7–11 s (sin cambios) y el planificador unos 2–3 s. Un caso aislado tardó 55 s por lentitud del proveedor y otro devolvió 503 transitorio del proveedor.
+- Pruebas finales: backend **192 pasaron y 3 se omitieron** (paquete privado ausente), ejecutadas en contenedor con la imagen del proyecto. Frontend: `astro check` 0 errores, ESLint limpio, Vitest 9/9 y 12/12 e2e de Gianna en verde.
+
+Limitaciones: la calidad sigue dependiendo del modelo y de una recuperación acotada; las respuestas varían entre ejecuciones y una redacción fluida no certifica cada afirmación. Esta evidencia usa una base de pruebas locales y no sustituye la revisión editorial ni las 62 preguntas y 12 situaciones humanas del checklist.
+
+## Activación de la base consolidada por solicitud del usuario · 19/10/2026
+
+La solicitud explícita «Debes reemplazar la base de conocimiento actual con la nueva» autorizó importar, aprobar la selección pública y publicar el consolidado previamente revisado. Se usaron los servicios de dominio existentes, sin modificar controles HTTP, prompts, routing, modelos ni configuración persistida. La operación quedó auditada como administración local, sin atribuirla a una cuenta humana ni presentar la aprobación como recertificación factual.
+
+**Nueva versión activa:** `16d7029f120c49aa84b7be74974a89de`, base `0f9f89d09b9c477eaf0586b9247ae7ac`. Contiene **332 registros públicos, 360 fragmentos y máximo 419 tokens Bekko**; los **75 internos se conservaron en el borrador administrativo, sin aprobarse ni entrar al snapshot/índice público**. Se comprobó igualdad exacta entre el snapshot y los registros públicos importados, cobertura de todos ellos y coincidencia de conteos SQLite/LanceDB. DeepSeek continúa en `deepseek-v4.1-flash:1017`.
+
+Antes de importar se creó un respaldo SQLite consistente, con `integrity_check=ok`, en el volumen persistente: `/app/data/backups/knowledge-20261019-f6405e1db9cc-before.sqlite3`. Es confidencial y no se copió al repositorio. La versión anterior `e03fdbd8a46a4c9aab37e2b44c77b463`, su base y su colección LanceDB permanecen para reversión; no se eliminó ninguna. El trabajador indexó la nueva colección antes del cambio del puntero activo.
+
+**Verificación posterior sobre el índice publicado: 5/5 consultas**, con Bekko/OpenVINO, Horizon/ONNX y LanceDB reales y el perfil configurado en el servidor: parques eólicos, autoconsumo, olivicultura, vertidos y mantenimiento industrial. Los contextos contienen fichas esperadas y exclusivamente registros públicos de la nueva versión. API `/health/live`, `/health/ready` y página `/gianna/`: HTTP 200; `/api/config`: `available=true`, `enabled=true`. No hubo llamadas al proveedor ni generación de respuestas en esta comprobación; no es una certificación de calidad conversacional o exhaustividad factual.
+
+[Registro local de publicación, validación y reversión](../../better-rag/consolidated/publicacion.json). El [manifiesto](../../better-rag/consolidated/manifest.json) y el [informe](../../better-rag/consolidated/Informe_consolidacion.html) reflejan ahora la publicación efectiva. Los resultados y afirmaciones de «base sin modificar» de la sección siguiente corresponden a la etapa anterior de consolidación aislada, no al estado actual del portal.
+
+## Consolidación documental para nueva ingestión · 19/10/2026
+
+Se creó el paquete local `better-rag/consolidated/` a partir del JSON y el Word de `better-rag`, sin modificar los originales, el flujo del agente, las credenciales ni la base del portal. El contrato se contrastó con `gianna/corpus.py`, `services/knowledge.py` y el fragmentador real. El archivo principal usa `gianna.corpus.v1`: **407 registros, 332 públicos candidatos a revisión, 75 internos y 172 fuentes**. Conserva exactamente los 271 registros y las 50 fuentes originales. Las 128 fichas del Word se consolidaron en 127 —dos describían el mismo evento de ecopuntos— y se añadieron nueve unidades de contexto territorial. Las 127 entradas bibliográficas nuevas se redujeron a 122 URLs únicas conservando alias y localizadores. El diagnóstico y la metodología del Word permanecen en el archivo administrativo de trazabilidad, no como instrucciones del agente.
+
+**Pruebas:** 10/10 regresiones de conversión; 21/21 comprobaciones de esquema, importación/exportación SQLite, preservación y bloqueo de indexación sin aprobación. En almacenamiento temporal con Bekko/OpenVINO, Horizon/ONNX y LanceDB reales: **390/390 comprobaciones**, 360 fragmentos, máximo **419 tokens** frente al límite 420, todos los 332 registros públicos representados y cero internos indexados. Las **13/13 consultas** recuperaron alguna ficha pertinente esperada en el contexto: parques eólicos, restricciones de Arequita, autoconsumo, biogás, olivos, vid, saneamiento serrano, residencias, audiovisual, vertidos, ecopuntos, mantenimiento y poscosecha. No se llamaron proveedores ni se generaron respuestas: estos resultados no certifican calidad conversacional, exhaustividad ni exactitud factual de toda la base.
+
+La versión temporal no se activó. La lectura de la base de servicio antes y después mantuvo `e03fdbd8a46a4c9aab37e2b44c77b463`. El paquete contiene material interno y quedó fuera de Git y de `public/`. Resultados reproducibles y límites: [informe local](../../better-rag/consolidated/Informe_consolidacion.html), [validación del importador](../../better-rag/consolidated/validacion-importador.json), [pruebas nativas](../../better-rag/consolidated/validacion-nativa.json) y [manifiesto](../../better-rag/consolidated/manifest.json). Los scripts y las regresiones están en `better-rag/tools/`.
+
+Se contrastaron puntualmente fuentes primarias de IMPO y MIEM; no se recertificó toda la bibliografía. Se mantuvieron fechas históricas, hipótesis, condiciones y audiencias. El informe señala revisiones temporales y una posible discrepancia entre título/año y URL en la referencia ACAU. La importación y publicación efectiva quedan pendientes de revisión editorial y autorización, no se simularon como realizadas.
+
+## Retirada de atajos temáticos y recuperación general · 19/10/2026
+
+**Esta sección sustituye las conclusiones de ausencia basadas en los filtros temáticos anteriores.** La implementación anterior sí buscaba, pero luego descartaba candidatos por palabras de una lista y reemplazaba la respuesta con una negativa armada por tema. Las pruebas previas que confirmaban esas negativas verificaban ese comportamiento restringido, no la capacidad general del RAG. No debieron presentarse como prueba de que la base carecía de información pertinente.
+
+Se retiraron `matches_information_scope`, la clasificación energética enumerada, los requisitos léxicos de padrón/porcentaje, la proyección que quitaba secciones y las prioridades fijas de fichas/temas. La recuperación usa siempre la pregunta original sobre todo el snapshot público, fusiona candidatos de búsqueda híbrida y los pasa por Horizon. Las referencias explícitas pueden sumar candidatos sin excluir otros. Las consultas nuevas o una ruta desconocida/fuera de alcance no producen una negativa sin búsqueda. No se cambiaron modelos, corpus, vectores, configuración persistida, diseño ni controles de acceso.
+
+El generador lee las fuentes para responder total o parcialmente, o redactar el dato puntual que no encontró. Ese último caso usa un JSON validado con texto generado e IDs opcionales de otros fragmentos recuperados; no usa una respuesta negativa por nombre del tema ni un menú de fichas preferidas. Un fallo de formato/validación es un fallo de respuesta, no una afirmación de que falta conocimiento. Las citas, límites de rol, privacidad y audiencias se conservan; no se exige un número fijo de localidades ni rellenar la respuesta con perfiles.
+
+### Evidencia encontrada y primera corrida real
+
+Por la API real, «Quiero invertir en energías renovables» recuperó y citó información parcial sobre **energía para venta a red** (`s17-01-04`), eficiencia como servicio (`O09`) y ausencia de tarifas publicadas (`s32-04-01`). Se inspeccionaron los tres textos públicos para comprobar esas afirmaciones. Esto no documenta parques disponibles ni convierte eficiencia en generación renovable: sí demuestra por qué la negativa temática previa no era una conclusión válida sobre todo el corpus.
+
+La [primera corrida real](rag-migration/general-rag-initial.json) cumplió **8/9** checks conjuntos. Las cinco consultas públicas recorrieron búsqueda, reranking y generación; agua/efluentes, equipos digitales y eficiencia citaron O10/O08/O09. Micropropagación de orquídeas terminó en falta de información redactada por el modelo. En los pares sintéticos aislados, micropropagación respondió con la fuente y se abstuvo sin ella. El caso energético sintético inicial no cumplió la expectativa positiva: solo describía un proceso físico ficticio, pero preguntaba por invertir en Lavalleja, sin documentar una propuesta de inversión. Se conserva ese resultado; no se cambió el motor para obligarlo a responder afirmativamente. Se precisó la consulta física correspondiente y se añadió un par separado que sí documenta una propuesta de inversión **sintética**, manteniendo la misma exigencia de responder con evidencia y abstenerse sin ella.
+
+### Corrida final con motores reales
+
+[Informe final, respuestas, trazas y hashes](rag-migration/general-rag-final.json): **11/11** checks conjuntos, con el mismo DeepSeek `deepseek-v4.1-flash:1017`, Bekko/OpenVINO, Horizon/ONNX y LanceDB. Se separan cinco consultas por la API pública real de seis ejecuciones en corpus sintéticos temporales:
+
+| Consulta del par sintético | Con fuente pertinente | Sin esa información |
+|---|---|---|
+| Información sobre generación eléctrica renovable, descrita mediante luz del sol | Responde y cita el documento, conservando que es ficticio | Falta de información redactada para la pregunta |
+| Micropropagación, descrita como multiplicación de tejidos in vitro | Responde y cita, sin depender de un tema del antiguo catálogo | Falta de información, sin inventar el procedimiento |
+| «Quiero invertir en energías renovables», con una propuesta sintética de capital privado | Describe esa propuesta atribuida al documento y su carácter ficticio; no la presenta como oferta real | Falta de información, después de buscar, reordenar y generar |
+
+En la API pública volvió a responder con información parcial sobre energía para venta a red y límites de la documentación; agua/efluentes, equipos digitales y eficiencia respondieron con sus fuentes. Micropropagación de orquídeas no encontró respaldo pertinente. Todas las trazas acreditan búsqueda global, reranking y generación; no se decidió la disponibilidad por un enum o por el score del reranker. Los hashes de los siete módulos del flujo probado coinciden con los archivos locales.
+
+La sesión pública de evaluación se borró y la versión del portal permaneció `e03fdbd8a46a4c9aab37e2b44c77b463`. No se publicó ningún documento sintético en la base del portal. Los pares aislados comprueban cambio de respuesta con la evidencia, no un benchmark independiente de recuperación: contienen una sola fuente pública y una privada excluida. La prueba sobre el corpus público sí recorre el índice existente. Los scores, citas y checks estructurales no certifican la verdad ni la exhaustividad de todas las respuestas; persisten la variación de redacción y la necesidad de revisión humana.
+
+### Regresiones automatizadas
+
+**174 pruebas Python aprobadas y 3 omitidas** por el paquete documental privado no versionado. Incluyen temas fuera del antiguo catálogo, paráfrasis sin la palabra temática en el documento, fuentes privadas excluidas, entrada efectiva a búsqueda/reranking/generación, respuestas parciales, abstenciones generadas validadas, fallos de validación diferenciados de falta de datos y preservación de memoria, citas y seguridad. Los dobles no se presentan como evaluación de los modelos reales. Los fixtures del router y del formato de abstención se actualizaron al nuevo contrato; las expectativas de negativas fijas y perfiles territoriales obligatorios se sustituyeron por pruebas de búsqueda y evidencia.
+
+## Falta de información específica y otros temas disponibles · 19/10/2026
+
+Se corrigió la respuesta genérica de la captura «Quiero invertir en energías renovables». La abstención identifica el tema reconocido o el detalle faltante y, en un párrafo separado, ofrece hasta tres temas presentes en fichas públicas no vacías de la misma versión que usa la consulta. No se presenta eficiencia energética como respuesta sobre generación renovable ni como recomendación para invertir en otra actividad. Los nombres proceden de títulos de fichas, no del generador; no se ofrecen registros internos, versiones ajenas, títulos inseguros ni las fichas identificadas como el tema fallido. Sin otros temas verificables no se promete un catálogo inexistente.
+
+El cambio se aplica tanto cuando no se recupera evidencia pertinente como cuando el modelo devuelve `[NO_EVIDENCE]`, sin forzar un segundo intento ni repetir detalles inventados. Las respuestas válidas siguen informando con fuentes y sin ese menú. No se cambiaron diseño, modelo, corpus, índices ni configuración persistida. El evaluador distingue el menú separado de una sustitución incorrecta del dato solicitado; sigue rechazando perfiles turísticos usados como supuestas ubicaciones renovables.
+
+**Prueba pública local: 3/3**, con CAPTCHA y sesión reales, versión `e03fdbd8a46a4c9aab37e2b44c77b463` y DeepSeek `deepseek-v4.1-flash:1017`:
+
+- La consulta de la captura reconoce que falta información suficiente sobre inversiones en renovables y ofrece información de eficiencia energética como servicio, hospitalidad serrana con operador y servicios rurales y mantenimiento móvil, sin citas ajenas ni recomendaciones.
+- La consulta por padrones disponibles expresa que no hay un listado verificado para ese proyecto; no afirma disponibilidad de terrenos.
+- Al elegir información sobre eficiencia energética, responde con la ficha O09 y su cita, sin mantener la negativa anterior ni insertar otro menú.
+
+[Respuestas y comprobaciones completas](rag-migration/missing-information-after.json). Se verificó que las tres fichas ofrecidas existen como públicas en el snapshot; el filtro temático de renovables no encontró registros. Ese filtro es conservador y léxico: no certifica ausencia semántica exhaustiva. La sesión de prueba fue eliminada.
+
+**Regresión final: 172 pruebas Python aprobadas y 3 omitidas** por el paquete documental privado no versionado. Cubre menú máximo de tres temas, ausencia de otras fichas, audiencia interna, snapshot capturado frente a otra publicación, no repetir una ficha fallida, abstención del proveedor sin reparación, casos positivos y evaluación del menú separado. Contenedor `healthy`, configuración pública disponible. No se modificó el frontend en esta corrección ni se presenta como una nueva evaluación visual. No se hizo push ni despliegue público.
+
+## Corrección de identidad: portal de inversiones · 19/10/2026
+
+El ajuste anterior de tono introdujo incorrectamente «desarrollo económico» como identidad de Gianna. Se corrigieron la persona, las instrucciones de conversación, la respuesta de respaldo y los textos de presentación del portal a **información sobre inversiones en Lavalleja**. Se conserva el rol informativo: responder lo pedido, sin asesoramiento ni consejos no solicitados. No se cambiaron diseño, modelo, recuperación, vectores ni corpus.
+
+La compatibilidad reconoce tanto los defaults originales como los informativos incorrectos por coincidencia exacta; no reemplaza personalizaciones. En la configuración local persistida se comprobó que solo cambiaron `persona` y `greeting`, manteniéndose `deepseek-v4.1-flash:1017` y todos los demás ajustes.
+
+Verificación específica de esta corrección:
+
+- **90 pruebas Python aprobadas** (`test_information_role.py`, `test_jobs_and_rag.py`, `test_web.py`), incluidas migración de ambos defaults, conservación de personalizaciones e identidad de inversiones. No se presenta como una nueva ejecución de la suite completa.
+- Astro check: cero errores, warnings e hints; lint correcto; build de 32 páginas.
+- **4/4 Playwright**, escritorio y móvil: presentación/enlaces sin JavaScript y consulta con API interceptada. Comprueban título, encabezado, bienvenida, placeholder y ausencia de la identidad incorrecta; no son una evaluación del proveedor.
+- API local real con CAPTCHA y sesión, usando DeepSeek: «Hola» → **«Hola, ¿en qué puedo ayudarte?»**; «¿Qué podés hacer?» → **«Informo sobre inversiones en Lavalleja: actividades, zonas, requisitos y fuentes publicadas en el portal.»** Ambas respuestas conversacionales fueron breves y sin citas ajenas. La sesión de prueba se borró al terminar.
+
+El contenedor quedó `healthy` y `/api/config` disponible con el saludo corregido. Las conversaciones anteriores del usuario no se borraron ni reescribieron. Esta comprobación verifica identidad y presentación, no certifica la calidad factual del RAG. No se hizo push ni despliegue público.
+
+## Rol institucional informativo · 19/10/2026
+
+Por la devolución de la Dirección de Desarrollo Económico se cambió el contrato: Gianna informa lo pedido y no actúa como asesora ni construye recomendaciones de inversión. **Esta sección sustituye los criterios anteriores que exigían recomendar, proponer una prueba y cerrar con preguntas.** Los informes históricos no se borraron ni se presentan como validación del rol actual.
+
+Antes de cambiarlo se fijó y ejecutó el escenario `information`: información de eficiencia energética → zonas mencionadas → ubicaciones renovables → padrones eólicos disponibles → información de poscosecha en Varela → rentabilidad garantizada. Cumplía **0/6**: las respuestas añadían pasos, métricas y preguntas; la consulta de renovables producía encajes inventados desde perfiles de Minas y Villa Serrana. [Baseline completo](rag-migration/information-before.json).
+
+Cambios aplicados sin cambiar modelo, corpus ni vectores:
+
+- Rol informativo como regla superior a las preferencias editoriales; tono institucional sencillo, sin voz de asesora, interrogatorio sobre recursos ni pregunta de cierre obligatoria. Pedir información no puede convertirse en una recomendación por decisión del clasificador. Se actualizaron el saludo, la persona predeterminada, el encabezado, el texto editorial, el ejemplo y el placeholder del portal. Los defaults anteriores se migran por coincidencia exacta y se preservan las personalizaciones.
+- Tema energético acotado en la memoria del servidor para los seguimientos. Eficiencia como servicio no prueba ubicaciones para generación renovable. Los filtros exigen evidencia del tema y, para inventarios, identificadores de sitios; no sustituyen un listado inexistente por requisitos de un predio. La consulta explícita de eficiencia ahora se enruta localmente y no depende de una clasificación generativa.
+- Una falta de información devuelve un mensaje breve controlado, sin contactos fabricados ni tareas para la persona. Ya no se reintenta una abstención legítima para forzar una respuesta. Cuando sí existe el dato se responde: se comprobaron las fichas reales O09/O03 y un caso positivo de inventario público **sintético** en las pruebas, no un padrón real.
+- La lectura humana de una corrida que ya aprobaba los checks encontró que seguían apareciendo métricas y «entrada y prueba». Para preguntas generales se prioriza la ficha nombrada y se envían al generador sus párrafos descriptivos literales, sin esos apartados no solicitados. Los registros, extractos de citas y límites editoriales no se alteran; las preguntas específicas por condiciones/indicadores conservan el texto completo.
+
+Se conservan la [corrida intermedia](rag-migration/information-intermediate.json), que reveló el fallo de enrutamiento de eficiencia, y la [revisión previa a recortar el contexto](rag-migration/information-before-context-trim.json). No bastó obtener un estado correcto o un score verde para cerrar el trabajo.
+
+### Prueba final por API pública real
+
+**6/6** casos. Tres respuestas documentales con fuentes pertinentes y tres faltas de datos explícitas, sin consejos ni preguntas no solicitadas. Las tres negativas se resolvieron por falta de evidencia pertinente, sin una generación forzada. [Respuestas, trazas y hashes finales](rag-migration/information-after.json).
+
+| Consulta | Palabras antes | Palabras después | Resultado final |
+|---|---:|---:|---|
+| Información de eficiencia energética | 262 | 81 | Descripción y alcance de O09; sin pasos ni métricas |
+| Zonas donde la menciona la guía | 206 | 29 | Minas, Solís y Varela, atribuidos a O09 |
+| Ubicaciones de generación renovable | 192 | 15 | No cuenta con ubicaciones documentadas |
+| Padrones eólicos disponibles | 132 | 14 | No cuenta con un listado verificado |
+| Información de poscosecha en Varela | 250 | 81 | Descripción de O03; sin plan de inversión |
+| Rentabilidad garantizada | 223 | 16 | No tiene cifras verificadas ni asegura rendimiento |
+
+Se mantuvieron `deepseek-v4.1-flash:1017`, `think:low`, temperatura 0,1 y 4.096 tokens, Bekko/Horizon/LanceDB y la versión `e03fdbd8a46a4c9aab37e2b44c77b463`. Persona y saludo informativos quedaron aplicados en los ajustes locales persistidos, sin modificar los parámetros del modelo.
+
+### Regresiones y límites
+
+Python/Flask/LanceDB: **166 aprobadas, 3 omitidas** por el paquete privado no versionado. Incluye 15 pruebas específicas del rol, selección descriptiva sin alterar fuentes, inventario positivo sintético, persistencia del tema, ausencia de recomendaciones y no reparar abstenciones. Los fixtures anteriores que daban consejos o exigían un primer paso se adaptaron al nuevo contrato sin retirar controles de fuentes, privacidad o seguridad.
+
+Portal: check sin errores/warnings/hints; lint y 9 pruebas unitarias correctos; build de 32 páginas. Playwright Gianna escritorio/móvil, con API interceptada: **12/12** en la corrida final. Un lote anterior tuvo 11/12 y un timeout móvil de 30 s al abrir las fuentes; el caso aislado pasó y la repetición completa posterior aprobó. No se confunden esos dobles con la prueba real del proveedor.
+
+La API quedó `healthy`, `/api/config` disponible y `/gianna/` respondió HTTP 200. Las sesiones de evaluación se borraron al finalizar. Es una regresión pequeña conocida, con checks léxicos y revisión de texto, no una certificación factual ni una garantía de que nunca haya errores. Los filtros son conservadores y pueden omitir paráfrasis o requerir adaptación con otro corpus. La revisión editorial sigue pendiente; no se hizo push ni despliegue público.
+
+## Recomendaciones enfocadas y próximos pasos · 19/10/2026
+
+Se reprodujo la conversación de las capturas por CAPTCHA/sesión/API/Ollama: «Hola» → «¿Cómo estás?» → «¿Qué me recomendás para invertir en el norte?» → «Profundiza con Varela» → «¿Cómo arranco?». Antes del cambio cumplía **1/5** casos: repetía su presentación, acumulaba opciones y condiciones, y el último seguimiento terminaba en `clarify`. El norte tenía 427 palabras; Varela, 296. Evidencia original: [antes](rag-migration/recommendations-before.json).
+
+El problema no era solo el estilo del generador. El plan clasificaba profundizar como un dato y no conservaba qué opción había ofrecido; la recuperación completaba contexto con otras fichas de la misma zona. La validación podía aprobar citas correctas aunque faltara una recomendación, incluso después de quitar una orientación inicial sin referencia. Se corrigió sin tocar la base documental ni reindexar:
+
+- Separación de `recommend` y `develop`. Las opciones presentadas se recuerdan como IDs/zonas de registros públicos citados, separadas de las preferencias explícitas del usuario. Al retomarlas se validan contra el snapshot activo, nunca contra el texto previo de Gianna.
+- Profundizar Varela conserva O03. Su contexto queda en O03, fundamento territorial y prueba comercial; no se agrega O09/O16 por compartir zona. Los cambios explícitos de sector descartan el foco anterior; tampoco heredan la prueba comercial de granos si pasan, por ejemplo, a energía en esa localidad.
+- Políticas de lenguaje cotidiano, propuesta condicional, cliente, forma de cobro documentada y prueba comercial. Se eliminan inventarios de métricas, descargos repetidos y preguntas genéricas que solo ofrecen otra lista.
+- «¿Cómo arranco?» se trata como acción del turno: comienza por a quién contactar y qué pedir, en vez de presentar otra vez el negocio. Tiene un presupuesto de extensión menor. Se comprueban orientación inicial, foco, extensión y próximo paso, también después de limpiar líneas sin cita.
+
+La primera iteración aprobó los cinco checks originales, pero la lectura humana detectó que el último turno aún repetía la presentación: [intermedio](rag-migration/recommendations-intermediate.json). Se añadió entonces el control de acción inicial y respuesta corta; no se dio por suficiente el estado `answered`.
+
+La corrida final cumplió **5/5** casos, incluyendo estos controles adicionales. Norte: **202 palabras**, dos rutas documentadas con criterios de encaje. Varela: **192 palabras**, una opción de servicio sobre granos, cliente, cobro y prueba. Primer paso: **134 palabras**, contacto con productores/operadores, datos de campaña y una prueba acotada. Las trazas confirman `recommend → develop → develop`, reducción Z5/Z6 → Z5, foco O03 en ambos seguimientos y `next_step:true` solo en el último. Hubo una reescritura por falta de cita inicial en la recomendación del norte; la respuesta final pasó la validación. [Después, respuestas completas, trazas y hashes](rag-migration/recommendations-after.json).
+
+Tras añadir la protección contra pruebas comerciales de otro sector y reconstruir la imagen, se repitió la secuencia completa: **5/5**, con **194 / 190 / 136 palabras** en los tres turnos documentales. Se conserva también esta [segunda corrida final con sus hashes](rag-migration/recommendations-repeat.json), sin sustituir la primera. La respuesta de inicio volvió a pedir contacto y datos concretos, no otra selección de negocios. La variación de redacción y el uso residual de términos contractuales confirman que estos controles no equivalen a una garantía de naturalidad en todos los turnos.
+
+Se mantuvieron **DeepSeek `deepseek-v4.1-flash:1017`, `think:low`, temperatura 0,1 y 4.096 tokens**, Bekko/Horizon/LanceDB y la versión pública `e03fdbd8a46a4c9aab37e2b44c77b463`. No se cambió de modelo para conseguir el resultado.
+
+Regresión completa Python/Flask/LanceDB: **151 aprobadas y 3 omitidas** por el paquete documental privado no versionado. Incluye once pruebas específicas del nuevo flujo, memoria no atribuida como preferencia, snapshot público, cambio de sector, seguimiento después de cortesía y limpieza que pierde la recomendación. La secuencia previa de boliche → lugares → bailable/Minas/permisos pasó **3/3** por la API real, sin reiniciar el rubro ni perder fuentes territoriales, suelo o Bomberos: [regresión territorial](rag-migration/recommendations-locations-regression.json).
+
+Son regresiones conocidas y señales estructurales/léxicas, con lectura humana de las respuestas, no evaluación independiente ni certificación de que cada cita implique cada afirmación. No prueban demanda, rentabilidad, disponibilidad de activos ni habilitación. La revisión editorial sigue pendiente. Se eliminó cada sesión de evaluación al finalizar; no hubo push ni despliegue público.
+
+## Comparación pareada Beam / DeepSeek Flash 1017 · 19/10/2026
+
+Se repitieron los mismos tres turnos por API pública, una sesión nueva por modelo, primero `beam` y después `deepseek-v4.1-flash:1017` (CLI: `deepseek-v4.1-flash:1017-cloud`). Ambos con **`think:low`, temperatura 0,1 y 4.096 tokens de generación**. `/api/tags` confirmó la revisión exacta y `/api/show` confirmó `low` en ambos. El perfil de la revisión 1017 se fijó explícitamente en `low` para esta comparación; el perfil de `deepseek-v4.1-flash` sin revisión sigue con `think:false` y no debe confundirse con este ensayo.
+
+El corpus, versión, prompts, harness, Bekko, Horizon y LanceDB fueron comunes. Los IDs seleccionados y su orden coincidieron en los tres turnos, con la misma versión pública `e03fdbd8a46a4c9aab37e2b44c77b463`. No hubo reindexación ni cambio de política durante la corrida. Registro íntegro, respuestas, trazas acotadas y hashes: [beam-vs-deepseek-1017.json](rag-migration/beam-vs-deepseek-1017.json). El script `scripts.compare_generation_models` permite repetir el ensayo con autorización explícita de llamadas al proveedor.
+
+| Métrica de esta corrida | Beam | DeepSeek Flash 1017 |
+|---|---:|---:|
+| Respuestas `answered`, con fuentes | 3/3 | 3/3 |
+| Turnos que cumplen todos los checks conocidos | 2/3 | 3/3 |
+| Tiempo HTTP medio | 15,23 s | 20,78 s |
+| Tiempo HTTP mediano | 15,68 s | 22,44 s |
+| Generación media, incluidas reescrituras | 5,42 s | 9,93 s |
+| Recuperación media, incluido reranking | 9,17 s | 10,16 s |
+| Respuestas con reescritura del modelo | 2 | 0 |
+| Tokens de salida informados por el proveedor, agregados | 6.756 | 6.179 |
+
+Por turno: Beam **19,11 / 15,68 / 10,91 s**; DeepSeek **24,67 / 15,25 / 22,44 s**. DeepSeek fue un **36,5 % más lento de extremo a extremo** en esta muestra; su generación media fue un 83,1 % mayor. La recuperación también fluctuó, especialmente en el tercer turno de DeepSeek (15,51 s), por lo que el tiempo HTTP no debe atribuirse íntegramente al LLM. La referencia anterior de Beam tenía media 12,79 s: la repetición muestra variabilidad de carga/cachés.
+
+Revisión cualitativa: DeepSeek explicitó el encaje condicional del negocio en Minas, la zona serrana y Solís/Aguas Blancas desde el primer turno, y separó los atributos documentados de esas hipótesis. Beam volvió a entregar una primera orientación genérica después de la validación: se retiraron siete líneas sin cita tras una reescritura. En su segundo turno también hubo reescritura y retirada de un párrafo por atribución. Ambos preservaron el rubro y resolvieron la aclaración bailable/Minas. En DeepSeek no hubo reescritura generativa ni retirada por atribución; sí se retiró una línea sin cita en el segundo turno.
+
+Esto favorece a DeepSeek en completitud/cumplimiento de estos casos, no certifica la veracidad de cada recomendación ni una superioridad general. Los checks incluyen coincidencias léxicas y cobertura estructural; la correspondencia factual requiere revisión humana. Es una única pasada de tres turnos por modelo, en orden fijo, sin control de caché del proveedor ni de toda la carga del host; no hay significación estadística ni cálculo de costo monetario. Los tokens agregados son los que registró el adaptador, no un contador de facturación.
+
+Los once tests de contrato y agregación aprobaron; comprueban además que los fallos no se promedien como respuestas rápidas. El nuevo DeepSeek quedó seleccionado localmente con el perfil ensayado, sin push ni despliegue público. Ambas sesiones de evaluación se borraron al terminar.
+
+## Beam seleccionado para prueba local · 19/10/2026
+
+Por pedido del usuario se abandonó MiniMax y se seleccionó **`beam`** en el `.env` local y en los ajustes persistidos de Gianna; corresponde a `ollama run beam:cloud`. El catálogo real confirmó el modelo. `/api/show` informó niveles `low`, `medium`, `high`, `xhigh`, `max` (predeterminado `max`); la prueba usa explícitamente **`think: low`**. Se mantuvieron Bekko, Horizon, LanceDB y la misma versión pública; no hubo reindexación.
+
+Una prueba inicial con 2.000 tokens respondió el primer turno en 21,1 s, pero el seguimiento falló durante generación (`ollama_unavailable`). Con el límite explícito de **4.096 tokens por llamada**, se repitió el diálogo completo por CAPTCHA/sesión/API/Ollama: **3/3 respuestas `answered`**, con fuentes, actividad conservada y cambio correcto a requisitos al aclarar bailable en Minas. Tiempos HTTP: **14,9 s / 11,4 s / 12,1 s**. Son observaciones con estas configuraciones y cargas, no un benchmark aislado de modelos ni garantía de latencia.
+
+La batería de contenido fue **2/3**, no 3/3: la respuesta inicial describió tres territorios y condiciones, pero no explicitó el encaje del emprendimiento como hipótesis. El seguimiento sí lo hizo. Se conserva ese fallo en [beam-chat.json](rag-migration/beam-chat.json); no se relajó el criterio para presentarlo como aprobado. Las citas y estados correctos no certifican respaldo factual de cada frase. La revisión humana sigue pendiente.
+
+Los nueve contratos del adaptador aprobaron, incluidos `think:low` para Beam, presupuesto acotado y ausencia de filtración de errores del proveedor. La suite completa anterior a este cambio de selección había dado 138 aprobadas y 3 omitidas; no se repitió la batería neuronal porque su motor y datos no cambiaron. Se mejoró el evaluador HTTP para conservar también fallos parciales en el informe sin imprimir cuerpos de error. Una comprobación HTTP adicional «Hola, ¿qué podés hacer?» respondió `conversation`, cero citas y orientación sobre el alcance del asistente. Ambas sesiones finales de evaluación fueron eliminadas al terminar.
+
+## Prueba interrumpida de MiniMax M3.1 Flash · 19/10/2026
+
+Se probó temporalmente el generador `minimax-m3.1-flash`, nombre confirmado en el catálogo real de Ollama Cloud; en terminal corresponde a `minimax-m3.1-flash:cloud`. El usuario pidió abortar esta prueba y sustituirlo por Beam. MiniMax ya no está seleccionado. Bekko, Horizon, LanceDB, el corpus y la versión activa no se modificaron ni reindexaron.
+
+La prueba detectó una incompatibilidad de presupuesto: el límite anterior de 950 tokens no produjo una respuesta RAG utilizable. Una comprobación con 2.000 tokens, por el flujo normal y el snapshot público, obtuvo dos HTTP 200 con `done_reason: length`, 2.000 tokens evaluados, razonamiento separado y **cero caracteres de respuesta**, aun solicitando `think:false`. No se imprimió ni guardó el razonamiento. Metadatos: [minimax-budget-probe.json](rag-migration/minimax-budget-probe.json).
+
+Se habilitó y configuró explícitamente un límite de **8.192 tokens de generación, incluido razonamiento**. Para MiniMax no se recorta ese límite a 400/500 en clasificación/conversación; tampoco se lo eleva silenciosamente en el transporte. Se mantiene el modo predeterminado de razonamiento porque la prueba mostró que apagarlo no eliminó su consumo. El panel identifica el presupuesto total; los demás modelos conservan sus presupuestos breves.
+
+Regresión Python/HTTP: **138 aprobadas, 3 omitidas** por el corpus privado no versionado. Incluye el presupuesto configurable de MiniMax, conservación de límites más bajos, modelos anteriores y las pruebas del harness. Con 8.192 tokens, los dos primeros turnos documentales respondieron `answered` en 149 y 97 segundos; el tercero terminó en `ollama_unavailable`. La prueba completa no aprobó y no se presenta como un chat validado. La comprobación breve `OK` no acreditaba funcionamiento RAG ni calidad factual.
+
+## Continuidad del proyecto y comparación territorial · 19/10/2026
+
+Las capturas posteriores a la migración revelaron un problema no cubierto por su batería: el primer turno sobre un boliche recibía permisos genéricos, y «Ok, pero qué lugares me recomendás para ponerlo?» perdía el rubro y terminaba pidiéndolo nuevamente. Se reprodujo exactamente por API pública: 1/3 turnos cumplió los criterios del nuevo diálogo; el seguimiento devolvió `insufficient_evidence`. Los anteriores 8/8 de recuperación y 2/2 de chat no acreditaban este caso conversacional.
+
+Se corrigieron los siguientes puntos sin cambiar pesos, vectores ni fuentes:
+
+- Memoria cifrada y acotada del proyecto, separada de los últimos 12 mensajes. Conserva actividad, aclaración pendiente y scope aportados por el usuario; sobrevive a cortesías y abstenciones. El sobre acepta sesiones antiguas, se borra con la sesión y no se expone ni acepta como entrada pública. La salida del modelo no agrega localidades o fichas a las preferencias del usuario.
+- Intención `locations` separada de `requirements`: primero comparar características territoriales y posibles formatos como hipótesis, después condiciones a verificar. Nombrar Minas para el mismo proyecto no borra la actividad; cambiar de emprendimiento descarta el resumen obsoleto. El router ambiguo recibe el estado estructurado del proyecto.
+- Se recuperan y reservan fuentes de territorios distintos y sus condiciones específicas, además de los controles de local, seguridad y negocio. Una respuesta de ubicación no aprueba solo por tener citas: debe mencionar y citar dos territorios, o los solicitados explícitamente.
+- Se eliminó el falso positivo que interpretaba «Villa Serrana» como una afirmación de protección territorial. Las afirmaciones reales de protección, SNAP o UNESCO siguen controladas. La revisión manual también detectó que faltaba asegurar el fragmento específico de suelo/paisaje en contexto y se añadió esa reserva.
+
+Verificación lógica y HTTP Flask: **137 aprobadas, 3 omitidas** por la ubicación histórica del corpus privado no versionado. Incluye la secuencia exacta, seguimientos largos, aclaración de formato/localidad, cambio de proyecto, entrada acotada al router, rechazo de ilícitos, estado privado no manipulable, cifrado, recorte del historial y borrado. Estas pruebas con dobles no certifican calidad factual del modelo.
+
+Diálogo real final por CAPTCHA/sesión/API/Ollama: **3/3 turnos**, frente a 1/3 antes de la corrección. Los primeros dos compararon Minas, Solís/Aguas Blancas y Villa Serrana/Penitente, distinguiendo atributos documentados e hipótesis de encaje; citaron también el fragmento específico de suelo/paisaje. El tercero conservó el proyecto, resolvió el formato bailable y pasó a verificaciones en Minas. Las trazas confirman `locations → locations → requirements`, con herencia del contexto en los dos seguimientos. Tiempos HTTP observados: **17,2 s / 14,1 s / 10,1 s**, no una garantía de latencia. Se borró la sesión final de evaluación al terminar. Evidencia: [antes](rag-migration/harness-before.json) y [después](rag-migration/harness-after.json). El portal respondió HTTP 200 y la pila Docker local quedó disponible.
+
+Se repitió además la batería original sobre Bekko/Horizon/LanceDB reales y la misma versión activa: **8/8 consultas, 14/14 grupos de evidencia**, sin llamadas de generación. El caso boliche conserva fuentes de suelo y seguridad, añadiendo ahora tres territorios y la condición de suelo/paisaje. Informe: [recuperación final](rag-migration/harness-retrieval.json). Es cobertura de contexto en casos conocidos, no certificación factual ni evaluación independiente.
+
+Las recomendaciones territoriales son hipótesis desde las características de la guía: no prueban demanda nocturna, rentabilidad, disponibilidad de locales ni habilitación. La continuidad es por sesión anónima, no memoria personal entre sesiones. No se ha desplegado públicamente ni modificado el repositorio remoto.
+
+## Migración a Bekko, Horizon y LanceDB · 19/10/2026
+
+El checkout partió de `30fb0b4`, con E5/FastEmbed, Qdrant y sin reranker. Se sustituyó el motor local por Bekko OpenVINO CPU (`hotchpotch/bekko-embedding-v1-a8m`, revisión `c721113d59a1d91b447450324f51c4b3332c924a`), Horizon ONNX cuantizado CPU (`Horizon-Labs/multilingual-reranker-small`, revisión `c2ec8fb3e499725b168bbed2164bfee095360f77`) y LanceDB 0.40.0 con cosine exacto, BM25 español y fusión RRF. Los modelos se prepararon explícitamente y se verificaron sus tamaños y SHA-256. La inferencia real produjo vectores de 384 dimensiones normalizados; Horizon ordenó correctamente la pareja relevante de la comprobación sintética (0,997 frente a 0,001; no son probabilidades de verdad).
+
+Se creó una nueva versión pública técnica `e03fdbd8a46a4c9aab37e2b44c77b463`: **196 registros públicos / 196 chunks; 75 internos excluidos**. No se reutilizaron vectores E5. Se guardó un backup consistente de SQLite dentro del volumen local antes de migrar. Qdrant quedó detenido, conservando sus datos; la API continúa saludable usando LanceDB embebido. El servicio nuevo arranca con la telemetría de OpenVINO desactivada y sin errores en su log final. El consumo observado al cierre fue aproximadamente 908 MiB sobre el límite configurado de 2 GiB; no representa una medición del VPS.
+
+La planificación conserva el rubro indicado, reconoce la ambigüedad de “boliche” y construye búsquedas para las necesidades de evidencia. Los candidatos del catálogo se someten a Horizon; no llenan el contexto por orden de llegada. Se verifican necesidades específicas de local/padrón, seguridad, alimentos, agua y costos, y se permite una única búsqueda de reparación. El valor inicial de 40 candidatos resultó lento: el valor operativo es 16, configurable y con presupuesto total de 30 segundos para reranking. El prompt permanente se redujo y las políticas de respuesta se eligen por intención. El historial de respuestas de la asistente no se reinyecta como evidencia ni conserva C-IDs de otro turno. Un control adicional identifica atribuciones improcedentes de conceptos concretos a fuentes que no los mencionan; considera texto y condiciones editoriales. Es un control acotado, no un verificador general de implicación semántica.
+
+Se revisaron Patitas Lavalleja y el código de Harness² (`recursion.py`, `spec.py`, `prompts.py`). De este último se adaptaron comparación con la misma tarea, trazas por fase, presupuestos acotados y políticas específicas bajo demanda. No se instaló su framework de agentes de tareas. Investigación y arquitectura: [RAG_ENGINE.md](../docs/RAG_ENGINE.md).
+
+### Evidencia de esta sesión
+
+| Comprobación | Resultado |
+|---|---|
+| Batería fija de 8 consultas, motor anterior | 2/8 consultas; 6/14 grupos de evidencia (42,9 %) |
+| Primera migración, antes de ajustar selección | 4/8 consultas; 10/14 grupos (71,4 %) |
+| Pipeline corregido, modelos e índice reales | 8/8 consultas; 14/14 grupos (100 %) |
+| Python: lógica, HTTP Flask, índices Lance reales y regresiones | 121 aprobadas, 3 omitidas por ubicación histórica del paquete privado |
+| Chat público con CAPTCHA y sesión, consulta de boliche y seguimiento bailable en Minas | 2/2; `answered`, fuentes de suelo y Bomberos presentes, actividad conservada, sin estado privado en JSON |
+| Navegador: 12 casos Gianna desktop/móvil | 11 aprobaron en lote; 1 agotó 30 s bajo carga. La repetición aislada aprobó en 9,9 s |
+| Dependencias instaladas | `pip check`: sin requisitos rotos |
+| Servicio local | `/api/config`: `available/enabled/test_mode=true`; `/gianna/`: HTTP 200; API `healthy` |
+
+Las ocho consultas y sus grupos esperados se fijaron antes de modificar el motor. Cubren boliche, bar, discoteca, norte, cabañas, agua, terreno y permisos. Es una batería pequeña de regresión conocida; los resultados no aíslan el efecto de Bekko, Horizon o el harness ni certifican exactitud factual. Se conservaron los informes antes, intermedio y final en [rag-migration](rag-migration/), junto con el diálogo real y hashes de las fuentes de la corrida de recuperación. El ajuste posterior que confirma actividad/localidad en un encabezado se verificó además mediante la API real.
+
+La base permanece en el entorno humano local de prueba; la revisión editorial y la verificación de vigencia de fuentes continúan pendientes. No se realizó push ni despliegue remoto.
+
 ## Corrección de recuperación territorial y respuestas RAG · 29/09/2026
 
 Se preparó este checkout nuevo para pruebas locales: `backend/.env` fue generado con secretos aleatorios, `.env.local` del portal apunta a `http://127.0.0.1:8001`, y la pila aislada `gianna-invest-human-test` quedó levantada con API Flask y Qdrant. Ambos archivos de entorno están ignorados por Git.

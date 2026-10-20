@@ -1,0 +1,115 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 5,
+  "total": 5,
+  "results": [
+    {
+      "question": "Hola",
+      "id": "e7e3c798d5fa4bbf9015211b4aa01685",
+      "status": "conversation",
+      "answer": "¡Hola! ¿En qué puedo orientarte sobre inversiones y proyectos en Lavalleja?",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 1432.48
+    },
+    {
+      "question": "¿Cómo estás?",
+      "id": "39d643f6d05441ec8ec905a41138d8a7",
+      "status": "conversation",
+      "answer": "Todo bien por acá, gracias por preguntar. ¿Querés que veamos alguna oportunidad de inversión en Lavalleja?",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 1059.0
+    },
+    {
+      "question": "¿Qué me recomendás para invertir en el norte?",
+      "id": "879cb7c6648d406eac4c35281842dee9",
+      "status": "answered",
+      "answer": "Empezaría por José Pedro Varela con un servicio de poscosecha y medición de granos: control de pérdidas, análisis de calidad o eficiencia de secado, cobrado por tonelada o por servicio a productores y operadores. Lo elegiría porque la guía ve un punto de partida verificable en la cadena del grano y propone probar a escala acotada antes de invertir [C1][C6]. La contracara es que no hay estadísticas locales de rendimiento ni capacidad libre confirmada, así que el primer paso sería pedir datos de una campaña completa y acordar quién paga y quién asume rechazos o humedad [C3].\n\nEn José Batlle y Ordóñez–Zapicán, la opción documentada es servicios rurales y mantenimiento móvil: rutas programadas de reparación o asistencia a productores y contratistas, con abono o alquiler operado. Conviene si tenés oficio, equipo móvil o red de contactos; la guía sugiere precontratar jornadas y comparar una base fija contra visitas desde otra localidad [C2][C4][C5]. Ninguna de las dos es demanda asegurada: son hipótesis a validar.\n\nMi primer paso comercial sería una ronda de entrevistas y una prueba piloto acotada, con indicadores acordados antes de poner dinero [C3][C5]. ¿Tenés experiencia o equipo en granos, o más bien en oficios y mantenimiento rural?",
+      "citation_record_ids": [
+        "O03",
+        "O12",
+        "s14-04-01",
+        "s15-01-01",
+        "s15-04-01",
+        "s14-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "clear_recommendation": true,
+        "no_distractors": true,
+        "single_question": true,
+        "north_choices": true
+      },
+      "timings": {
+        "generation_ms": 5374.68,
+        "retrieval_ms": 7744.7
+      },
+      "total_ms": 13734.53
+    },
+    {
+      "question": "Profundiza con Varela",
+      "id": "c7cd5a2d8b834e84b8ee93b5dd76378d",
+      "status": "answered",
+      "answer": "Evaluaría primero un servicio de medición de calidad y control de pérdidas en granos, para productores y operadores de José Pedro Varela y su entorno. Es una hipótesis de encaje, no una demanda comprobada: la fuente lo ubica entre servicios que necesitan control, reducción de pérdidas o atención específica [C1]. Se cobraría por tonelada, análisis o servicio, con contratos estacionales y estándares, según lo documentado [C1].\n\nAntes de comprar equipos o asumir un local, hacé una prueba comercial. Pedí a un operador datos de una campaña completa y contrastá escenarios de volumen y calidad; definí quién paga, cuándo paga y quién absorbe pérdidas por humedad, rechazo o demora. Probá un servicio o lote a escala acotada y acordá indicadores antes de invertir. La carta de intención debe distinguir volumen indicativo de compromiso vinculante [C2].\n\nTambién validá volumen efectivamente disponible, capacidad usada y libre, titularidad de subproductos y condiciones contractuales; no des por hecho el acceso a instalaciones existentes sin acuerdo [C2][C3]. La guía no trae estadísticas locales de rendimiento agrícola verificadas, así que esos números hay que pedirlos [C2][C3].\n\nEl riesgo que puede frenar el primer paso es que una sola campaña o un solo cliente explique toda la recuperación de la inversión [C1]. ¿Tenés experiencia previa en granos o un contacto concreto en un acopio o con un productor de Varela para pedir esos datos?",
+      "citation_record_ids": [
+        "O03",
+        "s14-04-01",
+        "s14-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "clear_recommendation": true,
+        "no_distractors": true,
+        "single_question": true,
+        "grain_focus": true
+      },
+      "timings": {
+        "generation_ms": 10843.12,
+        "retrieval_ms": 1360.25
+      },
+      "total_ms": 12618.56
+    },
+    {
+      "question": "¿Cómo arranco?",
+      "id": "f3e12817bf014c7fb9bd00c98dfe53cc",
+      "status": "answered",
+      "answer": "Arrancaría por un servicio de medición de calidad y control de pérdidas en granos, cobrado por tonelada o por análisis, con contratos estacionales y estándares acordados, apuntado a productores y operadores de José Pedro Varela y su entorno. Es la entrada más liviana de esa opción: la ficha plantea empezar con instrumentos y servicio especializado, o con uso acordado de infraestructura existente, sin dar por hecho que hay capacidad libre ni acceso a instalaciones de un operador [C1][C3].\n\nAntes de comprar equipos, hacé una prueba comercial concreta. Pedí datos de una campaña completa y contrastá al menos dos escenarios de volumen y calidad; definí quién paga, cuándo paga y quién asume las pérdidas por humedad, rechazo o demora. Probá un servicio o un lote a escala acotada y acordá los indicadores antes de invertir; si firmás una carta de intención, que distinga volumen indicativo de compromiso vinculante [C2]. En paralelo, hablá con operadores para validar volumen disponible, capacidad usada y libre, y condiciones contractuales [C2].\n\nEl riesgo que puede frenar este primer paso es la concentración: si una sola campaña o un solo cliente explica toda la recuperación de la inversión, no avances [C1].\n\n¿Tenés ya contacto con productores o acopios de la zona, o algún equipo de medición propio para probar?",
+      "citation_record_ids": [
+        "O03",
+        "s14-04-01",
+        "s14-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "clear_recommendation": true,
+        "no_distractors": true,
+        "single_question": true,
+        "grain_focus": true
+      },
+      "timings": {
+        "generation_ms": 5253.81,
+        "retrieval_ms": 1564.04
+      },
+      "total_ms": 7212.85
+    }
+  ]
+}

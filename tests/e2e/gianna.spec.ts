@@ -5,9 +5,11 @@ test('Gianna conserva orientación y enlaces editoriales sin JavaScript', async 
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('/');
+  await expect(page.locator('.gianna-promo')).toContainText('Información sobre inversiones, con sus fuentes.');
   await page.locator('.gianna-promo').getByRole('link', { name: /preguntale a gianna/i }).click();
   await expect(page).toHaveURL(/\/gianna\/$/);
   await expect(page.getByRole('heading', { level: 1, name: /conocé lavalleja con gianna/i })).toBeVisible();
+  await expect(page.getByText('Asistente de información', { exact: true })).toBeVisible();
   await expect(page.getByText(/no es asesoramiento financiero: cada persona es responsable/i)).toBeVisible();
   await expect(page.getByRole('link', { name: 'Ver fuentes editoriales' })).toHaveAttribute('href', '/fuentes/');
   await context.close();
@@ -26,7 +28,7 @@ test('Gianna consulta la API pública, muestra citas, valora y borra la sesión'
     const url = new URL(request.url());
     calls.push(`${request.method()} ${url.pathname}`);
     const respond = (body: unknown, status = 200) => route.fulfill({ status, contentType: 'application/json', headers: cors, body: JSON.stringify(body) });
-    if (url.pathname === '/api/config') return respond({ name: 'Gianna', greeting: '¿Qué proyecto tenés en mente?', notice: 'Confirmá las condiciones.', enabled: true, available: true, test_mode: true });
+    if (url.pathname === '/api/config') return respond({ name: 'Gianna', greeting: '¿Qué información sobre inversiones en Lavalleja necesitás consultar?', notice: 'Confirmá las condiciones.', enabled: true, available: true, test_mode: true });
     if (url.pathname === '/api/captcha') {
       expect(request.headers().authorization).toBeUndefined();
       return respond({ id: 'a'.repeat(43), question: '12 + 7', expires_in: 600 });
@@ -56,6 +58,12 @@ test('Gianna consulta la API pública, muestra citas, valora y borra la sesión'
   const island = page.locator('astro-island[component-url*="GiannaChat"]');
   test.skip(await island.count() === 0, 'La build necesita PUBLIC_GIANNA_API_BASE para activar el chat.');
   const input = page.getByRole('textbox', { name: 'Tu pregunta' });
+  await expect(page).toHaveTitle('Gianna | Información sobre inversiones en Lavalleja');
+  await expect(page.locator('.gianna-chat-header')).toContainText('Información sobre inversiones en Lavalleja');
+  await expect(page.locator('main')).not.toContainText('desarrollo económico');
+  await expect(input).toHaveAttribute('placeholder', '¿Qué información necesitás sobre inversiones en Lavalleja?');
+  await expect(page.locator('.gianna-welcome h2')).toHaveText('¿Qué información sobre inversiones en Lavalleja necesitás consultar?');
+  await expect(page.getByRole('button', { name: '¿Qué oportunidades hay en eficiencia energética?' })).toBeVisible();
   await expect(input).toBeEnabled();
   await expect(page.getByText(/modo de prueba local/i)).toBeVisible();
   await input.fill('¿Qué fuentes debería consultar para mi proyecto?');
@@ -75,7 +83,7 @@ test('Gianna consulta la API pública, muestra citas, valora y borra la sesión'
   await captchaInput.fill('19');
   await page.getByRole('button', { name: 'Verificar y enviar' }).click();
   await expect(page.getByText('Revisá las fuentes publicadas [C1].')).toBeVisible();
-  await page.getByText('[C1] Guía publicada').click();
+  await page.getByText('Guía publicada').click();
   await expect(page.getByText('Fragmento de prueba.')).toBeVisible();
   await expect(page.getByRole('link', { name: /S1 · Fuente pública/ })).toHaveAttribute('href', 'https://example.org/fuente');
   await expect(page.getByRole('link', { name: /Enlace inseguro/ })).toHaveCount(0);
@@ -135,7 +143,7 @@ test('Gianna saluda sin citas y luego cambia a RAG dentro de la misma conversaci
   await page.getByRole('textbox', { name: 'Tu pregunta' }).fill('¿Qué oportunidades de inversión hay en Lavalleja?');
   await page.getByRole('button', { name: 'Enviar', exact: true }).click();
   await expect(page.getByText(/La guía presenta oportunidades/)).toBeVisible();
-  await expect(page.getByText('[C1] Guía de prueba')).toBeVisible();
+  await expect(page.getByText('Guía de prueba')).toBeVisible();
   expect(asked).toEqual(['Hola, ¿cómo estás?', '¿Qué oportunidades de inversión hay en Lavalleja?']);
 });
 

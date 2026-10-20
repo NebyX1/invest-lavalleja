@@ -7,6 +7,7 @@ from ..db import dumps
 from ..errors import DomainError
 from ..security import token_hash
 from ..services.settings import get_settings
+from ..services.project_memory import clean_state,unpack_session
 from .common import json_body,services
 
 bp=Blueprint('public',__name__)
@@ -38,8 +39,12 @@ def chat_page():return render_template('chat.html')
 @bp.get('/api/config')
 def chat_config():
     allowed_origin();s=services();settings=get_settings(s.db,s.cfg)
+    active=s.knowledge.active()
+    profile=json.loads(active['profile_json']) if active else {}
+    available=bool(active and s.embeddings.model is not None and s.embeddings.profile
+                   and profile.get('fingerprint')==s.embeddings.profile.get('fingerprint'))
     return jsonify(name=settings.brand_name,greeting=settings.greeting,notice=settings.knowledge_notice,
-        enabled=settings.chat_enabled,available=bool(s.knowledge.active() and s.embeddings.model is not None),
+        enabled=settings.chat_enabled,available=available,
         history_hours=settings.chat_history_hours,test_mode=s.cfg.human_test_mode)
 
 
@@ -95,15 +100,16 @@ def chat():
         if not current or current['expires_at']<now:raise DomainError('La conversación venció.',401,'session_expired')
         if current['busy_until']>now:raise DomainError('Ya hay una respuesta en curso en esta conversación.',409,'conversation_busy')
         db.execute('UPDATE chat_sessions SET busy_until=? WHERE id_hash=?',(now+180,row['id_hash']))
-        history=json.loads(s.security.unseal(current['history_encrypted'])) if current['history_encrypted'] else []
+        stored=json.loads(s.security.unseal(current['history_encrypted'])) if current['history_encrypted'] else []
+        history,project=unpack_session(stored)
     try:
-        result=s.rag.answer(question,settings,history=history,session_hash=row['id_hash'])
+        result=s.rag.answer(question,settings,history=history,session_hash=row['id_hash'],project_state=project)
         state=result.pop('_conversation_state',None)
         assistant={'role':'assistant','content':result['answer'],'mode':result.get('mode','knowledge')}
-        if isinstance(state,dict):assistant['state']=state
+        if isinstance(state,dict):project=clean_state(state)
         updated=(history+[{'role':'user','content':question},assistant])[-12:]
         s.db.execute('UPDATE chat_sessions SET history_encrypted=? WHERE id_hash=?',
-            (s.security.seal(dumps(updated)),row['id_hash']))
+            (s.security.seal(dumps({'messages':updated,'project':project})),row['id_hash']))
         return jsonify(result)
     finally:s.db.execute('UPDATE chat_sessions SET busy_until=0 WHERE id_hash=?',(row['id_hash'],))
 

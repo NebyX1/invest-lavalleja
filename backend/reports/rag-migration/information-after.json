@@ -1,0 +1,368 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 6,
+  "total": 6,
+  "results": [
+    {
+      "question": "Quiero información sobre eficiencia energética en Lavalleja.",
+      "id": "18ecd587e73c4931be5c5810101f6d39",
+      "status": "answered",
+      "answer": "La guía de oportunidades de Lavalleja incluye una ficha sobre eficiencia energética como servicio, registrada como hipótesis y no como oferta ni recomendación. Plantea como cliente a empresas con consumos medidos y medidas de mejora técnicamente viables, y como negocio la auditoría, la ejecución y el mantenimiento, con ahorro compartido solo bajo reglas verificables [C1].\n\nLas zonas de referencia que menciona son Minas y entorno, Solís de Mataojo–Aguas Blancas, José Pedro Varela y entorno, además de clientes de otras zonas [C1].",
+      "citation_record_ids": [
+        "O09"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": true,
+        "answered": true
+      },
+      "timings": {
+        "generation_ms": 1883.59,
+        "retrieval_ms": 5287.86
+      },
+      "total_ms": 7523.51,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 81,
+      "trace": {
+        "intent": "fact",
+        "subject": "energy_efficiency",
+        "requested_detail": "",
+        "inherited_context": false,
+        "selected_record_ids": [
+          "O09"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        }
+      }
+    },
+    {
+      "question": "¿En qué zonas la menciona la guía?",
+      "id": "50558b0f73a445ce98d87bbb99f7c65a",
+      "status": "answered",
+      "answer": "La guía menciona eficiencia energética como servicio en Minas y entorno, Solís de Mataojo–Aguas Blancas y José Pedro Varela y entorno, así como para clientes de otras zonas [C1].",
+      "citation_record_ids": [
+        "O09"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": true,
+        "documented_zones": true
+      },
+      "timings": {
+        "generation_ms": 2661.91,
+        "retrieval_ms": 502.06
+      },
+      "total_ms": 3439.94,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 29,
+      "trace": {
+        "intent": "fact",
+        "subject": "energy_efficiency",
+        "requested_detail": "",
+        "inherited_context": true,
+        "selected_record_ids": [
+          "O09"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": true,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [
+            {
+              "paragraph": 0,
+              "citation_ids": [
+                "C1"
+              ],
+              "missing_concepts": [
+                "property_inventory"
+              ]
+            }
+          ],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        }
+      }
+    },
+    {
+      "question": "En dónde puedo invertir en energías renovables en Lavalleja?",
+      "id": "b8855fcf1c844fca8e48c4168da8992d",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con ubicaciones documentadas para instalar proyectos de generación de energía renovable en Lavalleja.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true
+      },
+      "timings": null,
+      "total_ms": 234.55,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 15,
+      "trace": {
+        "intent": "locations",
+        "subject": "renewable_energy",
+        "requested_detail": "generation_locations",
+        "inherited_context": false,
+        "selected_record_ids": [],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": null
+      }
+    },
+    {
+      "question": "¿Cuáles son los padrones disponibles para instalar un parque eólico?",
+      "id": "c80d76183938473fb33963299e1c3701",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con un listado verificado de predios o padrones disponibles para ese proyecto.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true,
+        "abstains": true,
+        "no_unrelated_sources": true
+      },
+      "timings": null,
+      "total_ms": 269.58,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 14,
+      "trace": {
+        "intent": "requirements",
+        "subject": "renewable_energy",
+        "requested_detail": "site_inventory",
+        "inherited_context": true,
+        "selected_record_ids": [],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": null
+      }
+    },
+    {
+      "question": "Quiero información sobre poscosecha en José Pedro Varela.",
+      "id": "4873b0b66b7944cf80c050ba131d36aa",
+      "status": "answered",
+      "answer": "La guía incluye una ficha sobre poscosecha, medición y eficiencia en granos con referencia a José Pedro Varela y su entorno, registrada como hipótesis y no como oportunidad confirmada [C1]. Describe como cliente y negocio a productores y operadores que necesitan control, reducción de pérdidas o servicios específicos, con ingresos por tarifa por tonelada, análisis o servicio y contratos estacionales con estándares [C1]. La propia ficha aclara que no se trata de ofertas de activos ni de recomendaciones financieras individualizadas [C1].",
+      "citation_record_ids": [
+        "O03"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "grain_source": true,
+        "no_other_business": true
+      },
+      "timings": {
+        "generation_ms": 1140.65,
+        "retrieval_ms": 311.95
+      },
+      "total_ms": 1659.23,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 81,
+      "trace": {
+        "intent": "fact",
+        "subject": "",
+        "requested_detail": "",
+        "inherited_context": false,
+        "selected_record_ids": [
+          "O03"
+        ],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": {
+          "repair_attempted": false,
+          "initial": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "after_repair": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          },
+          "removed_uncited_line_numbers": [],
+          "initial_attribution_issues": [],
+          "removed_attribution_paragraphs": [],
+          "final": {
+            "used_citation_ids": [
+              "C1"
+            ],
+            "unknown_citation_ids": [],
+            "uncited_line_numbers": [],
+            "contains_url": false,
+            "citation_syntax_ok": true,
+            "plan_coverage_ok": true,
+            "quality_issues": []
+          }
+        }
+      }
+    },
+    {
+      "question": "¿Me asegurás una rentabilidad del 20%?",
+      "id": "c7f2d2e33afb4da7975b59a874c56cf7",
+      "status": "insufficient_evidence",
+      "answer": "No cuento con cifras verificadas de rentabilidad para responder esa consulta. No puedo asegurar un rendimiento.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true
+      },
+      "timings": null,
+      "total_ms": 603.42,
+      "version_id": "e03fdbd8a46a4c9aab37e2b44c77b463",
+      "word_count": 16,
+      "trace": {
+        "intent": "fact",
+        "subject": "",
+        "requested_detail": "return_figures",
+        "inherited_context": true,
+        "selected_record_ids": [],
+        "coverage": {
+          "ok": true,
+          "complete": true,
+          "missing": []
+        },
+        "response_validation": null
+      }
+    }
+  ],
+  "parameters": {
+    "model": "deepseek-v4.1-flash:1017",
+    "think": "low",
+    "temperature": 0.1,
+    "max_output_tokens": 4096
+  },
+  "source_hashes": {
+    "harness.py": "6cc9f137592177af1c3964c9f8d336ebcafccfccd15c86f0bd89c7794a458993",
+    "rag.py": "9ef360eaebdc83fe4a32e2a9974df74e846f43a3bfe2781a278c3e00554f7022",
+    "information.py": "5668e3d1ba40a0b493df49801468cf71c5c947f98c0533a905e80d042bbd97c1",
+    "planning.py": "d1d100be60cd6a251cf1eb6f631289908e7ad6074af42ed7b9c24d39c7e6e3fe",
+    "response_policy.py": "36540bb6fa9768973b9996f2b0c668b46d7ae3b8c91103066df9cf7db5202cea",
+    "response_validation.py": "5fc4965bef1a694b7dbb414f39834405eeda3779fab810f4cd7578b85fcc01ac",
+    "conversation.py": "d5b9b260efd55c99403ef9c45cbb5280648a623a261d0aa48191de9598d76458",
+    "context_builder.py": "0771300d242096c6f62eba10c5a20924f09ff7d04b524e043720ba659fee9071",
+    "settings.py": "7f663a065a6dd78e0a4717180919d7d7927c1ee37aaf0e99e4f1c6834997cd9e"
+  }
+}

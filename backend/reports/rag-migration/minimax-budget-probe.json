@@ -1,0 +1,11 @@
+{
+  "model": "minimax-m3.1-flash",
+  "scope": "Metadata-only observation of the normal public-snapshot RAG generation; reasoning content was not printed or stored.",
+  "requested_think": false,
+  "max_generation_tokens": 2000,
+  "observations": [
+    {"http": 200, "done_reason": "length", "content_chars": 0, "thinking_chars": 9340, "output_tokens": 2000},
+    {"http": 200, "done_reason": "length", "content_chars": 0, "thinking_chars": 9211, "output_tokens": 2000}
+  ],
+  "outcome": "ollama_unavailable from the existing empty-response guard; no answer exposed to the client"
+}

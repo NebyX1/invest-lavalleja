@@ -1,143 +1,66 @@
-"""One E5 model instance per process. No CUDA, PyTorch, reranker or LLM process."""
-from pathlib import Path
-import hashlib
-import json
-import importlib.metadata
-import threading
+"""Generation transport; local retrieval runtimes live in dedicated modules."""
 import time
 import httpx
 from ..errors import DomainError
-
-
-class Embeddings:
-    def __init__(self,cfg):
-        self.cfg=cfg;self._load_lock=threading.Lock();self._infer_lock=threading.Lock()
-        self.model=None;self.sparse=None;self.tokenizer=None;self.profile=None
-
-    def load(self):
-        if self.model is not None:return
-        with self._load_lock:
-            if self.model is not None:return
-            from fastembed import TextEmbedding,SparseTextEmbedding
-            from fastembed.common.model_description import PoolingType,ModelSource
-            from huggingface_hub import snapshot_download
-            from tokenizers import Tokenizer
-            model_file=self.cfg.e5_model_file
-            if model_file!='onnx/model.onnx':
-                raise DomainError('Esta versión valida únicamente la exportación E5 onnx/model.onnx. Cambiarla exige pruebas y reindexación.')
-            path=Path(snapshot_download(repo_id='intfloat/multilingual-e5-small',revision=self.cfg.e5_revision,
-                cache_dir=str(self.cfg.model_dir/'hub'),allow_patterns=['config.json','tokenizer.json','tokenizer_config.json','special_tokens_map.json','sentencepiece.bpe.model',model_file,model_file+'_data']))
-            tokenizer=Tokenizer.from_file(str(path/'tokenizer.json'))
-            tokenizer.no_truncation();tokenizer.no_padding()
-            alias='gianna-multilingual-e5-small'
-            supported={x['model'] for x in TextEmbedding.list_supported_models()}
-            if alias not in supported:
-                TextEmbedding.add_custom_model(model=alias,pooling=PoolingType.MEAN,normalization=True,
-                  sources=ModelSource(hf='intfloat/multilingual-e5-small'),dim=384,model_file=model_file)
-            model=TextEmbedding(model_name=alias,specific_model_path=str(path),cache_dir=str(self.cfg.model_dir/'fastembed'),
-                threads=self.cfg.embedding_threads,providers=['CPUExecutionProvider'],cuda=False)
-            sparse=SparseTextEmbedding(model_name='Qdrant/bm25',language='spanish',avg_len=256,
-                cache_dir=str(self.cfg.model_dir/'fastembed'))
-            digest=hashlib.sha256()
-            for f in sorted([path/model_file,path/'tokenizer.json']+[p for p in (path/'onnx').glob('*.onnx_data')]):
-                with f.open('rb') as stream:
-                    for block in iter(lambda:stream.read(1024*1024),b''):digest.update(block)
-            digest.update(json.dumps({'pooling':'mean','normalize':True,'fastembed':importlib.metadata.version('fastembed'),
-                'sparse':'Qdrant/bm25','language':'spanish','avg_len':256,'passage_prefix':'passage: ','query_prefix':'query: '},sort_keys=True).encode())
-            self.profile={'model':'intfloat/multilingual-e5-small','revision_resolved':path.name,'model_file':model_file,
-                'fingerprint':digest.hexdigest(),'dim':384,'pooling':'mean','normalize':True,'query_prefix':'query: ',
-                'passage_prefix':'passage: ','runtime':'CPUExecutionProvider','fastembed':importlib.metadata.version('fastembed'),
-                'sparse':'Qdrant/bm25','sparse_language':'spanish','sparse_avg_len':256}
-            self.tokenizer=tokenizer;self.sparse=sparse;self.model=model
-
-    def count(self,text):
-        self.load()
-        return len(self.tokenizer.encode(text,add_special_tokens=True).ids)
-
-    def documents(self,texts,lexical_texts):
-        self.load()
-        if any(self.count(t)>512 for t in texts):raise DomainError('Se rechazó una entrada E5 de más de 512 tokens.')
-        with self._infer_lock:
-            dense=list(self.model.embed(texts,batch_size=self.cfg.embedding_batch_size,parallel=None))
-            sparse=list(self.sparse.embed(lexical_texts,batch_size=self.cfg.embedding_batch_size,parallel=None))
-        if len(dense)!=len(texts) or any(len(v)!=384 for v in dense):raise DomainError('Salida de embeddings inválida.',503)
-        return [v.tolist() for v in dense],[{'indices':v.indices.tolist(),'values':v.values.tolist()} for v in sparse]
-
-    def query(self,text):
-        self.load();text=text.strip()
-        # Explicit bounded query condensation; source passages are never truncated by the model runtime.
-        while self.count('query: '+text)>500:
-            text=text[:max(1,int(len(text)*0.85))]
-        with self._infer_lock:
-            dense=next(self.model.embed(['query: '+text],batch_size=1,parallel=None)).tolist()
-            sparse=next(self.sparse.query_embed(text))
-        return dense,{'indices':sparse.indices.tolist(),'values':sparse.values.tolist()}
-
-
-class Qdrant:
-    """REST API through an HTTP connection pool; no extra inference service."""
-    def __init__(self,cfg,client=None):
-        self.client=client or httpx.Client(base_url=cfg.qdrant_url,headers={'api-key':cfg.qdrant_api_key} if cfg.qdrant_api_key else {},
-             timeout=httpx.Timeout(30,connect=5),limits=httpx.Limits(max_connections=6,max_keepalive_connections=3),follow_redirects=False,trust_env=False)
-
-    def request(self,method,path,**kw):
-        try:
-            response=self.client.request(method,path,**kw)
-            response.raise_for_status()
-            return response.json().get('result')
-        except (httpx.HTTPError,ValueError) as exc:
-            raise DomainError('Qdrant no pudo completar la operación. Revisá conexión y estado del servicio.',503,'qdrant_unavailable') from exc
-
-    def exists(self,name):
-        try:
-            r=self.client.get('/collections/'+name)
-            if r.status_code==404:return False
-            r.raise_for_status();return True
-        except httpx.HTTPError as exc:raise DomainError('No se pudo consultar Qdrant.',503,'qdrant_unavailable') from exc
-
-    def create(self,name):
-        if self.exists(name):return
-        self.request('PUT','/collections/'+name,json={'vectors':{'dense':{'size':384,'distance':'Cosine'}},
-            'sparse_vectors':{'bm25':{'modifier':'idf'}},'shard_number':1,
-            'hnsw_config':{'m':8},'optimizers_config':{'default_segment_number':1}})
-        for field in ('audience','record_id','topic','zones','opportunity_id','record_type'):
-            self.request('PUT',f'/collections/{name}/index',params={'wait':'true'},json={'field_name':field,'field_schema':'keyword'})
-
-    def upsert(self,name,chunks,dense,sparse):
-        points=[]
-        for c,d,s in zip(chunks,dense,sparse,strict=True):
-            points.append({'id':c['id'],'vector':{'dense':d,'bm25':s},'payload':{
-                'record_id':c['record_id'],'audience':'public','topic':c['topic'],'title':c['title'],
-                'section':c.get('section',''),'zones':c.get('zones',[]),
-                'opportunity_id':c.get('opportunity_id'),'record_type':c.get('record_type','fact'),
-                'evidence_type':c['evidence_type'],'cutoff_date':c['cutoff_date'],'source_refs':c['source_refs']}})
-        self.request('PUT',f'/collections/{name}/points',params={'wait':'true'},json={'points':points})
-
-    def count(self,name):
-        return self.request('POST',f'/collections/{name}/points/count',json={'exact':True})['count']
-
-    def search(self,name,dense,sparse,candidates=20,limit=8,zones=None,opportunity_ids=None,record_types=None):
-        must=[{'key':'audience','match':{'value':'public'}}]
-        if zones:must.append({'key':'zones','match':{'any':list(zones)}})
-        if opportunity_ids:must.append({'key':'opportunity_id','match':{'any':list(opportunity_ids)}})
-        if record_types:must.append({'key':'record_type','match':{'any':list(record_types)}})
-        filters={'must':must}
-        payload={'prefetch':[{'query':dense,'using':'dense','limit':candidates,'filter':filters},
-                    {'query':sparse,'using':'bm25','limit':candidates,'filter':filters}],
-                 'query':{'fusion':'rrf'},'limit':limit,'with_payload':True,'with_vector':False}
-        return self.request('POST',f'/collections/{name}/points/query',json=payload)['points']
-
-    def delete(self,name):
-        if self.exists(name):self.request('DELETE','/collections/'+name)
-
-    def health(self):
-        return self.request('GET','/collections')
+from .neural import Embeddings
+from .vector_store import LanceStore
 
 
 def thinking_mode(model):
+    # Explicit 1017 comparison profile: this revision advertises low via
+    # /api/show. Match Beam's effort; keep older DeepSeek profiles unchanged.
+    if model in {'deepseek-v4.1-flash:1017','deepseek-v4.1-flash:1017-cloud'}:return 'low'
+    # This Cloud model still emitted reasoning with think=False in real tests.
+    # Use its default; budget reasoning explicitly instead of claiming it is off.
+    if model.startswith('minimax-m3.1-flash'):return None
     # Verified against the Cloud catalogue: this model accepts false and
     # returns its user-facing answer without spending the cap on thought.
     return False if model.startswith('deepseek-v4.1-flash') else 'low'
+
+
+def task_token_budget(settings,short_cap):
+    # MiniMax may consume thousands of tokens before message.content. Never
+    # silently increase the operator's cap, but don't shrink it to 400/500.
+    if settings.model.startswith('minimax-m3.1-flash'):return settings.max_output_tokens
+    return min(settings.max_output_tokens,short_cap)
+
+
+class _RequestScopedStream(httpx.AsyncByteStream):
+    """A response owns its pool and closes it on the loop that used it."""
+
+    def __init__(self,stream,transport):
+        self.stream=stream;self.transport=transport;self.closed=False
+
+    async def __aiter__(self):
+        try:
+            async for chunk in self.stream:yield chunk
+        finally:
+            await self.aclose()
+
+    async def aclose(self):
+        if not self.closed:
+            self.closed=True
+            try:await self.stream.aclose()
+            finally:await self.transport.aclose()
+
+
+class RequestScopedTransport(httpx.AsyncBaseTransport):
+    """Never share asyncio-bound connections between gunicorn threads.
+
+    PydanticAI runs each synchronous call on its own event loop. A shared AsyncClient
+    could reuse a connection created on another loop, so every request creates and
+    closes its own pool.
+    """
+
+    async def handle_async_request(self,request):
+        transport=httpx.AsyncHTTPTransport(retries=0)
+        try:response=await transport.handle_async_request(request)
+        except BaseException:
+            await transport.aclose();raise
+        response.stream=_RequestScopedStream(response.stream,transport)
+        return response
+
+    async def aclose(self):pass
 
 
 class Ollama:
@@ -145,6 +68,20 @@ class Ollama:
         self.cfg=cfg
         self.client=client or httpx.Client(base_url=cfg.ollama_url,headers={'Authorization':'Bearer '+cfg.ollama_api_key},
               timeout=httpx.Timeout(80,connect=8),limits=httpx.Limits(max_connections=4,max_keepalive_connections=3),follow_redirects=False,trust_env=False)
+
+    def agent_model(self,settings,timeout=80):
+        """PydanticAI model over Ollama's OpenAI-compatible endpoint (supports structured output and tools)."""
+        if not self.cfg.ollama_api_key or not settings.model:
+            raise DomainError('Configurá OLLAMA_API_KEY y seleccioná un modelo en Ajustes.',503,'ollama_not_configured')
+        from openai import AsyncOpenAI
+        from pydantic_ai.models.openai import OpenAIChatModel
+        from pydantic_ai.profiles.openai import OpenAIModelProfile
+        from pydantic_ai.providers.openai import OpenAIProvider
+        client=AsyncOpenAI(base_url=self.cfg.ollama_url+'/v1',api_key=self.cfg.ollama_api_key,timeout=timeout,max_retries=1,
+                           http_client=httpx.AsyncClient(transport=RequestScopedTransport(),trust_env=False))
+        # Ollama accepts max_tokens, not the newer max_completion_tokens field.
+        return OpenAIChatModel(settings.model,provider=OpenAIProvider(openai_client=client),
+                               profile=OpenAIModelProfile(openai_chat_supports_max_completion_tokens=False))
 
     def models(self):
         if not self.cfg.ollama_api_key:raise DomainError('Falta OLLAMA_API_KEY en .env.',503,'ollama_not_configured')
