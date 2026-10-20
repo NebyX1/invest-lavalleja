@@ -35,7 +35,7 @@ def enable(corpus_path: Path, cfg: Config, timeout: int = 900):
     internal_count = sum(r.audience == 'internal' for r in corpus.records)
     if not public_count:
         raise RuntimeError('El corpus no tiene registros públicos habilitados.')
-    db = Database(cfg.db_path)
+    db = Database(cfg.database_target)
     db.migrate()
     knowledge = Knowledge(db, cfg)
     existing = db.one('SELECT id FROM bases WHERE source_sha256=?', (corpus.document.sha256,))

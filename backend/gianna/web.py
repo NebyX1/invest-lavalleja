@@ -5,18 +5,17 @@ import json
 import logging
 import secrets
 import smtplib
-import sqlite3
 import ssl
 import time
 from email.message import EmailMessage
 from pathlib import Path
 from types import SimpleNamespace
 from flask import Flask, g, jsonify, render_template, request, session
-from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import HTTPException, SecurityError
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pydantic import ValidationError
 from .config import Config
-from .db import Database
+from .db import Database, IntegrityError
 from .errors import DomainError
 from .security import Security
 from .services.knowledge import Knowledge
@@ -39,7 +38,7 @@ def smtp_sender(cfg):
         connection=(smtplib.SMTP_SSL(cfg.smtp_host,cfg.smtp_port,timeout=12,context=context)
                     if cfg.smtp_mode=='ssl' else smtplib.SMTP(cfg.smtp_host,cfg.smtp_port,timeout=12))
         with connection as client:
-            if cfg.smtp_mode!='ssl':
+            if cfg.smtp_mode=='starttls':
                 client.ehlo();client.starttls(context=context);client.ehlo()
             if cfg.smtp_username:client.login(cfg.smtp_username,cfg.smtp_password)
             client.send_message(message)
@@ -47,7 +46,7 @@ def smtp_sender(cfg):
 
 
 def create_app(overrides=None):
-    cfg=Config.from_env(overrides)
+    cfg=overrides if isinstance(overrides,Config) else Config.from_env(overrides)
     app=Flask(__name__)
     app.config.update(SECRET_KEY=cfg.secret_key,MAX_CONTENT_LENGTH=cfg.max_upload_mb*1024*1024,
         MAX_FORM_MEMORY_SIZE=1024*1024,MAX_FORM_PARTS=100,
@@ -57,7 +56,7 @@ def create_app(overrides=None):
     if cfg.proxy_hops:
         # Only enable behind a trusted proxy which overwrites incoming forwarding headers.
         app.wsgi_app=ProxyFix(app.wsgi_app,x_for=cfg.proxy_hops,x_proto=cfg.proxy_hops,x_host=0,x_port=0,x_prefix=0)
-    db=Database(cfg.db_path);db.migrate()
+    db=Database(cfg.database_target);db.migrate()
     security=Security(db,cfg,smtp_sender(cfg));knowledge=Knowledge(db,cfg)
     embeddings=Embeddings(cfg);vector_store=LanceStore(cfg);ollama=Ollama(cfg)
     rag=RAG(db,cfg,knowledge,embeddings,vector_store,ollama,security)
@@ -94,7 +93,7 @@ def create_app(overrides=None):
         if cfg.production and request.is_secure:response.headers['Strict-Transport-Security']='max-age=31536000'
         if request.path.startswith(('/admin','/api')):
             response.headers['Cache-Control']='no-store'
-        if request.path.startswith('/api/'):
+        if request.path.startswith('/api/') and not isinstance(request.routing_exception,SecurityError):
             origin=request.headers.get('Origin')
             if origin and origin in cfg.public_origins+(request.host_url.rstrip('/'),):
                 response.headers['Access-Control-Allow-Origin']=origin
@@ -139,11 +138,18 @@ def create_app(overrides=None):
         fields=', '.join('.'.join(str(x) for x in e['loc']) for e in exc.errors()[:8])
         return render_error('Revisá los campos: '+fields,400,'validation_error')
 
-    @app.errorhandler(sqlite3.IntegrityError)
+    @app.errorhandler(IntegrityError)
     def constraint_error(exc):return render_error('El identificador o correo ya existe, o la operación contradice una relación vigente.',409,'conflict')
 
     @app.errorhandler(HTTPException)
-    def http_error(exc):return render_error('La solicitud no pudo procesarse.' if exc.code!=413 else 'El archivo excede el tamaño permitido.',exc.code or 500,'http_error')
+    def http_error(exc):
+        if isinstance(exc,SecurityError):
+            # A rejected Host has no URL adapter. Rendering base.html/url_for here
+            # would turn a safe 400 rejection into an exception and a 500.
+            response=app.make_response(('Solicitud no permitida.',400))
+            response.mimetype='text/plain'
+            return response
+        return render_error('La solicitud no pudo procesarse.' if exc.code!=413 else 'El archivo excede el tamaño permitido.',exc.code or 500,'http_error')
 
     @app.errorhandler(Exception)
     def unexpected_error(exc):

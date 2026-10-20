@@ -9,16 +9,16 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
-import sqlite3
-import sys
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / 'backend'))
+from backend_path import add_backend_path
+
+ROOT = add_backend_path(__file__)
 from gianna.config import Config
 from gianna.corpus import load_corpus
 from gianna.db import Database
 from gianna.services.knowledge import Knowledge
 from gianna.services.settings import get_settings
+from scripts.backup import create_backup
 
 EXPECTED_SHA256 = 'f6405e1db9cc1cd96dcd7b6d12245d619cc72ea5f01632750293c090d522562e'
 
@@ -54,7 +54,7 @@ def snapshot_checks(db, knowledge, cfg, state):
         raise RuntimeError('Hay fragmentos fuera del presupuesto.')
     store = LanceStore(cfg)
     if store.count(version['collection_name']) != len(chunks):
-        raise RuntimeError('El conteo de LanceDB no coincide con SQLite.')
+        raise RuntimeError('El conteo de LanceDB no coincide con MariaDB.')
     old = db.one('SELECT * FROM versions WHERE id=?', (state['previous_version'],))
     if not old or not old['published_at'] or not store.exists(old['collection_name']):
         raise RuntimeError('La versión anterior no está preservada para reversión.')
@@ -73,7 +73,7 @@ def main():
     if args.action != 'status' and not args.confirm_user_authorized_publication:
         raise SystemExit('Se requiere autorización explícita de publicación.')
     cfg = Config.from_env()  # Secrets remain in process memory, never in state/logs.
-    db = Database(cfg.db_path); knowledge = Knowledge(db, cfg)
+    db = Database(cfg.database_target); knowledge = Knowledge(db, cfg)
     if not args.state.resolve().is_relative_to((cfg.data_dir / 'operations').resolve()):
         raise SystemExit('El estado debe guardarse en DATA_DIR/operations.')
     args.state.parent.mkdir(parents=True, exist_ok=True)
@@ -90,17 +90,18 @@ def main():
             raise SystemExit('Se esperaba una base activa lista para reemplazar y conservar.')
         if not cfg.worker_enabled:
             raise SystemExit('El trabajador del servidor debe estar habilitado.')
-        backup = cfg.data_dir / 'backups' / (args.state.stem + '-before.sqlite3')
+        backup = cfg.data_dir / 'backups' / (args.state.stem + '-before.sql')
         if backup.exists():
             raise SystemExit('Ya existe el respaldo; no se sobrescribió.')
-        backup.parent.mkdir(parents=True, exist_ok=True)
-        db.backup(backup); backup.chmod(0o600)
-        with sqlite3.connect('file:' + str(backup) + '?mode=ro', uri=True) as copied:
-            if copied.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
-                raise RuntimeError('El respaldo no pasó la comprobación de integridad.')
+        backup = create_backup(cfg, backup)
+        backup_hash = hashlib.sha256()
+        with backup.open('rb') as stream:
+            for block in iter(lambda: stream.read(1024 * 1024), b''):
+                backup_hash.update(block)
         state = {'created_at': stamp(), 'corpus_sha256': EXPECTED_SHA256,
                  'previous_version': before['id'], 'previous_base': before['base_id'],
-                 'backup_path': str(backup), 'backup_integrity': 'ok',
+                 'backup_path': str(backup), 'backup_integrity': 'mariadb_dump_nonempty',
+                 'backup_sha256': backup_hash.hexdigest(), 'backup_size_bytes': backup.stat().st_size,
                  'authorization': 'Explicit user request: Debes reemplazar la base de conocimiento actual con la nueva',
                  'stage': 'backed_up'}
         write_state(args.state, state)

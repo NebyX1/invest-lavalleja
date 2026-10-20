@@ -1,5 +1,38 @@
 # Informe de validación de la entrega
 
+## Migración de SQLite a MariaDB · 20/10/2026
+
+Esta es la verificación vigente del backend local y sustituye las referencias anteriores a SQLite como base de ejecución. Se tomó la URL de conexión autorizada de `sample-backend` solo para aprovisionar dos esquemas nuevos y aislados (`gianna_invest` y `gianna_invest_human_test`) y una cuenta de aplicación con privilegios limitados. No se usaron ni alteraron el esquema `buzon-ciudadano` ni sus tablas. Las URLs quedaron en el `.env` local; se conservaron `SECRET_KEY`, `ENCRYPTION_KEY`, el modelo, Ollama y SMTP. El `.env` tiene respaldo local excluido de Git.
+
+La API de prueba se detuvo después de verificar un respaldo en línea de SQLite: `integrity_check=ok`, 22 tablas y 24.748.032 bytes, en `/app/data/backups/gianna-pre-mariadb-20261020.sqlite3`. El importador transfirió y verificó **4.883 filas en 20 tablas** a MariaDB. El archivo SQLite original y su respaldo siguen intactos para recuperación; ninguno se usa en runtime.
+
+Tras levantar la API contra MariaDB: contenedor `healthy`; `/health/live` y `/health/ready` respondieron 200. Los conteos de las 18 tablas persistentes comparadas coinciden con el respaldo. La única sesión de chat que ya estaba vencida fue eliminada por el mantenimiento normal de la aplicación; el arranque creó y completó un trabajo `warmup`. La versión activa conserva **360 chunks y 360 vectores LanceDB**. No se solicitó una generación a Ollama ni se hizo despliegue remoto.
+
+La suite del backend ejecutada sobre la imagen Linux: **246 aprobadas, 3 omitidas**, una advertencia de deprecación de PydanticGraph sin fallos. Compose validó la configuración sin imprimir secretos y `git diff --check` no reporta errores de whitespace. SQLite queda limitado a pruebas unitarias y al importador de transición; desarrollo y producción exigen `DATABASE_URL` MariaDB.
+
+## Configuración simplificada a partir de `sample-backend` · 20/10/2026
+
+Antecedente inmediatamente anterior a MariaDB: se adoptó la organización de Flask del proyecto de referencia, no sus credenciales ni servicios ajenos a Gianna. En esa etapa el `.env` pasó de 30 a **14 campos**; la migración descrita arriba añadió las dos URLs de base dedicadas, por lo que el archivo actual tiene 16 variables. Se eliminaron las opciones obsoletas de Qdrant/E5 y parámetros operativos que ya tienen valores predeterminados. Los perfiles desarrollo/producción/pruebas viven en `gianna/config_profiles.py`; `gianna/config.py` mantiene compatibilidad con nombres anteriores. El motor RAG y los modelos no cambiaron.
+
+Migración ejecutada con `python -m scripts.simplify_env --apply`: configuración efectiva equivalente; comprobación adicional de igualdad de `SECRET_KEY`, `ENCRYPTION_KEY`, token y modelo de Ollama y contraseña de correo. Respaldo local `.env.before-simplify-20261020T171723582005Z`, excluido de Git y Docker. El migrador rechaza opciones desconocidas, duplicadas o personalizadas que no pueda retirar sin cambios. El generador de instalaciones nuevas sigue negándose a sobrescribir `.env` o rotar claves existentes. `sample-backend/` se excluyó de Git y del contexto de construcción del portal; no se modificó ningún archivo de referencia.
+
+Seguridad conservada: CORS exacto sin comodines, hosts derivados de los orígenes configurados, HTTPS y cookies seguras en producción, CSRF, CSP, CAPTCHA, anti-replay, roles, sesiones y cifrado. El perfil local no confía en encabezados reenviados; producción presupone el único proxy privado de Coolify y ningún puerto público directo. Una nueva prueba detectó un fallo previo al rechazar un Host: la plantilla de error intentaba construir enlaces sin adaptador URL. Se corrigió para devolver 400 sin renderizar esa plantilla, sin desactivar la validación.
+
+Pruebas ejecutadas:
+
+- Backend: **243 aprobadas, 3 omitidas** por ausencia del paquete documental privado; incluye 39 pruebas nuevas de configuración, compatibilidad, migración, generación de claves y seguridad HTTP. Aviso previo de deprecación del bucle asyncio en PydanticGraph, sin fallos. Antes de los cambios faltaba PyArrow en el entorno virtual local; se instalaron PyArrow 26.0.0 y LanceDB 0.40.0, ya declarados en requirements. `pip check`: sin dependencias rotas.
+- Navegador de Gianna: **12/12 aprobadas**, escritorio y móvil. Estas pruebas simulan respuestas del proveedor; no certifican calidad de generación ni son un benchmark de los modelos.
+- Compose: configuración base, local y de prueba humana validadas mediante `config --quiet`, sin imprimir secretos.
+- Astro: revisión de 43 archivos, sin errores, advertencias ni indicaciones.
+- Docker: imagen reconstruida desde el Dockerfile existente; API local recreada con las 14 variables, mismo volumen persistente, contenedor healthy y cero reinicios. `pip check` dentro del contenedor: sin dependencias rotas.
+- HTTP real tras el reinicio: `/health/live`, `/api/config` y el portal `/gianna/` devuelven 200; chat disponible y modo local identificado. Verificados CORS, cabeceras del panel, autenticación requerida, rechazo CSRF, origen no permitido 403, Host no permitido 400, CAPTCHA y anti-replay, creación/revocación de sesión y validación de mensaje vacío sin llamar al modelo.
+- Recuperación real tras el reinicio: Bekko/LanceDB devolvieron 8 resultados públicos; Horizon reordenó 4. Modelo, puntero activo, base, huella, registros y conteos de LanceDB coinciden con el estado anterior. Se descifraron correctamente los 60 registros cifrados existentes (sesiones/TOTP), sin imprimir su contenido. No se reindexó ni se modificó el corpus.
+- Frontend unitario: **7 aprobadas y 2 fallidas** por copias antiguas de los banners/mapa en `public/media/`. Esos archivos ya están versionados y no se modificaron en esta tarea; las fallas no corresponden al backend.
+
+Antes del reinicio se creó `/app/data/backups/before-config-refactor-20261020.sqlite3`. La base activa registrada para comparación es `16d7029f120c49aa84b7be74974a89de`: 332 registros públicos, 360 chunks y 360 filas LanceDB, con modelo generativo `deepseek-v4.1-flash:1017`.
+
+No se desplegó en Coolify remoto, no se enviaron correos reales ni se consumieron generaciones pagas. El SMTP local sigue sin servidor configurado, tal como estaba. La disponibilidad local no equivale a aprobación editorial ni validación de producción.
+
 ## Gianna como agente con memoria (PydanticAI) · 19/10/2026
 
 **Esta sección sustituye el flujo descrito en «Respuestas coherentes y orientadas al inversor»** (planificador de búsqueda + generación de un solo paso), que se probó y resultó insuficiente.

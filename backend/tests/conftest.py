@@ -13,7 +13,8 @@ from gianna.services.knowledge import Knowledge
 def cfg(tmp_path):
     return Config.from_env(dict(data_dir=tmp_path,secret_key=secrets.token_urlsafe(48),encryption_key=Fernet.generate_key().decode(),
         production=False,trusted_hosts=('localhost','127.0.0.1'),proxy_hops=0,worker_enabled=False,smtp_host='smtp.example.test',smtp_from='test@example.test',
-        public_origins=('http://localhost',),ollama_api_key='test-not-a-real-token'))
+        public_origins=('http://localhost',),ollama_api_key='test-not-a-real-token'),
+        environ={'FLASK_ENV': 'testing', 'DATABASE_URL': ''})
 
 @pytest.fixture
 def db(cfg):

@@ -12,6 +12,9 @@ dist/
 .env.*
 !.env.example
 
+# Local backend reference; contains configuration from a separate application.
+sample-backend/
+
 # Test and coverage output
 coverage/
 test-results/

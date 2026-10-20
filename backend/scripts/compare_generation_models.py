@@ -30,7 +30,7 @@ def run(base,origin,output):
     cfg=Config.from_env()
     if not cfg.human_test_mode or cfg.production:
         raise RuntimeError('Comparación permitida solo en la pila local de prueba humana.')
-    db=Database(cfg.data_dir/'gianna.sqlite3');original=get_settings(db,cfg)
+    db=Database(cfg.database_target);original=get_settings(db,cfg)
     active=db.setting('active_knowledge')
     client=Ollama(cfg);catalogue=client.models()
     models=('beam','deepseek-v4.1-flash:1017')

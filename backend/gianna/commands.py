@@ -38,5 +38,5 @@ def register_commands(app):
     @app.cli.command('check-config')
     def check_config():
         s=app.extensions['gianna']
-        click.echo('Configuración válida. SQLite accesible. No se imprimen secretos.')
+        click.echo('Configuración válida. MariaDB accesible; no se imprimen secretos.')
         click.echo('Ollama token: '+('configurado' if s.cfg.ollama_api_key else 'pendiente'))

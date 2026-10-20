@@ -1,4 +1,4 @@
-"""Durable SQLite queue, one worker thread, short embedding batches and restart leases."""
+"""Durable MariaDB queue, one worker thread, short embedding batches and restart leases."""
 import json
 import logging
 import threading
@@ -239,6 +239,6 @@ class Jobs:
             db.execute('DELETE FROM chat_sessions WHERE expires_at<?',(now,))
             db.execute('DELETE FROM queries WHERE at<?',(now-settings.analytics_days*86400,))
             for window in (60,300,900,3600,86400):
-                db.execute("DELETE FROM rate_limits WHERE key LIKE ? AND bucket<?",(f'%:{window}',int(now//window)-max(2,172800//window)))
+                db.execute("DELETE FROM rate_limits WHERE `key` LIKE ? AND bucket<?",(f'%:{window}',int(now//window)-max(2,172800//window)))
         # Cache expiry is separate from the authoritative corpus and vector versions.
         self.db.execute('DELETE FROM embedding_cache WHERE created_at<?',(now-180*86400,))

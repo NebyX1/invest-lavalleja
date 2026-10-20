@@ -50,7 +50,7 @@ def main():
             ('Fecha de activación (UTC)', state['activated_at']), ('Índice público', str(state['validation']['chunks']) + ' fragmentos'),
             ('Modelo de respuesta, sin cambios', state['model']),
             ('Pruebas sobre el índice publicado', str(publication['retrieval']['passed']) + '/' + str(publication['retrieval']['total'])),
-            ('Respaldo SQLite previo, dentro del volumen local', state['backup_path']),
+            ('Respaldo lógico MariaDB previo, dentro del volumen local', state['backup_path']),
         ]) + '<p><a href="publicacion.json">Registro de la operación y pruebas posteriores</a>. Las secciones de pruebas aisladas de abajo describen la etapa anterior a esta publicación.</p></section>'
     body += '<section><h2>Resultado</h2>' + table(['Registros totales', 'Públicos', 'Internos', 'Fuentes'], [[counts['total_records'], counts['public_records'], counts['internal_records'], counts['total_sources']]])
     body += '<p>Se conservaron exactamente los 271 registros y las 50 fuentes originales, incluidos IDs, textos, condiciones, audiencias y fechas. Las 128 fichas del Word aportan 127 fichas consolidadas: AG-032 y TS-022 describían el mismo evento de ecopuntos y se unieron preservando sus detalles. Se añadieron 9 registros de contexto territorial. Resultado: 136 registros adicionales, sin reinterpretar todo el contenido como hechos nuevos.</p>'

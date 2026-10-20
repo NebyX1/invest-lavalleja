@@ -55,6 +55,6 @@ https://coolify.io/docs/applications/builds/docker-compose
 
 ## Razones de simplificación
 
-Jinja y JavaScript local mantienen la administración en el backend Flask, sin compilar otro SPA. SQLite WAL evita agregar MariaDB para el volumen inicial. Una cola persistente de un trabajador permite reintento, recuperación y progreso sin Redis/Celery. El compromiso es una sola instancia, competencia temporal por CPU y necesidad de medir la latencia durante cargas.
+Jinja y JavaScript local mantienen la administración en el backend Flask, sin compilar otro SPA. El prototipo comenzó con SQLite WAL y se migró a MariaDB para consolidar la configuración con el boilerplate institucional. Una cola persistente de un trabajador permite reintento, recuperación y progreso sin Redis/Celery. El compromiso sigue siendo una sola instancia y competencia temporal por CPU; medir la latencia durante cargas.
 
 PCA con NumPy se ejecuta después de indexar, no por cada pregunta. No se añade UMAP, PyTorch, GraphRAG, agentes autónomos, reranker o navegación web durante las conversaciones. Las mejoras de calidad deben justificarse con las preguntas reales de esta guía, no solo con popularidad de una biblioteca.

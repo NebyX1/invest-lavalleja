@@ -5,33 +5,21 @@ services:
     restart: unless-stopped
     init: true
     environment:
-      APP_ENV: ${APP_ENV:-production}
+      FLASK_ENV: ${FLASK_ENV:-production}
+      DATABASE_URL: ${DATABASE_URL:?Define DATABASE_URL para el esquema MariaDB de Gianna}
       SECRET_KEY: ${SECRET_KEY:?Define SECRET_KEY}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Define ENCRYPTION_KEY}
-      TRUSTED_HOSTS: ${TRUSTED_HOSTS:?Define TRUSTED_HOSTS}
-      PUBLIC_ORIGINS: ${PUBLIC_ORIGINS:-}
-      PROXY_HOPS: ${PROXY_HOPS:-1}
-      DATA_DIR: /app/data
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-https://ollama.com}
+      CORS_ORIGINS: ${CORS_ORIGINS:?Define CORS_ORIGINS con los origenes del portal y la API}
+      OLLAMA_HOST: ${OLLAMA_HOST:-https://ollama.com}
       OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-}
-      EMBEDDING_BACKEND: ${EMBEDDING_BACKEND:-openvino}
-      EMBEDDING_THREADS: ${EMBEDDING_THREADS:-2}
-      EMBEDDING_BATCH_SIZE: ${EMBEDDING_BATCH_SIZE:-8}
-      MAX_CONCURRENT_CHAT: ${MAX_CONCURRENT_CHAT:-3}
-      WORKER_ENABLED: ${WORKER_ENABLED:-true}
-      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-12}
-      MAX_RECORDS: ${MAX_RECORDS:-10000}
-      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-2}
-      OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS:-1}
-      MKL_NUM_THREADS: ${MKL_NUM_THREADS:-1}
-      TOKENIZERS_PARALLELISM: 'false'
-      SMTP_HOST: ${SMTP_HOST:-}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_USERNAME: ${SMTP_USERNAME:-}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_FROM: ${SMTP_FROM:-}
-      SMTP_MODE: ${SMTP_MODE:-starttls}
+      MAIL_SERVER: ${MAIL_SERVER:-}
+      MAIL_PORT: ${MAIL_PORT:-465}
+      MAIL_USE_TLS: ${MAIL_USE_TLS:-False}
+      MAIL_USE_SSL: ${MAIL_USE_SSL:-True}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_DEFAULT_SENDER: ${MAIL_DEFAULT_SENDER:-}
     expose:
       - '8000'
     volumes:
@@ -47,7 +35,7 @@ services:
     cpus: 2.0
     stop_grace_period: 35s
     healthcheck:
-      test: ['CMD','python','-c',"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/live',timeout=3)"]
+      test: ['CMD','curl','--fail','--silent','--show-error','--max-time','3','http://127.0.0.1:8000/health/live']
       interval: 30s
       timeout: 5s
       retries: 3

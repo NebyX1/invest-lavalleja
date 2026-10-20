@@ -19,7 +19,7 @@ from gianna.services.settings import get_settings
 
 
 def import_draft(corpus, cfg):
-    db = Database(cfg.db_path)
+    db = Database(cfg.database_target)
     db.migrate()
     knowledge = Knowledge(db, cfg)
     existing = db.one('SELECT id,status FROM bases WHERE source_sha256=?', (corpus.document.sha256,))

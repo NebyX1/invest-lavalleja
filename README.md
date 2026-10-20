@@ -31,7 +31,7 @@ Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibili
 | Buscador y explorador | Fuse.js, SVG del mapa | Búsqueda global y mapa de localidades |
 | Validación de datos | Zod | Comprueba el estado guardado en el navegador |
 | Backend | Python 3, Flask, Gunicorn | API y panel de administración |
-| Base de datos | SQLite | Documentos, versiones, aprobaciones y puntero activo |
+| Base de datos | MariaDB | Documentos, versiones, aprobaciones, sesiones y puntero activo |
 | Búsqueda vectorial | LanceDB | Índice de fragmentos por significado |
 | Embeddings | Bekko (`hotchpotch/bekko-embedding-v1-a8m`) en OpenVINO CPU | Convierte textos en vectores |
 | Reranker | Horizon (`Horizon-Labs/multilingual-reranker-small`) en ONNX CPU | Ordena los fragmentos por relevancia |
@@ -48,6 +48,10 @@ Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibili
 - `backend/docs/RAG_ENGINE.md`: arquitectura detallada del motor de búsqueda y del agente.
 - `better-rag/`: documento de conocimiento sectorial y su versión consolidada para alimentar el RAG.
 - `public/`: recursos estáticos (imágenes, mapa, PDFs editoriales).
+
+## Despliegue con Coolify
+
+El portal y la API son recursos separados en Coolify. El portal se construye desde este repositorio con el `Dockerfile` de la raíz y escucha en el puerto interno `80`; configurar los argumentos de construcción indicados en [docs/COOLIFY.md](docs/COOLIFY.md). La API se despliega desde el repositorio independiente `invest-lavalleja-backend`; seguir allí las instrucciones de [despliegue de Coolify](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/docs/COOLIFY.md).
 
 ## Puesta en marcha de Gianna
 

@@ -18,7 +18,7 @@ En el entorno del frontend:
 PUBLIC_GIANNA_API_BASE=https://DOMINIO-REAL-DEL-BACKEND
 ```
 
-En el backend, añadir el origen exacto del portal a `PUBLIC_ORIGINS`. Si el portal utiliza una política CSP, su directiva `connect-src` debe permitir ese dominio. Nunca pasar `OLLAMA_API_KEY` al frontend ni usar un nombre `PUBLIC_` para ese secreto.
+En el backend, añadir el origen exacto del portal a `CORS_ORIGINS`. Si el portal utiliza una política CSP, su directiva `connect-src` debe permitir ese dominio. Nunca pasar `OLLAMA_API_KEY` al frontend ni usar un nombre `PUBLIC_` para ese secreto.
 
 La instancia conserva la conversación visible solo en memoria mientras está montada. Astro puede desmontarla al navegar; esto es deliberado y evita persistir información del inversor en localStorage. El servidor conserva solo los últimos cuatro mensajes como contexto cifrado hasta la expiración configurada. Borrar conversación elimina ese contexto del servidor y rompe su vinculación con la analítica.
 

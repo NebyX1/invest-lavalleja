@@ -43,6 +43,6 @@ def get_settings(db,cfg):
 
 def save_settings(db,cfg,values,actor):
     settings=Settings.model_validate(values)
-    db.execute('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value',('runtime',dumps(settings.model_dump())))
+    db.execute('INSERT INTO settings(`key`,value) VALUES(?,?) ON CONFLICT(`key`) DO UPDATE SET value=excluded.value',('runtime',dumps(settings.model_dump())))
     db.audit(actor,'SETTINGS_CHANGED',details={'fields':sorted(values)})
     return settings

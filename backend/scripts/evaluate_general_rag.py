@@ -81,7 +81,7 @@ def paired_synthetic(cfg,settings):
         for present in (True,False):
             with TemporaryDirectory(prefix='gianna-rag-generality-') as folder:
                 isolated=replace(cfg,data_dir=Path(folder),worker_enabled=False)
-                db=Database(isolated.db_path);db.migrate();knowledge=Knowledge(db,isolated)
+                db=Database(isolated.database_target);db.migrate();knowledge=Knowledge(db,isolated)
                 security=Security(db,isolated,lambda *args:None)
                 rag=RAG(db,isolated,knowledge,embeddings,LanceStore(isolated),Ollama(cfg),security)
                 jobs=Jobs(db,isolated,knowledge,embeddings,rag.vector_store,rag)
@@ -115,7 +115,7 @@ if __name__=='__main__':
     parser.add_argument('--base',default='http://127.0.0.1:8000')
     parser.add_argument('--origin',default='http://127.0.0.1:4321')
     parser.add_argument('--output',type=Path,required=True)
-    args=parser.parse_args();cfg=Config.from_env();db=Database(cfg.db_path);settings=get_settings(db,cfg)
+    args=parser.parse_args();cfg=Config.from_env();db=Database(cfg.database_target);settings=get_settings(db,cfg)
     active_before=Knowledge(db,cfg).active()['id']
     public=public_cases(args.base.rstrip('/'),args.origin,db)
     synthetic=paired_synthetic(cfg,settings)

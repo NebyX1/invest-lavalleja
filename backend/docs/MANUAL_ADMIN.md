@@ -58,7 +58,7 @@ Comprobar especialmente que no se mezclen puntos con porcentajes; propuestas con
 
 ## Publicar, volver atrás y borrar
 
-El propietario confirma las pruebas y publica con segundo factor reciente. La nueva versión pasa a ser la única activa para nuevas consultas. El cambio del puntero se guarda en una transacción SQLite. No se anuncia como una transacción distribuida entre SQLite y LanceDB.
+El propietario confirma las pruebas y publica con segundo factor reciente. La nueva versión pasa a ser la única activa para nuevas consultas. El cambio del puntero se guarda en una transacción MariaDB. No se anuncia como una transacción distribuida entre MariaDB y LanceDB.
 
 Para volver atrás, elegir una versión previamente publicada. Las versiones quedan preservadas hasta borrar su base. No se puede publicar una versión obsoleta frente al borrador actual como si reflejara las últimas ediciones, salvo el flujo explícito de retorno a una versión previamente publicada.
 

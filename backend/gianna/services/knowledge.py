@@ -121,7 +121,7 @@ class Knowledge:
         return job_id,version_id
 
     def activate(self,version_id,actor,rollback=False):
-        # This SQLite pointer is the ONLY activation authority; no distributed SQL/LanceStore alias update.
+        # This MariaDB pointer is the ONLY activation authority; no distributed SQL/LanceStore alias update.
         with self.db.tx(immediate=True) as db:
             v=db.execute('SELECT v.*,b.revision AS current_revision,b.status AS base_status FROM versions v JOIN bases b ON b.id=v.base_id WHERE v.id=?',(version_id,)).fetchone()
             if not v or v['status']!='ready' or v['base_status']=='deleting':raise DomainError('La versión todavía no está lista.',409)

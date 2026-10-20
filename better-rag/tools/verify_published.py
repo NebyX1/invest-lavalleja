@@ -2,11 +2,11 @@
 import argparse
 import json
 from pathlib import Path
-import sys
 import time
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / 'backend'))
+from backend_path import add_backend_path
+
+ROOT = add_backend_path(__file__)
 from gianna.config import Config
 from gianna.db import Database
 from gianna.services.knowledge import Knowledge
@@ -30,7 +30,7 @@ def main():
     parser.add_argument('--version', required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    cfg = Config.from_env(); db = Database(cfg.db_path); knowledge = Knowledge(db, cfg)
+    cfg = Config.from_env(); db = Database(cfg.database_target); knowledge = Knowledge(db, cfg)
     if knowledge.active()['id'] != args.version:
         raise SystemExit('La versión solicitada no es la activa.')
     print(json.dumps({'stage': 'loading_verified_models', 'version': args.version}), flush=True)

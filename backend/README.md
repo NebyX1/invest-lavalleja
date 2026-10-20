@@ -2,7 +2,7 @@
 
 **Versión 1.0.0-rc1 · 28 de septiembre de 2026 · Candidata para validación.**
 
-Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro. No se modificaron repositorios remotos.
+Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro.
 
 **Motor RAG actualizado · 19/10/2026:** Bekko OpenVINO CPU + Horizon ONNX CPU + LanceDB (cosine exacto y BM25 español). Preparación explícita de modelos, versiones con huella nueva y reindexación obligatoria. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes de septiembre que siguen describen verificaciones históricas.
 
@@ -19,14 +19,14 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 - Laboratorio de recuperación y chat, evaluación de recuperación con preguntas cargables, publicación con confirmación, retorno a versiones previamente publicadas y borrado protegido de una base con sus versiones.
 - Analítica agregada de consultas, latencia, tokens informados por el proveedor, referencias, feedback y temas recuperados. No se inventan montos facturados ni porcentajes de exactitud.
 - Chat público de prueba `/chat`; isla React activa en `../src/components/islands/GiannaChat.tsx`; `AgentHarness` controla rutas, respuestas de seguridad y acceso al RAG; contexto corto cifrado de hasta seis intercambios, botón para olvidar y límites de uso. Ambos inicios de sesión exigen CAPTCHA.
-- Compose, Dockerfile, scripts de arranque, copia/restauración de SQLite, migraciones y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un índice LanceDB precalculado.
+- Compose, Dockerfile, migraciones MariaDB, importador único desde SQLite y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un índice LanceDB precalculado.
 
 ## Stack decidido
 
 ```text
 Portal Astro / isla React
         ↓
-Flask + Gunicorn + Jinja + SQLite WAL
+Flask + Gunicorn + Jinja + MariaDB
         ↓
 Bekko OpenVINO (384 dimensiones, CPU)
         ↓
@@ -35,26 +35,27 @@ LanceDB: cosine + BM25 español + RRF → Horizon cross-encoder
 Ollama Cloud API: Authorization Bearer desde OLLAMA_API_KEY
 ```
 
-Un servicio persistente de backend: `api`; LanceDB se aloja junto a SQLite en el volumen de datos. El trabajo de indexación usa un hilo supervisado dentro del único proceso de la API y una cola SQLite durable. No se agregan Redis, Celery, MariaDB, MinIO, un servidor de embeddings ni un Ollama local. Bekko y Horizon comparten el control de inferencia CPU. LanceDB se ejecuta embebido.
+Un servicio de API: `api`; MariaDB conserva usuarios, sesiones, analítica, corpus y cola; LanceDB y los modelos permanecen en el volumen privado local. El trabajo de indexación usa un hilo supervisado dentro del único proceso de la API y una cola durable en MariaDB. No se agregan Redis, Celery, MinIO, un servidor de embeddings ni un Ollama local. Bekko y Horizon comparten el control de inferencia CPU. LanceDB se ejecuta embebido.
 
 `D:\Ai Projects\chat-onnx-local` se tomó como referencia de separación navegador → API → proveedor y de interacción conversacional. Aquí la interfaz se adapta a una isla React en Astro y la API a RAG con citas; no se trasladó su SPA ni su servidor llama.cpp local.
 
 **Controlador de Gianna.** Primero aplica barreras locales para acusaciones directas sobre personas y pedidos explícitos de daño o ilícitos; las críticas a la asistente pasan a una respuesta conversacional contextual. Para los demás mensajes, el modelo propone una de seis rutas en JSON: `rag`, `chat`, `deescalate`, `allegation`, `refuse` u `out_of_scope`. El servidor valida la propuesta y solo `rag` puede consultar el índice público; una decisión inválida pide reformulación sin buscar. Las preguntas externas también reciben conversación natural, sin plantillas de “fuera del alcance”. Los saludos inequívocos evitan una clasificación. [Ollama Cloud no admite salidas con esquema](https://github.com/ollama/ollama/blob/main/docs/capabilities/structured-outputs.mdx), por lo que Python valida el JSON. `deepseek-v4.1-flash` se usa con `think: false`, probado contra el proveedor; otros modelos conservan `think: low`. Una respuesta documental sin citas válidas recibe un único intento de reparación con la misma evidencia; nunca se publican citas fabricadas como respaldo. Esto no sustituye pruebas adversariales continuas ni revisión humana de afirmaciones factuales.
 
-**Un proceso de Gunicorn.** No aumentar `workers` ni arrancar réplicas sin rediseñar la cola, los bloqueos de inferencia y los límites. El despliegue de SQLite necesita almacenamiento local persistente, no NFS compartido entre máquinas.
+**Un proceso de Gunicorn.** No aumentar `workers` ni arrancar réplicas sin rediseñar la cola, los bloqueos de inferencia y los límites. La cuenta SQL de la API debe tener acceso solo a los esquemas de Gianna; no usar `root` ni compartir el esquema de Buzón Ciudadano.
 
 ## Arranque local con Docker
 
-Requisitos del equipo destino: Python 3 para generar `.env`, Docker con Compose y acceso a los registros de imágenes, PyPI, Hugging Face y Ollama Cloud.
+Requisitos del equipo destino: MariaDB 10.6 o posterior, Python 3 para generar `.env`, Docker con Compose y acceso a los registros de imágenes, PyPI, Hugging Face y Ollama Cloud. Crear una base y un usuario exclusivos para Gianna; la URL existente de `sample-backend` usa el esquema `buzon-ciudadano` y no debe copiarse literalmente ni compartirse.
 
 ```bash
 python scripts/setup_env.py --local
-# Editar .env: poner OLLAMA_API_KEY. El modelo se puede elegir luego en el panel.
+# Editar .env: definir DATABASE_URL y DATABASE_URL_HUMAN_TEST para esquemas separados,
+# además de OLLAMA_API_KEY. El modelo se puede elegir luego en el panel.
 docker compose -f compose.yaml -f compose.local.yaml up --build -d
 docker compose -f compose.yaml -f compose.local.yaml exec api flask --app wsgi create-admin
 ```
 
-Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. En el primer ingreso, configurar TOTP y guardar los códigos de recuperación fuera del servidor. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
+Para la instancia de prueba, definir `DATABASE_URL_HUMAN_TEST` antes de iniciar Compose. Antes de ejecutar una importación antigua, detener la API y usar `scripts/migrate_sqlite_to_mariadb.py`; el destino debe estar vacío. Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. En el primer ingreso, configurar TOTP y guardar los códigos de recuperación fuera del servidor. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
 
 Si hay SMTP configurado y se quiere el segundo factor por correo como en el Buzón Ciudadano, crear la cuenta con `flask --app wsgi create-admin --mfa email`. Sin SMTP, conservar TOTP; nunca desactivar el segundo factor para suplir la falta de correo.
 
@@ -62,7 +63,7 @@ El panel permite trabajar con documentos antes de configurar Ollama. Para genera
 
 ### Prueba humana local del chat
 
-La instancia de prueba usa `compose.human-test.yaml`, el puerto **127.0.0.1:8001** y volúmenes SQLite/LanceDB distintos de los operativos. Nunca aplicar este override en Coolify. El modo de prueba rechaza hosts y orígenes no locales y muestra un aviso de guía no revisada en `/gianna/`. En la raíz Astro, `.env.local` debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`; no contiene secretos y está ignorado por Git. Iniciar o reiniciar `npm run dev` para que Astro lo tome.
+La instancia de prueba usa `compose.human-test.yaml`, el puerto **127.0.0.1:8001**, un esquema MariaDB y un volumen LanceDB independientes. `DATABASE_URL_HUMAN_TEST` debe señalar a ese esquema vacío. Nunca aplicar este override en Coolify. El modo de prueba rechaza hosts y orígenes no locales y muestra un aviso de guía no revisada en `/gianna/`. En la raíz Astro, `.env.local` debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`; no contiene secretos y está ignorado por Git. Iniciar o reiniciar `npm run dev` para que Astro lo tome.
 
 ```powershell
 # Desde backend/, con .env local configurado (incluida la clave de Ollama):
@@ -72,7 +73,7 @@ docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -
 docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env restart api
 ```
 
-Esperar a que `http://127.0.0.1:8001/api/config` indique `available: true` y `test_mode: true`; abrir `http://localhost:4321/gianna/`. El script selecciona **solo** los registros marcados públicos, verifica conteos de SQLite/LanceDB y activa exclusivamente el puntero de la pila aislada. Su marca de aprobación es técnica y **no** sustituye revisión editorial. No copiar su volumen ni su base de datos a producción. Las preguntas y fragmentos recuperados se envían a Ollama Cloud, así que no introducir datos confidenciales. Para detener solo la pila de prueba, usar `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env stop` (sin `down -v`).
+Esperar a que `http://127.0.0.1:8001/api/config` indique `available: true` y `test_mode: true`; abrir `http://localhost:4321/gianna/`. El script selecciona **solo** los registros marcados públicos, verifica conteos de MariaDB/LanceDB y activa exclusivamente el puntero de la pila aislada. Su marca de aprobación es técnica y **no** sustituye revisión editorial. No copiar su esquema ni su volumen a producción. Las preguntas y fragmentos recuperados se envían a Ollama Cloud, así que no introducir datos confidenciales. Para detener solo la pila de prueba, usar `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env stop` (sin `down -v`).
 
 La evaluación adversarial de diálogo se ejecuta **solo** por petición explícita, porque consume tokens de Ollama Cloud y usa la base técnica local: `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.evaluate_dialogue`. Cubre humor, crítica, propuestas personales, hechos externos, actualidad, actividad sensible, corrección, explotación/coerción, privacidad, inversión con seguimiento e inyección para forzar un beneficio fiscal. El script verifica rutas, ausencia de citas improcedentes y algunos fallos de redacción; no es un juez semántico ni una validación jurídica.
 
@@ -93,7 +94,13 @@ Para importar la guía sin aprobarla desde la consola del contenedor, copiar el 
 
 Los secretos permanecen en `.env` local o en las variables de ejecución de Coolify. El panel no puede leer ni modificar sus valores. `SECRET_KEY` y `ENCRYPTION_KEY` son diferentes y deben conservarse. Cambiar la clave de cifrado sin migración vuelve ilegibles los secretos TOTP y el contexto cifrado.
 
-Las variables operativas completas están en `.env.example`. Nombre, saludo, tono, aviso, modelo generativo, parámetros de recuperación, tamaño/solapamiento de chunks, límites y retención se administran desde Ajustes. Los modelos Bekko/Horizon y su espacio vectorial no se cambian con un selector genérico que pudiera mezclar vectores incompatibles.
+La configuración habitual requiere `DATABASE_URL` (MariaDB dedicada), `SECRET_KEY`, `ENCRYPTION_KEY`, `CORS_ORIGINS`, los tres campos de Ollama y `MAIL_*`. Para pruebas humanas se agrega `DATABASE_URL_HUMAN_TEST` con otro esquema vacío. No necesita variables para Qdrant, E5, CPU, tamaño de archivos, workers ni rutas de datos. `gianna/config_profiles.py` separa desarrollo, producción y pruebas; `gianna/config.py` centraliza los valores técnicos. El volumen `/app/data` conserva LanceDB, modelos, cargas y exports, no la base SQL.
+
+Para simplificar una instalación existente, ejecutar `python -m scripts.simplify_env` para verificar y luego `python -m scripts.simplify_env --apply` para aplicar. El script comprueba equivalencia, conserva las claves, el modelo y el correo, y deja un respaldo `.env.before-simplify-*` excluido de Git y Docker. Si encuentra opciones personalizadas que no puede retirar sin cambios, se detiene sin sobrescribir. Los nombres antiguos siguen siendo compatibles durante la transición; no deben mezclarse con los nuevos (los nuevos tienen prioridad).
+
+En producción, `CORS_ORIGINS` debe incluir los orígenes HTTPS exactos del portal **y de la API** si usa un dominio separado. De esa lista se deriva la validación de hosts, sin comodines. El perfil de producción conserva cookies seguras, SameSite estricto, HTTPS y un único proxy de Coolify; la API no debe tener un puerto publicado directamente a Internet.
+
+Nombre, saludo, tono, aviso, modelo generativo, parámetros de recuperación, tamaño/solapamiento de chunks, límites y retención se administran desde Ajustes. `OLLAMA_MODEL` inicia el valor de instalaciones nuevas; no sobrescribe el modelo ya elegido en el panel. Los modelos Bekko/Horizon y su espacio vectorial no se cambian con un selector genérico que pudiera mezclar vectores incompatibles.
 
 Las revisiones y artefactos están fijados en `gianna/services/neural.py`; el preparador verifica SHA-256. La aplicación detecta cambios de huella y exige una versión nueva.
 

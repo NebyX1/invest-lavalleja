@@ -8,12 +8,12 @@ from collections import Counter
 import hashlib
 import json
 from pathlib import Path
-import sys
 from tempfile import TemporaryDirectory
 import time
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / 'backend'))
+from backend_path import add_backend_path
+
+ROOT = add_backend_path(__file__)
 from gianna.config import Config
 from gianna.corpus import Corpus, load_corpus
 from gianna.db import Database

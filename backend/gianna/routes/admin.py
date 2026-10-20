@@ -342,7 +342,7 @@ def diagnostics():
         vector_store_ok=vector_store_ok,ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
         worker_alive=bool(s.jobs.thread and s.jobs.thread.is_alive()),
         process_rss_mib=round(psutil.Process().memory_info().rss/1024**2,1),data_disk_free_mib=round(disk.free/1024**2,1),
-        sqlite_mib=round(s.cfg.db_path.stat().st_size/1024**2,2),note='RAM del proceso, no de todo el VPS. No se realizó una generación de pago.')
+        database_mib=s.db.size_mib(),note='RAM del proceso, no de todo el VPS. No se realizó una generación de pago.')
 
 
 @bp.post('/warmup')

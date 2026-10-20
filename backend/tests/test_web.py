@@ -10,8 +10,7 @@ from gianna.config import Config
 
 @pytest.fixture
 def app(cfg):
-    from dataclasses import asdict
-    result=create_app(asdict(cfg));result.config['TESTING']=True;return result
+    result=create_app(cfg);result.config['TESTING']=True;return result
 
 
 def csrf(client):
@@ -55,14 +54,15 @@ def test_login_security_headers(app):
 def test_human_test_mode_is_loopback_only(cfg, tmp_path):
     from dataclasses import asdict
     options = asdict(cfg) | {'data_dir': tmp_path / 'human-test', 'human_test_mode': True}
-    assert Config.from_env(options).human_test_mode is True
+    test_environment = {'FLASK_ENV': 'testing', 'DATABASE_URL': ''}
+    assert Config.from_env(options, environ=test_environment).human_test_mode is True
     for invalid in (
         {'production': True},
         {'trusted_hosts': ('example.com',)},
         {'public_origins': ('https://example.com',)},
     ):
         with pytest.raises(ValueError, match='prueba humana'):
-            Config.from_env(options | invalid)
+            Config.from_env(options | invalid, environ=test_environment)
 
 
 def test_public_config_identifies_human_test(app):

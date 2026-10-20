@@ -70,8 +70,8 @@ class Security:
         bucket=int(now//seconds)
         key=keyed_hash(self.cfg.secret_key,key)+f':{seconds}'
         with self.db.tx(immediate=True) as db:
-            db.execute('INSERT INTO rate_limits(key,bucket,count) VALUES(?,?,1) ON CONFLICT(key,bucket) DO UPDATE SET count=count+1',(key,bucket))
-            n=db.execute('SELECT count FROM rate_limits WHERE key=? AND bucket=?',(key,bucket)).fetchone()[0]
+            db.execute('INSERT INTO rate_limits(`key`,bucket,count) VALUES(?,?,1) ON CONFLICT(`key`,bucket) DO UPDATE SET count=count+1',(key,bucket))
+            n=db.execute('SELECT count FROM rate_limits WHERE `key`=? AND bucket=?',(key,bucket)).fetchone()[0]
         if n>limit:
             raise DomainError('Demasiados intentos. Esperá antes de volver a intentar.',429,'rate_limited')
 
