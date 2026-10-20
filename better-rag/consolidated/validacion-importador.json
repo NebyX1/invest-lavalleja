@@ -1,0 +1,34 @@
+{
+  "checks": {
+    "all_original_records_preserved_exactly": true,
+    "all_original_sources_preserved_exactly": true,
+    "counts_407_records_332_public_75_internal": true,
+    "all_128_fiches_accounted_for": true,
+    "all_127_source_entries_resolved": true,
+    "all_docx_blocks_accounted_for": true,
+    "internal_audiences_unchanged": true,
+    "dates_not_recertified": true,
+    "ecopoints_duplicate_merged": true,
+    "no_orphan_references": true,
+    "parcel_record_no_invented_zone": true,
+    "original_sha256_Invest_Lavalleja_2026.gianna.json": true,
+    "original_sha256_Conocimiento_Sectorial_Lavalleja_2026_10_19.docx": true,
+    "duplicate_ids_rejected": true,
+    "imported_as_draft": true,
+    "no_approval_on_import": true,
+    "import_export_roundtrip_records": true,
+    "import_export_roundtrip_sources": true,
+    "import_export_document_and_audit": true,
+    "review_gate_rejects_unapproved_corpus": true,
+    "no_automatic_active_knowledge": true
+  },
+  "checks_passed": 21,
+  "checks_total": 21,
+  "native": null,
+  "elapsed_seconds": 0.336,
+  "limitations": [
+    "Import, audience and tokenizer checks do not certify every factual/legal claim.",
+    "Retrieval cases test context selection, not generated answers or conversational quality.",
+    "The service knowledge base was neither imported nor activated."
+  ]
+}

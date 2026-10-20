@@ -1,0 +1,183 @@
+{
+  "operation": {
+    "created_at": "2026-10-20T00:12:41.496744+00:00",
+    "corpus_sha256": "f6405e1db9cc1cd96dcd7b6d12245d619cc72ea5f01632750293c090d522562e",
+    "previous_version": "e03fdbd8a46a4c9aab37e2b44c77b463",
+    "previous_base": "f427830ad87a4d1db222c367fd70fa12",
+    "backup_path": "/app/data/backups/knowledge-20261019-f6405e1db9cc-before.sqlite3",
+    "backup_integrity": "ok",
+    "authorization": "Explicit user request: Debes reemplazar la base de conocimiento actual con la nueva",
+    "stage": "activated",
+    "base_id": "0f9f89d09b9c477eaf0586b9247ae7ac",
+    "job_id": "e226eabedd164f72b5e80c92d962039b",
+    "version_id": "16d7029f120c49aa84b7be74974a89de",
+    "model": "deepseek-v4.1-flash:1017",
+    "activated_at": "2026-10-20T00:14:26.089853+00:00",
+    "validation": {
+      "public_records": 332,
+      "internal_excluded": 75,
+      "chunks": 360,
+      "max_tokens": 419,
+      "collection": "gianna_16d7029f120c49aa84b7be74974a89de",
+      "fingerprint": "b38b504d7c223459a90fa9b1c1da7a9e252249219b07d32404abcaab80e4623f",
+      "old_collection_preserved": true
+    },
+    "active_version_now": "16d7029f120c49aa84b7be74974a89de",
+    "job": {
+      "status": "done",
+      "progress": 360,
+      "total": 360,
+      "message": "Finalizado",
+      "error": null
+    }
+  },
+  "retrieval": {
+    "active_version": "16d7029f120c49aa84b7be74974a89de",
+    "model": "deepseek-v4.1-flash:1017",
+    "cases": [
+      {
+        "question": "¿Qué información hay sobre parques eólicos existentes en Lavalleja?",
+        "expected_any": [
+          "EN-007",
+          "EN-008"
+        ],
+        "selected": [
+          "EN-008",
+          "EN-006",
+          "EN-015",
+          "EN-016",
+          "consulta-predial-20261019",
+          "EN-028",
+          "EN-001",
+          "EN-010"
+        ],
+        "expected_in_context": true,
+        "version_ids": [
+          "16d7029f120c49aa84b7be74974a89de"
+        ],
+        "public_only": true,
+        "global_search": true,
+        "horizon_reranked": true,
+        "elapsed_ms": 16073.86
+      },
+      {
+        "question": "¿Qué trámite corresponde para autoconsumo eléctrico de hasta 150 kW?",
+        "expected_any": [
+          "EN-017",
+          "EN-018"
+        ],
+        "selected": [
+          "EN-017",
+          "EN-009",
+          "EN-018",
+          "EN-019",
+          "EN-031",
+          "EN-029",
+          "EN-020",
+          "EN-011"
+        ],
+        "expected_in_context": true,
+        "version_ids": [
+          "16d7029f120c49aa84b7be74974a89de"
+        ],
+        "public_only": true,
+        "global_search": true,
+        "horizon_reranked": true,
+        "elapsed_ms": 9154.27
+      },
+      {
+        "question": "¿Qué se sabe de olivicultura y oleoturismo en Lavalleja?",
+        "expected_any": [
+          "AG-012"
+        ],
+        "selected": [
+          "AG-012",
+          "ambitos-geograficos-20261019",
+          "AG-001",
+          "AG-013",
+          "AG-011",
+          "AG-034",
+          "s05-01-06",
+          "TR-007"
+        ],
+        "expected_in_context": true,
+        "version_ids": [
+          "16d7029f120c49aa84b7be74974a89de"
+        ],
+        "public_only": true,
+        "global_search": true,
+        "horizon_reranked": true,
+        "elapsed_ms": 9884.6
+      },
+      {
+        "question": "¿Cuál es el régimen de calidad de agua y vertidos del Decreto 226/025?",
+        "expected_any": [
+          "TR-003",
+          "TR-004"
+        ],
+        "selected": [
+          "TR-003",
+          "TS-004",
+          "AG-026",
+          "TR-004",
+          "AG-008",
+          "TR-005",
+          "TS-034",
+          "TR-001"
+        ],
+        "expected_in_context": true,
+        "version_ids": [
+          "16d7029f120c49aa84b7be74974a89de"
+        ],
+        "public_only": true,
+        "global_search": true,
+        "horizon_reranked": true,
+        "elapsed_ms": 9744.48
+      },
+      {
+        "question": "¿Qué información hay sobre mantenimiento y automatización industrial?",
+        "expected_any": [
+          "O01"
+        ],
+        "selected": [
+          "O01",
+          "s06-03-01",
+          "TR-010",
+          "s10-02-01",
+          "TR-009",
+          "s13-06-01",
+          "O08",
+          "s08-03-01"
+        ],
+        "expected_in_context": true,
+        "version_ids": [
+          "16d7029f120c49aa84b7be74974a89de"
+        ],
+        "public_only": true,
+        "global_search": true,
+        "horizon_reranked": true,
+        "elapsed_ms": 7711.86
+      }
+    ],
+    "passed": 5,
+    "total": 5,
+    "provider_calls": 0,
+    "generation_tested": false,
+    "limitation": "Context retrieval checks, not factual certification or an evaluation of generated replies."
+  },
+  "http": {
+    "available": true,
+    "enabled": true,
+    "api_live": 200,
+    "api_ready": 200,
+    "frontend": 200,
+    "gianna_page": true
+  },
+  "scope": "Local Gianna Invest service; no remote deployment, no provider calls, original references unchanged.",
+  "rollback": {
+    "previous_version": "e03fdbd8a46a4c9aab37e2b44c77b463",
+    "previous_collection_preserved": true,
+    "sqlite_backup": "/app/data/backups/knowledge-20261019-f6405e1db9cc-before.sqlite3",
+    "note": "Previous published version is retained and can be selected through the existing admin rollback workflow; no old base or collection was deleted."
+  }
+}

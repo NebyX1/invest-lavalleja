@@ -1,0 +1,83 @@
+{
+  "corpus": {
+    "filename": "Invest_Lavalleja_2026_10_19_consolidado.gianna.json",
+    "sha256": "f6405e1db9cc1cd96dcd7b6d12245d619cc72ea5f01632750293c090d522562e",
+    "bytes": 1642168
+  },
+  "inputs": {
+    "Invest_Lavalleja_2026.gianna.json": {
+      "sha256": "cc59c1c01b21420c959ed5e48e22ca3486752a4ddd8f421b77c544fae73d58de",
+      "bytes": 425293
+    },
+    "Conocimiento_Sectorial_Lavalleja_2026_10_19.docx": {
+      "sha256": "1350c64f1dc53921f026289f9401ab4b5cbd68fed55f9e45a66b822c6a30ede8",
+      "bytes": 118477
+    }
+  },
+  "counts": {
+    "original_records": 271,
+    "original_public": 196,
+    "original_internal": 75,
+    "supplement_fiches": 128,
+    "consolidated_supplement_fiches": 127,
+    "supplement_context_records": 9,
+    "new_records": 136,
+    "total_records": 407,
+    "public_records": 332,
+    "internal_records": 75,
+    "original_sources": 50,
+    "supplement_source_entries": 127,
+    "supplement_unique_sources": 122,
+    "total_sources": 172
+  },
+  "active_knowledge_changed": true,
+  "status": "published_at_explicit_user_request; previous_version_retained",
+  "validation": {
+    "import_checks": 21,
+    "conversion_regression_tests": 10,
+    "chunks": 360,
+    "max_tokens": 419,
+    "retrieval_expected_in_context": 13,
+    "retrieval_cases": 13,
+    "provider_calls": 0,
+    "live_version_before": "e03fdbd8a46a4c9aab37e2b44c77b463",
+    "live_version_after": "e03fdbd8a46a4c9aab37e2b44c77b463"
+  },
+  "artifacts": {
+    "comparacion-y-trazabilidad.json": {
+      "sha256": "5b27d3f46af1716d4db1a70ada43b4ec2f8fb46bb77a1f3aa118e79666e530c0",
+      "bytes": 743054
+    },
+    "validacion-importador.json": {
+      "sha256": "d1cfc5202fe173387d879fdef11beca5f7f7128bc6361fd18f9c96d03408d771",
+      "bytes": 1379
+    },
+    "validacion-nativa.json": {
+      "sha256": "da21d3749a5fa4cf5eb936da78959f02ba2559f819c097a9dc25d94bb5fc900e",
+      "bytes": 36047
+    },
+    "regresiones-conversion.json": {
+      "sha256": "7942bea647b4858ae592b0338c2e862ccdedb1086eb5d1dbd0153de29d26605e",
+      "bytes": 84
+    },
+    "Informe_consolidacion.html": {
+      "sha256": "e39bf163000256bf9df3e1eb329e192775e0728496d3706a4ee2d363e937b362",
+      "bytes": 37727
+    },
+    "comprobacion-base-activa.json": {
+      "sha256": "fb4f85aea728976cff039c029c08a7bffaad22ada2f040fc90a2110f7fc9ac17",
+      "bytes": 564
+    },
+    "publicacion.json": {
+      "sha256": "a54506eaba627adb26d1510dfe7b46b47180e539975ba5727a7876ea2c657182",
+      "bytes": 5398
+    }
+  },
+  "publication": {
+    "version_id": "16d7029f120c49aa84b7be74974a89de",
+    "previous_version": "e03fdbd8a46a4c9aab37e2b44c77b463",
+    "activated_at": "2026-10-20T00:14:26.089853+00:00",
+    "retrieval_passed": 5,
+    "retrieval_total": 5
+  }
+}

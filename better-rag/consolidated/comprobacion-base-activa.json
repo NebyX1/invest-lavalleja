@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-19",
+  "database": "gianna-invest-human-test-api-1:/app/data/gianna.sqlite3",
+  "access": "SQLite read-only URI; no environment credentials read",
+  "before": "e03fdbd8a46a4c9aab37e2b44c77b463",
+  "after": "e03fdbd8a46a4c9aab37e2b44c77b463",
+  "active_knowledge_changed": false,
+  "live_imported": false,
+  "live_indexed": false,
+  "live_activated": false,
+  "provider_calls": 0,
+  "note": "Indexing and retrieval ran in an automatically cleaned temporary SQLite/LanceDB directory. No version was activated, even in the temporary database."
+}
