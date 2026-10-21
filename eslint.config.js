@@ -8,6 +8,7 @@ export default tseslint.config(
       'dist/**',
       '.astro/**',
       'backend/**',
+      'sample-backend/**',
       'jobkler-ai/**',
       'node_modules/**',
       'playwright-report/**',
