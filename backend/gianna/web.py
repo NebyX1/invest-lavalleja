@@ -87,7 +87,10 @@ def create_app(overrides=None):
         response.headers['X-Request-ID']=g.get('request_id','')
         response.headers['X-Content-Type-Options']='nosniff'
         response.headers['X-Frame-Options']='DENY'
-        response.headers['Referrer-Policy']='no-referrer'
+        # Native form POSTs use Origin: null with no-referrer, which fails our
+        # same-origin check. Keep the origin for admin forms without sending
+        # referrers to other sites.
+        response.headers['Referrer-Policy']='same-origin'
         response.headers['Permissions-Policy']='camera=(), microphone=(), geolocation=()'
         response.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'"
         if cfg.production and request.is_secure:response.headers['Strict-Transport-Security']='max-age=31536000'

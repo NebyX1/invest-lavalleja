@@ -89,4 +89,6 @@ Probar desde una sesión sin autenticar que `/admin/bases` no revela informació
 
 Si aparece “No Available Server”, revisar health, logs, dominio con puerto interno, escucha `0.0.0.0:8000`, certificados y hosts permitidos. No desactivar autenticación, CSRF o validación de hosts para ocultar el problema.
 
+El panel público de la instalación IDL está en `https://mapi.invest.lavalleja.uy/admin/login`. Si un formulario devuelve 403 con “Origen del formulario no permitido”, revisar el `Origin` de ese POST y la cabecera `Referrer-Policy` del documento que lo envió. La aplicación utiliza `same-origin`: conserva el origen en los formularios propios y no envía referencias a otros sitios. No sustituirla por `no-referrer` en Coolify o en otro proxy: los formularios HTML pueden pasar a enviar `Origin: null`, que el backend rechaza deliberadamente. La corrección requiere reconstruir y desplegar el backend actualizado, no agregar variables al `.env` ni permitir `null` como origen. Referencia: [efecto de Referrer-Policy sobre Origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy#effect_on_the_origin_header).
+
 Referencia oficial consultada el 28/09/2026: https://coolify.io/docs/applications/builds/docker-compose

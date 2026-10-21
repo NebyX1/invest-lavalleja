@@ -1,5 +1,18 @@
 # Informe de validación de la entrega
 
+## Formularios de acceso y segundo factor: 403 por origen nulo · 21/10/2026
+
+Se reprodujo el rechazo con un formulario HTML nativo en Chromium contra `https://mapi.invest.lavalleja.uy`. La respuesta del servidor contiene `Referrer-Policy: no-referrer`; el navegador envía `Origin: null` y el middleware devuelve 403 antes de comprobar credenciales o códigos. La comprobación HTTP anterior había fijado manualmente el origen y no reproducía ese comportamiento del navegador. Se cambió la cabecera de respuesta a `same-origin`: conserva el origen de los formularios propios y omite las referencias hacia otros sitios. Se mantienen la comparación estricta de origen, CSRF, CSP, cookies seguras, permisos y segundo factor. No se añadieron variables al entorno.
+
+Verificación ejecutada:
+
+- **280 pruebas Python aprobadas y 3 omitidas** por ausencia del paquete documental privado; permanece una advertencia de deprecación de PydanticGraph. Las dos nuevas regresiones completan login y segundo factor TOTP/correo con el esquema HTTPS reenviado por el proxy. Orígenes `null`, del portal y ajenos siguen rechazados; omitir CSRF también se rechaza, sin consumir el código MFA. El correo usa transporte simulado, sin envío SMTP real.
+- Reproducción remota con una sesión anónima nueva: un formulario dirigido a `/admin/mfa`, con CSRF válido y sin desafío pendiente, produjo `Origin: null` y HTTP 403. Al sustituir únicamente la cabecera del documento recibido dentro del navegador de prueba por `same-origin`, produjo `Origin: https://mapi.invest.lavalleja.uy` y la redirección esperada al login, HTTP 302. No se modificó el servidor remoto ni se enviaron credenciales o códigos reales.
+- Imagen Docker reconstruida y recorrido completo en Chromium contra la imagen corregida y una **MariaDB 11.4 desechable**: contraseña y CAPTCHA, HTTP 302 al segundo factor; enrolamiento TOTP, HTTP 200 con recuperación; acceso al panel, HTTP 200; cero errores de consola. La cuenta de prueba, la base temporal, ambos contenedores y las dos redes de prueba se eliminaron al terminar. No se utilizó la base operativa para crear cuentas.
+- API local recreada después de comprobar que `DATABASE_URL`, las claves de sesión/cifrado y el volumen persistente coinciden con el contenedor existente. `/health/ready` y `/admin/login` respondieron HTTP 200; el login local ya devuelve `Referrer-Policy: same-origin`.
+
+La corrección sigue local: no se hizo push ni despliegue en Coolify. El dominio público conserva la cabecera anterior hasta desplegar el backend actualizado. No se solicitaron generaciones a Ollama ni envíos SMTP reales en esta verificación. La prueba local con MariaDB y el contraste anónimo remoto no equivalen a un inicio de sesión autenticado en producción.
+
 ## Alta por consola compatible con Buzón Ciudadano · 21/10/2026
 
 Se contrastó `app/commands.py` del repositorio `IntendenciaDeLavalleja/buzon-ciudadano-backend`. Gianna ahora acepta `python -m flask create-admin NOMBRE CORREO CONTRASEÑA true/false`, sin necesitar `--app`, desde la carpeta del backend o la terminal del contenedor. `true` utiliza el rol existente `owner` (superadministrador) y `false`, `editor` (administrador). Omitir el booleano equivale a `false`; otros valores se rechazan. No se migraron roles, no se añadieron variables al `.env` y no se modificó la autenticación. Se mantiene el comando interactivo anterior y su alta de propietario, así como `--mfa email` cuando SMTP está configurado. Los duplicados no sobrescriben cuentas ni elevan permisos; la contraseña se guarda con Argon2id y no se incluye en la salida ni en la auditoría. Una contraseña posicional sí puede quedar en el historial de la terminal; el modo interactivo permite evitarlo.

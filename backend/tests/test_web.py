@@ -46,9 +46,59 @@ def authenticate(app,client,role='owner'):
 def test_login_security_headers(app):
     c=app.test_client();r=c.get('/admin/login')
     assert r.status_code==200
+    assert r.headers['Referrer-Policy']=='same-origin'
     assert "frame-ancestors 'none'" in r.headers['Content-Security-Policy']
     assert 'unsafe-inline' not in r.headers['Content-Security-Policy']
     assert 'HttpOnly' in r.headers['Set-Cookie'] and 'SameSite=Strict' in r.headers['Set-Cookie']
+
+
+@pytest.mark.parametrize('mfa_method',['totp','email'])
+def test_admin_forms_keep_origin_through_login_and_second_factor(cfg,mfa_method):
+    from dataclasses import replace
+    from gianna.security import totp
+
+    origin='https://api.example.test'
+    app=create_app(replace(cfg,production=True,proxy_hops=1,
+        trusted_hosts=('api.example.test',),public_origins=(origin,'https://portal.example.test')))
+    app.config['TESTING']=True
+    s=app.extensions['gianna'];codes=[]
+    s.security.mailer=lambda address,code:codes.append(code)
+    s.security.create_user('owner@example.test','Owner','a-long-test-password','owner',mfa_method)
+    client=app.test_client()
+    # Coolify terminates TLS: the application receives HTTP plus the trusted
+    # forwarded scheme, while browser forms send the public HTTPS origin.
+    base_url='http://api.example.test'
+    proxy_headers={'X-Forwarded-Proto':'https'}
+    form_headers={**proxy_headers,'Origin':origin}
+    page=client.get('/admin/login',base_url=base_url,headers=proxy_headers)
+    assert page.status_code==200 and page.headers['Referrer-Policy']=='same-origin'
+    assert 'Secure' in page.headers['Set-Cookie']
+    html=page.get_data(as_text=True)
+    csrf_token=re.search(r'name="csrf" value="([^"]+)"',html).group(1)
+    left,right=map(int,re.search(r'(\d+) \+ (\d+)',html).groups())
+    data={'csrf':csrf_token,'captcha':str(left+right),'email':'owner@example.test','password':'a-long-test-password'}
+    for denied_origin in ('null','https://portal.example.test','https://evil.example.test'):
+        denied=client.post('/admin/login',base_url=base_url,data=data,
+            headers={**proxy_headers,'Origin':denied_origin})
+        assert denied.status_code==403 and 'Origen del formulario no permitido' in denied.get_data(as_text=True)
+    login=client.post('/admin/login',base_url=base_url,data=data,headers=form_headers)
+    assert login.status_code==302 and login.location.endswith('/admin/mfa')
+    page=client.get('/admin/mfa',base_url=base_url,headers=proxy_headers)
+    assert page.status_code==200 and page.headers['Referrer-Policy']=='same-origin'
+    with client.session_transaction(base_url=origin,path='/admin/mfa') as sess:
+        pending=sess['pending'];csrf_token=sess['csrf']
+    challenge=s.security.challenge_info(pending)
+    code=codes[0] if mfa_method=='email' else totp(s.security.unseal(challenge['secret']),int(time.time()//30))
+    data={'csrf':csrf_token,'code':code}
+    for denied_origin in ('null','https://portal.example.test','https://evil.example.test'):
+        denied=client.post('/admin/mfa',base_url=base_url,data=data,
+            headers={**proxy_headers,'Origin':denied_origin})
+        assert denied.status_code==403 and 'Origen del formulario no permitido' in denied.get_data(as_text=True)
+    assert client.post('/admin/mfa',base_url=base_url,data={'code':code},headers=form_headers).status_code==403
+    assert s.security.challenge_info(pending)['attempts']==0
+    verified=client.post('/admin/mfa',base_url=base_url,data=data,headers=form_headers)
+    assert verified.status_code==(302 if mfa_method=='email' else 200)
+    assert client.get('/admin/dashboard',base_url=base_url,headers=proxy_headers).status_code==200
 
 
 def test_human_test_mode_is_loopback_only(cfg, tmp_path):
