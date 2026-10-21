@@ -1,7 +1,4 @@
-import base64
-import io
 import secrets
-import urllib.parse
 from flask import Blueprint,render_template,request,session,redirect,url_for,g,flash
 from .common import services,access
 from ..errors import DomainError
@@ -34,24 +31,23 @@ def login():
 def mfa():
     s=services();pending=session.get('pending')
     if not pending:return redirect(url_for('auth.login'))
-    info=s.security.challenge_info(pending)
+    try:s.security.challenge_info(pending)
+    except DomainError as exc:
+        if exc.code!='challenge_expired':raise
+        session.pop('pending',None)
+        flash('El código venció o agotó sus intentos. Iniciá sesión para recibir uno nuevo.','error')
+        return redirect(url_for('auth.login'))
     if request.method=='POST':
         old=session.get('sid')
-        token,user,recovery=s.security.finish_login(pending,request.form.get('code','')[:100],request.remote_addr or 'unknown')
+        try:token,user=s.security.finish_login(pending,request.form.get('code','')[:100],request.remote_addr or 'unknown')
+        except DomainError as exc:
+            if exc.code!='invalid_otp':raise
+            flash('Código incorrecto, usado o vencido. Revisá el código enviado a tu correo.','error')
+            return render_template('mfa.html'),401
         if old:s.db.execute('DELETE FROM admin_sessions WHERE id_hash=?',(token_hash(old),))
         session.clear();session['sid']=token;session['csrf']=secrets.token_urlsafe(32);session.permanent=True
-        if recovery:
-            return render_template('recovery.html',codes=recovery)
         return redirect(url_for('auth.security_page') if user['must_change_password'] else url_for('admin.dashboard'))
-    secret=None;qr=None
-    if info['kind']=='enroll':
-        import qrcode
-        secret=s.security.unseal(info['secret'])
-        label=urllib.parse.quote('Gianna:'+info['email'],safe='')
-        uri='otpauth://totp/'+label+'?'+urllib.parse.urlencode({'secret':secret,'issuer':'Gianna Invest Lavalleja','algorithm':'SHA1','digits':6,'period':30})
-        image=qrcode.make(uri);buf=io.BytesIO();image.save(buf,format='PNG')
-        qr='data:image/png;base64,'+base64.b64encode(buf.getvalue()).decode()
-    return render_template('mfa.html',kind=info['kind'],secret=secret,qr=qr)
+    return render_template('mfa.html')
 
 
 @bp.post('/logout')

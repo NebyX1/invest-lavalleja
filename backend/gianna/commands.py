@@ -13,9 +13,7 @@ def register_commands(app):
     @click.argument('is_superuser',required=False,type=click.Choice(['true','false'],case_sensitive=False))
     @click.option('--email','email_option',help='Correo para el modo interactivo anterior.')
     @click.option('--name','name_option',help='Nombre para el modo interactivo anterior.')
-    @click.option('--mfa',type=click.Choice(['totp','email']),default='totp',show_default=True,
-                  help='Método de doble factor; email requiere SMTP configurado.')
-    def create_admin(name,email,password,is_superuser,email_option,name_option,mfa):
+    def create_admin(name,email,password,is_superuser,email_option,name_option):
         """Crear una cuenta: NOMBRE CORREO CONTRASEÑA [true|false].
 
         true crea un superadministrador (owner); false u omitirlo crea un
@@ -38,16 +36,13 @@ def register_commands(app):
         if not name or len(name)>100:
             raise click.ClickException('Usá un nombre de entre 1 y 100 caracteres.')
         s=app.extensions['gianna']
-        try:id=s.security.create_user(email,name,password,role,mfa)
+        try:id=s.security.create_user(email,name,password,role)
         except DomainError as exc:raise click.ClickException(str(exc)) from exc
         except IntegrityError as exc:raise click.ClickException('Ya existe una cuenta con ese correo.') from exc
         s.db.audit(id,'OWNER_CREATED_BY_CONSOLE' if role=='owner' else 'ADMIN_CREATED_BY_CONSOLE',
-                   details={'role':role,'mfa_method':mfa})
+                   details={'role':role,'mfa_method':'email'})
         label='Superadministrador' if role=='owner' else 'Administrador'
-        if mfa=='email':
-            click.echo(f'{label} creado. Entrá en /admin/login; el código se enviará por correo.')
-        else:
-            click.echo(f'{label} creado. Entrá en /admin/login y configurá tu aplicación autenticadora.')
+        click.echo(f'{label} creado. Entrá en /admin/login; el código se enviará por correo.')
 
     @app.cli.command('reset-admin')
     @click.option('--email',prompt='Correo del administrador')
@@ -58,10 +53,10 @@ def register_commands(app):
         row=s.db.one('SELECT id,mfa_method FROM users WHERE email=?',(email.strip().lower(),))
         if not row:raise click.ClickException('La cuenta no existe.')
         with s.db.tx(immediate=True) as db:
-            db.execute("UPDATE users SET password_hash=?,mfa_enrolled=CASE WHEN mfa_method='email' THEN 1 ELSE 0 END,totp_secret=NULL,totp_last_step=-1,active=1 WHERE id=?",(PASSWORDS.hash(password),row['id']))
+            db.execute("UPDATE users SET password_hash=?,mfa_method='email',mfa_enrolled=1,totp_secret=NULL,totp_last_step=-1,active=1 WHERE id=?",(PASSWORDS.hash(password),row['id']))
             for table in ('admin_sessions','recovery_codes','auth_challenges'):db.execute(f'DELETE FROM {table} WHERE user_id=?',(row['id'],))
         s.db.audit(row['id'],'OWNER_CONSOLE_ACCOUNT_RESET')
-        click.echo('Cuenta restablecida. El segundo factor configurado seguirá siendo obligatorio.')
+        click.echo('Cuenta restablecida. El código de segundo factor se enviará por correo.')
 
     @app.cli.command('check-config')
     def check_config():

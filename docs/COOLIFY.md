@@ -16,4 +16,4 @@ Definir estos argumentos de construcción en Coolify antes de desplegar:
 
 Son valores públicos integrados en el HTML durante la compilación; no incluir claves ni credenciales. Cambiar un argumento requiere reconstruir la imagen.
 
-En el backend, establecer `CORS_ORIGINS` con el origen HTTPS exacto del portal. El dominio público del backend debe apuntar al servicio `api` en el puerto interno `8000`; Coolify gestiona HTTPS y el proxy. Consultar `backend/docs/COOLIFY.md` en el repositorio backend para generar y configurar los secretos.
+En el backend, establecer `CORS_ORIGINS` con el origen HTTPS exacto del portal. El dominio público del backend debe apuntar al servicio `api` en el puerto interno `8000`; Coolify gestiona HTTPS y el proxy. Consultar la [guía del backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/docs/COOLIFY.md) para generar y configurar los secretos y la conexión MariaDB dedicada.

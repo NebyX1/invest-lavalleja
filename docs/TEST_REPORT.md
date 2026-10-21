@@ -13,7 +13,7 @@ El repositorio frontend independiente sustituye el workflow heredado del backend
 
 Se actualizaron la presentación, el título SEO, el saludo, el encabezado del chat, el placeholder y la invitación desde portada para describir un rol informativo, no de asesoramiento. Se mantienen el aviso de alcance, las fuentes, la alternativa sin JavaScript y los controles de sesión/CAPTCHA.
 
-Check, lint, **9 pruebas unitarias** y build de **32 páginas** correctos. La suite Gianna de escritorio/móvil terminó **12/12** en su corrida final, con API interceptada. El backend pasó **166 pruebas** y el escenario informativo de seis consultas por la API/proveedor reales pasó **6/6**. Resultados, incidencia del primer lote móvil y límites en [validación del backend](../backend/reports/VALIDACION.md).
+Check, lint, **9 pruebas unitarias** y build de **32 páginas** correctos. La suite Gianna de escritorio/móvil terminó **12/12** en su corrida final, con API interceptada. El backend pasó **166 pruebas** y el escenario informativo de seis consultas por la API/proveedor reales pasó **6/6**. Resultados, incidencia del primer lote móvil y límites en [validación del backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/reports/VALIDACION.md).
 
 ## Actualización de banners y mapa · 19/10/2026
 

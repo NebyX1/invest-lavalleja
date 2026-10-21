@@ -6,13 +6,13 @@
 
 ## Acceso
 
-Entrar con correo y contraseña. Una cuenta TOTP nueva debe registrar el QR en su aplicación autenticadora y comprobar un código. Guardar los códigos de recuperación: se muestran una sola vez y cada uno se consume al usarlo. Las cuentas configuradas por correo reciben un código temporal, siempre que el servidor SMTP esté correctamente preparado.
+Entrar con correo y contraseña y resolver el CAPTCHA. Se envía al correo de la cuenta un código de seis dígitos, válido durante diez minutos y de un solo uso. Introducirlo para completar el acceso, igual que en Buzón Ciudadano. Si no llega, revisar correo no deseado o volver a iniciar sesión para generar uno nuevo; el anterior queda invalidado. El servidor debe tener SMTP configurado.
 
 El propietario administra cuentas y puede publicar, retirar, volver atrás o borrar bases. El editor administra documentos, revisión e indexación. El rol de consulta puede inspeccionar el panel y exportar el corpus, que puede contener material interno: asignarlo únicamente a personal autorizado. No existe un rol de “lector público” del admin.
 
-Para crear cuentas desde la consola del backend se usa `python -m flask create-admin "Nombre" "correo@example.com" "contraseña-de-al-menos-12-caracteres" true` para superadministradores (Propietario) y el mismo comando con `false` para administradores (Editor). Si se omite el booleano se crea un administrador. TOTP sigue siendo obligatorio; con SMTP configurado se puede añadir `--mfa email`. El modo anterior sin argumentos sigue creando un superadministrador de forma interactiva. Ver los ejemplos completos y la correspondencia de permisos en el README.
+Para crear cuentas desde la consola del backend se usa `python -m flask create-admin "Nombre" "correo@example.com" "contraseña-de-al-menos-12-caracteres" true` para superadministradores (Propietario) y el mismo comando con `false` para administradores (Editor). Si se omite el booleano se crea un administrador. Todas las cuentas utilizan segundo factor por correo automáticamente. El modo sin argumentos sigue creando un superadministrador de forma interactiva.
 
-Las operaciones críticas exigen verificación reciente. Si aparece el formulario de reconfirmación, introducir contraseña y segundo factor. Un TOTP ya usado se rechaza, incluso dentro de sus mismos 30 segundos: esperar el siguiente código. Al reconfirmar, repetir la acción administrativa deseada; no se ejecutan formularios antiguos automáticamente.
+Las operaciones críticas exigen verificación reciente. Si aparece el formulario de reconfirmación, introducir la contraseña y el nuevo código enviado por correo. Los códigos ya usados se rechazan. Al reconfirmar, repetir la acción administrativa deseada; no se ejecutan formularios antiguos automáticamente.
 
 En Seguridad se puede cambiar contraseña y cerrar otras sesiones. Los cambios de contraseña revocan sesiones. La recuperación excepcional de una cuenta sin segundo factor exige un operador con acceso a la consola del servidor; no un enlace público.
 

@@ -2,10 +2,10 @@
 
 Invest Lavalleja es un portal de información para inversores interesados en el departamento de Lavalleja (Uruguay). Reúne zonas, sectores, datos, casos, pasos y preguntas frecuentes, y tiene un asistente conversacional llamado **Gianna Invest** que responde preguntas usando solo la base de conocimiento del proyecto.
 
-El repositorio tiene dos partes que trabajan juntas:
+El portal y la API trabajan juntos y se mantienen en repositorios separados:
 
-- **Portal web** (raíz del repositorio): el sitio que ve el inversor. Genera las páginas con Astro y usa React solo para las herramientas interactivas, como el buscador, el mapa, el dossier y el chat.
-- **Backend de Gianna** (carpeta `backend/`): el servicio que recibe las preguntas, busca en la base de conocimiento y redacta las respuestas con sus fuentes.
+- **Portal web** (este repositorio): el sitio que ve el inversor. Genera las páginas con Astro y usa React solo para las herramientas interactivas, como el buscador, el mapa, el dossier y el chat.
+- **Backend de Gianna** ([repositorio backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend)): el servicio que recibe las preguntas, busca en la base de conocimiento y redacta las respuestas con sus fuentes.
 
 ## Qué es Gianna Invest
 
@@ -38,16 +38,17 @@ Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibili
 | Agente | PydanticAI | Intérprete de turnos, agente de respuesta y memoria del hilo |
 | Modelo generativo | DeepSeek vía Ollama Cloud (API compatible con OpenAI) | Interpreta, redacta y decide si hay respuesta |
 | Pruebas | pytest, Vitest, ESLint, Playwright, axe | Backend, unidades, estilo y flujos de punta a punta |
-| Despliegue local | Docker Compose | Levanta la API y conserva LanceDB; MariaDB se configura mediante su URL |
+| Despliegue local | Docker Compose | API con MariaDB dedicada y LanceDB persistente |
 
 ### Estructura
 
 - `src/`: portal Astro, componentes React y estilos.
 - `src/data/`: catálogo versionado y manifiesto editorial de las páginas.
-- `backend/gianna/`: servicios de Gianna (búsqueda, agentes, memoria, validación, panel web).
-- `backend/docs/RAG_ENGINE.md`: arquitectura detallada del motor de búsqueda y del agente.
-- `better-rag/`: documento de conocimiento sectorial y su versión consolidada para alimentar el RAG.
+- La API, el panel y las migraciones se mantienen en el repositorio independiente [`invest-lavalleja-backend`](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend).
+- `better-rag/`: herramientas y documentos de preparación, validación y publicación de la base de conocimiento.
 - `public/`: recursos estáticos (imágenes, mapa, PDFs editoriales).
+
+Las herramientas de `better-rag/` usan el backend de Gianna. Si ambos repositorios están clonados uno junto al otro, lo detectan automáticamente; si están en ubicaciones distintas, define `GIANNA_BACKEND_ROOT` con la ruta local del repositorio backend. La preparación o publicación no se ejecuta automáticamente al validar el portal.
 
 ## Despliegue con Coolify
 
@@ -55,26 +56,16 @@ El portal y la API son recursos separados en Coolify. El portal se construye des
 
 ## Puesta en marcha de Gianna
 
-Gianna necesita el backend en Docker, una base MariaDB dedicada y una clave de Ollama Cloud. Cada instalación utiliza una sola `DATABASE_URL`. Para desarrollo local, desde `backend/`:
+Gianna requiere el backend independiente, una base MariaDB dedicada y una clave de Ollama Cloud. Seguí las instrucciones de instalación del [repositorio backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/README.md); cada instalación configura una sola `DATABASE_URL`, además de los secretos y las variables de Ollama y correo. Estas credenciales se configuran únicamente en la API.
+
+Cuando la API local responda `available: true` en `http://127.0.0.1:8000/api/config`, configura `.env.local` en la raíz con `PUBLIC_GIANNA_API_BASE=http://localhost:8000`. Si elegiste la pila opcional de pruebas humanas, usá su puerto `8001`. Luego inicia el portal:
 
 ```powershell
-python scripts/setup_env.py --local
-# Editar .env: completar DATABASE_URL y OLLAMA_API_KEY.
-docker compose -f compose.yaml -f compose.local.yaml up -d --build
-docker compose -f compose.yaml -f compose.local.yaml run --rm api python -m scripts.prepare_models
-docker compose -f compose.yaml -f compose.local.yaml exec api flask --app wsgi create-admin
-```
-
-Abrir `http://localhost:8000/admin/login` para cargar, revisar, indexar y publicar la base de conocimiento desde el panel.
-
-Esperar a que `http://127.0.0.1:8000/api/config` responda `available: true`. Para que el portal se conecte, `.env.local` en la raíz debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8000`. Luego:
-
-```powershell
-npm install
+npm ci
 npm run dev
 ```
 
-Abrir `http://localhost:4321/gianna/`. Para detener la API local, usar `docker compose -f compose.yaml -f compose.local.yaml stop` desde `backend/`. El despliegue de producción usa únicamente `compose.yaml`; más detalle en [backend/README.md](backend/README.md).
+Abrir `http://localhost:4321/gianna/`. Para detener los servicios, usa los comandos documentados en el [README del backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/README.md); evita borrar volúmenes persistentes.
 
 ## Desarrollo
 
@@ -132,8 +123,8 @@ Las advertencias editoriales distinguen datos de fuente, interpretación comerci
 
 ## Documentación adicional
 
-- [Motor RAG y agente de Gianna](backend/docs/RAG_ENGINE.md): arquitectura, modelos y contrato de respuesta.
-- [Backend de Gianna](backend/README.md): despliegue, panel, bases de conocimiento y pruebas.
+- [Motor RAG y agente de Gianna](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/docs/RAG_ENGINE.md): arquitectura, modelos y contrato de respuesta.
+- [Backend de Gianna](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend): despliegue, panel, base de datos y pruebas.
 - [Plan e inventario](docs/IMPLEMENTATION_PLAN.md)
 - [Reporte de pruebas y limitaciones](docs/TEST_REPORT.md)
 - [Normas del proyecto](AGENTS.md)

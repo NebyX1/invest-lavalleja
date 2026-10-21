@@ -8,7 +8,7 @@ Revisión: 28 de septiembre de 2026. Las referencias describen capacidades de lo
 
 ## Patrón institucional revisado
 
-Repositorio `IntendenciaDeLavalleja/buzon-ciudadano-backend`, commit observado `3198d34ed3c15cee47caa33ef73e94dbfd16b6ed`: README, árbol, modelo de usuario, rutas de administración y factoría Flask. El ejemplo usa contraseña Argon2 y segundo factor por correo, administración por roles, auditoría y CSRF. Esta implementación conserva el patrón funcional, añade TOTP y reduce servicios persistentes para el alcance documental. No copia credenciales, historias de usuarios, adjuntos ni el código del Buzón.
+Repositorio `IntendenciaDeLavalleja/buzon-ciudadano-backend`, commit observado `3198d34ed3c15cee47caa33ef73e94dbfd16b6ed`: README, árbol, modelo de usuario, rutas de administración y factoría Flask. El ejemplo usa contraseña Argon2 y segundo factor por correo, administración por roles, auditoría y CSRF. El 21/10/2026 se volvió a contrastar ese código y se retiró la variante TOTP añadida en la entrega inicial. El acceso de Gianna sigue el mismo patrón institucional: CAPTCHA y contraseña, código aleatorio de seis dígitos por correo, hash Argon2, diez minutos y consumo de un solo uso. No copia credenciales, historias de usuarios ni adjuntos del Buzón.
 
 https://github.com/IntendenciaDeLavalleja/buzon-ciudadano-backend
 
