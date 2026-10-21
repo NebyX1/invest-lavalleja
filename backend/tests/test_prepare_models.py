@@ -19,10 +19,9 @@ def test_runtime_verification_loads_and_exercises_both_models(monkeypatch,tmp_pa
             return [.75]
 
     monkeypatch.setattr(prepare_models,'Embeddings',FakeEmbeddings)
-    prepare_models.verify_runtime(tmp_path,backend='openvino',threads=2)
+    prepare_models.verify_runtime(tmp_path,threads=2)
 
     assert calls['cfg'].model_dir==tmp_path
-    assert calls['cfg'].embedding_backend=='openvino'
     assert calls['cfg'].embedding_threads==2
     assert calls['load'] and calls['documents'] and calls['rerank']
     output=[json.loads(line) for line in capsys.readouterr().out.splitlines()]

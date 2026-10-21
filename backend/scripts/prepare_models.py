@@ -42,13 +42,11 @@ def prepare(model_dir):
         (folder/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
 
 
-def verify_runtime(model_dir,backend=None,threads=None):
+def verify_runtime(model_dir,threads=None):
     """Load both pinned runtimes and run one local embedding/reranker smoke check."""
-    backend=backend or os.environ.get('EMBEDDING_BACKEND','openvino')
     threads=threads or int(os.environ.get('EMBEDDING_THREADS','2'))
-    if backend not in {'openvino','onnx'}:raise ValueError('EMBEDDING_BACKEND debe ser openvino u onnx.')
     if not 1<=threads<=8:raise ValueError('EMBEDDING_THREADS debe estar entre 1 y 8.')
-    engine=Embeddings(SimpleNamespace(model_dir=model_dir,embedding_threads=threads,embedding_backend=backend))
+    engine=Embeddings(SimpleNamespace(model_dir=model_dir,embedding_threads=threads))
     def report(message):
         print(json.dumps({'runtime_stage':message},ensure_ascii=False),flush=True)
     engine.load(report)

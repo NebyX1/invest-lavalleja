@@ -1,6 +1,6 @@
 # Motor RAG · octubre de 2026
 
-Gianna usa Bekko + Horizon + LanceDB. Flask, Gunicorn de un proceso, MariaDB y la API de Ollama mantienen sus responsabilidades. MariaDB conserva documentos, versiones, aprobación editorial y el puntero activo. Cada versión pública tiene una tabla LanceDB propia y una huella que incluye pesos, tokenizadores, pooling, normalización y runtimes. El índice E5/Qdrant anterior requiere reindexación; sus vectores de 384 dimensiones no se reutilizan.
+Gianna usa Bekko + Horizon + LanceDB. Flask, Gunicorn de un proceso, MariaDB y la API de Ollama mantienen sus responsabilidades. MariaDB conserva documentos, versiones, aprobación editorial y el puntero activo. Cada versión pública tiene una tabla LanceDB propia y una huella que incluye pesos, tokenizadores, pooling, normalización y runtimes. Desde el 21/10/2026 ambos modelos locales usan ONNX Runtime en CPU. OpenVINO se retiró tras observar en producción que el proceso terminaba con `SIGSEGV` durante la compilación de Bekko. El cambio incrementa la versión de motor y exige reindexar con una versión nueva; la publicación activa anterior no se sobrescribe. El índice E5/Qdrant anterior también requiere reindexación; sus vectores de 384 dimensiones no se reutilizan.
 
 ## Modelos
 
@@ -10,8 +10,8 @@ Con este MiniMax, una consulta completa agotó 2.000 tokens en `message.thinking
 
 | Componente | Modelo | Revisión fijada | Ejecución |
 |---|---|---|---|
-| Embedding | `hotchpotch/bekko-embedding-v1-a8m` | `c721113d59a1d91b447450324f51c4b3332c924a` | OpenVINO CPU, media enmascarada y normalización L2, 384 dimensiones |
-| Reranker | `Horizon-Labs/multilingual-reranker-small` | `c2ec8fb3e499725b168bbed2164bfee095360f77` | ONNX cuantizado CPU, pares de 384 tokens, consulta hasta 120 tokens |
+| Embedding | `hotchpotch/bekko-embedding-v1-a8m` | `c721113d59a1d91b447450324f51c4b3332c924a` | ONNX Runtime CPU, media enmascarada y normalización L2, 384 dimensiones |
+| Reranker | `Horizon-Labs/multilingual-reranker-small` | `c2ec8fb3e499725b168bbed2164bfee095360f77` | ONNX Runtime cuantizado CPU, pares de 384 tokens, consulta hasta 120 tokens |
 
 Se tomó como referencia la implementación de [Patitas Lavalleja](https://github.com/NebyX1/patitas-lavalleja). Bekko no usa los prefijos `query:`/`passage:` de E5. Los pasajes se cuentan con su tokenizador real y se limitan a 480 tokens, dentro de la ventana operativa de 512. Horizon ordena pasajes; su salida sigmoid es relevancia textual, no probabilidad de verdad o éxito del negocio. Los modelos se cargan una vez por proceso y comparten un bloqueo de inferencia. Sus configuraciones y pesos se preparan explícitamente y verifican con SHA-256; las peticiones de chat no descargan modelos.
 

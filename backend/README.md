@@ -4,7 +4,7 @@
 
 Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro.
 
-**Motor RAG actualizado · 19/10/2026:** Bekko OpenVINO CPU + Horizon ONNX CPU + LanceDB (cosine exacto y BM25 español). Preparación explícita de modelos, versiones con huella nueva y reindexación obligatoria. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes de septiembre que siguen describen verificaciones históricas.
+**Motor RAG actualizado · 21/10/2026:** Bekko ONNX Runtime CPU + Horizon ONNX Runtime CPU + LanceDB (cosine exacto y BM25 español). Se retiró OpenVINO tras confirmar un `SIGSEGV` del compilador en producción. La huella nueva requiere una nueva versión vectorial; no se reutilizan ni mezclan vectores. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes anteriores describen verificaciones históricas.
 
 **Estado conversacional:** Gianna usa `deepseek-v4.1-flash` en la pila local de prueba. Un harness distingue conversación, consulta RAG, preguntas externas, burlas, privacidad y pedidos dañinos antes de recuperar documentos. Las respuestas sobre inversión requieren fuentes; la conversación no muestra citas irrelevantes ni rechazos en tercera persona. La pila Docker de prueba humana está aislada y avisa que el contenido no fue revisado. La base operativa permanece sin publicación y no está validada para producción. Se aprobaron 106 pruebas Python, 12 pruebas de navegador de Gianna (escritorio y móvil) y una batería real de 16/16 diálogos; esos resultados no certifican exactitud factual. SMTP real y Coolify remoto no están validados. Consultar `reports/VALIDACION.md` y completar `docs/PUESTA_EN_MARCHA.md` antes de abrirla al público.
 
@@ -55,7 +55,7 @@ Portal Astro / isla React
         ↓
 Flask + Gunicorn + Jinja + MariaDB
         ↓
-Bekko OpenVINO (384 dimensiones, CPU)
+Bekko ONNX Runtime (384 dimensiones, CPU)
         ↓
 LanceDB: cosine + BM25 español + RRF → Horizon cross-encoder
         ↓

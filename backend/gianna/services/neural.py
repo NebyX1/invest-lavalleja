@@ -16,14 +16,14 @@ EMBEDDING_REVISION='c721113d59a1d91b447450324f51c4b3332c924a'
 RERANK_ID='Horizon-Labs/multilingual-reranker-small'
 RERANK_REVISION='c2ec8fb3e499725b168bbed2164bfee095360f77'
 DIMENSIONS=384
-ENGINE_VERSION='bekko-horizon-lance-v1'
+ENGINE_VERSION='bekko-horizon-lance-v2'
 
 
 def artifact_specs():
     return [
         ('bekko',EMBEDDING_ID,EMBEDDING_REVISION,[
             'tokenizer.json','tokenizer_config.json','config.json','1_Pooling/config.json',
-            'openvino/openvino_model.xml','openvino/openvino_model.bin','onnx/model.onnx']),
+            'onnx/model.onnx']),
         ('horizon',RERANK_ID,RERANK_REVISION,[
             'tokenizer.json','tokenizer_config.json','config.json','onnx/model_quantized.onnx']),
     ]
@@ -34,7 +34,8 @@ def verified_manifest(folder,model_id,revision,required):
         manifest=json.loads((folder/'manifest.json').read_text(encoding='utf-8'))
         if manifest['model_id']!=model_id or manifest['revision']!=revision:raise ValueError('identity')
         if not set(required)<=set(manifest['files']):raise ValueError('missing entries')
-        for name,info in manifest['files'].items():
+        for name in required:
+            info=manifest['files'][name]
             path=(folder/name).resolve()
             if not path.is_relative_to(folder.resolve()):raise ValueError('path')
             with path.open('rb') as stream:digest=hashlib.file_digest(stream,'sha256').hexdigest()
@@ -82,22 +83,16 @@ class Embeddings:
             options.inter_op_num_threads=1;options.execution_mode=ort.ExecutionMode.ORT_SEQUENTIAL
             stage('Inicializando Horizon ONNX en CPU')
             ranker=ort.InferenceSession(str(horizon/'onnx/model_quantized.onnx'),sess_options=options,providers=['CPUExecutionProvider'])
-            if self.cfg.embedding_backend=='openvino':
-                import openvino as ov
-                stage('Compilando Bekko OpenVINO en CPU')
-                model=ov.Core().compile_model(str(bekko/'openvino/openvino_model.xml'),'CPU',{
-                    'INFERENCE_NUM_THREADS':self.cfg.embedding_threads,'NUM_STREAMS':1,'PERFORMANCE_HINT':'LATENCY'})
-                self.input_names={port.any_name for port in model.inputs}
-            else:
-                model=ort.InferenceSession(str(bekko/'onnx/model.onnx'),sess_options=options,providers=['CPUExecutionProvider'])
-                self.input_names={item.name for item in model.get_inputs()}
+            stage('Inicializando Bekko ONNX en CPU')
+            model=ort.InferenceSession(str(bekko/'onnx/model.onnx'),sess_options=options,providers=['CPUExecutionProvider'])
+            self.input_names={item.name for item in model.get_inputs()}
             profile={'engine':ENGINE_VERSION,'model':EMBEDDING_ID,'revision_resolved':EMBEDDING_REVISION,
                 'dim':DIMENSIONS,'pooling':'masked_mean','normalize':True,'query_prefix':'','passage_prefix':'',
-                'runtime':self.cfg.embedding_backend,'max_input_tokens':512,'sparse':'lancedb/bm25-spanish',
+                'runtime':'onnx-cpu','max_input_tokens':512,'sparse':'lancedb/bm25-spanish',
                 'reranker':RERANK_ID,'reranker_revision':RERANK_REVISION,'reranker_tokens':384,
                 'onnxruntime':importlib.metadata.version('onnxruntime'),
-                'openvino':importlib.metadata.version('openvino'),
-                'artifact_hashes':{kind:{name:meta['sha256'] for name,meta in m['files'].items()} for kind,m in manifests.items()}}
+                'artifact_hashes':{kind:{name:manifests[kind]['files'][name]['sha256'] for name in files}
+                    for kind,_,_,files in artifact_specs()}}
             profile['fingerprint']=hashlib.sha256(json.dumps(profile,sort_keys=True).encode()).hexdigest()
             self.profile=profile;self.ranker=ranker;self.model=model
             stage('Bekko y Horizon quedaron inicializados')
@@ -110,15 +105,7 @@ class Embeddings:
         data={'input_ids':np.asarray([e.ids for e in enc],dtype=np.int64),
               'attention_mask':np.asarray([e.attention_mask for e in enc],dtype=np.int64)}
         feeds={key:value for key,value in data.items() if key in self.input_names}
-        if self.cfg.embedding_backend=='openvino':
-            request=self.model.create_infer_request();request.start_async(feeds)
-            if not request.wait_for(30000):
-                request.cancel()
-                try:request.wait()
-                except RuntimeError:pass
-                raise DomainError('Se agotó el plazo de inferencia.',503,'inference_timeout')
-            output=np.array(request.get_output_tensor(0).data,copy=True)
-        else:output=self._onnx(self.model,feeds)
+        output=self._onnx(self.model,feeds)
         if output.ndim==3:
             mask=data['attention_mask'][...,None]
             output=(output*mask).sum(axis=1)/np.maximum(mask.sum(axis=1),1)

@@ -1,16 +1,17 @@
 # Informe de validación de la entrega
 
-## Diagnóstico de inicialización Bekko/Horizon en Coolify · 21/10/2026
+## Fallo de inicialización Bekko en producción y corrección · 21/10/2026
 
-Los logs de producción suministrados muestran dos fallos distintos: un intento inicial de vectorización no encontró `/app/data/models/bekko/<revisión>/manifest.json`; más tarde Gunicorn recibió `SIGSEGV` y levantó un worker nuevo aproximadamente cada dos minutos. El export no incluye un stack nativo ni la última operación de la biblioteca, así que no permite atribuir el `SIGSEGV` a OpenVINO u ONNX Runtime.
+La captura posterior de la terminal identificó el fallo que los logs anteriores no permitían atribuir: `Segmentation fault (core dumped)` inmediatamente después de «Compilando Bekko OpenVINO en CPU». Se retiró ese runtime nativo y Bekko ahora usa su export ONNX Runtime CPU. Se mantienen el mismo modelo y revisión de Bekko, Horizon, los tokenizadores, pooling enmascarado, normalización L2, dimensión 384 y LanceDB; no se agregaron variables de entorno. También se retiraron la dependencia OpenVINO y su comando de telemetría del Dockerfile.
 
-Se agregó progreso por etapa al trabajo y registro del servidor (verificación de hashes, tokenizadores, sesión ONNX de Horizon y compilación OpenVINO de Bekko). `scripts.prepare_models` ahora ejecuta una prueba local de embedding y reranking tras descargar/verificar los pesos; `scripts.check_model_runtime` repite solo esa prueba en el contenedor configurado, sin red ni cambios de base. Esto evita confundir la descarga íntegra de archivos con una inicialización/inferencia comprobada.
+La huella del motor cambió a `bekko-horizon-lance-v2`. La versión anterior queda intacta, pero no se mezclan ni reutilizan sus vectores. Tras desplegar, hay que validar con `python -m scripts.check_model_runtime`, reintentar el trabajo fallido (la captura indica que se detuvo antes del cálculo de vectores) o generar otra versión, probarla en el laboratorio y publicarla explícitamente. La base activa no se cambia automáticamente.
 
 Verificación local:
 
-- Suite Python: **295 aprobadas, 15 omitidas, una advertencia de deprecación de PydanticGraph**. Las omitidas corresponden a tres casos sin paquete documental privado y doce pruebas MariaDB optativas ejecutadas previamente en la validación de importación.
-- En contenedor Linux local `linux/amd64`, con las dependencias fijadas (`OpenVINO 2026.4.1`, `ONNX Runtime 1.31.0`, `tokenizers 0.23.3`), los artefactos locales de Bekko/Horizon y límites Docker de 2 CPU/2 GiB, `scripts.check_model_runtime` llegó por todas las etapas y completó embedding de 384 dimensiones y reranking en aproximadamente 30 segundos.
-- La misma carga con ejecución concurrente en hilo también pasó. Esto no reproduce el `SIGSEGV` del VPS; el problema de producción no se declara resuelto hasta ejecutar la nueva comprobación en el contenedor api de Coolify y revisar su resultado. No se reinició ni modificó el servicio remoto.
+- Suite Python: **297 aprobadas, 15 omitidas, una advertencia de deprecación de PydanticGraph**. Las omitidas corresponden a tres casos sin paquete documental privado y doce pruebas MariaDB optativas.
+- `docker build` completado para `invest-lavalleja-backend:onnx-fix`; se comprobó que OpenVINO no está instalado en la imagen.
+- En la imagen construida, sobre `linux/amd64`, con los modelos del volumen persistente existente y límites Docker de 2 CPU/2 GiB, `scripts.check_model_runtime` inicializó ambos modelos, generó un embedding de 384 dimensiones, ejecutó el reranker y terminó con `Verificación de inferencia Bekko/Horizon superada`.
+- No se desplegó Coolify ni se verificó aún el runtime del VPS. La corrección está publicada en el código, pero la confirmación final depende del despliegue y del smoke test en la instancia institucional.
 
 ## Importación en MariaDB estricta y valores por defecto · 21/10/2026
 
