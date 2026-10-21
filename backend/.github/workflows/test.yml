@@ -16,6 +16,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Install MariaDB connector build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
       - run: pip install -r requirements-test.txt
       - run: python -m compileall -q gianna scripts
       # Guide content is intentionally not versioned. Generic/unit/web tests run without that private package.
@@ -25,6 +29,19 @@ jobs:
         with:
           name: tests-${{ matrix.python }}
           path: reports/ci-tests.xml
+  compose-config:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-config-only-not-a-real-secret-32-chars
+      ENCRYPTION_KEY: ci-config-only
+      DATABASE_URL: mariadb+mariadbconnector://ci:ci@db:3306/gianna_ci
+      CORS_ORIGINS: https://portal.example.test
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          docker compose --env-file /dev/null -f compose.yaml config --quiet
+          docker compose --env-file /dev/null -f compose.yaml -f compose.local.yaml config --quiet
+          docker compose --env-file /dev/null -f compose.yaml -f compose.human-test.yaml config --quiet
   dependency-audit:
     runs-on: ubuntu-latest
     steps:
@@ -32,5 +49,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install MariaDB connector build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
       - run: pip install pip-audit
       - run: pip-audit -r requirements.txt

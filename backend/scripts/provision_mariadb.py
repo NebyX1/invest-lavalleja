@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Provision isolated local Gianna schemas from an authorized MariaDB bootstrap URL."""
+"""Provision one dedicated Gianna schema from an authorized MariaDB bootstrap URL."""
 from pathlib import Path
 import argparse
 import secrets
@@ -12,7 +12,7 @@ from sqlalchemy.engine import make_url
 from scripts.simplify_env import migrate as update_backend_env, prepare as validate_backend_env
 
 
-DATABASES = ('gianna_invest', 'gianna_invest_human_test')
+DATABASE = 'gianna_invest'
 APP_USER = 'gianna_invest_app'
 PRIVILEGES = 'SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES'
 
@@ -44,9 +44,7 @@ def main():
     password = secrets.token_hex(32)
     urls = {
         'DATABASE_URL': bootstrap_connection.set(username=APP_USER, password=password,
-                                                   database=DATABASES[0]).render_as_string(hide_password=False),
-        'DATABASE_URL_HUMAN_TEST': bootstrap_connection.set(username=APP_USER, password=password,
-                                                             database=DATABASES[1]).render_as_string(hide_password=False),
+                                                   database=DATABASE).render_as_string(hide_password=False),
     }
     try:
         validate_backend_env(backend_env.read_bytes(), urls)
@@ -56,24 +54,22 @@ def main():
     try:
         with engine.begin() as connection:
             existing_databases = connection.exec_driver_sql(
-                'SELECT schema_name FROM information_schema.schemata WHERE schema_name IN (?,?)', DATABASES
+                'SELECT schema_name FROM information_schema.schemata WHERE schema_name=?', (DATABASE,)
             ).fetchall()
             existing_users = connection.exec_driver_sql(
                 'SELECT User FROM mysql.user WHERE User=?', (APP_USER,)
             ).fetchall()
             if existing_databases or existing_users:
                 raise SystemExit('Ya existe un esquema o usuario Gianna; no se modificó nada.')
-            for database in DATABASES:
-                connection.exec_driver_sql(
-                    f'CREATE DATABASE `{database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
-                )
+            connection.exec_driver_sql(
+                f'CREATE DATABASE `{DATABASE}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+            )
             connection.exec_driver_sql(
                 f"CREATE USER '{APP_USER}'@'%' IDENTIFIED BY '{password}'"
             )
-            for database in DATABASES:
-                connection.exec_driver_sql(
-                    f'GRANT {PRIVILEGES} ON `{database}`.* TO \'{APP_USER}\'@\'%\''
-                )
+            connection.exec_driver_sql(
+                f'GRANT {PRIVILEGES} ON `{DATABASE}`.* TO \'{APP_USER}\'@\'%\''
+            )
         update_backend_env(backend_env, apply=True, replacements=urls)
     except SystemExit:
         raise
@@ -82,8 +78,8 @@ def main():
     finally:
         engine.dispose()
 
-    print('Esquemas exclusivos de Gianna creados y usuario restringido configurado.')
-    print(f'URLs guardadas en {backend_env.name} con respaldo automático; credenciales omitidas.')
+    print('Base exclusiva de Gianna creada y usuario restringido configurado.')
+    print(f'DATABASE_URL guardada en {backend_env.name} con respaldo automático; credenciales omitidas.')
     print('El esquema buzon-ciudadano y sus tablas no fueron modificados.')
 
 

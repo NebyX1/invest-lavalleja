@@ -38,7 +38,7 @@ Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibili
 | Agente | PydanticAI | Intérprete de turnos, agente de respuesta y memoria del hilo |
 | Modelo generativo | DeepSeek vía Ollama Cloud (API compatible con OpenAI) | Interpreta, redacta y decide si hay respuesta |
 | Pruebas | pytest, Vitest, ESLint, Playwright, axe | Backend, unidades, estilo y flujos de punta a punta |
-| Despliegue local | Docker Compose | Levanta Gianna y su base en contenedores |
+| Despliegue local | Docker Compose | Levanta la API y conserva LanceDB; MariaDB se configura mediante su URL |
 
 ### Estructura
 
@@ -55,29 +55,26 @@ El portal y la API son recursos separados en Coolify. El portal se construye des
 
 ## Puesta en marcha de Gianna
 
-Gianna necesita el backend en Docker y una clave de Ollama Cloud. Desde `backend/`:
+Gianna necesita el backend en Docker, una base MariaDB dedicada y una clave de Ollama Cloud. Cada instalación utiliza una sola `DATABASE_URL`. Para desarrollo local, desde `backend/`:
 
 ```powershell
-Copy-Item .env.example .env
-# Editar .env: completar OLLAMA_API_KEY (no se comparte ni se versiona)
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env up -d --build
+python scripts/setup_env.py --local
+# Editar .env: completar DATABASE_URL y OLLAMA_API_KEY.
+docker compose -f compose.yaml -f compose.local.yaml up -d --build
+docker compose -f compose.yaml -f compose.local.yaml run --rm api python -m scripts.prepare_models
+docker compose -f compose.yaml -f compose.local.yaml exec api flask --app wsgi create-admin
 ```
 
-Después, cargar la base de conocimiento de prueba (solo registros públicos) y reiniciar la API:
+Abrir `http://localhost:8000/admin/login` para cargar, revisar, indexar y publicar la base de conocimiento desde el panel.
 
-```powershell
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.enable_human_test /app/data/invest_lavalleja_2026.gianna.json
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env restart api
-```
-
-Esperar a que `http://127.0.0.1:8001/api/config` responda `available: true`. Para que el portal se conecte, `.env.local` en la raíz debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`. Luego:
+Esperar a que `http://127.0.0.1:8000/api/config` responda `available: true`. Para que el portal se conecte, `.env.local` en la raíz debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8000`. Luego:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Abrir `http://localhost:4321/gianna/`. Para detener solo la pila de prueba, usar `docker compose ... stop` (sin `down -v`, que borraría los volúmenes). Más detalle en [backend/README.md](backend/README.md).
+Abrir `http://localhost:4321/gianna/`. Para detener la API local, usar `docker compose -f compose.yaml -f compose.local.yaml stop` desde `backend/`. El despliegue de producción usa únicamente `compose.yaml`; más detalle en [backend/README.md](backend/README.md).
 
 ## Desarrollo
 

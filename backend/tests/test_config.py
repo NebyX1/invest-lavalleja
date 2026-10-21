@@ -15,6 +15,7 @@ import pytest
 from gianna import create_app
 from gianna.config import BACKEND_ROOT, Config
 from gianna.web import smtp_sender
+from scripts import provision_mariadb
 from scripts.simplify_env import FIELDS, migrate, prepare, quote
 
 
@@ -200,7 +201,7 @@ def test_migration_keeps_keys_model_mail_and_effective_settings(env, tmp_path):
     plan = migrate(path)
     assert not plan['applied'] and path.read_bytes() == original
     result = migrate(path, apply=True)
-    assert result['variables_after'] == 16 and result['effective_config_unchanged']
+    assert result['variables_after'] == 15 and result['effective_config_unchanged']
     assert (tmp_path / result['backup']).read_bytes() == original
     after = dict(dotenv_values(path))
     assert set(after) == set(FIELDS)
@@ -225,7 +226,41 @@ def test_migration_does_not_silently_discard_custom_settings(env, tmp_path, extr
 def test_migration_roundtrip_is_idempotent(env):
     compact, _, _ = prepare(legacy_text(env).encode())
     again, old_count, new_count = prepare(compact)
-    assert compact == again and old_count == new_count == 16
+    assert compact == again and old_count == new_count == 15
+
+
+def test_migration_removes_secondary_url_without_changing_primary_database(env):
+    secondary = 'mariadb+mariadbconnector://test:unused@db.example.test:3306/other_schema'
+    original = legacy_text(env).replace("DATABASE_URL_HUMAN_TEST=''", 'DATABASE_URL_HUMAN_TEST=' + quote(secondary))
+    compact, _, _ = prepare(original.encode())
+    values = dotenv_values(stream=StringIO(compact.decode()))
+    assert values['DATABASE_URL'] == env['DATABASE_URL']
+    assert 'DATABASE_URL_HUMAN_TEST' not in values
+    assert values['SECRET_KEY'] == env['SECRET_KEY']
+    assert values['ENCRYPTION_KEY'] == env['ENCRYPTION_KEY']
+
+
+def test_provisioning_creates_one_schema_and_saves_one_database_url(env, tmp_path, monkeypatch):
+    bootstrap = tmp_path / 'bootstrap.env'
+    bootstrap.write_text('DATABASE_URL=mariadb+mariadbconnector://bootstrap:fake@localhost:3306/reference\n')
+    backend = tmp_path / '.env'
+    backend.write_text(legacy_text(env))
+    connection = MagicMock()
+    connection.exec_driver_sql.return_value.fetchall.return_value = []
+    engine = MagicMock()
+    engine.begin.return_value.__enter__.return_value = connection
+    monkeypatch.setattr(provision_mariadb, 'create_engine', lambda *args, **kwargs: engine)
+    monkeypatch.setattr(sys, 'argv', ['provision_mariadb', '--bootstrap-env', str(bootstrap), '--backend-env', str(backend)])
+    provision_mariadb.main()
+    statements = [call.args[0] for call in connection.exec_driver_sql.call_args_list]
+    creates = [sql for sql in statements if sql.startswith('CREATE DATABASE')]
+    grants = [sql for sql in statements if sql.startswith('GRANT')]
+    assert len(creates) == len(grants) == 1
+    assert '`gianna_invest`' in creates[0] and '`gianna_invest`.*' in grants[0]
+    values = dotenv_values(backend)
+    assert set(values) == set(FIELDS)
+    assert values['DATABASE_URL'].endswith('/gianna_invest')
+    assert 'DATABASE_URL_HUMAN_TEST' not in values
 
 
 def test_setup_generates_minimal_local_env_and_refuses_to_rotate(tmp_path):

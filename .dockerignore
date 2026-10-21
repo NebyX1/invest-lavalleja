@@ -1,0 +1,15 @@
+.git
+.astro
+dist
+node_modules
+backend
+sample-backend
+better-rag
+docs
+reports
+scripts
+test-results
+tests
+.env
+.env.*
+!.env.example

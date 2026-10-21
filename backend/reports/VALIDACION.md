@@ -1,5 +1,33 @@
 # Informe de validación de la entrega
 
+## Alta por consola compatible con Buzón Ciudadano · 21/10/2026
+
+Se contrastó `app/commands.py` del repositorio `IntendenciaDeLavalleja/buzon-ciudadano-backend`. Gianna ahora acepta `python -m flask create-admin NOMBRE CORREO CONTRASEÑA true/false`, sin necesitar `--app`, desde la carpeta del backend o la terminal del contenedor. `true` utiliza el rol existente `owner` (superadministrador) y `false`, `editor` (administrador). Omitir el booleano equivale a `false`; otros valores se rechazan. No se migraron roles, no se añadieron variables al `.env` y no se modificó la autenticación. Se mantiene el comando interactivo anterior y su alta de propietario, así como `--mfa email` cuando SMTP está configurado. Los duplicados no sobrescriben cuentas ni elevan permisos; la contraseña se guarda con Argon2id y no se incluye en la salida ni en la auditoría. Una contraseña posicional sí puede quedar en el historial de la terminal; el modo interactivo permite evitarlo.
+
+Verificación ejecutada:
+
+- **278 pruebas Python aprobadas y 3 omitidas** por el paquete documental privado ausente; permanece la advertencia de deprecación de PydanticGraph. Son 24 regresiones nuevas del comando: ambos perfiles, booleano omitido y mayúsculas, validaciones, duplicados, compatibilidad interactiva, TOTP y correo con transporte simulado.
+- Las pruebas HTTP completaron contraseña, CAPTCHA y enrolamiento TOTP para cada perfil. Ambos entran al panel; solo el superadministrador accede a usuarios, configuración y auditoría y puede crear otra cuenta. Los controles de permisos y el segundo factor siguen vigentes.
+- Imagen real reconstruida y prueba adicional en Docker con **MariaDB 11.4 nueva y desechable**, en una red interna sin puertos publicados. Se ejecutaron subprocessos reales `python -m flask create-admin`, sin `--app`, para los dos perfiles y para el booleano omitido. Se comprobaron hashes, auditoría, duplicados, rechazo de booleanos inválidos y permisos HTTP con CAPTCHA y TOTP. La base y el contenedor de prueba se eliminaron al finalizar; no se usó la base operativa para crear cuentas.
+- Contenedor local de Gianna actualizado con su volumen y conexión conservados, estado `healthy`. La ayuda del comando funciona en el contenedor. `/health/live`, `/health/ready`, `/admin/login` y el portal `/gianna/` respondieron HTTP 200. Se conservaron la versión activa `16d7029f120c49aa84b7be74974a89de`, sus 360 fragmentos (948 entre todas las versiones) y el conteo de usuarios operativos, que sigue en cero. No se hicieron llamadas a Ollama ni envíos SMTP reales; no se desplegó en Coolify ni se modificaron repositorios remotos en esta tarea.
+
+Limitación local comprobada: invocar la ayuda con Python nativo de Windows usando el `.env` destinado a Docker falla al conectar con `host.docker.internal`. No se cambió la URL operativa ni se creó otra variable para solventarlo. La ejecución documentada para esta instalación se realiza dentro del contenedor actualizado, donde ese host sí funciona. No se afirma haber validado el comando contra MariaDB desde Python nativo de Windows con esta URL.
+
+## Una única conexión MariaDB · 21/10/2026
+
+Se retiró `DATABASE_URL_HUMAN_TEST` del `.env` local, la plantilla y Compose. Cada instalación usa únicamente `DATABASE_URL`; el archivo canónico tiene **15 campos**. El generador, el simplificador, el aprovisionamiento y el importador SQLite/MariaDB siguen ese contrato. El simplificador solo reconoce el nombre retirado como entrada antigua para eliminarlo; conserva la URL principal salvo reemplazo explícito. El aprovisionamiento crea una única base dedicada. El README principal ahora describe el arranque habitual y la publicación desde el panel; las pruebas humanas son una opción de desarrollo separada.
+
+En este equipo, la única URL conserva exactamente la conexión de la API local que ya estaba funcionando. Se verificó igualdad de todos los demás valores del `.env`, incluidas las claves y credenciales, y se guardó un respaldo local ignorado por Git y Docker. No se migraron, eliminaron ni publicaron datos de MariaDB.
+
+Verificación ejecutada:
+
+- Backend en el entorno virtual Windows: **254 aprobadas, 3 omitidas** por ausencia del paquete documental privado; una advertencia de deprecación de PydanticGraph. Incluye regresiones para retirar la URL secundaria sin cambiar la principal, conservar secretos y aprovisionar una sola base (sin acceso real a un servidor en esa prueba).
+- Compose de producción, local y prueba humana: `config --quiet` correcto con el único campo `DATABASE_URL`. El perfil Python de producción también se validó con los 15 campos canónicos.
+- Imagen Docker reconstruida y API local recreada con su volumen persistente: contenedor saludable, `/health/live` y `/health/ready` con HTTP 200, `/api/config` con `available: true`. El portal local respondió HTTP 200.
+- La versión activa `16d7029f120c49aa84b7be74974a89de` mantiene **360 fragmentos en MariaDB y 360 vectores en LanceDB**, idénticos antes y después de recrear la API.
+
+No se solicitaron generaciones a Ollama ni se desplegó en Coolify durante esta verificación. Esta validación de configuración y arranque local no certifica una puesta en producción remota.
+
 ## Migración de SQLite a MariaDB · 20/10/2026
 
 Esta es la verificación vigente del backend local y sustituye las referencias anteriores a SQLite como base de ejecución. Se tomó la URL de conexión autorizada de `sample-backend` solo para aprovisionar dos esquemas nuevos y aislados (`gianna_invest` y `gianna_invest_human_test`) y una cuenta de aplicación con privilegios limitados. No se usaron ni alteraron el esquema `buzon-ciudadano` ni sus tablas. Las URLs quedaron en el `.env` local; se conservaron `SECRET_KEY`, `ENCRYPTION_KEY`, el modelo, Ollama y SMTP. El `.env` tiene respaldo local excluido de Git.
@@ -12,7 +40,7 @@ La suite del backend ejecutada sobre la imagen Linux: **246 aprobadas, 3 omitida
 
 ## Configuración simplificada a partir de `sample-backend` · 20/10/2026
 
-Antecedente inmediatamente anterior a MariaDB: se adoptó la organización de Flask del proyecto de referencia, no sus credenciales ni servicios ajenos a Gianna. En esa etapa el `.env` pasó de 30 a **14 campos**; la migración descrita arriba añadió las dos URLs de base dedicadas, por lo que el archivo actual tiene 16 variables. Se eliminaron las opciones obsoletas de Qdrant/E5 y parámetros operativos que ya tienen valores predeterminados. Los perfiles desarrollo/producción/pruebas viven en `gianna/config_profiles.py`; `gianna/config.py` mantiene compatibilidad con nombres anteriores. El motor RAG y los modelos no cambiaron.
+Antecedente inmediatamente anterior a MariaDB: se adoptó la organización de Flask del proyecto de referencia, no sus credenciales ni servicios ajenos a Gianna. En esa etapa el `.env` pasó de 30 a **14 campos**; la migración descrita arriba añadió inicialmente dos URLs de base dedicadas y lo llevó a 16 variables. Se eliminaron las opciones obsoletas de Qdrant/E5 y parámetros operativos que ya tienen valores predeterminados. Los perfiles desarrollo/producción/pruebas viven en `gianna/config_profiles.py`; `gianna/config.py` mantiene compatibilidad con nombres anteriores. El motor RAG y los modelos no cambiaron.
 
 Migración ejecutada con `python -m scripts.simplify_env --apply`: configuración efectiva equivalente; comprobación adicional de igualdad de `SECRET_KEY`, `ENCRYPTION_KEY`, token y modelo de Ollama y contraseña de correo. Respaldo local `.env.before-simplify-20261020T171723582005Z`, excluido de Git y Docker. El migrador rechaza opciones desconocidas, duplicadas o personalizadas que no pueda retirar sin cambios. El generador de instalaciones nuevas sigue negándose a sobrescribir `.env` o rotar claves existentes. `sample-backend/` se excluyó de Git y del contexto de construcción del portal; no se modificó ningún archivo de referencia.
 

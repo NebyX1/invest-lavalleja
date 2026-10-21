@@ -1,5 +1,6 @@
 # LOCAL HUMAN TEST ONLY. Use with compose.yaml, never in Coolify/production.
-# Separate project name creates separate MariaDB and LanceDB data for the human test.
+# Use a test-only installation whose DATABASE_URL points to an isolated MariaDB schema.
+# The project name isolates the LanceDB volume, not the external MariaDB database.
 name: gianna-invest-human-test
 services:
   api:
@@ -7,7 +8,6 @@ services:
       - 'host.docker.internal:host-gateway'
     environment:
       FLASK_ENV: development
-      DATABASE_URL: ${DATABASE_URL_HUMAN_TEST:?Define DATABASE_URL_HUMAN_TEST con una base vacía aislada}
       GIANNA_HUMAN_TEST_MODE: 'true'
       CORS_ORIGINS: http://localhost:4321,http://127.0.0.1:4321,http://localhost:8001,http://127.0.0.1:8001
     ports:

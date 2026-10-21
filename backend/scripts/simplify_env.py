@@ -18,7 +18,7 @@ from gianna.config import BACKEND_ROOT, Config
 
 SECTIONS = (
     ('Flask y seguridad', ('FLASK_ENV', 'SECRET_KEY', 'ENCRYPTION_KEY')),
-    ('Bases MariaDB dedicadas', ('DATABASE_URL', 'DATABASE_URL_HUMAN_TEST')),
+    ('Base MariaDB', ('DATABASE_URL',)),
     ('Portal y API: origenes exactos separados por coma', ('CORS_ORIGINS',)),
     ('Ollama Cloud', ('OLLAMA_HOST', 'OLLAMA_API_KEY', 'OLLAMA_MODEL')),
     ('Correo SMTP', ('MAIL_SERVER', 'MAIL_PORT', 'MAIL_USE_TLS', 'MAIL_USE_SSL',
@@ -32,6 +32,7 @@ LEGACY_FIELDS = {
     'EMBEDDING_BATCH_SIZE', 'MAX_CONCURRENT_CHAT', 'WORKER_ENABLED',
     'MAX_UPLOAD_MB', 'MAX_RECORDS', 'QDRANT_URL', 'QDRANT_API_KEY',
     'E5_REVISION', 'E5_MODEL_FILE', 'GIANNA_HUMAN_TEST_MODE',
+    'DATABASE_URL_HUMAN_TEST',
 }
 CPU_DEFAULTS = {'OMP_NUM_THREADS': '2', 'OPENBLAS_NUM_THREADS': '1',
                 'MKL_NUM_THREADS': '1', 'TOKENIZERS_PARALLELISM': 'false'}
@@ -57,8 +58,7 @@ def prepare(original, replacements=None):
     cfg = Config.from_env(environ=old)
     values = dict(zip(FIELDS, (
         'production' if cfg.production else ('testing' if old.get('FLASK_ENV') == 'testing' else 'development'),
-        cfg.secret_key, cfg.encryption_key, old.get('DATABASE_URL', ''),
-        old.get('DATABASE_URL_HUMAN_TEST', ''), ','.join(cfg.public_origins),
+        cfg.secret_key, cfg.encryption_key, old.get('DATABASE_URL', ''), ','.join(cfg.public_origins),
         cfg.ollama_url, cfg.ollama_api_key, cfg.ollama_model,
         cfg.smtp_host, str(cfg.smtp_port), str(cfg.smtp_mode == 'starttls'),
         str(cfg.smtp_mode == 'ssl'), cfg.smtp_username, cfg.smtp_password, cfg.smtp_from,
@@ -116,15 +116,14 @@ def migrate(path, apply=False, replacements=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true', help='Aplicar con respaldo; sin esta opción solo verifica.')
-    parser.add_argument('--set-database-urls', action='store_true',
-                        help='Usar DATABASE_URL y DATABASE_URL_HUMAN_TEST del entorno y guardarlas con respaldo.')
+    parser.add_argument('--set-database-url', action='store_true',
+                        help='Usar DATABASE_URL del entorno y guardarla con respaldo.')
     args = parser.parse_args()
     replacements = None
-    if args.set_database_urls:
-        replacements = {key: os.environ.get(key, '').strip()
-                        for key in ('DATABASE_URL', 'DATABASE_URL_HUMAN_TEST')}
+    if args.set_database_url:
+        replacements = {'DATABASE_URL': os.environ.get('DATABASE_URL', '').strip()}
         if any(not value.startswith('mariadb+mariadbconnector://') for value in replacements.values()):
-            raise SystemExit('Se requieren ambas URLs MariaDB por variables de entorno; no se imprimieron valores.')
+            raise SystemExit('Se requiere DATABASE_URL MariaDB en el entorno; no se imprimió su valor.')
     try:
         report = migrate(BACKEND_ROOT / '.env', apply=args.apply, replacements=replacements)
     except (ValueError, OSError, UnicodeError):

@@ -10,6 +10,8 @@ Entrar con correo y contraseña. Una cuenta TOTP nueva debe registrar el QR en s
 
 El propietario administra cuentas y puede publicar, retirar, volver atrás o borrar bases. El editor administra documentos, revisión e indexación. El rol de consulta puede inspeccionar el panel y exportar el corpus, que puede contener material interno: asignarlo únicamente a personal autorizado. No existe un rol de “lector público” del admin.
 
+Para crear cuentas desde la consola del backend se usa `python -m flask create-admin "Nombre" "correo@example.com" "contraseña-de-al-menos-12-caracteres" true` para superadministradores (Propietario) y el mismo comando con `false` para administradores (Editor). Si se omite el booleano se crea un administrador. TOTP sigue siendo obligatorio; con SMTP configurado se puede añadir `--mfa email`. El modo anterior sin argumentos sigue creando un superadministrador de forma interactiva. Ver los ejemplos completos y la correspondencia de permisos en el README.
+
 Las operaciones críticas exigen verificación reciente. Si aparece el formulario de reconfirmación, introducir contraseña y segundo factor. Un TOTP ya usado se rechaza, incluso dentro de sus mismos 30 segundos: esperar el siguiente código. Al reconfirmar, repetir la acción administrativa deseada; no se ejecutan formularios antiguos automáticamente.
 
 En Seguridad se puede cambiar contraseña y cerrar otras sesiones. Los cambios de contraseña revocan sesiones. La recuperación excepcional de una cuenta sin segundo factor exige un operador con acceso a la consola del servidor; no un enlace público.

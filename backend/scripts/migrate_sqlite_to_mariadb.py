@@ -21,7 +21,6 @@ TABLES = (
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', help='Archivo SQLite existente de Gianna')
-    parser.add_argument('--target-env', choices=('DATABASE_URL', 'DATABASE_URL_HUMAN_TEST'), default='DATABASE_URL')
     parser.add_argument('--confirm-api-stopped', action='store_true')
     parser.add_argument('--confirm', action='store_true')
     args = parser.parse_args()
@@ -31,9 +30,9 @@ def main():
     source = Path(args.source).resolve()
     if not source.is_file():
         raise SystemExit('No se encontró el archivo SQLite indicado.')
-    target = os.environ.get(args.target_env, '').strip()
+    target = os.environ.get('DATABASE_URL', '').strip()
     if not target.startswith('mariadb+mariadbconnector://'):
-        raise SystemExit(f'{args.target_env} debe apuntar a MariaDB. No se imprimió su valor.')
+        raise SystemExit('DATABASE_URL debe apuntar a MariaDB. No se imprimió su valor.')
 
     with sqlite3.connect(f'file:{source.as_posix()}?mode=ro', uri=True) as sqlite_db:
         if sqlite_db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':

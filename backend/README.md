@@ -21,6 +21,31 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 - Chat público de prueba `/chat`; isla React activa en `../src/components/islands/GiannaChat.tsx`; `AgentHarness` controla rutas, respuestas de seguridad y acceso al RAG; contexto corto cifrado de hasta seis intercambios, botón para olvidar y límites de uso. Ambos inicios de sesión exigen CAPTCHA.
 - Compose, Dockerfile, migraciones MariaDB, importador único desde SQLite y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un índice LanceDB precalculado.
 
+## Crear administradores y superadministradores
+
+Desde la carpeta `backend`, con las dependencias y el `.env` de la instalación, se usa la misma sintaxis que en Buzón Ciudadano:
+
+```bash
+# Superadministrador
+python -m flask create-admin "Nombre completo" "superadmin@example.com" "contraseña-de-al-menos-12-caracteres" true
+# Administrador
+python -m flask create-admin "Nombre completo" "admin@example.com" "otra-contraseña-de-al-menos-12-caracteres" false
+```
+
+Los valores son ejemplos: reemplazarlos antes de ejecutar. `true` corresponde al rol interno `owner` (Propietario en el panel): administra cuentas y configuración, y puede publicar y retirar conocimiento. `false` corresponde a `editor` (Editor en el panel): gestiona documentos, revisión e indexación, pero no administra cuentas ni publica. Si se omite el último argumento, se crea un administrador, igual que en Buzón. Solo se admiten `true` y `false`, sin distinguir mayúsculas; un valor incorrecto detiene el alta.
+
+En la terminal del contenedor de Coolify funciona el mismo comando. Con Compose, anteponer `docker compose exec api` (y los overrides de la instalación cuando correspondan). No se necesitan variables nuevas ni migraciones de usuarios. Las cuentas existentes conservan sus permisos.
+
+En esta instalación local Docker, si `DATABASE_URL` usa `host.docker.internal`, ejecutar dentro del contenedor, no con Python nativo de Windows. Para la pila local de prueba activa:
+
+```bash
+docker compose -f compose.yaml -f compose.human-test.yaml exec api python -m flask create-admin "Nombre completo" "superadmin@example.com" "contraseña-de-al-menos-12-caracteres" true
+```
+
+Usar `false` al final para un administrador. Esto utiliza la misma `DATABASE_URL`; no requiere otra conexión ni variables adicionales.
+
+El doble factor sigue siendo obligatorio: TOTP por defecto, o `--mfa email` al final si SMTP está configurado. El comando sin argumentos y las opciones anteriores `--email` y `--name` conservan el alta interactiva de un **superadministrador**, con contraseña oculta. Las contraseñas posicionales pueden quedar en el historial de la terminal; usar el modo interactivo cuando no se quiera incluirlas allí. No hay credenciales por defecto ni se imprime la contraseña en el resultado.
+
 ## Stack decidido
 
 ```text
@@ -49,13 +74,13 @@ Requisitos del equipo destino: MariaDB 10.6 o posterior, Python 3 para generar `
 
 ```bash
 python scripts/setup_env.py --local
-# Editar .env: definir DATABASE_URL y DATABASE_URL_HUMAN_TEST para esquemas separados,
+# Editar .env: definir DATABASE_URL para la base de esta instalación,
 # además de OLLAMA_API_KEY. El modelo se puede elegir luego en el panel.
 docker compose -f compose.yaml -f compose.local.yaml up --build -d
 docker compose -f compose.yaml -f compose.local.yaml exec api flask --app wsgi create-admin
 ```
 
-Para la instancia de prueba, definir `DATABASE_URL_HUMAN_TEST` antes de iniciar Compose. Antes de ejecutar una importación antigua, detener la API y usar `scripts/migrate_sqlite_to_mariadb.py`; el destino debe estar vacío. Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. En el primer ingreso, configurar TOTP y guardar los códigos de recuperación fuera del servidor. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
+Antes de ejecutar una importación antigua, detener la API y usar `scripts/migrate_sqlite_to_mariadb.py`; `DATABASE_URL` debe indicar un destino vacío. Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. En el primer ingreso, configurar TOTP y guardar los códigos de recuperación fuera del servidor. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
 
 Si hay SMTP configurado y se quiere el segundo factor por correo como en el Buzón Ciudadano, crear la cuenta con `flask --app wsgi create-admin --mfa email`. Sin SMTP, conservar TOTP; nunca desactivar el segundo factor para suplir la falta de correo.
 
@@ -63,7 +88,7 @@ El panel permite trabajar con documentos antes de configurar Ollama. Para genera
 
 ### Prueba humana local del chat
 
-La instancia de prueba usa `compose.human-test.yaml`, el puerto **127.0.0.1:8001**, un esquema MariaDB y un volumen LanceDB independientes. `DATABASE_URL_HUMAN_TEST` debe señalar a ese esquema vacío. Nunca aplicar este override en Coolify. El modo de prueba rechaza hosts y orígenes no locales y muestra un aviso de guía no revisada en `/gianna/`. En la raíz Astro, `.env.local` debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`; no contiene secretos y está ignorado por Git. Iniciar o reiniciar `npm run dev` para que Astro lo tome.
+Esta opción es exclusiva de una instalación de pruebas cuyo `.env` contiene su propia `DATABASE_URL`, dirigida a un esquema MariaDB aislado. No usar la configuración de producción para esta prueba. `compose.human-test.yaml` hereda esa única URL, publica el puerto **127.0.0.1:8001** y crea un volumen LanceDB independiente; el nombre del proyecto Compose no aísla por sí solo la base MariaDB externa. Nunca aplicar este override en Coolify. El modo de prueba rechaza hosts y orígenes no locales y muestra un aviso de guía no revisada en `/gianna/`. En la raíz Astro, `.env.local` debe contener `PUBLIC_GIANNA_API_BASE=http://localhost:8001`; no contiene secretos y está ignorado por Git. Iniciar o reiniciar `npm run dev` para que Astro lo tome.
 
 ```powershell
 # Desde backend/, con .env local configurado (incluida la clave de Ollama):
@@ -94,7 +119,7 @@ Para importar la guía sin aprobarla desde la consola del contenedor, copiar el 
 
 Los secretos permanecen en `.env` local o en las variables de ejecución de Coolify. El panel no puede leer ni modificar sus valores. `SECRET_KEY` y `ENCRYPTION_KEY` son diferentes y deben conservarse. Cambiar la clave de cifrado sin migración vuelve ilegibles los secretos TOTP y el contexto cifrado.
 
-La configuración habitual requiere `DATABASE_URL` (MariaDB dedicada), `SECRET_KEY`, `ENCRYPTION_KEY`, `CORS_ORIGINS`, los tres campos de Ollama y `MAIL_*`. Para pruebas humanas se agrega `DATABASE_URL_HUMAN_TEST` con otro esquema vacío. No necesita variables para Qdrant, E5, CPU, tamaño de archivos, workers ni rutas de datos. `gianna/config_profiles.py` separa desarrollo, producción y pruebas; `gianna/config.py` centraliza los valores técnicos. El volumen `/app/data` conserva LanceDB, modelos, cargas y exports, no la base SQL.
+La configuración requiere una sola `DATABASE_URL` (MariaDB dedicada) por instalación, `SECRET_KEY`, `ENCRYPTION_KEY`, `CORS_ORIGINS`, los tres campos de Ollama y `MAIL_*`. El mismo nombre se usa en local y en Coolify, con el valor que corresponde a cada instalación. No necesita variables adicionales de base de datos, Qdrant, E5, CPU, tamaño de archivos, workers ni rutas de datos. `gianna/config_profiles.py` separa desarrollo, producción y pruebas; `gianna/config.py` centraliza los valores técnicos. El volumen `/app/data` conserva LanceDB, modelos, cargas y exports, no la base SQL.
 
 Para simplificar una instalación existente, ejecutar `python -m scripts.simplify_env` para verificar y luego `python -m scripts.simplify_env --apply` para aplicar. El script comprueba equivalencia, conserva las claves, el modelo y el correo, y deja un respaldo `.env.before-simplify-*` excluido de Git y Docker. Si encuentra opciones personalizadas que no puede retirar sin cambios, se detiene sin sobrescribir. Los nombres antiguos siguen siendo compatibles durante la transición; no deben mezclarse con los nuevos (los nuevos tienen prioridad).
 

@@ -64,7 +64,7 @@ Se revisaron [README](https://github.com/google-research/harness2), [recursion.p
 
 ## Preparar y reindexar en local
 
-Desde `backend/`, con la configuración local existente:
+Desde `backend/` en una instalación exclusiva de pruebas, con `DATABASE_URL` apuntando a su esquema MariaDB aislado:
 
 ```powershell
 docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env build api
@@ -73,7 +73,7 @@ docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env up -d 
 docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.enable_human_test /app/data/invest_lavalleja_2026.gianna.json
 ```
 
-LanceDB y modelos quedan dentro de `/app/data`, en el volumen persistente `gianna_data` del proyecto Compose correspondiente. La pila humana conserva su aislamiento. El servicio Qdrant deja de ser una dependencia; sus datos anteriores pueden conservarse como respaldo histórico. Un rollback de datos dentro del motor nuevo requiere una versión compatible; volver al motor antiguo exige además su imagen y servicio anteriores.
+LanceDB y modelos quedan dentro de `/app/data`, en el volumen persistente `gianna_data` del proyecto Compose correspondiente. Compose aísla este volumen; la base MariaDB depende de la única `DATABASE_URL` de esa instalación. El servicio Qdrant deja de ser una dependencia; sus datos anteriores pueden conservarse como respaldo histórico. Un rollback de datos dentro del motor nuevo requiere una versión compatible; volver al motor antiguo exige además su imagen y servicio anteriores.
 
 ## Medición
 

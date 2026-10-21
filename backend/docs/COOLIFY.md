@@ -14,6 +14,8 @@ El Compose usa referencias `${VARIABLE}` explícitas para que Coolify las descub
 
 Variables mínimas:
 
+Cada instalación configura una única `DATABASE_URL` para su base MariaDB. La preparación del recurso de producción no requiere variables de base de datos para pruebas.
+
 ```dotenv
 FLASK_ENV=production
 SECRET_KEY=<generada por setup_env.py>
@@ -61,11 +63,15 @@ El perfil de producción ya configura un salto de proxy; no hace falta una varia
 Desplegar y abrir los logs. Si falta una clave, la aplicación rechaza el arranque en vez de generar un secreto efímero. En la terminal del contenedor **api**, ejecutar:
 
 ```bash
-flask --app wsgi check-config
-flask --app wsgi create-admin
+python -m flask check-config
+python -m flask create-admin "Nombre completo" "superadmin@example.com" "contraseña-de-al-menos-12-caracteres" true
+# Para un administrador sin gestión de cuentas/configuración ni publicación:
+python -m flask create-admin "Nombre completo" "admin@example.com" "otra-contraseña-de-al-menos-12-caracteres" false
 ```
 
-Para reproducir el segundo factor por correo del sistema de referencia, configurar `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USE_SSL`, `MAIL_USERNAME`, `MAIL_PASSWORD` y `MAIL_DEFAULT_SENDER`, y usar `flask --app wsgi create-admin --mfa email`. No activar TLS y SSL a la vez: normalmente SSL utiliza 465 y STARTTLS, 587. En producción no se admite correo configurado sin cifrado. El valor predeterminado es TOTP y no requiere SMTP. Entrar en `/admin/login`, resolver el CAPTCHA y completar el segundo factor elegido; con TOTP, guardar la recuperación. Desde ese momento, documentos, indexación, pruebas, usuarios y configuración operativa se manejan en el panel. No existe registro público de administradores ni credenciales iniciales impresas en logs.
+Reemplazar los nombres, correos y contraseñas de ejemplo. Se mantiene la sintaxis de Buzón Ciudadano: `true` crea un superadministrador (`owner`, Propietario en el panel) y `false` un administrador (`editor`, Editor en el panel). Omitir el booleano equivale a `false`. El comando sin argumentos conserva el alta interactiva de un superadministrador con contraseña oculta, sin incluirla en el historial de la terminal. No se agregan variables de entorno ni se cambian roles existentes.
+
+Para reproducir el segundo factor por correo del sistema de referencia, configurar `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USE_SSL`, `MAIL_USERNAME`, `MAIL_PASSWORD` y `MAIL_DEFAULT_SENDER`, y añadir `--mfa email` al comando de alta. No activar TLS y SSL a la vez: normalmente SSL utiliza 465 y STARTTLS, 587. En producción no se admite correo configurado sin cifrado. El valor predeterminado es TOTP y no requiere SMTP. Entrar en `/admin/login`, resolver el CAPTCHA y completar el segundo factor elegido; con TOTP, guardar la recuperación. Desde ese momento, documentos, indexación, pruebas, usuarios y configuración operativa se manejan en el panel. No existe registro público de administradores ni credenciales iniciales impresas en logs.
 
 En Ajustes, cargar el catálogo real de Ollama y elegir el modelo. Importar el JSON canónico, aprobar, indexar, evaluar y publicar según el manual. Ejecutar `docker compose run --rm api python -m scripts.prepare_models` para la descarga explícita desde Hugging Face. La API usa Ollama para responder y lee los modelos locales.
 
