@@ -2,9 +2,12 @@
 import argparse
 import hashlib
 import json
+import math
+import os
 from pathlib import Path
+from types import SimpleNamespace
 import urllib.request
-from gianna.services.neural import artifact_specs
+from gianna.services.neural import Embeddings,artifact_specs
 
 
 def prepare(model_dir):
@@ -39,7 +42,28 @@ def prepare(model_dir):
         (folder/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
 
 
+def verify_runtime(model_dir,backend=None,threads=None):
+    """Load both pinned runtimes and run one local embedding/reranker smoke check."""
+    backend=backend or os.environ.get('EMBEDDING_BACKEND','openvino')
+    threads=threads or int(os.environ.get('EMBEDDING_THREADS','2'))
+    if backend not in {'openvino','onnx'}:raise ValueError('EMBEDDING_BACKEND debe ser openvino u onnx.')
+    if not 1<=threads<=8:raise ValueError('EMBEDDING_THREADS debe estar entre 1 y 8.')
+    engine=Embeddings(SimpleNamespace(model_dir=model_dir,embedding_threads=threads,embedding_backend=backend))
+    def report(message):
+        print(json.dumps({'runtime_stage':message},ensure_ascii=False),flush=True)
+    engine.load(report)
+    sample='Información de inversión y territorio en Lavalleja.'
+    vectors,_=engine.documents([sample],[sample])
+    norm=math.sqrt(sum(value*value for value in vectors[0])) if len(vectors)==1 else 0
+    if len(vectors)!=1 or len(vectors[0])!=384 or not all(math.isfinite(value) for value in vectors[0]) or norm<=1e-12:
+        raise RuntimeError('Bekko no superó la verificación de una dimensión y valores finitos.')
+    scores=engine.rerank('información territorial',[sample])
+    if len(scores)!=1 or not math.isfinite(scores[0]):
+        raise RuntimeError('Horizon no devolvió un puntaje finito.')
+    report('Verificación de inferencia Bekko/Horizon superada')
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model-dir',type=Path,default=Path('/app/data/models'))
-    args=parser.parse_args();prepare(args.model_dir)
+    args=parser.parse_args();prepare(args.model_dir);verify_runtime(args.model_dir)

@@ -2,11 +2,14 @@
 import hashlib
 import importlib.metadata
 import json
+import logging
 from pathlib import Path
 import threading
 import time
 import numpy as np
 from ..errors import DomainError
+
+LOG=logging.getLogger(__name__)
 
 EMBEDDING_ID='hotchpotch/bekko-embedding-v1-a8m'
 EMBEDDING_REVISION='c721113d59a1d91b447450324f51c4b3332c924a'
@@ -47,10 +50,15 @@ class Embeddings:
         self.cfg=cfg;self.model=None;self.ranker=None;self.profile=None
         self._load_lock=threading.Lock();self._infer_lock=threading.Lock()
 
-    def load(self):
+    def load(self,on_progress=None):
         if self.model is not None:return
         with self._load_lock:
             if self.model is not None:return
+            def stage(message):
+                LOG.info('Inicialización del motor vectorial: %s',message)
+                if on_progress:on_progress(message)
+
+            stage('Verificando integridad de Bekko y Horizon')
             from tokenizers import Tokenizer
             import onnxruntime as ort
             manifests={}
@@ -59,6 +67,7 @@ class Embeddings:
                 manifests[kind]=verified_manifest(folder,model_id,revision,files)
             bekko=self.cfg.model_dir/'bekko'/EMBEDDING_REVISION
             horizon=self.cfg.model_dir/'horizon'/RERANK_REVISION
+            stage('Cargando tokenizadores de Bekko y Horizon')
             self.tokenizer=Tokenizer.from_file(str(bekko/'tokenizer.json'))
             self.tokenizer.no_truncation();self.tokenizer.no_padding()
             self.encoder_tokenizer=Tokenizer.from_file(str(bekko/'tokenizer.json'))
@@ -71,9 +80,11 @@ class Embeddings:
             self.query_tokenizer.enable_truncation(max_length=120)
             options=ort.SessionOptions();options.intra_op_num_threads=self.cfg.embedding_threads
             options.inter_op_num_threads=1;options.execution_mode=ort.ExecutionMode.ORT_SEQUENTIAL
+            stage('Inicializando Horizon ONNX en CPU')
             ranker=ort.InferenceSession(str(horizon/'onnx/model_quantized.onnx'),sess_options=options,providers=['CPUExecutionProvider'])
             if self.cfg.embedding_backend=='openvino':
                 import openvino as ov
+                stage('Compilando Bekko OpenVINO en CPU')
                 model=ov.Core().compile_model(str(bekko/'openvino/openvino_model.xml'),'CPU',{
                     'INFERENCE_NUM_THREADS':self.cfg.embedding_threads,'NUM_STREAMS':1,'PERFORMANCE_HINT':'LATENCY'})
                 self.input_names={port.any_name for port in model.inputs}
@@ -89,6 +100,7 @@ class Embeddings:
                 'artifact_hashes':{kind:{name:meta['sha256'] for name,meta in m['files'].items()} for kind,m in manifests.items()}}
             profile['fingerprint']=hashlib.sha256(json.dumps(profile,sort_keys=True).encode()).hexdigest()
             self.profile=profile;self.ranker=ranker;self.model=model
+            stage('Bekko y Horizon quedaron inicializados')
 
     def count(self,text):
         self.load();return len(self.tokenizer.encode(text,add_special_tokens=True).ids)

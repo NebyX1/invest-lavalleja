@@ -19,8 +19,12 @@ def no_information(text):
 
 class FakeEmbeddings:
     def __init__(self):
-        self.model=None;self.calls=0;self.queries=[];self.rerank_calls=[];self.profile={'fingerprint':'test-fingerprint','dim':384,'runtime':'DETERMINISTIC_TEST_DOUBLE'}
-    def load(self):self.model=True
+        self.model=None;self.calls=0;self.queries=[];self.rerank_calls=[];self.load_stages=[];self.profile={'fingerprint':'test-fingerprint','dim':384,'runtime':'DETERMINISTIC_TEST_DOUBLE'}
+    def load(self,on_progress=None):
+        self.model=True
+        if on_progress:
+            self.load_stages.append('Bekko y Horizon quedaron inicializados')
+            on_progress(self.load_stages[-1])
     def count(self,text):return len(text.split())+2
     def documents(self,texts,lexical):
         self.load();self.calls+=len(texts);dense=[]
@@ -533,3 +537,10 @@ def test_expired_job_lease_recovered(db,cfg,knowledge):
     db.execute('UPDATE jobs SET lease_until=? WHERE id=?',(time.time()-1,jid))
     new=Jobs(db,cfg,knowledge,FakeEmbeddings(),FakeLanceStore());claimed=new.claim();assert claimed['id']==jid
     assert db.one('SELECT owner_token FROM jobs WHERE id=?',(jid,))['owner_token']==new.token
+
+
+def test_warmup_forwards_model_initialization_progress(db,cfg,knowledge):
+    embeddings=FakeEmbeddings();jobs=Jobs(db,cfg,knowledge,embeddings,FakeLanceStore())
+    jid=jobs.enqueue('warmup');jobs.execute_job(jobs.claim())
+    assert embeddings.load_stages==['Bekko y Horizon quedaron inicializados']
+    assert db.one('SELECT status FROM jobs WHERE id=?',(jid,))['status']=='done'

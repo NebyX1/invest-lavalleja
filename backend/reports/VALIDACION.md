@@ -1,5 +1,17 @@
 # Informe de validación de la entrega
 
+## Diagnóstico de inicialización Bekko/Horizon en Coolify · 21/10/2026
+
+Los logs de producción suministrados muestran dos fallos distintos: un intento inicial de vectorización no encontró `/app/data/models/bekko/<revisión>/manifest.json`; más tarde Gunicorn recibió `SIGSEGV` y levantó un worker nuevo aproximadamente cada dos minutos. El export no incluye un stack nativo ni la última operación de la biblioteca, así que no permite atribuir el `SIGSEGV` a OpenVINO u ONNX Runtime.
+
+Se agregó progreso por etapa al trabajo y registro del servidor (verificación de hashes, tokenizadores, sesión ONNX de Horizon y compilación OpenVINO de Bekko). `scripts.prepare_models` ahora ejecuta una prueba local de embedding y reranking tras descargar/verificar los pesos; `scripts.check_model_runtime` repite solo esa prueba en el contenedor configurado, sin red ni cambios de base. Esto evita confundir la descarga íntegra de archivos con una inicialización/inferencia comprobada.
+
+Verificación local:
+
+- Suite Python: **295 aprobadas, 15 omitidas, una advertencia de deprecación de PydanticGraph**. Las omitidas corresponden a tres casos sin paquete documental privado y doce pruebas MariaDB optativas ejecutadas previamente en la validación de importación.
+- En contenedor Linux local `linux/amd64`, con las dependencias fijadas (`OpenVINO 2026.4.1`, `ONNX Runtime 1.31.0`, `tokenizers 0.23.3`), los artefactos locales de Bekko/Horizon y límites Docker de 2 CPU/2 GiB, `scripts.check_model_runtime` llegó por todas las etapas y completó embedding de 384 dimensiones y reranking en aproximadamente 30 segundos.
+- La misma carga con ejecución concurrente en hilo también pasó. Esto no reproduce el `SIGSEGV` del VPS; el problema de producción no se declara resuelto hasta ejecutar la nueva comprobación en el contenedor api de Coolify y revisar su resultado. No se reinició ni modificó el servicio remoto.
+
 ## Importación en MariaDB estricta y valores por defecto · 21/10/2026
 
 Se reprodujo el fallo de conversión/importación con la guía local de **271 registros y 50 fuentes** en una MariaDB 11.4 nueva con `STRICT_TRANS_TABLES`: `IntegrityError: Field 'description' doesn't have a default value`. La migración MariaDB 001 había omitido nueve valores por defecto existentes en el esquema original. El importador dependía de `bases.description`; la preparación de versiones dependía también de `versions.report_json`. Los datos que ya se habían migrado a la instalación local no ejercitaban una importación nueva desde ese esquema.

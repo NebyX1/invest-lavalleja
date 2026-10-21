@@ -75,7 +75,9 @@ El segundo factor de todas las cuentas es el código por correo, como en Buzón 
 
 El arranque migra las cuentas existentes al método institucional por correo sin cambiar sus contraseñas ni permisos. Revoca las sesiones del autenticador anterior y los desafíos pendientes, y retira las claves y códigos de recuperación anteriores. No hay que recrear usuarios, restablecer contraseñas ni agregar variables al entorno. Desplegar la imagen nueva e iniciar sesión nuevamente para recibir el código por correo.
 
-En Ajustes, cargar el catálogo real de Ollama y elegir el modelo. Importar el JSON canónico, aprobar, indexar, evaluar y publicar según el manual. Ejecutar `docker compose run --rm api python -m scripts.prepare_models` para la descarga explícita desde Hugging Face. La API usa Ollama para responder y lee los modelos locales.
+En Ajustes, cargar el catálogo real de Ollama y elegir el modelo. Importar el JSON canónico, aprobar, indexar, evaluar y publicar según el manual. En la terminal del contenedor **api**, ejecutar `python -m scripts.prepare_models --model-dir /app/data/models`. El comando verifica los artefactos y luego inicializa Bekko y Horizon y ejecuta una inferencia de prueba. Para revisar modelos ya descargados sin llamar a Hugging Face, ejecutar `python -m scripts.check_model_runtime`. No reintentar la vectorización si la comprobación no termina con `Verificación de inferencia Bekko/Horizon superada`.
+
+Durante la carga, los logs del backend informan la etapa actual: verificación de manifiestos, tokenizadores, sesión ONNX de Horizon o compilación OpenVINO de Bekko. Si Gunicorn reinicia un worker con `SIGSEGV`, revisar la última etapa registrada; no tratarlo como demora de vectorización ni repetir el trabajo a ciegas. La comprobación independiente de modelos ejecuta los mismos artefactos y motores en el contenedor sin iniciar trabajos ni modificar la base.
 
 ## Recursos y reproducibilidad
 
