@@ -1,5 +1,17 @@
 # Informe de validación de la entrega
 
+## Errores de login dentro del formulario · 21/10/2026
+
+Se tomó como referencia el manejo de errores del login de Buzón Ciudadano. Los errores de correo/contraseña y CAPTCHA se muestran dentro del mismo formulario, conservando el correo, dejando la contraseña vacía y renovando el CAPTCHA. Las credenciales inválidas y el CAPTCHA inválido/vencido devuelven HTTP 200; una falla de envío del segundo factor se muestra en el formulario con HTTP 503. Se mantienen CSRF, validación de origen, límites de intentos y segundo factor por correo, sin cambios de cuentas, claves ni variables de entorno.
+
+Verificación ejecutada:
+
+- Pruebas de regresión de login y HTTP: **30 aprobadas** en el proyecto fuente y **30 aprobadas** en el checkout institucional. Cubren credenciales inválidas, cuentas inexistentes/inactivas, CAPTCHA ausente/incorrecto/vencido/reutilizado, reintento exitoso hasta el segundo factor, escape de correo y fallo SMTP.
+- Chromium contra Gunicorn y MariaDB locales, en escritorio (1440 × 1000) y móvil (390 × 844): errores de CAPTCHA y credenciales dentro del formulario, misma URL, correo conservado, contraseña vacía, sin desbordamiento horizontal ni errores JavaScript. Revisión visual de ambas capturas correcta.
+- Imagen de comprobación construida sobre las dependencias de la imagen local estable; API local actualizada y `/health/ready` HTTP 200. No se presenta como reconstrucción limpia de dependencias ni como validación de producción.
+
+La publicación en GitHub no despliega por sí sola el backend: queda pendiente el redeploy en Coolify y la comprobación de acceso en producción.
+
 ## Segundo factor institucional por correo · 21/10/2026
 
 Se contrastaron `app/routes/admin/routes.py`, `app/models/user.py`, `app/services/mail_service.py` y la pantalla de verificación del `main` de Buzón Ciudadano, commit `3198d34ed3c15cee47caa33ef73e94dbfd16b6ed`. Gianna utiliza el mismo flujo: contraseña y CAPTCHA, código aleatorio de seis dígitos enviado al correo del administrador, hash Argon2id, diez minutos de vigencia y consumo de un solo uso. Conserva además el límite de seis intentos y las protecciones CSRF, origen, roles y sesiones del backend.
