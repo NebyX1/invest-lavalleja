@@ -11,7 +11,7 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 ## Qué incluye
 
 - Panel en español, responsive, con recursos locales y sin un segundo frontend Node para administrarlo.
-- Contraseña Argon2id, TOTP con QR, códigos de recuperación de un solo uso y alternativa de código por correo con SMTP TLS. Sesiones revocables y roles propietario, editor y consulta.
+- Contraseña Argon2id y código de seis dígitos por correo, válido durante diez minutos y de un solo uso, como en Buzón Ciudadano. Sesiones revocables y roles propietario, editor y consulta.
 - Cargar JSON canónico, JSONL autocontenido, DOCX, Markdown o TXT. Los documentos desconocidos entran como internos. Conversión en cola persistente, nunca publicación automática.
 - Editar texto, fuentes, tema, zonas, fechas, condiciones, audiencia y estado de cada registro. Búsqueda, filtros y aprobación del contenido público.
 - Crear versiones vectoriales inmutables, progreso por lotes, caché de embeddings, reintento y cancelación cooperativa. Una base nueva no interrumpe ni reemplaza automáticamente a la publicada.
@@ -34,7 +34,7 @@ python -m flask create-admin "Nombre completo" "admin@example.com" "otra-contras
 
 Los valores son ejemplos: reemplazarlos antes de ejecutar. `true` corresponde al rol interno `owner` (Propietario en el panel): administra cuentas y configuración, y puede publicar y retirar conocimiento. `false` corresponde a `editor` (Editor en el panel): gestiona documentos, revisión e indexación, pero no administra cuentas ni publica. Si se omite el último argumento, se crea un administrador, igual que en Buzón. Solo se admiten `true` y `false`, sin distinguir mayúsculas; un valor incorrecto detiene el alta.
 
-En la terminal del contenedor de Coolify funciona el mismo comando. Con Compose, anteponer `docker compose exec api` (y los overrides de la instalación cuando correspondan). No se necesitan variables nuevas ni migraciones de usuarios. Las cuentas existentes conservan sus permisos.
+En la terminal del contenedor de Coolify funciona el mismo comando. Con Compose, anteponer `docker compose exec api` (y los overrides de la instalación cuando correspondan). No se necesitan variables nuevas ni recrear usuarios. Las cuentas existentes conservan sus permisos.
 
 En esta instalación local Docker, si `DATABASE_URL` usa `host.docker.internal`, ejecutar dentro del contenedor, no con Python nativo de Windows. Para la pila local de prueba activa:
 
@@ -44,7 +44,9 @@ docker compose -f compose.yaml -f compose.human-test.yaml exec api python -m fla
 
 Usar `false` al final para un administrador. Esto utiliza la misma `DATABASE_URL`; no requiere otra conexión ni variables adicionales.
 
-El doble factor sigue siendo obligatorio: TOTP por defecto, o `--mfa email` al final si SMTP está configurado. El comando sin argumentos y las opciones anteriores `--email` y `--name` conservan el alta interactiva de un **superadministrador**, con contraseña oculta. Las contraseñas posicionales pueden quedar en el historial de la terminal; usar el modo interactivo cuando no se quiera incluirlas allí. No hay credenciales por defecto ni se imprime la contraseña en el resultado.
+El doble factor por correo es obligatorio para todas las cuentas. Configurar `MAIL_*` antes del alta; el código se envía al correo de cada administrador al iniciar sesión y no requiere opciones adicionales. El comando sin argumentos y las opciones anteriores `--email` y `--name` conservan el alta interactiva de un **superadministrador**, con contraseña oculta. Las contraseñas posicionales pueden quedar en el historial de la terminal; usar el modo interactivo cuando no se quiera incluirlas allí. No hay credenciales por defecto ni se imprime la contraseña en el resultado.
+
+Al desplegar esta versión, la migración cambia las cuentas existentes a segundo factor por correo, conserva sus contraseñas y permisos y revoca las sesiones y los desafíos del autenticador anterior. No hay que recrear cuentas ni cambiar claves del entorno. Para recibir un nuevo código, iniciar sesión nuevamente; los códigos anteriores quedan invalidados.
 
 ## Stack decidido
 
@@ -80,9 +82,9 @@ docker compose -f compose.yaml -f compose.local.yaml up --build -d
 docker compose -f compose.yaml -f compose.local.yaml exec api flask --app wsgi create-admin
 ```
 
-Antes de ejecutar una importación antigua, detener la API y usar `scripts/migrate_sqlite_to_mariadb.py`; `DATABASE_URL` debe indicar un destino vacío. Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. En el primer ingreso, configurar TOTP y guardar los códigos de recuperación fuera del servidor. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
+Antes de ejecutar una importación antigua, detener la API y usar `scripts/migrate_sqlite_to_mariadb.py`; `DATABASE_URL` debe indicar un destino vacío. Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. Después de resolver el CAPTCHA e ingresar la contraseña, introducir el código enviado al correo de la cuenta. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
 
-Si hay SMTP configurado y se quiere el segundo factor por correo como en el Buzón Ciudadano, crear la cuenta con `flask --app wsgi create-admin --mfa email`. Sin SMTP, conservar TOTP; nunca desactivar el segundo factor para suplir la falta de correo.
+Configurar las variables habituales `MAIL_*` para enviar el segundo factor por correo, igual que en Buzón Ciudadano. Si falla el envío, se informa el problema y no se abre una sesión autenticada.
 
 El panel permite trabajar con documentos antes de configurar Ollama. Para generar respuestas se necesita una clave válida y seleccionar un modelo que exista en el catálogo real. El botón **Cargar catálogo real de Ollama** evita adivinar nombres. Antes de indexar, ejecutar `docker compose run --rm api python -m scripts.prepare_models`. Las consultas solo leen los modelos locales verificados.
 
@@ -117,7 +119,7 @@ Para importar la guía sin aprobarla desde la consola del contenedor, copiar el 
 
 ## Configuración
 
-Los secretos permanecen en `.env` local o en las variables de ejecución de Coolify. El panel no puede leer ni modificar sus valores. `SECRET_KEY` y `ENCRYPTION_KEY` son diferentes y deben conservarse. Cambiar la clave de cifrado sin migración vuelve ilegibles los secretos TOTP y el contexto cifrado.
+Los secretos permanecen en `.env` local o en las variables de ejecución de Coolify. El panel no puede leer ni modificar sus valores. `SECRET_KEY` y `ENCRYPTION_KEY` son diferentes y deben conservarse. Cambiar la clave de cifrado sin migración vuelve ilegible el contexto cifrado.
 
 La configuración requiere una sola `DATABASE_URL` (MariaDB dedicada) por instalación, `SECRET_KEY`, `ENCRYPTION_KEY`, `CORS_ORIGINS`, los tres campos de Ollama y `MAIL_*`. El mismo nombre se usa en local y en Coolify, con el valor que corresponde a cada instalación. No necesita variables adicionales de base de datos, Qdrant, E5, CPU, tamaño de archivos, workers ni rutas de datos. `gianna/config_profiles.py` separa desarrollo, producción y pruebas; `gianna/config.py` centraliza los valores técnicos. El volumen `/app/data` conserva LanceDB, modelos, cargas y exports, no la base SQL.
 

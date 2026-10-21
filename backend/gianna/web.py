@@ -33,7 +33,7 @@ def smtp_sender(cfg):
         message['Subject']='Tu código de acceso a Gianna'
         message['From']=cfg.smtp_from
         message['To']=address
-        message.set_content(f'Tu código de verificación es {code}. Vence en 5 minutos. No lo compartas. Si no iniciaste este acceso, ignorá este mensaje.')
+        message.set_content(f'Tu código de verificación es {code}. Vence en 10 minutos. No lo compartas. Si no iniciaste este acceso, ignorá este mensaje.')
         context=ssl.create_default_context()
         connection=(smtplib.SMTP_SSL(cfg.smtp_host,cfg.smtp_port,timeout=12,context=context)
                     if cfg.smtp_mode=='ssl' else smtplib.SMTP(cfg.smtp_host,cfg.smtp_port,timeout=12))

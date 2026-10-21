@@ -1,12 +1,11 @@
 """Account CLI compatibility and authorization, without real accounts or SMTP."""
 import json
 import re
-import time
 
 import pytest
 
 from gianna import create_app
-from gianna.security import totp,verify_password
+from gianna.security import verify_password
 
 
 PASSWORD='a-long-cli-test-password'
@@ -31,11 +30,11 @@ def test_create_admin_buzon_syntax(app,flag,role,caplog):
     user=s.db.one('SELECT * FROM users WHERE email=?',('cli@example.test',))
     assert user['name']=='Nombre del administrador'
     assert user['role']==role and user['active']==1 and user['must_change_password']==0
-    assert user['mfa_method']=='totp' and user['mfa_enrolled']==0
+    assert user['mfa_method']=='email' and user['mfa_enrolled']==1
     assert user['password_hash']!=PASSWORD and verify_password(user['password_hash'],PASSWORD)
     audit=s.db.one('SELECT * FROM audit WHERE user_id=?',(user['id'],))
     assert audit['action']==('OWNER_CREATED_BY_CONSOLE' if role=='owner' else 'ADMIN_CREATED_BY_CONSOLE')
-    assert json.loads(audit['details_json'])=={'role':role,'mfa_method':'totp'}
+    assert json.loads(audit['details_json'])=={'role':role,'mfa_method':'email'}
     assert PASSWORD not in result.output+audit['details_json']+caplog.text
     assert ('Superadministrador creado' if role=='owner' else 'Administrador creado') in result.output
 
@@ -45,6 +44,7 @@ def test_cli_accounts_login_with_mfa_and_keep_role_permissions(app,flag,restrict
     result=app.test_cli_runner().invoke(args=['create-admin','Cuenta CLI','cli@example.test',PASSWORD,flag])
     assert result.exit_code==0,result.output
     s=app.extensions['gianna']
+    codes=[];s.security.mailer=lambda address,code:codes.append(code)
     client=app.test_client()
     page=client.get('/admin/login')
     left,right=map(int,re.search(r'(\d+) \+ (\d+)',page.get_data(as_text=True)).groups())
@@ -56,10 +56,11 @@ def test_cli_accounts_login_with_mfa_and_keep_role_permissions(app,flag,restrict
     with client.session_transaction(path='/admin/mfa') as session:
         pending=session['pending'];csrf=session['csrf']
     challenge=s.security.challenge_info(pending)
-    assert challenge['kind']=='enroll'
-    secret=s.security.unseal(challenge['secret'])
-    response=client.post('/admin/mfa',data={'csrf':csrf,'code':totp(secret,int(time.time()//30))})
-    assert response.status_code==200  # First enrollment shows recovery codes.
+    assert challenge['kind']=='email' and challenge['secret'] is None
+    page=client.get('/admin/mfa').get_data(as_text=True)
+    assert 'correo' in page and 'diez minutos' in page and 'QR' not in page and 'otpauth' not in page
+    response=client.post('/admin/mfa',data={'csrf':csrf,'code':codes[0]})
+    assert response.status_code==302
     assert client.get('/admin/dashboard').status_code==200
     assert client.get('/admin/bases').status_code==200
     for path in ('/admin/users','/admin/settings','/admin/audit'):
@@ -69,11 +70,13 @@ def test_cli_accounts_login_with_mfa_and_keep_role_permissions(app,flag,restrict
         'email':'another@example.test','role':'owner','mfa_method':'totp'})
     assert response.status_code==restricted_status
     assert bool(s.db.one('SELECT id FROM users WHERE email=?',('another@example.test',)))==(flag=='true')
+    if flag=='true':
+        assert s.db.one('SELECT mfa_method FROM users WHERE email=?',('another@example.test',))=={'mfa_method':'email'}
 
 
 @pytest.mark.parametrize('flag,role',[('true','owner'),('false','editor')])
 def test_positional_accounts_support_email_mfa(app,flag,role):
-    result=app.test_cli_runner().invoke(args=['create-admin','Cuenta CLI','cli@example.test',PASSWORD,flag,'--mfa','email'])
+    result=app.test_cli_runner().invoke(args=['create-admin','Cuenta CLI','cli@example.test',PASSWORD,flag])
     assert result.exit_code==0,result.output
     s=app.extensions['gianna']
     user=s.db.one('SELECT role,mfa_method,mfa_enrolled FROM users WHERE email=?',('cli@example.test',))
@@ -82,7 +85,7 @@ def test_positional_accounts_support_email_mfa(app,flag,role):
     s.security.mailer=lambda address,code:codes.append(code)
     challenge,kind=s.security.begin_login('cli@example.test',PASSWORD,'127.0.0.1')
     assert kind=='email' and len(codes)==1
-    _,logged_in,_=s.security.finish_login(challenge,codes[0],'127.0.0.1')
+    _,logged_in=s.security.finish_login(challenge,codes[0],'127.0.0.1')
     assert logged_in['role']==role
 
 
@@ -124,7 +127,7 @@ def test_duplicate_email_cannot_overwrite_password_or_elevate_role(app):
 def test_email_mfa_requires_smtp(cfg):
     from dataclasses import replace
     app=create_app(replace(cfg,smtp_host=''))
-    result=app.test_cli_runner().invoke(args=['create-admin','Administrador','cli@example.test',PASSWORD,'false','--mfa','email'])
+    result=app.test_cli_runner().invoke(args=['create-admin','Administrador','cli@example.test',PASSWORD,'false'])
     assert result.exit_code==1 and 'Configurá SMTP' in result.output
     assert app.extensions['gianna'].db.all('SELECT id FROM users')==[]
 

@@ -6,7 +6,7 @@ Esta lista contiene trabajo real pendiente. No marcarla como cumplida por haber 
 
 - Resolver dependencias directas/transitivas y ejecutar pruebas en Python 3.12; comprobar también 3.13 si se utiliza. Ejecutar la revisión de vulnerabilidades y corregir hallazgos antes de publicar.
 - Construir la imagen Docker sin credenciales como argumentos, subir ambos servicios y verificar volúmenes persistentes, HTTPS, hosts y orígenes.
-- Crear la primera cuenta por consola. Probar TOTP, código erróneo, código reutilizado, recuperación, revocación y bloqueo de cuenta. Probar el método de correo solo con SMTP validado.
+- Crear la primera cuenta por consola. Validar el envío SMTP del código de seis dígitos, su vencimiento a diez minutos, códigos erróneos/reutilizados, revocación y bloqueo de cuenta. Verificar la migración de cuentas existentes al segundo factor por correo.
 - Confirmar que una cuenta de consulta no edita, un editor no publica y una sesión anónima no accede al admin. Comprobar CSRF y cierre de sesión por POST.
 
 ## Datos e indexación

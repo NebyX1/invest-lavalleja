@@ -1,5 +1,21 @@
 # Informe de validación de la entrega
 
+## Segundo factor institucional por correo · 21/10/2026
+
+Se contrastaron `app/routes/admin/routes.py`, `app/models/user.py`, `app/services/mail_service.py` y la pantalla de verificación del `main` de Buzón Ciudadano, commit `3198d34ed3c15cee47caa33ef73e94dbfd16b6ed`. Gianna utiliza el mismo flujo: contraseña y CAPTCHA, código aleatorio de seis dígitos enviado al correo del administrador, hash Argon2id, diez minutos de vigencia y consumo de un solo uso. Conserva además el límite de seis intentos y las protecciones CSRF, origen, roles y sesiones del backend.
+
+Se retiraron el enrolamiento con autenticador, QR, códigos de recuperación, selector de método y opción `--mfa`. El comando `python -m flask create-admin NOMBRE CORREO CONTRASEÑA true/false`, el alta interactiva, las cuentas del panel y la reconfirmación usan correo automáticamente. Las migraciones MariaDB 002 y SQLite 005 convierten las cuentas anteriores, conservan contraseñas/roles/estado, revocan las sesiones del autenticador y retiran sus claves, códigos y desafíos. El segundo arranque conserva los nuevos códigos de correo pendientes. No se añadieron variables al entorno.
+
+Verificación ejecutada:
+
+- Suite completa del proyecto fuente: **283 aprobadas, 3 omitidas** por ausencia del paquete documental privado; una advertencia de deprecación de PydanticGraph. En el checkout institucional, las **65 pruebas de seguridad, migración, comandos y HTTP** aprobaron. Incluyen vencimiento, formato, reutilización, sustitución de códigos, concurrencia y permisos.
+- Imagen Docker de comprobación construida sobre las dependencias de la imagen local estable, con `qrcode` desinstalado y el código actualizado. Una reconstrucción completa desde PyPI se interrumpió durante las descargas; no se presenta como build limpio aprobado.
+- MariaDB 11.4 desechable preparada con la imagen anterior: dos cuentas TOTP, sesiones, desafíos y un dato de control. La API nueva migró del esquema 1 al 2 conservando cuentas, hashes de contraseña, permisos y el dato de control. Gunicorn y SMTP Mailpit reales completaron CAPTCHA → contraseña → correo recibido → código → panel para propietario y editor. Se comprobaron rechazo antes del código, errores visibles en el mismo formulario, consumo, permisos y creación por panel y CLI `true/false`.
+- Con el servidor SMTP de prueba detenido, el login devolvió **503**, invalidó el desafío y no creó sesión. No se imprimieron códigos ni credenciales. Mailpit fue un buzón local aislado: no se enviaron mensajes a cuentas reales ni se certificó entrega SMTP de producción.
+- Instancia local actualizada tras comparar conexión, claves, correo y volumen persistente con la configuración existente. Respaldo previo en `/app/data/exports/pre-email-2fa-20261021-033632.sql`. La comparación exacta antes/después conservó datos de cuentas, 678 registros, 948 chunks, cuatro versiones y el puntero activo; esta instalación local no tenía administradores. Esquema MariaDB 2, `/health/ready` y `/admin/login` HTTP 200. No se modificó el corpus ni el índice LanceDB.
+
+Los contenedores, volumen SQL y red desechables de QA se retiraron al terminar. La corrección se publica en `main` del backend institucional. El despliegue en Coolify y un acceso autenticado con correo real en producción siguen siendo verificaciones diferentes de las pruebas locales anteriores.
+
 ## Formularios de acceso y segundo factor: 403 por origen nulo · 21/10/2026
 
 Se reprodujo el rechazo con un formulario HTML nativo en Chromium contra `https://mapi.invest.lavalleja.uy`. La respuesta del servidor contiene `Referrer-Policy: no-referrer`; el navegador envía `Origin: null` y el middleware devuelve 403 antes de comprobar credenciales o códigos. La comprobación HTTP anterior había fijado manualmente el origen y no reproducía ese comportamiento del navegador. Se cambió la cabecera de respuesta a `same-origin`: conserva el origen de los formularios propios y omite las referencias hacia otros sitios. Se mantienen la comparación estricta de origen, CSRF, CSP, cookies seguras, permisos y segundo factor. No se añadieron variables al entorno.

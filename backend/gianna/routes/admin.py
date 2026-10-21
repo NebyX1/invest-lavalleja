@@ -389,7 +389,7 @@ def users():
     if request.method=='POST':
         temporary=secrets.token_urlsafe(18)
         id=s.security.create_user(request.form.get('email',''),request.form.get('name',''),temporary,
-            request.form.get('role','editor'),request.form.get('mfa_method','totp'),temporary=True)
+            request.form.get('role','editor'),temporary=True)
         s.db.audit(g.user['id'],'USER_CREATED',id)
     rows=s.db.all('SELECT id,email,name,role,active,mfa_method,mfa_enrolled,created_at,last_login FROM users ORDER BY created_at')
     return render_template('users.html',rows=rows,temporary=temporary,smtp=bool(s.cfg.smtp_host))

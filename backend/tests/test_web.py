@@ -10,7 +10,9 @@ from gianna.config import Config
 
 @pytest.fixture
 def app(cfg):
-    result=create_app(cfg);result.config['TESTING']=True;return result
+    result=create_app(cfg);result.config['TESTING']=True
+    result.extensions['gianna'].security.mailer=lambda address,code:None
+    return result
 
 
 def csrf(client):
@@ -52,10 +54,8 @@ def test_login_security_headers(app):
     assert 'HttpOnly' in r.headers['Set-Cookie'] and 'SameSite=Strict' in r.headers['Set-Cookie']
 
 
-@pytest.mark.parametrize('mfa_method',['totp','email'])
-def test_admin_forms_keep_origin_through_login_and_second_factor(cfg,mfa_method):
+def test_admin_forms_keep_origin_through_login_and_second_factor(cfg):
     from dataclasses import replace
-    from gianna.security import totp
 
     origin='https://api.example.test'
     app=create_app(replace(cfg,production=True,proxy_hops=1,
@@ -63,7 +63,7 @@ def test_admin_forms_keep_origin_through_login_and_second_factor(cfg,mfa_method)
     app.config['TESTING']=True
     s=app.extensions['gianna'];codes=[]
     s.security.mailer=lambda address,code:codes.append(code)
-    s.security.create_user('owner@example.test','Owner','a-long-test-password','owner',mfa_method)
+    s.security.create_user('owner@example.test','Owner','a-long-test-password','owner')
     client=app.test_client()
     # Coolify terminates TLS: the application receives HTTP plus the trusted
     # forwarded scheme, while browser forms send the public HTTPS origin.
@@ -88,7 +88,8 @@ def test_admin_forms_keep_origin_through_login_and_second_factor(cfg,mfa_method)
     with client.session_transaction(base_url=origin,path='/admin/mfa') as sess:
         pending=sess['pending'];csrf_token=sess['csrf']
     challenge=s.security.challenge_info(pending)
-    code=codes[0] if mfa_method=='email' else totp(s.security.unseal(challenge['secret']),int(time.time()//30))
+    assert challenge['kind']=='email' and challenge['secret'] is None
+    code=codes[0]
     data={'csrf':csrf_token,'code':code}
     for denied_origin in ('null','https://portal.example.test','https://evil.example.test'):
         denied=client.post('/admin/mfa',base_url=base_url,data=data,
@@ -96,8 +97,12 @@ def test_admin_forms_keep_origin_through_login_and_second_factor(cfg,mfa_method)
         assert denied.status_code==403 and 'Origen del formulario no permitido' in denied.get_data(as_text=True)
     assert client.post('/admin/mfa',base_url=base_url,data={'code':code},headers=form_headers).status_code==403
     assert s.security.challenge_info(pending)['attempts']==0
+    wrong=client.post('/admin/mfa',base_url=base_url,data={'csrf':csrf_token,'code':'incorrecto'},headers=form_headers)
+    assert wrong.status_code==401
+    assert 'enviado a tu correo' in wrong.get_data(as_text=True) and 'name="code"' in wrong.get_data(as_text=True)
+    assert client.get('/admin/dashboard',base_url=base_url,headers=proxy_headers).status_code==302
     verified=client.post('/admin/mfa',base_url=base_url,data=data,headers=form_headers)
-    assert verified.status_code==(302 if mfa_method=='email' else 200)
+    assert verified.status_code==302
     assert client.get('/admin/dashboard',base_url=base_url,headers=proxy_headers).status_code==200
 
 
@@ -269,7 +274,7 @@ def test_dashboard_templates_render(app):
 
 def test_console_can_bootstrap_email_mfa_owner(app):
     result=app.test_cli_runner().invoke(args=['create-admin','--email','owner@example.test',
-                                            '--name','Owner','--mfa','email'],
+                                            '--name','Owner'],
                                      input='a-long-test-password\na-long-test-password\n')
     assert result.exit_code==0,result.output
     user=app.extensions['gianna'].db.one('SELECT mfa_method,mfa_enrolled FROM users WHERE email=?',

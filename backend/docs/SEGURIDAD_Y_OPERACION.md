@@ -2,7 +2,7 @@
 
 ## Controles implementados
 
-Contraseñas Argon2id; segundo factor obligatorio; TOTP con comprobación anti-reutilización; códigos de recuperación de un solo uso; OTP por correo de corta duración y con límite de intentos; secretos TOTP y contexto de conversación cifrados con Fernet. Los códigos de correo se almacenan mediante HMAC con clave y contexto, no como seis dígitos en texto plano.
+Contraseñas Argon2id y segundo factor por correo obligatorio, como en Buzón Ciudadano. Los códigos de seis dígitos se almacenan mediante Argon2id, vencen en diez minutos, admiten como máximo seis intentos y se consumen transaccionalmente al verificarlos. Un nuevo inicio de sesión invalida el código anterior. Los fallos SMTP invalidan el desafío y no abren sesión. No se imprimen códigos en logs. El contexto de conversación se cifra con Fernet.
 
 Las sesiones de administración son opacas, almacenadas en servidor, caducan y se revocan. El navegador recibe una cookie HttpOnly, Secure en producción, SameSite Strict y restringida al camino `/admin`. Cada solicitud comprueba que el usuario siga activo. No se permite dejar el sistema sin un propietario activo mediante la gestión ordinaria de cuentas.
 
@@ -14,7 +14,7 @@ La auditoría registra acciones, usuarios, objetos e identificadores; no imprime
 
 ## Límites que no deben ocultarse
 
-Es una implementación nueva y necesita revisión independiente antes de exposición institucional. No se realizó pentest, auditoría de seguridad ni certificación. TOTP no es resistente al phishing de la misma forma que una passkey; el método por correo depende además de la seguridad de esa cuenta. WebAuthn/passkeys no está implementado.
+Es una implementación nueva y necesita revisión independiente antes de exposición institucional. No se realizó pentest, auditoría de seguridad ni certificación. El segundo factor por correo depende de la seguridad de esa cuenta. WebAuthn/passkeys no está implementado.
 
 Las preguntas públicas usan capacidades anónimas de sesión. El origen HTTP y CORS no autentican a una persona y un cliente no navegador puede imitar encabezados. Los límites y presupuestos reducen el abuso, no garantizan impedirlo. Para tráfico público relevante, aplicar también controles de proxy/WAF y revisar cuotas de Ollama. El presupuesto de solicitudes no es una factura en dinero ni garantiza un techo monetario contractual.
 
@@ -28,7 +28,7 @@ El repositorio de referencia mostraba un `.env` versionado. No se leyeron ni cop
 
 La nueva aplicación ignora `.env` en Git y Docker. `.env.example` solo contiene campos vacíos o ejemplos. Un usuario del panel no puede recuperar el token de Ollama. Tampoco debe introducirlo en la personalidad, en una fuente, una pregunta o un documento.
 
-`SECRET_KEY` protege funciones de autenticación y firmas/HMAC; `ENCRYPTION_KEY` cifra TOTP y contexto. No sustituirlas en cada reinicio. Conservar una copia cifrada separada. Cambiar `SECRET_KEY` invalida material de autenticación; cambiar `ENCRYPTION_KEY` sin migración impide descifrar datos existentes. No se incluye una rotación automática con recifrado.
+`SECRET_KEY` protege funciones de autenticación y firmas/HMAC; `ENCRYPTION_KEY` cifra el contexto de conversación. No sustituirlas en cada reinicio. Conservar una copia cifrada separada. Cambiar `SECRET_KEY` invalida material de autenticación; cambiar `ENCRYPTION_KEY` sin migración impide descifrar datos existentes. No se incluye una rotación automática con recifrado.
 
 ## Copias
 
@@ -51,13 +51,13 @@ El importador `scripts/migrate_sqlite_to_mariadb.py` es de consola y solo se usa
 
 Los respaldos `.sql` se restauran en un esquema MariaDB de recuperación siguiendo el procedimiento operativo del servidor y con la API detenida. Mantener además una copia compatible de LanceDB y los modelos/huellas; restaurar solo SQL puede apuntar a una colección que no existe. Probar la instancia aislada antes del retorno. No borrar el SQLite legado hasta validar la migración y completar un respaldo MariaDB y LanceDB.
 
-Si se pierde el autenticador, utilizar primero un código de recuperación. Si se perdieron ambos y hay acceso autorizado a la consola:
+Las cuentas existentes se migran automáticamente a segundo factor por correo al desplegar esta versión. Se conservan sus contraseñas, roles y estado activo; se retiran las claves y códigos del autenticador anterior, se revocan sus sesiones y se invalidan los desafíos pendientes. La migración se ejecuta una sola vez. Si hay que restablecer una contraseña y se dispone de acceso autorizado a la consola:
 
 ```bash
 flask --app wsgi reset-admin
 ```
 
-El comando pide correo y contraseña oculta, solicita confirmación, revoca sesiones y exige configurar nuevamente TOTP. No da privilegios del sistema operativo a un usuario del chat.
+El comando pide correo y contraseña oculta, solicita confirmación y revoca sesiones. El segundo factor sigue siendo el código enviado al correo de la cuenta. No da privilegios del sistema operativo a un usuario del chat.
 
 ## Mantenimiento
 

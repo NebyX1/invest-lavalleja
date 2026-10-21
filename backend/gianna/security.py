@@ -1,11 +1,8 @@
-"""Authentication primitives. TOTP follows RFC 6238; replay protection is transactional."""
-import base64
+"""Institutional authentication: password and a single-use code sent by email."""
 import hashlib
 import hmac
-import json
 import re
 import secrets
-import struct
 import time
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError, InvalidHashError
@@ -16,6 +13,7 @@ from .errors import DomainError
 PASSWORDS=PasswordHasher(time_cost=2,memory_cost=19456,parallelism=1)
 DUMMY_HASH=PASSWORDS.hash(secrets.token_urlsafe(32))
 CAPTCHA_TTL_SECONDS=600
+EMAIL_OTP_TTL_SECONDS=600
 
 
 def token_hash(value):
@@ -24,25 +22,6 @@ def token_hash(value):
 
 def keyed_hash(key, value):
     return hmac.new(key.encode(),value.encode(),hashlib.sha256).hexdigest()
-
-
-def totp(secret, step, digits=6, digest='sha1'):
-    """RFC 4226 HOTP with the time step supplied by the caller (RFC 6238)."""
-    key=base64.b32decode(secret.upper() + '='*((-len(secret))%8))
-    mac=hmac.new(key,struct.pack('>Q',int(step)),getattr(hashlib,digest)).digest()
-    offset=mac[-1]&15
-    value=struct.unpack('>I',mac[offset:offset+4])[0]&0x7fffffff
-    return str(value%(10**digits)).zfill(digits)
-
-
-def matching_step(secret, code, last_step=-1, now=None):
-    if not isinstance(code,str) or len(code)!=6 or not code.isascii() or not code.isdigit():
-        return None
-    current=int((time.time() if now is None else now)//30)
-    for step in (current,current-1,current+1):
-        if step>last_step and hmac.compare_digest(totp(secret,step),code):
-            return step
-    return None
 
 
 def validate_password(password):
@@ -109,18 +88,18 @@ class Security:
             expected=keyed_hash(self.cfg.secret_key,f'captcha:{purpose}:{challenge_id}:{int(normalized)}')
             return hmac.compare_digest(row['answer_digest'],expected)
 
-    def create_user(self,email,name,password,role='editor',mfa_method='totp',temporary=False):
+    def create_user(self,email,name,password,role='editor',mfa_method='email',temporary=False):
         email=email.strip().lower()
         if not email or '@' not in email or len(email)>254 or '\n' in email or '\r' in email:
             raise DomainError('Correo inválido.')
-        if role not in {'owner','editor','viewer'} or mfa_method not in {'totp','email'}:
+        if role not in {'owner','editor','viewer'} or mfa_method!='email':
             raise DomainError('Rol o método de verificación inválido.')
-        if mfa_method=='email' and not self.cfg.smtp_host:
+        if not self.cfg.smtp_host or not self.cfg.smtp_from:
             raise DomainError('Configurá SMTP antes de habilitar doble factor por correo.')
         validate_password(password)
         id=uid()
         self.db.execute('INSERT INTO users(id,email,name,role,password_hash,mfa_method,mfa_enrolled,created_at,must_change_password) VALUES(?,?,?,?,?,?,?,?,?)',
-          (id,email,name[:100],role,PASSWORDS.hash(password),mfa_method,int(mfa_method=='email'),time.time(),int(temporary)))
+          (id,email,name[:100],role,PASSWORDS.hash(password),'email',1,time.time(),int(temporary)))
         return id
 
     def begin_login(self,email,password,ip):
@@ -136,67 +115,47 @@ class Security:
             self.db.execute('UPDATE users SET password_hash=? WHERE id=?',(PASSWORDS.hash(password),user['id']))
         return self._challenge(user)
 
-    def _challenge(self,user,reauth=False):
+    def _challenge(self,user):
         id=secrets.token_urlsafe(32)
-        kind='totp' if user['mfa_method']=='totp' else 'email'
-        secret=None; code_hash=None; raw_code=None
-        if kind=='totp' and not user['mfa_enrolled']:
-            kind='enroll'; secret=self.seal(base64.b32encode(secrets.token_bytes(20)).decode().rstrip('='))
-        if kind=='email':
-            raw_code=''.join(secrets.choice('0123456789') for _ in range(6))
-            code_hash=keyed_hash(self.cfg.secret_key,id+':'+raw_code)
+        raw_code=''.join(secrets.choice('0123456789') for _ in range(6))
+        code_hash=PASSWORDS.hash(raw_code)
         with self.db.tx(immediate=True) as db:
             db.execute('UPDATE auth_challenges SET consumed=1 WHERE user_id=?',(user['id'],))
             db.execute('INSERT INTO auth_challenges(id,user_id,kind,code_hash,secret,expires_at) VALUES(?,?,?,?,?,?)',
-                        (token_hash(id),user['id'],kind,code_hash,secret,time.time()+300))
-        if raw_code:
-            try:
-                if not self.mailer: raise RuntimeError('SMTP no configurado')
-                self.mailer(user['email'],raw_code)
-            except Exception:
-                self.db.execute('UPDATE auth_challenges SET consumed=1 WHERE id=?',(token_hash(id),))
-                raise DomainError('No se pudo enviar el código. Revisá la configuración de correo.',503,'mail_unavailable')
-        return id,kind
+                        (token_hash(id),user['id'],'email',code_hash,None,time.time()+EMAIL_OTP_TTL_SECONDS))
+        try:
+            if not self.mailer: raise RuntimeError('SMTP no configurado')
+            self.mailer(user['email'],raw_code)
+        except Exception:
+            self.db.execute('UPDATE auth_challenges SET consumed=1 WHERE id=?',(token_hash(id),))
+            raise DomainError('No se pudo enviar el código. Revisá la configuración de correo.',503,'mail_unavailable') from None
+        return id,'email'
 
     def challenge_info(self, token):
         row=self.db.one('SELECT c.*,u.email FROM auth_challenges c JOIN users u ON u.id=c.user_id WHERE c.id=?',(token_hash(token),))
-        if not row or row['consumed'] or row['expires_at']<time.time() or row['attempts']>=6:
+        if not row or row['kind']!='email' or row['consumed'] or row['expires_at']<=time.time() or row['attempts']>=6:
             raise DomainError('La verificación venció. Iniciá sesión nuevamente.',401,'challenge_expired')
         return row
 
     def finish_login(self, token, code, ip):
         self.rate_limit('mfa-ip:'+ip,15,300)
-        now=time.time(); result=None; recovery=[]
+        now=time.time(); result=None
         with self.db.tx(immediate=True) as db:
             ch=db.execute('SELECT * FROM auth_challenges WHERE id=?',(token_hash(token),)).fetchone()
-            if ch and not ch['consumed'] and ch['expires_at']>=now and ch['attempts']<6:
+            if ch and ch['kind']=='email' and not ch['consumed'] and ch['expires_at']>now and ch['attempts']<6:
                 db.execute('UPDATE auth_challenges SET attempts=attempts+1 WHERE id=?',(ch['id'],))
                 user=db.execute('SELECT * FROM users WHERE id=?',(ch['user_id'],)).fetchone()
-                valid=False; step=None
+                valid=False
                 if user and user['active']:
-                    if ch['kind']=='email':
-                        valid=hmac.compare_digest(ch['code_hash'] or '',keyed_hash(self.cfg.secret_key,token+':'+code.strip()))
-                    else:
-                        encrypted=ch['secret'] if ch['kind']=='enroll' else user['totp_secret']
-                        if encrypted:
-                            step=matching_step(self.unseal(encrypted),code.strip(),user['totp_last_step'])
-                            valid=step is not None
-                        if not valid and ch['kind']=='totp':
-                            digest=keyed_hash(self.cfg.secret_key,'recovery:'+code.strip().upper())
-                            valid=db.execute('DELETE FROM recovery_codes WHERE user_id=? AND code_hash=?',(user['id'],digest)).rowcount==1
+                    normalized=code.strip() if isinstance(code,str) else ''
+                    if re.fullmatch(r'[0-9]{6}',normalized):
+                        valid=verify_password(ch['code_hash'],normalized)
                 if valid:
                     db.execute('UPDATE auth_challenges SET consumed=1 WHERE user_id=?',(user['id'],))
-                    if ch['kind']=='enroll':
-                        db.execute('UPDATE users SET totp_secret=?,mfa_enrolled=1,totp_last_step=? WHERE id=?',(ch['secret'],step,user['id']))
-                        recovery=[secrets.token_hex(12).upper() for _ in range(10)]
-                        for item in recovery:
-                            db.execute('INSERT INTO recovery_codes VALUES(?,?)',(user['id'],keyed_hash(self.cfg.secret_key,'recovery:'+item)))
-                    elif step is not None:
-                        db.execute('UPDATE users SET totp_last_step=? WHERE id=?',(step,user['id']))
                     session_token=secrets.token_urlsafe(40)
                     db.execute('INSERT INTO admin_sessions VALUES(?,?,?,?,?,?)',(token_hash(session_token),user['id'],now,now,now+28800,now))
-                    db.execute('UPDATE users SET last_login=? WHERE id=?',(now,user['id']))
-                    result=(session_token,dict(user),recovery)
+                    db.execute("UPDATE users SET last_login=?,mfa_method='email',mfa_enrolled=1,totp_secret=NULL,totp_last_step=-1 WHERE id=?",(now,user['id']))
+                    result=(session_token,dict(user))
         if result is None:
             raise DomainError('Código incorrecto, usado o vencido.',401,'invalid_otp')
         self.db.audit(result[1]['id'],'LOGIN_SUCCESS')
@@ -205,7 +164,7 @@ class Security:
     def session_user(self,token):
         now=time.time()
         row=self.db.one('SELECT u.*,s.id_hash AS session_hash,s.reauthenticated_at,s.expires_at,s.touched_at FROM admin_sessions s JOIN users u ON u.id=s.user_id WHERE s.id_hash=?',(token_hash(token),))
-        if not row or not row['active'] or not row['mfa_enrolled'] or row['expires_at']<now or row['touched_at']<now-1800:
+        if not row or not row['active'] or row['mfa_method']!='email' or not row['mfa_enrolled'] or row['expires_at']<now or row['touched_at']<now-1800:
             return None
         if row['touched_at']<now-60:
             self.db.execute('UPDATE admin_sessions SET touched_at=? WHERE id_hash=?',(now,row['session_hash']))
@@ -215,7 +174,7 @@ class Security:
         self.rate_limit('reauth:'+user['id'],10,300)
         if not verify_password(user['password_hash'],password):
             raise DomainError('Contraseña incorrecta.',401,'invalid_credentials')
-        return self._challenge(user,True)
+        return self._challenge(user)
 
     def change_password(self,user_id,old,new):
         row=self.db.one('SELECT * FROM users WHERE id=?',(user_id,))
