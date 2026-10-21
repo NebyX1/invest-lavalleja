@@ -9,6 +9,10 @@ from gianna.security import Security
 from gianna.corpus import Corpus,DocumentInfo,Record,Source
 from gianna.services.knowledge import Knowledge
 
+
+def pytest_addoption(parser):
+    parser.addoption('--mariadb-docker',action='store_true',help='Run integration tests against a disposable strict MariaDB 11.4 container.')
+
 @pytest.fixture
 def cfg(tmp_path):
     return Config.from_env(dict(data_dir=tmp_path,secret_key=secrets.token_urlsafe(48),encryption_key=Fernet.generate_key().decode(),

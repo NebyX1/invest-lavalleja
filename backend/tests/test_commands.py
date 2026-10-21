@@ -58,7 +58,10 @@ def test_cli_accounts_login_with_mfa_and_keep_role_permissions(app,flag,restrict
     challenge=s.security.challenge_info(pending)
     assert challenge['kind']=='email' and challenge['secret'] is None
     page=client.get('/admin/mfa').get_data(as_text=True)
-    assert 'correo' in page and 'diez minutos' in page and 'QR' not in page and 'otpauth' not in page
+    visible_text=re.sub(r'<[^>]+>','',page)
+    # Random CSRF/nonces can contain the letters QR without rendering a QR code.
+    assert 'correo' in visible_text and 'diez minutos' in visible_text and 'QR' not in visible_text
+    assert '<img' not in page and 'otpauth://' not in page
     response=client.post('/admin/mfa',data={'csrf':csrf,'code':codes[0]})
     assert response.status_code==302
     assert client.get('/admin/dashboard').status_code==200

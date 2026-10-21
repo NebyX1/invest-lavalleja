@@ -85,6 +85,14 @@ Vigilar memoria al cargar ONNX y al calcular la proyección. Un cierre por OOM r
 
 Las revisiones de Bekko y Horizon están fijadas en `gianna/services/neural.py` y los artefactos se verifican con SHA-256. Mantener versiones del modelo y paquetes coherentes. No cuantizar o cambiar pooling sin crear una nueva base vectorial y medir la pérdida de recuperación.
 
+## Importación que falla con IntegrityError al terminar la conversión
+
+La migración MariaDB `003.sql` restaura nueve valores por defecto que el código ya esperaba: descripción y JSON de bases, versiones, auditoría y consultas. La omisión de `bases.description` en el esquema anterior impedía importar una guía válida con SQL estricto; también faltaba el valor inicial de `versions.report_json` al preparar una indexación. La corrección se aplica automáticamente al arrancar el backend actualizado, tanto en instalaciones nuevas como existentes. No requiere nuevas variables, vaciar tablas, recrear cuentas ni desactivar el modo SQL estricto.
+
+Antes del redeploy, conservar un respaldo MariaDB y el volumen `/app/data`. Tras desplegar, verificar `/health/ready` y que `SELECT MAX(version) FROM schema_versions` devuelva al menos `3`. En el trabajo de importación fallido, usar **Reintentar de forma segura**: el archivo se conserva cuando falla la transacción y el trabajo recupera la misma base sin duplicarla. Si la carga original ya no existe en el volumen persistente, volver a subir el archivo. La importación continúa siendo un borrador: no aprueba registros ni publica conocimiento automáticamente.
+
+Regresión reproducible desde la raíz del backend: `python -m pytest tests/test_mariadb_import.py --mariadb-docker -q`. Requiere Docker y `mariadb:11.4`; crea un servidor efímero en loopback con SQL estricto, claves aleatorias y esquemas exclusivos, y los elimina al terminar. No usa `.env` ni bases existentes. Sin la opción, estas pruebas se omiten explícitamente. El caso con la guía privada se omite cuando el documento no está disponible; los demás casos usan un corpus de prueba autocontenido.
+
 ## Verificación de apertura
 
 Probar desde una sesión sin autenticar que `/admin/bases` no revela información. Probar desde otro origen que la API pública lo rechaza. Confirmar que el volumen LanceDB no se publica como archivos estáticos. Reiniciar y comprobar persistencia, luego ejecutar las preguntas de evaluación y una conversación real de seguimiento.
