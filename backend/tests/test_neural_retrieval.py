@@ -4,14 +4,14 @@ import pytest
 from gianna.errors import DomainError
 from gianna.services.neural import ENGINE_VERSION,artifact_specs,verified_manifest
 from gianna.services.vector_store import LanceStore
-from gianna.services.harness import AgentHarness
+from gianna.services.neural import Embeddings,MODEL_PROFILES,LEGACY_ENGINE_VERSION,GRANITE_ENGINE_VERSION
 
 
 def test_lance_hybrid_is_idempotent_and_prefilters_public_zones(cfg):
     store=LanceStore(cfg);name='gianna_contract'
     store.create(name)
     chunks=[{'id':str(i),'record_id':'r'+str(i),'audience':'public','topic':'Permisos',
-        'zones':[zone],'record_type':'requirement','opportunity_id':None}
+        'zones':[zone],'record_type':'ficha','opportunity_id':None}
         for i,zone in enumerate(['Z1','Z5'])]
     vectors=[[1.0]+[0.0]*383,[0.0,1.0]+[0.0]*382]
     texts=['Bomberos incendios seguridad local','Granos poscosecha campaña']
@@ -44,24 +44,33 @@ def test_model_manifest_ignores_unused_runtime_artifacts(tmp_path):
     assert verified_manifest(folder,'test','pinned',['tokenizer.json'])['model_id']=='test'
 
 
-def test_bekko_runtime_uses_onnx_and_invalidates_previous_vector_fingerprint():
-    bekko=artifact_specs()[0][3]
-    assert 'onnx/model.onnx' in bekko
-    assert not any(name.startswith('openvino/') for name in bekko)
-    assert ENGINE_VERSION=='bekko-horizon-lance-v2'
+def test_default_runtime_uses_pinned_cpu_onnx_and_preserves_explicit_legacy_profile():
+    granite=artifact_specs()[0][3]
+    assert 'onnx/model_quint8_avx2.onnx' in granite
+    assert not any(name.startswith('openvino/') for name in granite)
+    assert ENGINE_VERSION=='granite-mmarco-lance-v3'
+    assert 'onnx/model.onnx' in artifact_specs(LEGACY_ENGINE_VERSION)[0][3]
 
 
-def test_boliche_is_answered_as_a_bar_pub_or_dance_venue_without_asking_first():
-    plan=AgentHarness.retrieval_plan('Quiero invertir poniendo un boliche, ¿qué me recomendás?',[])
-    assert 'bar' in plan.activity and 'bailable' in plan.activity and not plan.clarification
-    assert plan.intent=='locations' and {'premises','business'}<=set(plan.facets)
-    assert len(plan.searches)<=4
+def test_model_profiles_are_pinned_and_do_not_share_pooling_or_fingerprints(cfg):
+    old=Embeddings(cfg,LEGACY_ENGINE_VERSION);new=old.for_profile({'engine':GRANITE_ENGINE_VERSION})
+    assert new is old.for_profile({'engine':GRANITE_ENGINE_VERSION}) and new is not old
+    assert new._infer_lock is old._infer_lock
+    assert old.spec['pooling']=='masked_mean' and new.spec['pooling']=='cls'
+    assert new.spec['rank_pad']==1 and old.spec['rank_pad']==0
+    assert all(len(spec[2])==40 for profile in MODEL_PROFILES.values() for spec in (profile['embedding'],profile['reranker']))
+    assert not old.ready_for({'engine':GRANITE_ENGINE_VERSION,'fingerprint':'missing'})
+    with pytest.raises(DomainError):old.for_profile({'engine':'unrecognized'})
 
 
-def test_bailable_followup_resolves_previous_ambiguity():
-    plan=AgentHarness.retrieval_plan('Un local bailable',[
-        {'role':'user','content':'Quiero abrir un boliche'},
-        {'role':'assistant','mode':'knowledge','content':'Orientación documentada. [C1]',
-         'state':{'zones':[],'opportunity_ids':[],'activity':'local de ocio','facets':['premises','safety']}},
-    ])
-    assert plan.activity=='local bailable o de ocio nocturno' and not plan.clarification
+def test_cls_and_masked_mean_execute_the_profile_contract(cfg,monkeypatch):
+    import numpy as np
+    from types import SimpleNamespace
+    output=np.zeros((1,2,384));output[0,0,0]=2;output[0,1,1]=2
+    for version,expected in ((LEGACY_ENGINE_VERSION,[2**-.5,2**-.5]),(GRANITE_ENGINE_VERSION,[1.,0.])):
+        engine=Embeddings(cfg,version)
+        engine.encoder_tokenizer=SimpleNamespace(encode_batch=lambda texts:[SimpleNamespace(ids=[1,2],attention_mask=[1,1],type_ids=[0,0])])
+        engine.input_names={'input_ids','attention_mask'}
+        monkeypatch.setattr(engine,'_onnx',lambda *args:output)
+        vector=engine._encode(['test'])[0]
+        assert np.allclose(vector[:2],expected) and np.isclose(np.linalg.norm(vector),1.)

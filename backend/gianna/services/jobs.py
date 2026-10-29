@@ -94,7 +94,13 @@ class Jobs:
                 path.unlink(missing_ok=True)
                 result={'base_id':base_id,'records':len(corpus.records)}
             elif kind=='warmup':
-                self.embeddings.load(lambda message:self.progress(id,message));result=self.embeddings.profile
+                # Warm the ACTIVE snapshot first. A runtime upgrade must not
+                # turn an already published index into a different vector space.
+                target=payload.get('version_id')
+                active=self.db.one('SELECT profile_json FROM versions WHERE id=?',(target,)) if target else self.knowledge.active()
+                if target and not active:raise DomainError('Versión no encontrada.',404)
+                engine=self.rag.engine_for(json.loads(active['profile_json'])) if active and self.rag else self.embeddings
+                engine.load(lambda message:self.progress(id,message));result=engine.profile
             elif kind=='build':result=self.build(job)
             elif kind=='delete':result=self.delete(job)
             elif kind=='evaluation':result=self.evaluate(job,payload)
@@ -127,7 +133,7 @@ class Jobs:
             records=self.db.all('SELECT content_json FROM version_records WHERE version_id=? ORDER BY record_key',(vid,))
             all_chunks=[]
             for i,r in enumerate(records):
-                self.progress(id,'Dividiendo contenido con el tokenizador de Bekko',i,len(records))
+                self.progress(id,'Dividiendo contenido con el tokenizador exacto del encoder',i,len(records))
                 record=json.loads(r['content_json'])
                 if record['audience']!='public':raise DomainError('Se detectó contenido interno en una versión pública.')
                 all_chunks.extend(chunks_for_record(vid,record,self.embeddings.count,profile['chunk_tokens'],profile['overlap_tokens']))
@@ -210,9 +216,9 @@ class Jobs:
         if not tests or len(tests)>200:raise DomainError('La evaluación admite entre 1 y 200 preguntas.')
         settings=get_settings(self.db,self.cfg);results=[]
         for i,test in enumerate(tests):
-            self.progress(job['id'],'Evaluando el contexto final; no se llama al modelo generativo',i,len(tests))
-            plan=self.rag.harness.retrieval_plan(test['question'],[])
-            found,ms,trace=self.rag.retrieve_plan(plan,settings,job['version_id'])
+            self.progress(job['id'],'Evaluando la recuperación; no se llama al modelo generativo',i,len(tests))
+            found,trace=self.rag.retriever.search(test['question'],settings,job['version_id'],limit=settings.retrieval_limit)
+            ms=trace['ms']
             ids=[x['record_id'] for x in found]
             expected=set(test.get('expected_any_record_ids',[]))
             groups=[]

@@ -1,122 +1,118 @@
-"""Generation transport; local retrieval runtimes live in dedicated modules."""
+"""Transporte hacia Ollama Cloud (API nativa con herramientas) y re-exportación de los motores locales."""
+import logging
 import time
+
 import httpx
+
 from ..errors import DomainError
 from .neural import Embeddings
 from .vector_store import LanceStore
 
+LOG = logging.getLogger(__name__)
+UNAVAILABLE = 'El proveedor de respuestas no está disponible en este momento. Volvé a intentar en unos segundos.'
+RETRYABLE = {408, 409, 425, 429, 500, 502, 503, 504}
+
 
 def thinking_mode(model):
-    # Explicit 1017 comparison profile: this revision advertises low via
-    # /api/show. Match Beam's effort; keep older DeepSeek profiles unchanged.
-    if model in {'deepseek-v4.1-flash:1017','deepseek-v4.1-flash:1017-cloud'}:return 'low'
-    # This Cloud model still emitted reasoning with think=False in real tests.
-    # Use its default; budget reasoning explicitly instead of claiming it is off.
-    if model.startswith('minimax-m3.1-flash'):return None
-    # Verified against the Cloud catalogue: this model accepts false and
-    # returns its user-facing answer without spending the cap on thought.
-    return False if model.startswith('deepseek-v4.1-flash') else 'low'
-
-
-def task_token_budget(settings,short_cap):
-    # MiniMax may consume thousands of tokens before message.content. Never
-    # silently increase the operator's cap, but don't shrink it to 400/500.
-    if settings.model.startswith('minimax-m3.1-flash'):return settings.max_output_tokens
-    return min(settings.max_output_tokens,short_cap)
-
-
-class _RequestScopedStream(httpx.AsyncByteStream):
-    """A response owns its pool and closes it on the loop that used it."""
-
-    def __init__(self,stream,transport):
-        self.stream=stream;self.transport=transport;self.closed=False
-
-    async def __aiter__(self):
-        try:
-            async for chunk in self.stream:yield chunk
-        finally:
-            await self.aclose()
-
-    async def aclose(self):
-        if not self.closed:
-            self.closed=True
-            try:await self.stream.aclose()
-            finally:await self.transport.aclose()
-
-
-class RequestScopedTransport(httpx.AsyncBaseTransport):
-    """Never share asyncio-bound connections between gunicorn threads.
-
-    PydanticAI runs each synchronous call on its own event loop. A shared AsyncClient
-    could reuse a connection created on another loop, so every request creates and
-    closes its own pool.
-    """
-
-    async def handle_async_request(self,request):
-        transport=httpx.AsyncHTTPTransport(retries=0)
-        try:response=await transport.handle_async_request(request)
-        except BaseException:
-            await transport.aclose();raise
-        response.stream=_RequestScopedStream(response.stream,transport)
-        return response
-
-    async def aclose(self):pass
+    """Valor de ``think`` verificado contra el catálogo de Ollama Cloud para cada familia."""
+    if model.startswith('deepseek-v4.1-flash:1017'):
+        return 'low'
+    if model.startswith('deepseek-v4.1-flash'):
+        return False
+    if model.startswith('minimax-m3.1-flash'):
+        return None
+    return 'low'
 
 
 class Ollama:
-    def __init__(self,cfg,client=None):
-        self.cfg=cfg
-        self.client=client or httpx.Client(base_url=cfg.ollama_url,headers={'Authorization':'Bearer '+cfg.ollama_api_key},
-              timeout=httpx.Timeout(80,connect=8),limits=httpx.Limits(max_connections=4,max_keepalive_connections=3),follow_redirects=False,trust_env=False)
-
-    def agent_model(self,settings,timeout=80):
-        """PydanticAI model over Ollama's OpenAI-compatible endpoint (supports structured output and tools)."""
-        if not self.cfg.ollama_api_key or not settings.model:
-            raise DomainError('Configurá OLLAMA_API_KEY y seleccioná un modelo en Ajustes.',503,'ollama_not_configured')
-        from openai import AsyncOpenAI
-        from pydantic_ai.models.openai import OpenAIChatModel
-        from pydantic_ai.profiles.openai import OpenAIModelProfile
-        from pydantic_ai.providers.openai import OpenAIProvider
-        client=AsyncOpenAI(base_url=self.cfg.ollama_url+'/v1',api_key=self.cfg.ollama_api_key,timeout=timeout,max_retries=1,
-                           http_client=httpx.AsyncClient(transport=RequestScopedTransport(),trust_env=False))
-        # Ollama accepts max_tokens, not the newer max_completion_tokens field.
-        return OpenAIChatModel(settings.model,provider=OpenAIProvider(openai_client=client),
-                               profile=OpenAIModelProfile(openai_chat_supports_max_completion_tokens=False))
+    def __init__(self, cfg, client=None):
+        self.cfg = cfg
+        self.client = client or httpx.Client(
+            base_url=cfg.ollama_url, headers={'Authorization': 'Bearer ' + cfg.ollama_api_key},
+            timeout=httpx.Timeout(75, connect=8), limits=httpx.Limits(max_connections=6, max_keepalive_connections=4),
+            follow_redirects=False, trust_env=False)
 
     def models(self):
-        if not self.cfg.ollama_api_key:raise DomainError('Falta OLLAMA_API_KEY en .env.',503,'ollama_not_configured')
+        if not self.cfg.ollama_api_key:
+            raise DomainError('Falta OLLAMA_API_KEY en .env.', 503, 'ollama_not_configured')
         try:
-            r=self.client.get('/api/tags');r.raise_for_status()
-            return sorted({x.get('name',x.get('model','')) for x in r.json().get('models',[]) if x.get('name') or x.get('model')})
-        except (httpx.HTTPError,ValueError) as exc:raise DomainError('No se pudo consultar el catálogo de Ollama Cloud.',503,'ollama_unavailable') from exc
+            response = self.client.get('/api/tags')
+            response.raise_for_status()
+            return sorted({x.get('name', x.get('model', '')) for x in response.json().get('models', []) if x.get('name') or x.get('model')})
+        except (httpx.HTTPError, ValueError) as exc:
+            raise DomainError('No se pudo consultar el catálogo de Ollama Cloud.', 503, 'ollama_unavailable') from exc
 
-    def chat(self,messages,settings,think=None):
+    def candidates(self, settings):
+        """Modelo elegido y, si falla, alternativas verificadas del mismo proveedor (sin repetir)."""
+        order = [settings.model, *self.cfg.ollama_fallback_models]
+        return [m for i, m in enumerate(order) if m and m not in order[:i]]
+
+    def chat(self, messages, settings, *, tools=None, max_tokens=None, model=None, think='auto', timeout=75):
+        """Una respuesta del modelo. Devuelve (message, usage, model_usado).
+
+        Reintenta con espera creciente ante límites, caídas de red o respuestas vacías y,
+        si el modelo elegido sigue fallando, prueba el siguiente de la lista de alternativas.
+        """
         if not self.cfg.ollama_api_key or not settings.model:
-            raise DomainError('Configurá OLLAMA_API_KEY y seleccioná un modelo en Ajustes.',503,'ollama_not_configured')
-        payload={'model':settings.model,'messages':messages,'stream':False,
-                 'options':{'temperature':settings.temperature,'num_predict':settings.max_output_tokens}}
-        if think is not None:
-            payload['think']=think
-        for attempt in range(2):
+            raise DomainError('Configurá OLLAMA_API_KEY y seleccioná un modelo en Ajustes.', 503, 'ollama_not_configured')
+        last_error = None
+        deadline = time.monotonic() + timeout
+        for name in ([model] if model else self.candidates(settings)):
+            for attempt in range(3):
+                remaining = deadline - time.monotonic()
+                if remaining < 5:
+                    raise DomainError(UNAVAILABLE, 503, 'ollama_unavailable') from last_error
+                try:
+                    return self._once(name, messages, settings, tools, max_tokens, think, remaining) + (name,)
+                except _Retry as exc:
+                    last_error = exc
+                    LOG.warning('Ollama %s intento %s: %s', name, attempt + 1, exc)
+                    time.sleep((0.7, 1.8)[attempt] if attempt < 2 else 0)
+                except _Fatal as exc:
+                    last_error = exc
+                    LOG.warning('Ollama %s rechazó la solicitud: %s', name, exc)
+                    break
+        raise DomainError(UNAVAILABLE, 503, 'ollama_unavailable') from last_error
+
+    def _once(self, model, messages, settings, tools, max_tokens, think, timeout):
+        payload = {'model': model, 'messages': messages, 'stream': False,
+                   'options': {'temperature': settings.temperature, 'num_predict': max_tokens or settings.max_output_tokens}}
+        if tools:
+            payload['tools'] = tools
+        mode = thinking_mode(model) if think == 'auto' else think
+        if mode is not None:
+            payload['think'] = mode
+        limit = httpx.Timeout(timeout, connect=8)
+        try:
+            response = self.client.post('/api/chat', json=payload, timeout=limit)
+        except (httpx.TimeoutException, httpx.TransportError) as exc:
+            raise _Retry(type(exc).__name__) from exc
+        if response.status_code == 400 and 'think' in payload and 'think' in response.text.lower():
+            payload.pop('think')
             try:
-                response=self.client.post('/api/chat',json=payload)
-                response.raise_for_status(); data=response.json()
-                text=data.get('message',{}).get('content','')
-                if not isinstance(text,str) or not text.strip():
-                    if attempt==0:continue
-                    raise ValueError('empty response')
-                return text[:18000],{'prompt_tokens':data.get('prompt_eval_count'),'output_tokens':data.get('eval_count')}
-            except httpx.HTTPStatusError as exc:
-                # Retry only explicit throttling/unavailable responses; do not
-                # duplicate a possibly completed generation after a timeout.
-                if attempt==0 and exc.response.status_code in {429,503}:
-                    time.sleep(0.8)
-                    continue
-                raise DomainError('El proveedor de respuestas no está disponible. La base de conocimiento no se modificó.',503,'ollama_unavailable') from exc
-            except httpx.ConnectError as exc:
-                if attempt==0:
-                    time.sleep(0.8)
-                    continue
-                raise DomainError('El proveedor de respuestas no está disponible. La base de conocimiento no se modificó.',503,'ollama_unavailable') from exc
-            except (httpx.HTTPError,ValueError) as exc:
-                raise DomainError('El proveedor de respuestas no está disponible. La base de conocimiento no se modificó.',503,'ollama_unavailable') from exc
+                response = self.client.post('/api/chat', json=payload, timeout=limit)
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                raise _Retry(type(exc).__name__) from exc
+        if response.status_code in RETRYABLE:
+            raise _Retry(f'HTTP {response.status_code}')
+        if response.status_code >= 400:
+            raise _Fatal(f'HTTP {response.status_code}: {response.text[:200]}')
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise _Retry('respuesta no JSON') from exc
+        message = data.get('message') or {}
+        content = message.get('content') or ''
+        calls = message.get('tool_calls') or []
+        if not content.strip() and not calls:
+            raise _Retry('respuesta vacía')
+        usage = {'prompt_tokens': data.get('prompt_eval_count'), 'output_tokens': data.get('eval_count')}
+        return {'content': content, 'tool_calls': calls}, usage
+
+
+class _Retry(Exception):
+    pass
+
+
+class _Fatal(Exception):
+    pass

@@ -1,7 +1,7 @@
 import pytest
-from gianna.chunking import chunks_for_record,pack_record
+from gianna.chunking import chunks_for_record,pack_record,input_prefix
 from gianna.errors import DomainError
-# Deterministic synthetic tokenizer ONLY for algorithm tests; not an E5 performance/quality test.
+# Tokenizador sintético determinista SOLO para probar el algoritmo; no mide calidad de embeddings.
 def count(text):return len(text)+2
 
 
@@ -12,8 +12,8 @@ def test_budget_and_complete_character_coverage(corpus):
     coverage=set()
     for c in chunks:coverage.update(range(c['char_start'],c['char_end']))
     assert coverage==set(range(len(record['text'])))
-    assert all(c['embedding_text'].startswith('Título: ') for c in chunks)
-    assert all(not c['embedding_text'].startswith('passage: ') for c in chunks)
+    assert all(c['embedding_text'].startswith(record['title']+'\n') for c in chunks)
+    assert all(c['sparse_text']==c['embedding_text'] for c in chunks)
 
 
 def test_ids_idempotent_per_version(corpus):
@@ -31,3 +31,16 @@ def test_invalid_limit(corpus):
 def test_small_record_no_extra_chunks(corpus):
     r=corpus.records[0].model_dump();r['text']='Texto corto.'
     assert len(pack_record(r,count,420,40))==1
+
+
+def test_header_carries_topic_section_and_zone_without_rewriting_the_text(corpus):
+    r=corpus.records[0].model_dump()
+    r.update(topic='SIERRAS',section='Una sección real',title='Dónde puede estar el negocio',zones=['Z5'],text='Texto original, sin completar ni reescribir.')
+    c=pack_record(r,count,420,40)[0]
+    assert c['text']==r['text']
+    assert c['embedding_text']=='Dónde puede estar el negocio\nTema: SIERRAS | Una sección real\nZonas: José Pedro Varela y entorno\nTexto original, sin completar ni reescribir.'
+
+
+def test_all_zones_is_not_listed_in_the_header(corpus):
+    r=corpus.records[0].model_dump();r['zones']=['Z1','Z2','Z3','Z4','Z5','Z6','Z7']
+    assert 'Zonas:' not in input_prefix(r)

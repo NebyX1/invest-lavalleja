@@ -12,7 +12,7 @@ Esta lista contiene trabajo real pendiente. No marcarla como cumplida por haber 
 ## Datos e indexación
 
 - Importar el JSON canónico. Confirmar 271 registros y 50 fuentes; revisar la separación 196/75 antes de aprobar.
-- Preparar y verificar Bekko/Horizon; comprobar 384 dimensiones, pooling, normalización y tokenización sin prefijos E5. Revisar que ningún chunk indexado supere el límite.
+- Preparar y verificar el perfil nuevo Granite/mMARCO; comprobar CLS/L2, 384 dimensiones, padding/tokenizadores exactos y presupuesto de chunks. Conservar el perfil v2 de las versiones publicadas hasta la transición explícita.
 - Comprobar revisiones fijadas en `services/neural.py` y repetir carga/reinicio sin cambios inesperados de huella.
 - Confirmar que LanceDB contiene exclusivamente contenido público aprobado y los puntos coinciden con la versión MariaDB.
 - Interrumpir una construcción en un entorno de prueba, reiniciar, reintentar y verificar que no duplica puntos ni cambia la versión activa. Confirmar cancelación entre lotes.

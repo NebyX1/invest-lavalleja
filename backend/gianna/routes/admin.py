@@ -32,8 +32,9 @@ def dashboard():
     s=services();active=s.knowledge.active();stats=summary(s.db,7)
     counts={name:s.db.one(f'SELECT COUNT(*) n FROM {name}')['n'] for name in ('bases','records','chunks')}
     jobs=s.db.all('SELECT id,kind,status,progress,total,message,error,created_at FROM jobs ORDER BY created_at DESC LIMIT 5')
+    engine=s.rag.engine_for(json.loads(active['profile_json'])) if active else s.embeddings
     return render_template('dashboard.html',active=active,stats=stats,counts=counts,jobs=jobs,
-        engine_ready=s.embeddings.model is not None,cloud_ready=bool(s.cfg.ollama_api_key))
+        engine_ready=engine.model is not None,cloud_ready=bool(s.cfg.ollama_api_key))
 
 
 @bp.get('/bases')
@@ -194,8 +195,12 @@ def publish(version_id):
     if request.form.get('confirm_tested')!='yes':raise DomainError('Confirmá que revisaste y probaste esta versión en el laboratorio.')
     v=s.db.one('SELECT * FROM versions WHERE id=?',(version_id,))
     if not v or v['status']!='ready':raise DomainError('La versión no está lista.',409)
-    if s.embeddings.model is None:raise DomainError('Prepará el motor antes de publicar.',409)
-    if json.loads(v['profile_json']).get('fingerprint')!=s.embeddings.profile['fingerprint']:raise DomainError('La versión pertenece a otro perfil de embeddings.',409)
+    profile=json.loads(v['profile_json']);engine=s.rag.engine_for(profile)
+    if engine.model is None:
+        job=s.jobs.enqueue('warmup',{'version_id':version_id})
+        flash('Se está preparando el perfil de esta versión. Volvé a la versión y confirmá la publicación cuando termine.','info')
+        return redirect(url_for('admin.job_detail',job_id=job))
+    if profile.get('fingerprint')!=engine.profile['fingerprint']:raise DomainError('La versión pertenece a otro perfil de embeddings.',409)
     if s.vector_store.count(v['collection_name'])!=v['chunk_count']:raise DomainError('La cantidad de puntos no coincide. No se puede publicar.',409)
     s.knowledge.activate(version_id,g.user['id'],request.form.get('rollback')=='yes')
     flash('Versión publicada. Las nuevas consultas usarán esta base.','success')
@@ -277,8 +282,10 @@ def lab():
         if request.form.get('mode')=='answer':
             result={'answer':s.rag.answer(question,setting,version_id=selected or None,preview=True)}
         else:
-            hits,ms=s.rag.retrieve(question,setting,selected or None)
-            result={'hits':hits,'ms':round(ms,2)}
+            version=s.db.one('SELECT id FROM versions WHERE id=?',(selected,)) if selected else s.knowledge.active()
+            if not version:raise DomainError('Todavía no hay una versión lista para consultar.',503,'no_knowledge')
+            hits,trace=s.rag.retriever.search(question,setting,version['id'],limit=setting.retrieval_limit)
+            result={'hits':hits,'ms':trace['ms'],'trace':trace}
     versions=s.db.all("SELECT v.id,v.revision,b.name FROM versions v JOIN bases b ON b.id=v.base_id WHERE v.status='ready' ORDER BY v.created_at DESC")
     return render_template('lab.html',result=result,question=question,versions=versions,selected=selected)
 
@@ -338,7 +345,10 @@ def diagnostics():
     try:s.vector_store.health();vector_store_ok=True
     except DomainError:pass
     disk=psutil.disk_usage(str(s.cfg.data_dir))
-    return jsonify(model_loaded=s.embeddings.model is not None,profile=s.embeddings.profile,
+    active=s.knowledge.active()
+    engine=s.rag.engine_for(json.loads(active['profile_json'])) if active else s.embeddings
+    return jsonify(model_loaded=engine.model is not None,profile=engine.profile,
+        build_model_loaded=s.embeddings.model is not None,build_profile=s.embeddings.profile,
         vector_store_ok=vector_store_ok,ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
         worker_alive=bool(s.jobs.thread and s.jobs.thread.is_alive()),
         process_rss_mib=round(psutil.Process().memory_info().rss/1024**2,1),data_disk_free_mib=round(disk.free/1024**2,1),

@@ -25,4 +25,4 @@ def test_runtime_verification_loads_and_exercises_both_models(monkeypatch,tmp_pa
     assert calls['cfg'].embedding_threads==2
     assert calls['load'] and calls['documents'] and calls['rerank']
     output=[json.loads(line) for line in capsys.readouterr().out.splitlines()]
-    assert output[-1]['runtime_stage']=='Verificación de inferencia Bekko/Horizon superada'
+    assert output[-1]['runtime_stage']=='Verificación de inferencia Granite/mMARCO superada'
