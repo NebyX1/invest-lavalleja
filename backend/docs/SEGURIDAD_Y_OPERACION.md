@@ -36,7 +36,7 @@ El volumen `gianna_data` conserva archivos de la API, modelos y tablas LanceDB. 
 
 El script `scripts/backup.py` crea un dump lógico consistente de MariaDB con `mariadb-dump`. **No copia automáticamente LanceDB, `.env`, modelos o cargas pendientes.** Exportar también el corpus desde el panel y conservar las claves de cifrado en otro lugar seguro.
 
-Para un respaldo completo coordinado, realizarlo en una ventana de mantenimiento con la API detenida y conservar el volumen de datos completo. Registrar versión de LanceDB, aplicación, paquetes y huellas de Bekko/Horizon. Cifrar los respaldos y probar restauración en una instancia separada.
+Para un respaldo completo coordinado, realizarlo en una ventana de mantenimiento con la API detenida y conservar el volumen de datos completo. Registrar versión de LanceDB, aplicación, paquetes y huellas de los modelos (Granite/mMARCO y, si hay versiones antiguas publicadas, Bekko/Horizon). Cifrar los respaldos y probar restauración en una instancia separada.
 
 ```bash
 # Dentro del contenedor API, crea el dump SQL en su volumen de datos:

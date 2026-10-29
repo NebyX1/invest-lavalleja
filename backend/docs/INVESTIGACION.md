@@ -1,6 +1,6 @@
 # Investigación histórica de septiembre
 
-El motor descrito en este documento corresponde a la entrega inicial. Desde el 19/10/2026 la arquitectura vigente es Bekko + Horizon + LanceDB, documentada en [RAG_ENGINE.md](RAG_ENGINE.md), con las comparaciones locales en `reports/rag-migration/`.
+El motor descrito en este documento corresponde a la entrega inicial (E5 + Qdrant) y se conserva como registro de la investigación. La arquitectura vigente desde el 29/10/2026 es Granite + LanceDB (vectores + BM25 español) con un agente de herramientas, documentada en [RAG_ENGINE.md](RAG_ENGINE.md) y [AGENT_DESIGN.md](AGENT_DESIGN.md); las versiones Bekko/Horizon siguen consultables, y las comparaciones locales anteriores están en `reports/rag-migration/`.
 
 # Referencias técnicas y decisiones
 

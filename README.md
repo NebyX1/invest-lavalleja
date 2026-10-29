@@ -9,19 +9,34 @@ El repositorio tiene dos partes que trabajan juntas:
 
 ## Qué es Gianna Invest
 
-Gianna no es un buscador de palabras ni una lista de respuestas fijas. Es un agente de asesoría informativa: entiende lo que se le pregunta, recuerda lo que ya se conversó en el mismo hilo y responde con lo que encuentra en su base. Si la base no tiene información sobre algo, lo dice.
+Gianna no es un buscador de palabras ni una lista de respuestas fijas. Es un **agente con herramientas** que entiende lo que se le pregunta, recuerda lo conversado en el hilo y responde solo con lo que encuentra en la guía de conocimiento del portal. Si la guía no cubre algo, lo dice y aporta lo documentado que sí aplica (zonas, condiciones, trámites, qué validar).
 
 Cuando un inversor escribe una pregunta, ocurre lo siguiente:
 
-1. **Recibe el mensaje junto con la memoria del hilo.** Gianna guarda, dentro de la sesión, lo que el inversor ya dijo: la zona que le interesa, el tipo de proyecto, lo que ya se respondió.
-2. **Interpreta qué necesita.** Un modelo de lenguaje lee el mensaje y produce un plan: qué tipo de pedido es (dónde ubicarse, oportunidades, requisitos, comparar opciones, próximos pasos), qué necesita realmente la persona y qué buscar en la base. Por ejemplo, «quiero poner un boliche» se entiende como una pregunta sobre *dónde* y *qué ofrece cada zona*, no como una consulta de trámites.
-3. **Busca en la base de conocimiento.** Combina dos tipos de búsqueda: por significado (embeddings) y por palabras clave (BM25), usando las consultas que armó el intérprete.
-4. **Ordena los resultados.** Un reranker puntúa qué tan relacionado está cada fragmento con la necesidad de la persona, y ese orden se combina con el de las búsquedas. Se usan solo registros públicos y aprobados.
-5. **Redacta la respuesta.** Un agente de respuesta arma el texto con la evidencia encontrada, trata al inversor como alguien que sabe lo que quiere y compara las opciones cuando hay varias. Si el pedido es puntual (un requisito, un dato), puede hacer una segunda lectura de la base.
-6. **Verifica antes de mostrar.** La respuesta debe indicar si la base alcanza o no, y citar sus fuentes. El servidor descarta las fuentes que no tienen relación con el texto y nunca muestra una respuesta sin fuente.
-7. **Muestra la respuesta, sus fuentes y la memoria actualizada.** Las fuentes aparecen aparte en la interfaz.
+```text
+pregunta ─► seguridad determinista ─► (acusaciones, insultos, delitos: respuesta fija, sin modelo)
+   │
+   ▼
+búsqueda híbrida inicial: vectores (Granite) + palabras clave (BM25 español), fusión RRF, ≈60 ms
+   │      un seguimiento corto ("¿y en Varela?") se busca junto con la pregunta anterior
+   ▼
+el modelo lee la evidencia numerada y, si hace falta, usa sus herramientas (hasta 4 pasos):
+   ├─ buscar_en_la_guia(consulta, zonas?, tipo?)
+   └─ ver_ficha(identificadores del mapa de la guía)
+   ▼
+respuesta breve con citas [n] ─► el servidor descarta citas inexistentes, renumera y adjunta fuentes
+   │
+   └─ si el proveedor falla: respuesta degradada con las fichas más relacionadas
+```
 
-Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibilidad, y no da asesoramiento legal, fiscal o financiero definitivo.
+1. **Recibe el mensaje junto con el historial cifrado de la sesión.**
+2. **Pasa por la compuerta de seguridad**, que no depende del modelo.
+3. **Busca en la guía.** Combina significado (embeddings) y palabras clave (BM25) y usa solo registros públicos y aprobados. La guía está organizada en fichas completas con una cabecera (título, tema, sección, zonas).
+4. **Razona con herramientas.** El modelo ve un mapa de toda la guía, puede buscar de nuevo o leer fichas completas, y nunca afirma que algo no está sin haberlo mirado.
+5. **Redacta con citas.** Respeta el nivel de evidencia de cada ficha (dato documentado, hipótesis, ejemplo didáctico), compara zonas u oportunidades con criterios documentados y no declara una opción como «la mejor».
+6. **Valida antes de mostrar.** Las citas `[n]` se comprueban contra lo realmente recuperado y los códigos internos se traducen a nombres.
+
+Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibilidad, y no da asesoramiento legal, fiscal o financiero definitivo. Una cita válida no garantiza que la afirmación sea correcta: las respuestas deben contrastarse con sus fuentes.
 
 ### Tecnologías
 
@@ -32,21 +47,22 @@ Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibili
 | Validación de datos | Zod | Comprueba el estado guardado en el navegador |
 | Backend | Python 3, Flask, Gunicorn | API y panel de administración |
 | Base de datos | MariaDB | Documentos, versiones, aprobaciones, sesiones y puntero activo |
-| Búsqueda vectorial | LanceDB | Índice de fragmentos por significado |
-| Embeddings | Bekko (`hotchpotch/bekko-embedding-v1-a8m`) en OpenVINO CPU | Convierte textos en vectores |
-| Reranker | Horizon (`Horizon-Labs/multilingual-reranker-small`) en ONNX CPU | Ordena los fragmentos por relevancia |
-| Agente | PydanticAI | Intérprete de turnos, agente de respuesta y memoria del hilo |
-| Modelo generativo | DeepSeek vía Ollama Cloud (API compatible con OpenAI) | Interpreta, redacta y decide si hay respuesta |
+| Búsqueda | LanceDB (coseno exacto + BM25 español, fusión RRF) | Índice de fichas por significado y por palabras |
+| Embeddings | Granite 97M multilingüe R2 (`ibm-granite/granite-embedding-97m-multilingual-r2`), ONNX cuantizado en CPU | Convierte textos en vectores de 384 dimensiones |
+| Reranker | mMARCO MiniLM (ONNX CPU), solo laboratorio | No está en el camino de la consulta: no mejoró los aciertos y costaba ~5 s |
+| Agente | Bucle propio con herramientas (`services/agent.py`) | Búsqueda, lectura de fichas, citas validadas y degradación sin proveedor |
+| Modelo generativo | DeepSeek vía Ollama Cloud (API nativa con herramientas), con modelo alternativo | Redacta la respuesta |
 | Pruebas | pytest, Vitest, ESLint, Playwright, axe | Backend, unidades, estilo y flujos de punta a punta |
-| Despliegue local | Docker Compose | Levanta la API y conserva LanceDB; MariaDB se configura mediante su URL |
+| Despliegue local | Docker Compose o `scripts/run_local.py` | Levanta la API y conserva LanceDB; MariaDB se configura mediante su URL |
 
 ### Estructura
 
 - `src/`: portal Astro, componentes React y estilos.
 - `src/data/`: catálogo versionado y manifiesto editorial de las páginas.
-- `backend/gianna/`: servicios de Gianna (búsqueda, agentes, memoria, validación, panel web).
-- `backend/docs/RAG_ENGINE.md`: arquitectura detallada del motor de búsqueda y del agente.
-- `better-rag/`: documento de conocimiento sectorial y su versión consolidada para alimentar el RAG.
+- `backend/gianna/`: servicios de Gianna (agente, recuperación, prompts, seguridad, panel web).
+- `backend/docs/RAG_ENGINE.md`: arquitectura de la base de conocimiento y del flujo; `backend/docs/AGENT_DESIGN.md`: política de respuesta.
+- `backend/evals/` y `backend/scripts/evaluate_*.py`: conjuntos de evaluación de recuperación y de conversaciones.
+- `better-rag/`: documento de conocimiento sectorial, su versión consolidada y `tools/restructure.py`, que arma las fichas.
 - `public/`: recursos estáticos (imágenes, mapa, PDFs editoriales).
 
 ## Despliegue con Coolify
@@ -74,7 +90,7 @@ npm install
 npm run dev
 ```
 
-Abrir `http://localhost:4321/gianna/`. Para detener la API local, usar `docker compose -f compose.yaml -f compose.local.yaml stop` desde `backend/`. El despliegue de producción usa únicamente `compose.yaml`; más detalle en [backend/README.md](backend/README.md).
+Abrir `http://localhost:4321/gianna/`. Sin Docker (por ejemplo en Windows) se puede levantar la API con `python scripts/run_local.py --port 8001 --human-test` desde `backend/`, usando `PUBLIC_GIANNA_API_BASE=http://localhost:8001`. Para detener la API local, usar `docker compose -f compose.yaml -f compose.local.yaml stop` desde `backend/`. El despliegue de producción usa únicamente `compose.yaml`; más detalle en [backend/README.md](backend/README.md).
 
 ## Desarrollo
 
@@ -132,7 +148,9 @@ Las advertencias editoriales distinguen datos de fuente, interpretación comerci
 
 ## Documentación adicional
 
-- [Motor RAG y agente de Gianna](backend/docs/RAG_ENGINE.md): arquitectura, modelos y contrato de respuesta.
+- [Motor RAG de Gianna](backend/docs/RAG_ENGINE.md): arquitectura, flujo de una consulta, base de conocimiento y mediciones.
+- [Diseño del agente](backend/docs/AGENT_DESIGN.md): política de respuesta, herramientas y citas.
+- [Validación del agente](backend/reports/VALIDACION.md): resultados reales y límites.
 - [Backend de Gianna](backend/README.md): despliegue, panel, bases de conocimiento y pruebas.
 - [Plan e inventario](docs/IMPLEMENTATION_PLAN.md)
 - [Reporte de pruebas y limitaciones](docs/TEST_REPORT.md)

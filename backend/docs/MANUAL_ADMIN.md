@@ -36,7 +36,7 @@ Las modificaciones solo afectan al borrador. Una versión ya indexada contiene s
 
 ## Crear el índice
 
-Pulsar la acción de crear versión. El sistema toma una instantánea del contenido público aprobado, tokeniza con Bekko, corta fragmentos respetando el presupuesto configurado, genera vectores y crea una tabla LanceDB con búsqueda BM25 española. Horizon reordena los candidatos durante las consultas. Los modelos deben prepararse mediante `python -m scripts.prepare_models` antes de indexar.
+Pulsar la acción de crear versión. El sistema toma una instantánea del contenido público aprobado, tokeniza con el tokenizador real de Granite, corta fragmentos respetando el presupuesto configurado (cada uno lleva una cabecera con título, tema, sección y zonas), genera vectores y crea una tabla LanceDB con búsqueda BM25 española. Durante las consultas, la búsqueda híbrida (vectores + BM25 con fusión RRF) alimenta al agente, que puede buscar de nuevo o leer fichas completas; el reranker ya no interviene en el chat. Para un corpus con fragmentos sueltos, generar antes las fichas con `better-rag/tools/restructure.py`. Los modelos deben prepararse mediante `python -m scripts.prepare_models` antes de indexar.
 
 El trabajo muestra progreso y verifica la cantidad final de puntos. El modelo se carga una vez por proceso y los embeddings idénticos se reutilizan por huella. Los textos cambiados se vuelven a calcular. Un reintento mantiene identificadores estables y no duplica puntos.
 
@@ -52,7 +52,7 @@ El mapa 2D usa PCA sobre los vectores reales y como máximo 1.200 fragmentos. Se
 
 ## Probar antes de publicar
 
-El laboratorio permite recuperar evidencia y conversar contra una versión concreta sin hacerla pública. No permite seleccionar material interno como fuente del chat. Las consultas de prueba pueden usar la API de pago; la prueba de recuperación no necesita generar una respuesta con Ollama.
+El laboratorio permite recuperar fichas (búsqueda híbrida, sin llamar a Ollama) o ejecutar el agente completo contra una versión concreta sin hacerla pública. No permite seleccionar material interno como fuente del chat. Las consultas de prueba pueden usar la API de pago; la prueba de recuperación no necesita generar una respuesta con Ollama.
 
 Para esta guía, cargar las 62 preguntas de `pruebas_recuperacion.json`. El resultado indica si se recuperó alguno de los registros esperados. Ese indicador **no mide exactitud de la redacción**, cobertura de todos los aspectos ni validez jurídica. Complementarlo con las 12 situaciones de revisión humana y preguntas propias.
 

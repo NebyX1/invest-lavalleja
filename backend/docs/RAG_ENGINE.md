@@ -35,7 +35,86 @@ códigos internos (Z3, O05) se traducen a nombres, fuentes completas por cita
 JSON del chat (answer, citations, status, notice…) — mismo contrato que usa la isla React
 ```
 
-Si el proveedor falla tras reintentos y modelo alternativo y ya hay evidencia, se devuelve un estado `degraded` con las tres fichas más relacionadas; sin evidencia, un error `ollama_unavailable` claro.
+Si el proveedor falla tras reintentos y modelo alternativo y ya hay evidencia, se devuelve un estado `degraded` con las tres fichas más relacionadas; sin evidencia, un error `ollama_unavailable` claro. El prompt del modelo incluye además el **mapa de la guía** (identificador y título de las 257 fichas) para que descubra qué existe antes de afirmar que algo no está.
+
+## Diagramas
+
+### Componentes
+
+```mermaid
+flowchart LR
+    subgraph Portal["Portal Astro"]
+        UI["Isla React GiannaChat<br/>(captcha, sesión, fuentes)"]
+    end
+    subgraph API["Backend Flask + Gunicorn (1 proceso)"]
+        PUB["routes/public.py<br/>sesión anónima, límites, historial cifrado"]
+        RAG["services/rag.py<br/>orquestación y métricas"]
+        AG["services/agent.py<br/>bucle con herramientas, citas"]
+        SAFE["services/safety.py<br/>compuerta determinista"]
+        RET["services/retrieval.py<br/>búsqueda híbrida, fichas"]
+        RT["services/runtime.py<br/>cliente Ollama: reintentos, alternativa"]
+        ADM["Panel admin<br/>bases, versiones, laboratorio, ajustes"]
+        JOBS["services/jobs.py<br/>cola de indexación"]
+    end
+    MDB[("MariaDB<br/>registros, versiones, chunks,<br/>sesiones, métricas")]
+    LDB[("LanceDB<br/>vectores + FTS español")]
+    EMB["Granite 97M ONNX<br/>(CPU, embeddings)"]
+    OLL["Ollama Cloud<br/>DeepSeek (+ alternativo)"]
+    UI -->|HTTPS| PUB --> RAG --> SAFE
+    RAG --> AG --> RET
+    AG --> RT --> OLL
+    RET --> EMB
+    RET --> LDB
+    RET --> MDB
+    PUB --> MDB
+    ADM --> JOBS --> EMB
+    JOBS --> LDB
+    JOBS --> MDB
+```
+
+### Una consulta
+
+```mermaid
+sequenceDiagram
+    participant P as Persona
+    participant A as API (rag.py / agent.py)
+    participant R as Recuperación
+    participant M as Modelo (Ollama)
+    P->>A: pregunta + historial cifrado
+    A->>A: compuerta de seguridad (sin modelo)
+    alt acusación, insulto o delito
+        A-->>P: respuesta fija
+    else cortesía pura
+        A->>M: mensaje sin herramientas
+        M-->>A: respuesta breve
+    else consulta de contenido
+        A->>R: búsqueda híbrida inicial (vectores + BM25, RRF)
+        R-->>A: fichas numeradas
+        A->>M: reglas + mapa de la guía + historial + evidencia
+        loop hasta 4 pasos
+            M->>R: buscar_en_la_guia / ver_ficha
+            R-->>M: fichas nuevas
+        end
+        M-->>A: respuesta con citas [n]
+        A->>A: validar y renumerar citas, traducir códigos internos
+    end
+    A-->>P: respuesta + fuentes (o degradada si el proveedor falla)
+```
+
+### Publicación de conocimiento
+
+```mermaid
+flowchart LR
+    DOCX["Documento fuente (.docx)"] --> CONV["Conversión a gianna.corpus.v1"]
+    CONV --> RESTR["restructure.py<br/>fichas autosuficientes"]
+    RESTR --> IMP["Importación (borrador)"]
+    IMP --> REV["Revisión y aprobación editorial"]
+    REV --> BUILD["Versión inmutable:<br/>chunks con cabecera, embeddings Granite,<br/>LanceDB + FTS"]
+    BUILD --> LAB["Laboratorio y evaluación<br/>(evaluate_retrieval / evaluate_answers)"]
+    LAB --> PUBL["Publicación:<br/>puntero transaccional en MariaDB"]
+    PUBL --> CHAT["Chat público"]
+    PUBL -.->|rollback| BUILD
+```
 
 ## La base de conocimiento
 

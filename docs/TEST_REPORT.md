@@ -1,5 +1,9 @@
 # Reporte de verificación — Invest Lavalleja
 
+## Rediseño del agente Gianna · 29/10/2026
+
+El backend de Gianna se reescribió como agente con herramientas (ver [RAG_ENGINE.md](../backend/docs/RAG_ENGINE.md)). Lo único que cambió en el portal es `Sources.tsx` (las fuentes muestran el número de cita `[n]` y el nivel de evidencia en español); el contrato JSON del chat se mantiene. Verificado en esta fecha: `npm run lint` sin hallazgos y `vitest` **9/9**; `pytest` del backend **193 aprobadas, 3 omitidas**; recorrido manual en el navegador (captcha → sesión → pregunta → respuesta con fuentes) contra la API local. **No se reejecutó** la suite Playwright ni el build de 32 páginas en esta fecha. Resultados y límites del agente: [backend/reports/VALIDACION.md](../backend/reports/VALIDACION.md).
+
 ## Verificación de publicación · 21/10/2026
 
 `npm run verify` completó tipos, lint, **9 pruebas unitarias**, la compilación de **32 páginas** y Playwright con **33 aprobadas y 1 omitida** (la captura de referencia duplicada en móvil). Las pruebas de Gianna interceptan la API; no consumen Ollama ni evalúan la calidad factual del modelo.
