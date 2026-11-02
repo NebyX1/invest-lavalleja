@@ -7,24 +7,34 @@ from ..security import token_hash
 bp=Blueprint('auth',__name__,url_prefix='/admin')
 
 
+def login_form(email=''):
+    challenge=services().security.create_captcha('admin-login',request.host_url.rstrip('/'),request.remote_addr or 'unknown')
+    session['login_captcha_id']=challenge['id']
+    return render_template('login.html',captcha_question=challenge['question'],email=email)
+
+
 @bp.route('/login',methods=['GET','POST'])
 def login():
     s=services()
     if request.method=='POST':
+        email=request.form.get('email','').strip()[:254]
         challenge_id=session.pop('login_captcha_id',None)
         if not s.security.consume_captcha(challenge_id,request.form.get('captcha',''),'admin-login',
                                           request.host_url.rstrip('/'),request.remote_addr or 'unknown'):
-            flash('La verificación es incorrecta o venció. Resolvé una nueva suma.','error')
-            return redirect(url_for('auth.login'))
-        token,kind=s.security.begin_login(request.form.get('email',''),request.form.get('password',''),request.remote_addr or 'unknown')
+            flash('El CAPTCHA es incorrecto o venció. Resolvé una nueva suma.','error')
+            return login_form(email)
+        try:
+            token,kind=s.security.begin_login(email,request.form.get('password',''),request.remote_addr or 'unknown')
+        except DomainError as exc:
+            if exc.code not in {'invalid_credentials','mail_unavailable'}:raise
+            flash(str(exc),'error')
+            return login_form(email),(503 if exc.code=='mail_unavailable' else 200)
         previous=session.get('sid')
         if previous:s.db.execute('DELETE FROM admin_sessions WHERE id_hash=?',(token_hash(previous),))
         session.clear();session['pending']=token;session['csrf']=secrets.token_urlsafe(32)
         return redirect(url_for('auth.mfa'))
     if g.get('user'):return redirect(url_for('admin.dashboard'))
-    challenge=s.security.create_captcha('admin-login',request.host_url.rstrip('/'),request.remote_addr or 'unknown')
-    session['login_captcha_id']=challenge['id']
-    return render_template('login.html',captcha_question=challenge['question'])
+    return login_form()
 
 
 @bp.route('/mfa',methods=['GET','POST'])

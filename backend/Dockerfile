@@ -22,7 +22,6 @@ COPY --chown=gianna:gianna gianna /app/gianna
 COPY --chown=gianna:gianna scripts /app/scripts
 COPY --chown=gianna:gianna wsgi.py gunicorn.conf.py /app/
 USER 10001:10001
-RUN opt_in_out --opt_out
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD curl --fail --silent --show-error --max-time 3 http://127.0.0.1:8000/health/live || exit 1

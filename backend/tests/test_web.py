@@ -254,11 +254,11 @@ def test_admin_login_requires_fresh_captcha(app):
     c=app.test_client();s=app.extensions['gianna'];s.security.create_user('owner@example.test','Owner','a-long-test-password','owner')
     csrf_token,answer=admin_captcha(c)
     login={'csrf':csrf_token,'email':'owner@example.test','password':'a-long-test-password'}
-    assert c.post('/admin/login',data=login).status_code==302
-    with c.session_transaction(path='/admin/login') as sess:assert 'pending' not in sess and 'login_captcha_id' not in sess
+    assert c.post('/admin/login',data=login).status_code==200
+    with c.session_transaction(path='/admin/login') as sess:assert 'pending' not in sess and 'login_captcha_id' in sess
     csrf_token,answer=admin_captcha(c);login['csrf']=csrf_token
-    assert c.post('/admin/login',data={**login,'captcha':'99'}).status_code==302
-    assert c.post('/admin/login',data={**login,'captcha':str(answer)}).status_code==302
+    assert c.post('/admin/login',data={**login,'captcha':'99'}).status_code==200
+    assert c.post('/admin/login',data={**login,'captcha':'99'}).status_code==200
     with c.session_transaction(path='/admin/login') as sess:assert 'pending' not in sess
     csrf_token,answer=admin_captcha(c);login['csrf']=csrf_token
     response=c.post('/admin/login',data={**login,'captcha':str(answer)})

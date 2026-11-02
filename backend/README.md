@@ -4,7 +4,7 @@
 
 Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro.
 
-**Motor RAG actualizado · 19/10/2026:** Bekko OpenVINO CPU + Horizon ONNX CPU + LanceDB (cosine exacto y BM25 español). Preparación explícita de modelos, versiones con huella nueva y reindexación obligatoria. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes de septiembre que siguen describen verificaciones históricas.
+**Motor RAG actualizado · 21/10/2026:** Bekko ONNX Runtime CPU + Horizon ONNX Runtime CPU + LanceDB (cosine exacto y BM25 español). Se retiró OpenVINO tras confirmar un `SIGSEGV` del compilador en producción. La huella nueva requiere una nueva versión vectorial; no se reutilizan ni mezclan vectores. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes anteriores describen verificaciones históricas.
 
 **Estado conversacional:** Gianna usa `deepseek-v4.1-flash` en la pila local de prueba. Un harness distingue conversación, consulta RAG, preguntas externas, burlas, privacidad y pedidos dañinos antes de recuperar documentos. Las respuestas sobre inversión requieren fuentes; la conversación no muestra citas irrelevantes ni rechazos en tercera persona. La pila Docker de prueba humana está aislada y avisa que el contenido no fue revisado. La base operativa permanece sin publicación y no está validada para producción. Se aprobaron 106 pruebas Python, 12 pruebas de navegador de Gianna (escritorio y móvil) y una batería real de 16/16 diálogos; esos resultados no certifican exactitud factual. SMTP real y Coolify remoto no están validados. Consultar `reports/VALIDACION.md` y completar `docs/PUESTA_EN_MARCHA.md` antes de abrirla al público.
 
@@ -21,6 +21,33 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 - Chat público de prueba `/chat`; isla React activa en `../src/components/islands/GiannaChat.tsx`; `AgentHarness` controla rutas, respuestas de seguridad y acceso al RAG; contexto corto cifrado de hasta seis intercambios, botón para olvidar y límites de uso. Ambos inicios de sesión exigen CAPTCHA.
 - Compose, Dockerfile, migraciones MariaDB, importador único desde SQLite y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un índice LanceDB precalculado.
 
+## Crear administradores y superadministradores
+
+Desde la carpeta `backend`, con las dependencias y el `.env` de la instalación, se usa la misma sintaxis que en Buzón Ciudadano:
+
+```bash
+# Superadministrador
+python -m flask create-admin "Nombre completo" "superadmin@example.com" "contraseña-de-al-menos-12-caracteres" true
+# Administrador
+python -m flask create-admin "Nombre completo" "admin@example.com" "otra-contraseña-de-al-menos-12-caracteres" false
+```
+
+Los valores son ejemplos: reemplazarlos antes de ejecutar. `true` corresponde al rol interno `owner` (Propietario en el panel): administra cuentas y configuración, y puede publicar y retirar conocimiento. `false` corresponde a `editor` (Editor en el panel): gestiona documentos, revisión e indexación, pero no administra cuentas ni publica. Si se omite el último argumento, se crea un administrador, igual que en Buzón. Solo se admiten `true` y `false`, sin distinguir mayúsculas; un valor incorrecto detiene el alta.
+
+En la terminal del contenedor de Coolify funciona el mismo comando. Con Compose, anteponer `docker compose exec api` (y los overrides de la instalación cuando correspondan). No se necesitan variables nuevas ni recrear usuarios. Las cuentas existentes conservan sus permisos.
+
+En esta instalación local Docker, si `DATABASE_URL` usa `host.docker.internal`, ejecutar dentro del contenedor, no con Python nativo de Windows. Para la pila local de prueba activa:
+
+```bash
+docker compose -f compose.yaml -f compose.human-test.yaml exec api python -m flask create-admin "Nombre completo" "superadmin@example.com" "contraseña-de-al-menos-12-caracteres" true
+```
+
+Usar `false` al final para un administrador. Esto utiliza la misma `DATABASE_URL`; no requiere otra conexión ni variables adicionales.
+
+El doble factor por correo es obligatorio para todas las cuentas. Configurar `MAIL_*` antes del alta; el código se envía al correo de cada administrador al iniciar sesión y no requiere opciones adicionales. El comando sin argumentos y las opciones anteriores `--email` y `--name` conservan el alta interactiva de un **superadministrador**, con contraseña oculta. Las contraseñas posicionales pueden quedar en el historial de la terminal; usar el modo interactivo cuando no se quiera incluirlas allí. No hay credenciales por defecto ni se imprime la contraseña en el resultado.
+
+Al desplegar esta versión, la migración cambia las cuentas existentes a segundo factor por correo, conserva sus contraseñas y permisos y revoca las sesiones y los desafíos del autenticador anterior. No hay que recrear cuentas ni cambiar claves del entorno. Para recibir un nuevo código, iniciar sesión nuevamente; los códigos anteriores quedan invalidados.
+
 ## Stack decidido
 
 ```text
@@ -28,7 +55,7 @@ Portal Astro / isla React
         ↓
 Flask + Gunicorn + Jinja + MariaDB
         ↓
-Bekko OpenVINO (384 dimensiones, CPU)
+Bekko ONNX Runtime (384 dimensiones, CPU)
         ↓
 LanceDB: cosine + BM25 español + RRF → Horizon cross-encoder
         ↓
@@ -58,19 +85,6 @@ docker compose -f compose.yaml -f compose.local.yaml exec api flask --app wsgi c
 Antes de ejecutar una importación antigua, detener la API y usar `scripts/migrate_sqlite_to_mariadb.py`; `DATABASE_URL` debe indicar un destino vacío. Abrir `http://localhost:8000/admin/login`. El comando solicita nombre, correo y contraseña sin imprimirla. Después de resolver el CAPTCHA e ingresar la contraseña, introducir el código enviado al correo de la cuenta. No hay usuario ni contraseña por defecto. En Windows está también `run.ps1`.
 
 Configurar las variables habituales `MAIL_*` para enviar el segundo factor por correo, igual que en Buzón Ciudadano. Si falla el envío, se informa el problema y no se abre una sesión autenticada.
-
-### Crear administradores y superadministradores
-
-El comando mantiene la sintaxis de Buzón Ciudadano; ejecutarlo desde `backend/` o dentro del contenedor API:
-
-```bash
-python -m flask create-admin "Nombre completo" "superadmin@example.com" "contraseña-de-al-menos-12-caracteres" true
-python -m flask create-admin "Nombre completo" "admin@example.com" "otra-contraseña-de-al-menos-12-caracteres" false
-```
-
-Reemplazar los valores de ejemplo. `true` crea un superadministrador (`owner`, Propietario en el panel); `false` crea un administrador (`editor`, Editor). Omitir el booleano equivale a `false`. Todas las cuentas usan el código por correo automáticamente. El alta interactiva sigue disponible sin argumentos y crea un superadministrador con la contraseña oculta. Con URL `host.docker.internal`, ejecutar dentro del contenedor. Las contraseñas posicionales pueden quedar en el historial de la terminal.
-
-Al desplegar esta versión, la migración cambia las cuentas existentes a segundo factor por correo, conserva sus contraseñas y permisos y revoca las sesiones y los desafíos del autenticador anterior. No hay que recrear cuentas ni cambiar claves del entorno. Para recibir un nuevo código, iniciar sesión nuevamente; los códigos anteriores quedan invalidados.
 
 El panel permite trabajar con documentos antes de configurar Ollama. Para generar respuestas se necesita una clave válida y seleccionar un modelo que exista en el catálogo real. El botón **Cargar catálogo real de Ollama** evita adivinar nombres. Antes de indexar, ejecutar `docker compose run --rm api python -m scripts.prepare_models`. Las consultas solo leen los modelos locales verificados.
 

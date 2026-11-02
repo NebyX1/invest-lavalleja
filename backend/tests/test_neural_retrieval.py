@@ -2,7 +2,7 @@ import json
 import math
 import pytest
 from gianna.errors import DomainError
-from gianna.services.neural import verified_manifest
+from gianna.services.neural import ENGINE_VERSION,artifact_specs,verified_manifest
 from gianna.services.vector_store import LanceStore
 from gianna.services.harness import AgentHarness
 
@@ -32,6 +32,23 @@ def test_model_manifest_rejects_corruption(tmp_path):
         'tokenizer.json':{'bytes':2,'sha256':'wrong'}}}))
     with pytest.raises(DomainError) as exc:verified_manifest(folder,'test','pinned',['tokenizer.json'])
     assert exc.value.code=='models_not_prepared'
+
+
+def test_model_manifest_ignores_unused_runtime_artifacts(tmp_path):
+    folder=tmp_path/'model';folder.mkdir()
+    artifact=folder/'tokenizer.json';artifact.write_text('{}')
+    digest=__import__('hashlib').sha256(artifact.read_bytes()).hexdigest()
+    (folder/'manifest.json').write_text(json.dumps({'model_id':'test','revision':'pinned','files':{
+        'tokenizer.json':{'bytes':2,'sha256':digest},
+        'openvino/openvino_model.xml':{'bytes':999,'sha256':'unused'}}}))
+    assert verified_manifest(folder,'test','pinned',['tokenizer.json'])['model_id']=='test'
+
+
+def test_bekko_runtime_uses_onnx_and_invalidates_previous_vector_fingerprint():
+    bekko=artifact_specs()[0][3]
+    assert 'onnx/model.onnx' in bekko
+    assert not any(name.startswith('openvino/') for name in bekko)
+    assert ENGINE_VERSION=='bekko-horizon-lance-v2'
 
 
 def test_boliche_is_answered_as_a_bar_pub_or_dance_venue_without_asking_first():

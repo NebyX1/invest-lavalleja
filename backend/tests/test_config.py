@@ -33,10 +33,12 @@ def load(env, tmp_path, **overrides):
 
 
 def test_minimal_production_uses_internal_defaults(env, tmp_path):
+    env['EMBEDDING_BACKEND']='openvino'  # A stale deployment variable cannot select a native runtime.
     cfg = load(env, tmp_path)
     assert cfg.production and cfg.proxy_hops == 1
     assert set(cfg.trusted_hosts) == {'portal.example.test', 'api.example.test', 'localhost', '127.0.0.1'}
-    assert (cfg.embedding_backend, cfg.embedding_threads, cfg.embedding_batch_size) == ('openvino', 2, 8)
+    assert (cfg.embedding_threads, cfg.embedding_batch_size) == (2, 8)
+    assert not hasattr(cfg,'embedding_backend')
     assert (cfg.max_concurrent_chat, cfg.max_upload_mb, cfg.max_records) == (3, 12, 10000)
     assert cfg.ollama_url == 'https://ollama.com'
 

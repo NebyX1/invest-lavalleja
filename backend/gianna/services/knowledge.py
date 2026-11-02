@@ -6,6 +6,7 @@ from ..db import uid,dumps
 from ..corpus import Corpus,Record,Source,DocumentInfo
 from ..errors import DomainError
 from ..chunking import CONTEXTUALIZER_VERSION
+from .neural import ENGINE_VERSION
 
 
 class Knowledge:
@@ -108,7 +109,7 @@ class Knowledge:
             if not rows:raise DomainError('No hay contenido público aprobado para indexar.')
             profile={'chunk_tokens':settings.chunk_tokens,'overlap_tokens':settings.overlap_tokens,
                 'contextualizer_version':CONTEXTUALIZER_VERSION,'model':'hotchpotch/bekko-embedding-v1-a8m',
-                'engine':'bekko-horizon-lance-v1','sparse':'lancedb/bm25-spanish','language':'spanish','dim':384}
+                'engine':ENGINE_VERSION,'sparse':'lancedb/bm25-spanish','language':'spanish','dim':384}
             db.execute('INSERT INTO versions(id,base_id,revision,collection_name,profile_json,created_at) VALUES(?,?,?,?,?,?)',
                 (version_id,base_id,base['revision'],'gianna_'+version_id,dumps(profile),now))
             for r in rows:
@@ -125,7 +126,6 @@ class Knowledge:
         with self.db.tx(immediate=True) as db:
             v=db.execute('SELECT v.*,b.revision AS current_revision,b.status AS base_status FROM versions v JOIN bases b ON b.id=v.base_id WHERE v.id=?',(version_id,)).fetchone()
             if not v or v['status']!='ready' or v['base_status']=='deleting':raise DomainError('La versión todavía no está lista.',409)
-            from .neural import ENGINE_VERSION
             if json.loads(v['profile_json']).get('engine')!=ENGINE_VERSION:
                 raise DomainError('Esta versión pertenece al motor anterior. Creá una nueva versión antes de publicarla.',409,'index_profile_mismatch')
             if not rollback and v['revision']!=v['current_revision']:

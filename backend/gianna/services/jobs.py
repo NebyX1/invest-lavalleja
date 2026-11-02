@@ -94,8 +94,7 @@ class Jobs:
                 path.unlink(missing_ok=True)
                 result={'base_id':base_id,'records':len(corpus.records)}
             elif kind=='warmup':
-                self.progress(id,'Preparando Bekko, Horizon y LanceDB desde artefactos locales verificados.')
-                self.embeddings.load();result=self.embeddings.profile
+                self.embeddings.load(lambda message:self.progress(id,message));result=self.embeddings.profile
             elif kind=='build':result=self.build(job)
             elif kind=='delete':result=self.delete(job)
             elif kind=='evaluation':result=self.evaluate(job,payload)
@@ -118,8 +117,7 @@ class Jobs:
         if not version:raise DomainError('Versión no encontrada.',404)
         profile=json.loads(version['profile_json'])
         self.db.execute("UPDATE versions SET status='building' WHERE id=?",(vid,))
-        self.progress(id,'Preparando Bekko y Horizon y el tokenizador exacto')
-        self.embeddings.load()
+        self.embeddings.load(lambda message:self.progress(id,message))
         if profile.get('fingerprint') and profile['fingerprint']!=self.embeddings.profile['fingerprint']:
             raise DomainError('Cambió el modelo durante una reanudación. Creá una versión nueva; no mezcles vectores.')
         profile.update(self.embeddings.profile)

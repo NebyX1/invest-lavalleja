@@ -154,11 +154,12 @@ a, button, input, select, summary { outline: none; }
 .faq-list details { padding:.9rem 0; border-top:1px solid var(--line); }
 .faq-list summary { cursor:pointer; font-weight:600; }
 .faq-list details p { color:var(--muted); line-height:1.6; }
-.error-page { width:min(100% - 2rem, 900px); min-height:55vh; margin:0 auto; display:grid; align-content:center; padding:5rem 0; }
+.error-page { width:min(100% - 2rem, 900px); min-height:55vh; margin:0 auto; display:grid; align-content:start; padding:clamp(9rem, calc(7rem + 6vh), 12rem) 0 4rem; }
 .error-page h1 { max-width:700px; margin:.7rem 0; font-size:clamp(2.5rem, 7vw, 6rem); line-height:.98; }
 .error-page > p:not(.eyebrow) { max-width:34rem; color:var(--muted); font-size:1.1rem; }
 
 @media (max-width: 820px) {
+  .error-page { padding-top:clamp(8.5rem, 16vh, 10rem); }
   .site-header.big-nav { display: none; }
   .site-header.small-nav { display: block; }
   .site-header .nav-shell { position:relative; }

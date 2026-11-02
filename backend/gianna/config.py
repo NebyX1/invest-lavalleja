@@ -39,7 +39,6 @@ class Config:
     database_url: str = field(default='', repr=False)
     production: bool = True
     human_test_mode: bool = False
-    embedding_backend: str = 'openvino'
     ollama_url: str = 'https://ollama.com'
     ollama_api_key: str = field(default='', repr=False)
     ollama_model: str = ''
@@ -103,7 +102,6 @@ class Config:
             database_url=env.get('DATABASE_URL', '').strip(),
             production=profile.production,
             human_test_mode=truth('GIANNA_HUMAN_TEST_MODE', 'false'),
-            embedding_backend=env.get('EMBEDDING_BACKEND','openvino'),
             ollama_url=env_value(env, 'OLLAMA_HOST', 'OLLAMA_BASE_URL', 'https://ollama.com').rstrip('/'),
             ollama_api_key=env.get('OLLAMA_API_KEY', ''),
             ollama_model=env.get('OLLAMA_MODEL', ''),
@@ -179,8 +177,6 @@ class Config:
             raise ValueError('Perfil de CPU fuera de rango.')
         if not 1 <= cfg.max_concurrent_chat <= 16:
             raise ValueError('MAX_CONCURRENT_CHAT fuera de rango.')
-        if cfg.embedding_backend not in {'openvino','onnx'}:
-            raise ValueError('EMBEDDING_BACKEND debe ser openvino u onnx.')
         cfg.data_dir.mkdir(parents=True, exist_ok=True)
         for sub in ('uploads','exports','models'):
             (cfg.data_dir/sub).mkdir(exist_ok=True)
