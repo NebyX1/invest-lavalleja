@@ -1,60 +1,130 @@
-# Investigación histórica de septiembre
-
-El motor descrito en este documento corresponde a la entrega inicial (E5 + Qdrant) y se conserva como registro de la investigación. La arquitectura vigente desde el 29/10/2026 es Granite + LanceDB (vectores + BM25 español) con un agente de herramientas, documentada en [RAG_ENGINE.md](RAG_ENGINE.md) y [AGENT_DESIGN.md](AGENT_DESIGN.md); las versiones Bekko/Horizon siguen consultables, y las comparaciones locales anteriores están en `reports/rag-migration/`.
-
 # Referencias técnicas y decisiones
 
-Revisión: 28 de septiembre de 2026. Las referencias describen capacidades de los componentes, no resultados medidos de esta aplicación.
+**Revisión: 6 de noviembre de 2026.** Este documento describe el stack vigente y conserva, al final, el registro de las etapas anteriores. Las referencias externas describen capacidades de los componentes; no son resultados medidos de esta aplicación.
 
-## Patrón institucional revisado
+## Stack vigente
 
-Repositorio `IntendenciaDeLavalleja/buzon-ciudadano-backend`, commit observado `3198d34ed3c15cee47caa33ef73e94dbfd16b6ed`: README, árbol, modelo de usuario, rutas de administración y factoría Flask. El ejemplo usa contraseña Argon2 y segundo factor por correo, administración por roles, auditoría y CSRF. El 21/10/2026 se volvió a contrastar ese código y se retiró la variante TOTP añadida en la entrega inicial. El acceso de Gianna sigue el mismo patrón institucional: CAPTCHA y contraseña, código aleatorio de seis dígitos por correo, hash Argon2, diez minutos y consumo de un solo uso. No copia credenciales, historias de usuarios ni adjuntos del Buzón.
+| Capa | Componente | Versión / revisión | Por qué |
+| --- | --- | --- | --- |
+| Portal | Astro + React | ver `package.json` | Páginas estáticas con islas interactivas |
+| API | Flask + Gunicorn | 3.1.3 / 26.2.0 | Un solo proceso, seis hilos, cola durable |
+| Datos | MariaDB | 10.6 o posterior | Usuarios, sesiones, corpus, versiones, métricas |
+| Vectores | LanceDB embebido | 0.40.0 | Coseno exacto + FTS español sin servidor aparte |
+| Embedding | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad140…` | Multilingüe, 384 dim, CPU |
+| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | Comparación en evaluación; no se usa en el chat |
+| Inferencia local | ONNX Runtime | 1.31.0 | CPU, sin GPU ni OpenVINO |
+| Tokenizador | `tokenizers` | 0.23.3 | Conteo exacto de tokens para el chunking |
+| Generación | Ollama Cloud `/api/chat` | catálogo `/api/tags` | Modelo con herramientas nativas, sin descargar pesos |
 
-https://github.com/IntendenciaDeLavalleja/buzon-ciudadano-backend
+## Embedding en CPU
 
-## Embeddings en CPU
+Se usa **Granite 97M multilingüe R2** (`ibm-granite/granite-embedding-97m-multilingual-r2`), exportado a ONNX cuantizado (`model_quint8_avx2.onnx`) y ejecutado con ONNX Runtime en CPU.
 
-Se mantiene `intfloat/multilingual-e5-small`. El modelo documenta 384 dimensiones, entradas de hasta 512 tokens y prefijos `query: ` / `passage: ` también en otros idiomas. Se implementa pooling medio y normalización, y se valida el presupuesto incluyendo metadatos y tokens especiales.
+- 384 dimensiones, pooling **CLS**, normalización L2.
+- Hasta 512 tokens por entrada.
+- Sin prefijos `query:` / `passage:`: el modelo no los requiere y el proyecto no los agrega.
+- La cabecera contextual de cada ficha (título, tema, sección, zonas) se antepone al texto que se vectoriza y al que se indexa para BM25.
+- La revisión está fijada por SHA-256; un cambio de pesos, pooling o runtime invalida la huella y exige una versión nueva.
 
-https://huggingface.co/intfloat/multilingual-e5-small
+Referencia: <https://huggingface.co/ibm-granite/granite-embedding-97m-multilingual-r2>
 
-FastEmbed utiliza ONNX Runtime y admite modelos personalizados con configuración de pooling, normalización y fuente. No se afirma que sea universalmente el runtime más rápido ni que cualquier exportación sea automáticamente INT8. La entrega utiliza `onnx/model.onnx`, no una cuantización inventada.
+## Reranker
 
-https://github.com/qdrant/fastembed
-https://github.com/qdrant/fastembed/blob/main/fastembed/text/custom_text_embedding.py
-https://github.com/qdrant/fastembed/blob/main/fastembed/text/text_embedding.py
-https://pypi.org/project/fastembed/
+Se conserva **mMARCO MiniLM** (`cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`), también en ONNX cuantizado para CPU, con pares de hasta 512 tokens y puntaje sigmoide.
 
-BM25 se configura en español. Su implementación FastEmbed requiere el modificador IDF en Qdrant; se incluye en la colección. No se fusionan directamente valores coseno y BM25 como si fueran escalas equivalentes: se usa RRF.
+No participa del camino de la consulta. Se evaluó contra el conjunto de oro y no mejoró el resultado híbrido:
 
-https://github.com/qdrant/fastembed/blob/main/fastembed/sparse/bm25.py
-https://qdrant.tech/documentation/search/hybrid-queries/
-https://api.qdrant.tech/api-reference/search/query-points
+| Modo | hit@8 | MRR | ms por búsqueda |
+| --- | --- | --- | --- |
+| Híbrido | **0,961** | **0,830** | **145** |
+| Híbrido + cross-encoder | 0,941 | 0,825 | ~4.800 |
+| Solo cross-encoder | 0,922 | 0,841 | ~4.850 |
 
-## Servicios y versiones
+Por eso se usa solo en dos lugares: la verificación de `scripts/prepare_models.py` y la comparación de `scripts/evaluate_retrieval.py --modes fused rerank`. El laboratorio del panel y el chat usan búsqueda híbrida sin reranker.
 
-Se fija Qdrant Server `v1.19.1`, identificado como release estable en la revisión; no `latest` ni Edge beta. El contenedor no se ejecutó aquí. Se emplea su API REST con HTTPX y conexión reutilizable, evitando otro cliente de inferencia.
+Referencia: <https://huggingface.co/cross-encoder/mmarco-mMiniLMv2-L12-H384-v1>
 
-https://github.com/qdrant/qdrant/releases
+## Búsqueda híbrida y fusión
 
-Dependencias directas elegidas: Flask `3.1.3`, Gunicorn `26.2.0`, FastEmbed `0.8.1`, además de las versiones incluidas en `requirements.txt`. Se verificó la publicación de estos paquetes; la combinación completa y sus dependencias transitivas sigue pendiente de instalación y pruebas en la imagen final.
+LanceDB combina dos canales sobre la misma tabla versionada:
 
-https://pypi.org/project/Flask/
-https://pypi.org/project/gunicorn/
-https://flask.palletsprojects.com/en/stable/deploying/gunicorn/
+1. **Vectorial:** coseno exacto sobre los embeddings de Granite.
+2. **Léxico:** índice FTS nativo con idioma español, stemming, `ascii_folding` y eliminación de palabras vacías.
 
-Ollama Cloud recibe llamadas directas a `/api/chat` con Bearer token desde el backend. El modelo se elige a partir de `/api/tags`. No se necesita descargar Ollama ni el modelo generativo en el VPS. No se depende de una garantía de salida estructurada JSON: el backend construye la respuesta y resuelve las citas conocidas.
+Los resultados se fusionan con **Reciprocal Rank Fusion** (`k = 60`). No se suman directamente un coseno y un puntaje BM25: son escalas distintas. La fusión se hace por ranking, que es lo que documenta LanceDB para búsqueda híbrida.
 
-https://docs.ollama.com/cloud
-https://docs.ollama.com/api/chat
-https://docs.ollama.com/api/tags
+- <https://docs.lancedb.com/search/hybrid-search>
+- <https://docs.lancedb.com/search/full-text-search>
+- <https://docs.lancedb.com/reranker>
 
-Coolify administra Compose desde Git, variables referenciadas, dominios por servicio, volúmenes y health checks declarados. Se evita publicar Qdrant con `ports:`. Las variables sensibles son de ejecución y no argumentos de build.
+El índice vive embebido en el proceso. No hay un servidor vectorial separado, ni Qdrant, ni un servicio de embeddings por HTTP.
 
-https://coolify.io/docs/applications/builds/docker-compose
+## Generación
 
-## Razones de simplificación
+Ollama Cloud recibe llamadas directas a `/api/chat` con Bearer token desde el backend. El modelo se elige desde `/api/tags`; el panel muestra el catálogo real.
 
-Jinja y JavaScript local mantienen la administración en el backend Flask, sin compilar otro SPA. El prototipo comenzó con SQLite WAL y se migró a MariaDB para consolidar la configuración con el boilerplate institucional. Una cola persistente de un trabajador permite reintento, recuperación y progreso sin Redis/Celery. El compromiso sigue siendo una sola instancia y competencia temporal por CPU; medir la latencia durante cargas.
+- Modelo por defecto en esta instalación: `deepseek-v4.1-flash:1017`.
+- Alternativa: `OLLAMA_FALLBACK_MODELS`, por defecto `deepseek-v4.1-flash`.
+- `think` se decide por familia en `services/runtime.py`: `low` para `deepseek-v4.1-flash:1017`, `false` para `deepseek-v4.1-flash` sin revisión, ausente para `minimax-m3.1-flash`.
+- No se descarga el modelo generativo en el VPS ni se depende de salida JSON estructurada. El backend valida las citas contra la evidencia y arma la respuesta.
 
-PCA con NumPy se ejecuta después de indexar, no por cada pregunta. No se añade UMAP, PyTorch, GraphRAG, agentes autónomos, reranker o navegación web durante las conversaciones. Las mejoras de calidad deben justificarse con las preguntas reales de esta guía, no solo con popularidad de una biblioteca.
+- <https://docs.ollama.com/cloud>
+- <https://docs.ollama.com/api/chat>
+- <https://docs.ollama.com/api/tags>
+
+## Recuperación contextual
+
+La unidad editorial es la **ficha**; la unidad indexada es el **fragmento**. Cada fragmento lleva una cabecera determinista con título, tema, sección y zonas, inspirada en *Contextual Retrieval* de Anthropic. No se usa un modelo generativo para reescribir el contexto: la cabecera se arma con metadatos del registro.
+
+- <https://www.anthropic.com/research/contextual-retrieval>
+
+El agente recibe la ficha completa (small-to-big), no solo el fragmento, para que una condición o un porcentaje no aparezca separado de su oportunidad.
+
+## Decisiones de arquitectura
+
+- **Un proceso Gunicorn.** Un solo proceso mantiene un encoder, un reranker opcional y un trabajador de indexación. Aumentar workers duplicaría memoria y rompería los bloqueos de inferencia; la concurrencia se maneja con hilos y un semáforo.
+- **MariaDB para todo el estado.** Usuarios, sesiones, corpus, versiones, trabajos, métricas y el puntero activo. SQLite solo se usa en pruebas y como origen del importador.
+- **Cola durable, sin Redis ni Celery.** La cola vive en MariaDB y la procesa un hilo supervisado. Permite reintento, progreso y recuperación tras un reinicio sin agregar servicios.
+- **LanceDB embebido.** Evita otro contenedor y mantiene el índice junto a los modelos en el volumen privado. Cada versión tiene su propia tabla.
+- **ONNX en CPU, sin OpenVINO.** OpenVINO se retiró por un `SIGSEGV` confirmado en producción. ONNX Runtime es el runtime único.
+- **Sin web ni herramientas de escritura.** El agente solo busca y lee la versión pública publicada. No publica, no modifica, no accede a secretos.
+- **Agente acotado.** Bucle máximo de 4 pasos, 6 llamadas por paso, 36.000 caracteres de evidencia y 100 s totales. No es un agente autónomo sin límites.
+- **Publicación explícita.** Cargar, editar e indexar no publican. Solo una cuenta propietaria mueve el puntero activo, con segundo factor reciente.
+
+## Dependencias directas
+
+```text
+Flask 3.1.3            Gunicorn 26.2.0        pydantic 2.13.4
+httpx 0.28.1           argon2-cffi 25.1.0     cryptography 50.0.1
+python-docx 1.2.0      python-dotenv 1.2.2    numpy 2.4.6
+psutil 7.2.2           tokenizers 0.23.3      onnxruntime 1.31.0
+lancedb 0.40.0         pyarrow 26.0.0         SQLAlchemy 2.0.46
+mariadb 1.1.14
+```
+
+Las versiones están fijadas en `requirements.txt`. El árbol transitivo debe resolverse y verificarse en la plataforma destino; la revisión de vulnerabilidades forma parte del checklist de puesta en marcha.
+
+## Coolify
+
+Coolify administra Compose desde Git, variables de ejecución, dominios por servicio, volúmenes y health checks. La API no publica puertos directamente: queda detrás del proxy HTTPS. Los secretos son variables de ejecución, nunca argumentos de build.
+
+- <https://coolify.io/docs/applications/builds/docker-compose>
+
+## Etapas anteriores (registro)
+
+| Etapa | Stack | Estado |
+| --- | --- | --- |
+| Entrega inicial (septiembre de 2026) | E5 multilingüe + FastEmbed + Qdrant + SQLite | Reemplazada. E5 y Qdrant ya no se usan; el texto sobre `passage:`/`query:` y el servidor Qdrant no describe el sistema actual. |
+| Migración a MariaDB (octubre de 2026) | E5 + Qdrant + MariaDB | Reemplazada. |
+| Perfil v2 (24 de octubre de 2026) | Bekko + Horizon + LanceDB | Solo lectura para versiones ya publicadas. |
+| Perfil v3 (29 de octubre de 2026) | Granite + mMARCO + LanceDB + agente con herramientas | **Vigente.** |
+
+Las comparaciones y los informes de las etapas anteriores están en `reports/rag-migration/` y en `docs/historico/`. No se usan como benchmark del sistema actual.
+
+## Alternativas descartadas
+
+- **UMAP, PyTorch, GraphRAG:** no aportan al problema y suman peso de despliegue. El mapa 2D del panel usa PCA con NumPy y es exploratorio, no una prueba de calidad.
+- **Reranker en el chat:** mejora marginal y latencia desproporcionada en CPU.
+- **Búsqueda web o inventario de predios:** la guía es la única fuente autorizada; agregar web exigiría revisión editorial y de permisos.
+- **Más workers o réplicas:** comparten estado y compiten por CPU; requieren rediseñar la cola y los bloqueos.
+- **Cambiar embeddings con un selector genérico:** mezclaría espacios vectoriales incompatibles. Cada cambio exige una versión nueva y una evaluación comparativa.

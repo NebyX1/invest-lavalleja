@@ -1,8 +1,14 @@
 # Validación del agente RAG
 
-**Fecha:** 29/10/2026. **Alcance:** cambios locales; sin push, despliegue ni cambios en producción. La base de prueba local no tiene revisión editorial final.
+**Fecha:** 29/10/2026. **Revisión de documentación y recuperación:** 06/11/2026. **Alcance:** cambios locales; sin despliegue ni cambios en producción. La base de prueba local no tiene revisión editorial final.
 
 Este informe describe el código actual. El informe del diseño anterior (planificador determinista) está en [historico/VALIDACION_agente_anterior.md](historico/VALIDACION_agente_anterior.md) y no aplica.
+
+## Reverificación del 06/11/2026
+
+Se auditó la documentación contra el código y la base activa (`ca5f61b7…`, motor `granite-mmarco-lance-v3`, representación `cards-context-v5`). Se corrigieron referencias obsoletas a E5/Qdrant/FastEmbed, al prefijo `passage:` y a un reranker que se describía como parte del laboratorio cuando solo se usa en la verificación de modelos y en la evaluación comparativa.
+
+Se volvió a ejecutar la recuperación híbrida sobre las 51 preguntas: **hit@1 0,745, hit@3 0,902, hit@5 0,922, hit@8 0,961, MRR 0,830, 144,9 ms de promedio**. El código de recuperación y de agente no cambió desde el 29/10/2026. No se volvieron a ejecutar las 31 conversaciones contra el proveedor en esta fecha; los resultados de esa sección corresponden a la corrida original.
 
 ## Diagnóstico de lo que fallaba
 
@@ -10,7 +16,7 @@ Este informe describe el código actual. El informe del diseño anterior (planif
 | --- | --- | --- |
 | "El proveedor de respuestas no está disponible" | El cliente trataba igual cualquier error HTTP, timeout de 80 s, respuesta vacía o recorte de contexto; el cross-encoder sumaba ~5 s por búsqueda y había varias por consulta | Reintentos con espera, modelo alternativo, plazo total de 100 s, reranker fuera del camino, respuesta degradada con fichas en vez de error |
 | "No tengo documentado un perfil de zona…" para cualquier rubro fuera del catálogo | Un planificador de palabras clave decidía abstenerse antes de que el modelo viera la evidencia | Agente con herramientas: el modelo ve la evidencia y el mapa completo de la guía y decide qué buscar |
-| Respuestas pobres con evidencia fragmentada | Registros de 60–200 caracteres ("Ocupación supuesta", "2 · Contrastar mercado") recuperados sin su contexto | Fichas autosuficientes (332 → 257 registros públicos) con cabecera contextual |
+| Respuestas pobres con evidencia fragmentada | Registros de 60–200 caracteres ("Ocupación supuesta", "2 · Contrastar mercado") recuperados sin su contexto | Fichas autosuficientes (332 fichas: 257 públicas y 75 internas; se indexan las públicas) con cabecera contextual |
 | Evidencia recortada | Tope artificial de 8.000 tokens por petición | Sin tope de 8K: hasta 36.000 caracteres de evidencia por respuesta |
 
 El modelo configurado (`deepseek-v4.1-flash:1017`) existe en el catálogo real de Ollama Cloud (`/api/tags`) y respondió en 1,4–2,7 s con y sin herramientas, con llamadas de herramientas nativas también en `glm-5.3` y `kimi-k3`.
@@ -21,7 +27,7 @@ El modelo configurado (`deepseek-v4.1-flash:1017`) existe en el catálogo real d
 
 | Modo | hit@1 | hit@3 | hit@5 | hit@8 | MRR | ms por búsqueda |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Híbrido (camino de la consulta)** | 0,745 | 0,902 | 0,922 | **0,961** | 0,830 | 60–150 |
+| **Híbrido (camino de la consulta)** | 0,745 | 0,902 | 0,922 | **0,961** | 0,830 | 145 (promedio) |
 | Híbrido + cross-encoder | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | ≈5.000 |
 | Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | ≈4.800 |
 
@@ -41,7 +47,7 @@ Además se revisaron a mano las respuestas de los casos críticos:
 
 ### 3. Pruebas automáticas y E2E
 
-- `pytest` (backend, sin las pruebas MariaDB reales): **193 passed, 3 skipped** (corpus privado no versionado). Incluye 28 pruebas nuevas del agente (herramientas, citas, degradación, mapa de la guía, privacidad de métricas) y el resto de la suite de seguridad, sesiones, índice y panel.
+- `pytest` (backend): **193 passed, 15 skipped** (12 pruebas MariaDB opcionales que requieren `--mariadb-docker` y 3 del corpus privado no versionado). Incluye 28 pruebas nuevas del agente (herramientas, citas, degradación, mapa de la guía, privacidad de métricas) y el resto de la suite de seguridad, sesiones, índice y panel.
 - Frontend: `npm run lint` sin hallazgos y `vitest` **9/9**.
 - **Concurrencia por HTTP** contra la API local con el proveedor real: 4 conversaciones simultáneas respondieron 200 en 9–15 s (las ráfagas esperan turno hasta 30 s en vez de recibir un 429 inmediato).
 - **UI real** (Astro en `localhost:4321` → API en `127.0.0.1:8001`): el flujo captcha → sesión → pregunta → respuesta con fuentes funciona con la consulta de la captura.

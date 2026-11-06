@@ -17,7 +17,7 @@ Cuando un inversor escribe una pregunta, ocurre lo siguiente:
 pregunta ─► seguridad determinista ─► (acusaciones, insultos, delitos: respuesta fija, sin modelo)
    │
    ▼
-búsqueda híbrida inicial: vectores (Granite) + palabras clave (BM25 español), fusión RRF, ≈60 ms
+búsqueda híbrida inicial: vectores (Granite) + palabras clave (BM25 español), fusión RRF, ≈145 ms medidos
    │      un seguimiento corto ("¿y en Varela?") se busca junto con la pregunta anterior
    ▼
 el modelo lee la evidencia numerada y, si hace falta, usa sus herramientas (hasta 4 pasos):
@@ -47,13 +47,23 @@ Gianna no inventa cifras, predios, beneficios fiscales, contactos ni disponibili
 | Validación de datos | Zod | Comprueba el estado guardado en el navegador |
 | Backend | Python 3, Flask, Gunicorn | API y panel de administración |
 | Base de datos | MariaDB | Documentos, versiones, aprobaciones, sesiones y puntero activo |
-| Búsqueda | LanceDB (coseno exacto + BM25 español, fusión RRF) | Índice de fichas por significado y por palabras |
-| Embeddings | Granite 97M multilingüe R2 (`ibm-granite/granite-embedding-97m-multilingual-r2`), ONNX cuantizado en CPU | Convierte textos en vectores de 384 dimensiones |
-| Reranker | mMARCO MiniLM (ONNX CPU), solo laboratorio | No está en el camino de la consulta: no mejoró los aciertos y costaba ~5 s |
+| Búsqueda | LanceDB 0.40 (coseno exacto + BM25 español, fusión RRF `k=60`) | Índice de fichas por significado y por palabras |
+| Embeddings | `ibm-granite/granite-embedding-97m-multilingual-r2`, ONNX CPU (`model_quint8_avx2.onnx`) | 384 dimensiones, pooling CLS, L2, 512 tokens, sin prefijos |
+| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`, ONNX CPU | Fuera del chat: solo verificación de modelos y evaluación comparativa |
 | Agente | Bucle propio con herramientas (`services/agent.py`) | Búsqueda, lectura de fichas, citas validadas y degradación sin proveedor |
-| Modelo generativo | DeepSeek vía Ollama Cloud (API nativa con herramientas), con modelo alternativo | Redacta la respuesta |
+| Modelo generativo | `deepseek-v4.1-flash:1017` vía Ollama Cloud (API nativa con herramientas) | Redacta la respuesta; alternativa `deepseek-v4.1-flash` |
 | Pruebas | pytest, Vitest, ESLint, Playwright, axe | Backend, unidades, estilo y flujos de punta a punta |
 | Despliegue local | Docker Compose o `scripts/run_local.py` | Levanta la API y conserva LanceDB; MariaDB se configura mediante su URL |
+
+### Modelos y versiones
+
+- **Motor vigente:** `granite-mmarco-lance-v3`, con representación documental `cards-context-v5`.
+- **Embedding:** `ibm-granite/granite-embedding-97m-multilingual-r2`, revisión `835ad140…`, ONNX CPU, 384 dimensiones, CLS, L2, 512 tokens.
+- **Reranker:** `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`, revisión `1427fd65…`, ONNX CPU, 512 tokens. No se consulta en el chat.
+- **Generación:** `deepseek-v4.1-flash:1017` en esta instalación, con `deepseek-v4.1-flash` como alternativa. El parámetro `think` se decide por familia en `services/runtime.py`.
+- **Legado:** las versiones publicadas con `bekko-horizon-lance-v2` siguen consultables con su propio par de modelos; no se mezclan vectores entre perfiles.
+
+Cada versión guarda una huella con modelo, revisión, pooling, normalización, runtime, dimensión, representación y hashes. Cambiar cualquiera de esos valores exige construir y evaluar una versión nueva. Detalle completo en [backend/docs/RAG_ENGINE.md](backend/docs/RAG_ENGINE.md).
 
 ### Estructura
 

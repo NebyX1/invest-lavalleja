@@ -22,7 +22,7 @@ La conversión recorrió el cuerpo DOCX en orden, conservando párrafos, saltos 
 | Escenarios de revisión humana de respuestas | 12 |
 | Bloques sin contabilizar en el informe de conversión | 0 |
 
-**Registros no significa chunks.** El registro es la unidad editorial reutilizable; el chunk es un fragmento indexable calculado posteriormente con el tokenizador real. No hay embeddings ya producidos en este paquete, ni se indica un conteo ficticio de tokens como si se hubiera ejecutado E5.
+**Registros no significa chunks.** El registro es la unidad editorial reutilizable; el chunk es un fragmento indexable calculado posteriormente con el tokenizador real de Granite. No hay embeddings ya producidos en este paquete, ni se indica un conteo ficticio de tokens como si se hubiera ejecutado el encoder.
 
 ## Formatos entregados
 

@@ -23,7 +23,7 @@ ENCRYPTION_KEY=<generada por setup_env.py>
 CORS_ORIGINS=https://invest.tu-dominio.uy,https://gianna.tu-dominio.uy
 OLLAMA_HOST=https://ollama.com
 OLLAMA_API_KEY=<tu token>
-OLLAMA_MODEL=deepseek-v4.1-flash
+OLLAMA_MODEL=deepseek-v4.1-flash:1017
 DATABASE_URL=mariadb+mariadbconnector://gianna_app:<password>@<host>:3306/gianna_invest
 MAIL_SERVER=
 MAIL_PORT=465
@@ -75,11 +75,11 @@ El segundo factor de todas las cuentas es el código por correo, como en Buzón 
 
 El arranque migra las cuentas existentes al método institucional por correo sin cambiar sus contraseñas ni permisos. Revoca las sesiones del autenticador anterior y los desafíos pendientes, y retira las claves y códigos de recuperación anteriores. No hay que recrear usuarios, restablecer contraseñas ni agregar variables al entorno. Desplegar la imagen nueva e iniciar sesión nuevamente para recibir el código por correo.
 
-En Ajustes, cargar el catálogo real de Ollama y elegir el modelo. Importar el JSON canónico, revisar, indexar, evaluar y publicar según el manual. En la terminal del contenedor **api**, ejecutar `python -m scripts.prepare_models --model-dir /app/data/models`. El comando verifica los artefactos e inicializa Granite y mMARCO con una inferencia de prueba (el reranker solo se usa en el laboratorio). Para revisar pesos descargados sin red, ejecutar `python -m scripts.check_model_runtime`. Debe terminar con `Verificación de inferencia Granite/mMARCO superada`.
+En Ajustes, cargar el catálogo real de Ollama y elegir el modelo. Importar el JSON canónico, revisar, indexar, evaluar y publicar según el manual. En la terminal del contenedor **api**, ejecutar `python -m scripts.prepare_models --model-dir /app/data/models`. El comando verifica los artefactos e inicializa Granite y mMARCO con una inferencia de prueba (el reranker solo se valida y se usa en la evaluación comparativa, no en el chat). Para revisar pesos descargados sin red, ejecutar `python -m scripts.check_model_runtime`. Debe terminar con `Verificación de inferencia Granite/mMARCO superada`.
 
-La nueva huella exige generar otra versión vectorial y probarla antes de publicarla; no exige importar nuevamente el JSON ni modificar `.env`. La publicación v2 conserva Bekko/Horizon y sigue siendo consultable hasta el cambio explícito. No borrar sus modelos ni su volumen. Durante el arranque el worker prepara el perfil activo; al construir carga el perfil nuevo. OpenVINO sigue retirado por el `SIGSEGV` confirmado. Ver [transición y rollback](RAG_ENGINE.md).
+La nueva huella exige generar otra versión vectorial y probarla antes de publicarla; no exige importar nuevamente el JSON ni modificar `.env`. Las versiones publicadas con el motor anterior (`bekko-horizon-lance-v2`) siguen siendo consultables hasta el cambio explícito. No borrar sus modelos ni su volumen. Durante el arranque el worker prepara el perfil activo; al construir carga el perfil nuevo. OpenVINO sigue retirado por el `SIGSEGV` confirmado. Ver [transición y rollback](RAG_ENGINE.md).
 
-La preparación ya no descarga un tokenizador de generación: el agente no usa un tope de 8.000 tokens (ver [arquitectura](RAG_ENGINE.md)). Tras actualizar el código, **crear una versión nueva** desde el panel (la representación documental cambió a `cards-context-v5`) o con `python scripts/ingest_corpus.py <corpus>`, probarla en Laboratorio y publicarla; las versiones anteriores siguen consultables. El agente hace entre una y tres llamadas al proveedor por consulta (3 s de promedio medido localmente); la variable opcional `OLLAMA_FALLBACK_MODELS` (por defecto `deepseek-v4.1-flash`) define el modelo alternativo si el elegido falla. El chequeo de inferencia no publica la base ni prueba por sí solo el chat.
+La preparación ya no descarga un tokenizador de generación: el agente no usa un tope de 8.000 tokens (ver [arquitectura](RAG_ENGINE.md)). Tras actualizar el código, **crear una versión nueva** desde el panel (la representación documental cambió a `cards-context-v5`) o con `python scripts/ingest_corpus.py <corpus>`, probarla en Laboratorio y publicarla; las versiones anteriores siguen consultables. El agente hace varias llamadas al proveedor según los pasos que necesite (hasta cinco con la reparación de citas); la variable opcional `OLLAMA_FALLBACK_MODELS` (por defecto `deepseek-v4.1-flash`) define el modelo alternativo si el elegido falla. El chequeo de inferencia no publica la base ni prueba por sí solo el chat.
 
 ## Recursos y reproducibilidad
 
