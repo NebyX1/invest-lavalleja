@@ -59,5 +59,5 @@ Además se revisaron a mano las respuestas de los casos críticos:
 - Las pruebas con dobles (`tests/fakes.py`) no son benchmarks de Granite/LanceDB ni del modelo.
 - No se probó el despliegue en Coolify/VPS ni los tiempos con la CPU del servidor; la latencia medida es la del equipo local más la del proveedor.
 - La guía es la única fuente: sin web, inventario de predios, precios ni contactos fuera de ella. Su corte es el 18/09/2026 (complementos al 19/10/2026).
-- Con el volumen de consultas de producción habría que medir costo por consulta (1–5 llamadas al proveedor, 4.000–15.000 tokens de entrada).
+- Con el volumen de consultas de producción habría que medir costo por consulta: 1-5 llamadas al proveedor y, en las 379 consultas registradas, 475-45.581 tokens de entrada (promedio ~6.900).
 - Falta la revisión editorial humana de la base y de las respuestas antes de publicar fuera de la prueba local.
