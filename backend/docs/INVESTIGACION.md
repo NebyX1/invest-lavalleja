@@ -37,8 +37,8 @@ No participa del camino de la consulta. Se evaluó contra el conjunto de oro y n
 | Modo | hit@8 | MRR | ms por búsqueda |
 | --- | --- | --- | --- |
 | Híbrido | **0,961** | **0,830** | **145** |
-| Híbrido + cross-encoder | 0,941 | 0,825 | ~4.800 |
-| Solo cross-encoder | 0,922 | 0,841 | ~4.850 |
+| Híbrido + cross-encoder | 0,941 | 0,825 | 6.023 |
+| Solo cross-encoder | 0,922 | 0,841 | 6.571 |
 
 Por eso se usa solo en dos lugares: la verificación de `scripts/prepare_models.py` y la comparación de `scripts/evaluate_retrieval.py --modes fused rerank`. El laboratorio del panel y el chat usan búsqueda híbrida sin reranker.
 

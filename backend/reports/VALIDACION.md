@@ -8,13 +8,13 @@ Este informe describe el código actual. El informe del diseño anterior (planif
 
 Se auditó la documentación contra el código y la base activa (`ca5f61b7…`, motor `granite-mmarco-lance-v3`, representación `cards-context-v5`). Se corrigieron referencias obsoletas a E5/Qdrant/FastEmbed, al prefijo `passage:` y a un reranker que se describía como parte del laboratorio cuando solo se usa en la verificación de modelos y en la evaluación comparativa.
 
-Se volvió a ejecutar la recuperación híbrida sobre las 51 preguntas: **hit@1 0,745, hit@3 0,902, hit@5 0,922, hit@8 0,961, MRR 0,830, 144,9 ms de promedio**. El código de recuperación y de agente no cambió desde el 29/10/2026. No se volvieron a ejecutar las 31 conversaciones contra el proveedor en esta fecha; los resultados de esa sección corresponden a la corrida original.
+Se volvieron a ejecutar los tres modos sobre las 51 preguntas: **híbrido** hit@1 0,745, hit@8 0,961, MRR 0,830, **144,9 ms**; **fusión con cross-encoder** hit@8 0,941, MRR 0,825, **6.023 ms**; **solo cross-encoder** hit@8 0,922, MRR 0,841, **6.571 ms**. El código de recuperación y de agente no cambió desde el 29/10/2026. No se volvieron a ejecutar las 31 conversaciones contra el proveedor en esta fecha; los resultados de esa sección corresponden a la corrida original.
 
 ## Diagnóstico de lo que fallaba
 
 | Síntoma en el chat | Causa verificada | Corrección |
 | --- | --- | --- |
-| "El proveedor de respuestas no está disponible" | El cliente trataba igual cualquier error HTTP, timeout de 80 s, respuesta vacía o recorte de contexto; el cross-encoder sumaba ~5 s por búsqueda y había varias por consulta | Reintentos con espera, modelo alternativo, plazo total de 100 s, reranker fuera del camino, respuesta degradada con fichas en vez de error |
+| "El proveedor de respuestas no está disponible" | El cliente trataba igual cualquier error HTTP, timeout de 80 s, respuesta vacía o recorte de contexto; el cross-encoder sumaba ~6 s por búsqueda y había varias por consulta | Reintentos con espera, modelo alternativo, plazo total de 100 s, reranker fuera del camino, respuesta degradada con fichas en vez de error |
 | "No tengo documentado un perfil de zona…" para cualquier rubro fuera del catálogo | Un planificador de palabras clave decidía abstenerse antes de que el modelo viera la evidencia | Agente con herramientas: el modelo ve la evidencia y el mapa completo de la guía y decide qué buscar |
 | Respuestas pobres con evidencia fragmentada | Registros de 60–200 caracteres ("Ocupación supuesta", "2 · Contrastar mercado") recuperados sin su contexto | Fichas autosuficientes (332 fichas: 257 públicas y 75 internas; se indexan las públicas) con cabecera contextual |
 | Evidencia recortada | Tope artificial de 8.000 tokens por petición | Sin tope de 8K: hasta 36.000 caracteres de evidencia por respuesta |
@@ -28,8 +28,8 @@ El modelo configurado (`deepseek-v4.1-flash:1017`) existe en el catálogo real d
 | Modo | hit@1 | hit@3 | hit@5 | hit@8 | MRR | ms por búsqueda |
 | --- | --- | --- | --- | --- | --- | --- |
 | **Híbrido (camino de la consulta)** | 0,745 | 0,902 | 0,922 | **0,961** | 0,830 | 145 (promedio) |
-| Híbrido + cross-encoder | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | ≈5.000 |
-| Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | ≈4.800 |
+| Híbrido + cross-encoder | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | 6.023 |
+| Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | 6.571 |
 
 Fallos restantes del híbrido a k=8: contactos ("¿con quién hablo para permisos?"), "zona para un boliche" (no existe ficha) y riesgos. El agente los compensa reformulando.
 

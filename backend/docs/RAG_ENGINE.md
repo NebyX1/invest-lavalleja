@@ -222,15 +222,15 @@ El **reranker no participa de este camino**. Se conserva para dos usos explícit
 
 ## Mediciones de recuperación
 
-Conjunto de oro de 51 preguntas (`evals/retrieval_gold.json`), sin llamar al modelo. El modo híbrido se reejecutó el 06/11/2026 sobre la versión activa; las filas con cross-encoder conservan la medición del 29/10/2026 (tardan varios minutos en CPU y no son el camino del chat):
+Conjunto de oro de 51 preguntas (`evals/retrieval_gold.json`), sin llamar al modelo. Los tres modos se midieron el 06/11/2026 sobre la versión activa:
 
 | Modo | hit@1 | hit@3 | hit@5 | hit@8 | MRR | ms por búsqueda |
 | --- | --- | --- | --- | --- | --- | --- |
 | **Híbrido (camino de la consulta)** | 0,745 | 0,902 | 0,922 | **0,961** | 0,830 | **145** |
-| Híbrido + cross-encoder (fusión) | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | ~4.800 |
-| Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | ~4.850 |
+| Híbrido + cross-encoder (fusión) | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | 6.023 |
+| Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | 6.571 |
 
-El híbrido es el único modo del chat. El cross-encoder no mejora el hit@8 ni el MRR y multiplica la latencia por más de 30 en CPU; por eso se mide, no se usa. Los fallos restantes del híbrido (contactos para permisos, "zona para un boliche", riesgos) los compensa el agente reformulando la búsqueda.
+El híbrido es el único modo del chat. El cross-encoder no mejora el hit@8 ni el MRR y multiplica la latencia por más de 40 en CPU; por eso se mide, no se usa. Los fallos restantes del híbrido (contactos para permisos, "zona para un boliche", riesgos) los compensa el agente reformulando la búsqueda.
 
 Estas cifras miden cobertura de fichas, no exactitud factual. El conjunto lo escribió el mismo equipo que ajustó el sistema: no es un holdout ciego.
 
