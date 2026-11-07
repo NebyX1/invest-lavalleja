@@ -1,6 +1,56 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+test('Gianna muestra recuperación y vuelve a habilitar consultas sin recargar', async ({ page }) => {
+  let state = { available: false, knowledge_state: 'restoring_models', knowledge_message: 'Restaurando el motor de conocimiento.' };
+  await page.route('**/api/config', (route) => route.fulfill({ status: 200, contentType: 'application/json',
+    headers: { 'access-control-allow-origin': '*' },
+    body: JSON.stringify({ name: 'Gianna', greeting: '¿Qué proyecto tenés en mente?', notice: '', enabled: true, ...state }) }));
+  await page.goto('/gianna/');
+  test.skip(await page.locator('astro-island[component-url*="GiannaChat"]').count() === 0, 'La build necesita PUBLIC_GIANNA_API_BASE.');
+  const input = page.getByRole('textbox', { name: 'Tu pregunta' });
+  await expect(input).toBeDisabled();
+  await expect(page.locator('.gianna-status')).toHaveText('Restaurando el motor de conocimiento.');
+  state = { available: false, knowledge_state: 'restoring_index', knowledge_message: 'Recuperando el índice de conocimiento.' };
+  await expect(page.locator('.gianna-status')).toHaveText('Recuperando el índice de conocimiento.', { timeout: 10_000 });
+  await expect(input).toBeDisabled();
+  state = { available: true, knowledge_state: 'ready', knowledge_message: 'Listo para consultar.' };
+  await expect(input).toBeEnabled({ timeout: 10_000 });
+  await expect(page.locator('.gianna-status')).toHaveText('Listo para consultar.');
+});
+
+test('Gianna conserva la pregunta ante un índice perdido y detecta su recuperación', async ({ page }) => {
+  let available = true;
+  const cors = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'Authorization, Content-Type' };
+  await page.route('**/api/**', async (route) => {
+    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+    const path = new URL(route.request().url()).pathname;
+    const respond = (body: unknown, status = 200) => route.fulfill({ status, contentType: 'application/json', headers: cors, body: JSON.stringify(body) });
+    if (path === '/api/config') return respond({ name: 'Gianna', greeting: '¿Qué proyecto tenés en mente?', notice: '', enabled: true, available,
+      knowledge_state: available ? 'ready' : 'restoring_index', knowledge_message: available ? 'Listo para consultar.' : 'Recuperando el índice de conocimiento.' });
+    if (path === '/api/captcha') return respond({ id: 'r'.repeat(43), question: '2 + 3', expires_in: 600 });
+    if (path === '/api/sessions') return respond({ token: 'recovery-test', expires_at: 1_800_000_000 }, 201);
+    if (path === '/api/chat') {
+      available = false;
+      return respond({ error: { code: 'index_missing', message: 'Recuperando el índice de conocimiento.' } }, 503);
+    }
+    return respond({ error: { message: 'Ruta inesperada.' } }, 404);
+  });
+  await page.goto('/gianna/');
+  test.skip(await page.locator('astro-island[component-url*="GiannaChat"]').count() === 0, 'La build necesita PUBLIC_GIANNA_API_BASE.');
+  const input = page.getByRole('textbox', { name: 'Tu pregunta' });
+  await input.fill('¿Qué requisitos tengo que verificar?');
+  await page.getByRole('button', { name: 'Iniciar consulta' }).click();
+  await page.locator('.gianna-captcha input').fill('5');
+  await page.getByRole('button', { name: 'Verificar y enviar' }).click();
+  await expect(input).toHaveValue('¿Qué requisitos tengo que verificar?');
+  await expect(input).toBeDisabled();
+  await expect(page.locator('.gianna-status')).toHaveText('Recuperando el índice de conocimiento.');
+  available = true;
+  await expect(input).toBeEnabled({ timeout: 10_000 });
+  await expect(input).toHaveValue('¿Qué requisitos tengo que verificar?');
+});
+
 test('Gianna conserva orientación y enlaces editoriales sin JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
@@ -270,9 +320,11 @@ test('un CAPTCHA vencido se renueva antes de solicitar la sesión', async ({ pag
   await page.getByRole('button', { name: 'Verificar y enviar' }).click();
   await expect(page.getByText(/¿cuánto es 4 \+ 4/)).toBeVisible();
   await expect(page.getByRole('status')).toContainText('La suma venció');
-  expect(calls).toEqual(['GET /api/config', 'GET /api/captcha', 'GET /api/captcha']);
+  // Advancing the clock also triggers availability polling; CAPTCHA/session
+  // requests must still keep their exact order without replaying a challenge.
+  expect(calls.filter((call) => call !== 'GET /api/config')).toEqual(['GET /api/captcha', 'GET /api/captcha']);
   await page.locator('.gianna-captcha input').fill('8');
   await page.getByRole('button', { name: 'Verificar y enviar' }).click();
   await expect(page.getByText('Respuesta con fuentes.')).toBeVisible();
-  expect(calls).toEqual(['GET /api/config', 'GET /api/captcha', 'GET /api/captcha', 'POST /api/sessions', 'POST /api/chat']);
+  expect(calls.filter((call) => call !== 'GET /api/config')).toEqual(['GET /api/captcha', 'GET /api/captcha', 'POST /api/sessions', 'POST /api/chat']);
 });

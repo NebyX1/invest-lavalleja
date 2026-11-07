@@ -19,4 +19,9 @@ export type Reply = {
   notice: string;
 };
 export type Exchange = { question: string; reply: Reply };
-export type Config = { name: string; greeting: string; notice: string; enabled: boolean; available: boolean; test_mode?: boolean };
+export type Config = {
+  name: string; greeting: string; notice: string; enabled: boolean; available: boolean; test_mode?: boolean;
+  knowledge_state?: 'initializing' | 'restoring_models' | 'restoring_index' | 'ready' | 'no_knowledge' | 'failed';
+  knowledge_code?: string | null;
+  knowledge_message?: string;
+};

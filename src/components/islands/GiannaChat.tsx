@@ -12,6 +12,12 @@ const PROGRESS_STEPS = [
   'Armando una respuesta clara con sus fuentes…',
 ];
 
+const KNOWLEDGE_ERRORS = new Set([
+  'warming_up', 'embedding_mismatch', 'index_profile_mismatch', 'no_knowledge',
+  'index_missing', 'index_incomplete', 'index_schema_invalid', 'index_fts_missing', 'index_fts_incomplete', 'index_fts_incompatible', 'index_unavailable',
+  'knowledge_initializing', 'knowledge_unavailable', 'version_not_ready', 'storage_mismatch', 'storage_not_mounted', 'database_unavailable',
+]);
+
 class ApiRequestError extends Error {
   constructor(message: string, readonly code?: string) { super(message); }
 }
@@ -37,6 +43,8 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
   const [progressStep, setProgressStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('');
+  const [availabilityError, setAvailabilityError] = useState('');
+  const [configRefresh, setConfigRefresh] = useState(0);
   const [rated, setRated] = useState<Set<string>>(new Set());
 
   async function call<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -56,20 +64,36 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
 
   useEffect(() => {
     mounted.current = true;
-    const controller = new AbortController();
-    fetch(base + '/api/config', { credentials: 'omit', signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error('Gianna no está disponible en este momento.');
-        return response.json() as Promise<Config>;
-      })
-      .then((data) => { if (mounted.current) setConfig(data); })
-      .catch((error: unknown) => {
-        if (mounted.current && !(error instanceof DOMException && error.name === 'AbortError')) {
-          setStatus('No pudimos conectar con Gianna. Recargá la página para intentarlo de nuevo.');
+    let controller: AbortController | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let deadline: ReturnType<typeof setTimeout> | undefined;
+    let cancelled = false;
+    async function refresh() {
+      controller = new AbortController();
+      deadline = setTimeout(() => controller?.abort(), 10_000);
+      let delay = 15_000;
+      try {
+        const response = await fetch(base + '/api/config', { credentials: 'omit', signal: controller.signal });
+        if (!response.ok) throw new Error('Servicio temporalmente no disponible.');
+        const data = await response.json() as Config;
+        if (!cancelled) {
+          setConfig(data);
+          setAvailabilityError('');
+          delay = data.available ? 30_000 : 5_000;
         }
-      });
-    return () => { mounted.current = false; controller.abort(); };
-  }, [base]);
+      } catch {
+        if (!cancelled) {
+          setConfig((old) => old ? { ...old, available: false } : old);
+          setAvailabilityError('No pudimos conectar con Gianna. Volveremos a intentarlo automáticamente.');
+        }
+      } finally {
+        clearTimeout(deadline);
+        if (!cancelled) timer = setTimeout(refresh, delay);
+      }
+    }
+    void refresh();
+    return () => { cancelled = true; mounted.current = false; clearTimeout(timer); clearTimeout(deadline); controller?.abort(); };
+  }, [base, configRefresh]);
 
   useEffect(() => {
     if (challenge && !busy) captchaField.current?.focus();
@@ -147,7 +171,14 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
       if (mounted.current) {
         setPendingQuestion('');
         setQuestion(message);
-        setStatus(error instanceof Error ? error.message : 'No se pudo conectar con Gianna.');
+        if (error instanceof ApiRequestError && error.code && KNOWLEDGE_ERRORS.has(error.code)) {
+          setStatus('');
+          setAvailabilityError(error.message);
+          setConfig((old) => old ? { ...old, available: false } : old);
+          setConfigRefresh((old) => old + 1);
+        } else {
+          setStatus(error instanceof Error ? error.message : 'No se pudo conectar con Gianna.');
+        }
       }
     } finally {
       if (mounted.current) { setBusy(false); if (token.current) field.current?.focus(); }
@@ -238,7 +269,7 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
       </div>}
     </div>
 
-    <p className="gianna-status" role="status">{status || (config && !available ? (config.enabled ? 'La base de conocimiento aún no está disponible.' : 'El chat está pausado temporalmente.') : '')}</p>
+    <p className="gianna-status" role="status">{status || availabilityError || (config && !available ? (config.enabled ? (config.knowledge_message || 'La base de conocimiento aún no está disponible.') : 'El chat está pausado temporalmente.') : config?.knowledge_message || '')}</p>
     <form className="gianna-composer" ref={form} onSubmit={submit}>
       {!token.current && challenge && <div className="gianna-captcha" role="group" aria-label="Verificación de seguridad">
         <div><label htmlFor={captchaId}>Verificación de seguridad: ¿cuánto es {challenge.question}?</label><p>Resolvé la suma para enviar tu pregunta. Cada suma se usa una sola vez.</p></div>
