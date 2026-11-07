@@ -13,6 +13,7 @@ services:
       OLLAMA_HOST: ${OLLAMA_HOST:-https://ollama.com}
       OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-}
+      OLLAMA_FALLBACK_MODELS: ${OLLAMA_FALLBACK_MODELS:-deepseek-v4.1-flash}
       MAIL_SERVER: ${MAIL_SERVER:-}
       MAIL_PORT: ${MAIL_PORT:-465}
       MAIL_USE_TLS: ${MAIL_USE_TLS:-False}

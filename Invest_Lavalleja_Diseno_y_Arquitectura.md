@@ -157,7 +157,7 @@ La extensión propuesta combina recorrido audiovisual real, zonas guardadas y pr
 
 ### Innovación 5: asistente documental con respuestas citadas
 
-El catálogo JSON se entrega separado de la presentación y puede alimentar una futura búsqueda documental. Un asistente posterior debería responder con fuentes, distinguir vigencia y solicitar aclaraciones antes de una consulta sobre permisos o impuestos. La entrega incluye búsqueda local, no un LLM, un motor vectorial o un chatbot conectado.
+El catálogo JSON se entrega separado de la presentación y puede alimentar una futura búsqueda documental. Un asistente posterior debería responder con fuentes, distinguir vigencia y solicitar aclaraciones antes de una consulta sobre permisos o impuestos. La entrega de diseño del 20/09/2026 incluía búsqueda local, no un LLM, un motor vectorial o un chatbot conectado. **Actualización 29/10/2026:** el asistente existe como Gianna, un agente con herramientas sobre una base de fichas con búsqueda híbrida (vectores + BM25) y citas validadas; ver [backend/docs/RAG_ENGINE.md](backend/docs/RAG_ENGINE.md) y [backend/docs/AGENT_DESIGN.md](backend/docs/AGENT_DESIGN.md).
 
 ## 7. Arquitectura técnica
 

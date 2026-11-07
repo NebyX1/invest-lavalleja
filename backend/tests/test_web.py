@@ -195,14 +195,31 @@ def test_public_captcha_wrong_answer_expiry_and_origin(app):
     assert c.post('/api/sessions',json=data,headers={'Origin':'http://localhost'}).status_code==201
 
 
-def test_public_captcha_issue_rate_limit(app):
+def test_lab_uses_the_context_pipeline_and_reranker_without_calling_ollama(app,corpus):
+    from test_jobs_and_rag import build_system
+    s=app.extensions['gianna']
+    _,vid,e,q,o,rag,jobs=build_system(s.db,s.cfg,s.knowledge,s.security,corpus)
+    s.rag=rag;s.embeddings=e;s.vector_store=q;s.jobs=jobs
+    client=app.test_client();authenticate(app,client)
+    response=client.post('/admin/lab',data={'csrf':'csrf-test-value','version_id':vid,
+        'question':'¿Qué condiciones tiene esta oportunidad?','mode':'retrieve'},headers={'Origin':'http://localhost'})
+    html=response.get_data(as_text=True)
+    assert response.status_code==200 and 'Búsqueda y reordenamiento' in html
+    assert e.queries and o.calls==[]
+    assert 'Ver recorrido de búsqueda' in html and 'contenido no debe publicarse' not in html
+
+
+def test_public_captcha_issue_rate_limit(app,monkeypatch):
+    # A fixed-window test must not straddle a real minute under CPU-heavy CI.
+    monkeypatch.setattr('gianna.security.time.time',lambda:1700000010.)
     c=app.test_client()
     for _ in range(20):assert c.get('/api/captcha',headers={'Origin':'http://localhost'}).status_code==200
     response=c.get('/api/captcha',headers={'Origin':'http://localhost'})
     assert response.status_code==429 and response.json['error']['code']=='rate_limited'
 
 
-def test_public_captcha_verification_rate_limit(app):
+def test_public_captcha_verification_rate_limit(app,monkeypatch):
+    monkeypatch.setattr('gianna.security.time.time',lambda:1700000010.)
     c=app.test_client();headers={'Origin':'http://localhost'}
     for _ in range(10):
         response=c.post('/api/sessions',json={},headers=headers)
@@ -219,33 +236,27 @@ def test_backend_chat_renders_human_challenge_controls(app):
     assert 'id="refresh-captcha"' in html
 
 
-def test_project_memory_is_encrypted_private_and_survives_transcript_trimming(app):
-    from gianna.services.project_memory import state_for
-    from gianna.services.harness import AgentHarness
+def test_conversation_history_is_encrypted_private_and_retained(app):
     c=app.test_client();s=app.extensions['gianna'];headers={'Origin':'http://localhost'}
     challenge,answer=public_captcha(c)
     created=c.post('/api/sessions',json={'captcha_id':challenge.json['id'],'captcha_answer':str(answer)},headers=headers)
     headers['Authorization']='Bearer '+created.json['token']
-    state=state_for(AgentHarness.retrieval_plan('Quiero instalar un boliche',[]))
     received=[]
     def reply(question,settings,**kwargs):
-        received.append(kwargs['project_state'])
-        result={'id':'test','answer':'Respuesta','status':'insufficient_evidence','mode':'knowledge','citations':[]}
-        if len(received)==1:result['_conversation_state']=state
-        return result
+        received.append(list(kwargs.get('history') or []))
+        return {'id':'test','answer':'Respuesta','status':'answered','mode':'knowledge','citations':[]}
     s.rag.answer=reply
     for index in range(8):
-        # Keep rate limiting enabled; reset only this test's counters to
-        # exercise >12 retained messages without spending a minute waiting.
         s.db.execute('DELETE FROM rate_limits')
         response=c.post('/api/chat',json={'message':'Quiero instalar un boliche' if index==0 else 'Gracias'},headers=headers)
-        assert response.status_code==200 and '_conversation_state' not in response.json
-    assert all(item.get('activity')==state['activity'] for item in received[1:])
+        assert response.status_code==200
+    assert len(received)==8 and len(received[-1])==14
     row=s.db.one('SELECT history_encrypted FROM chat_sessions')
     assert 'boliche' not in row['history_encrypted']
     stored=json.loads(s.security.unseal(row['history_encrypted']))
-    assert len(stored['messages'])==12 and stored['project']==state
-    assert c.post('/api/chat',json={'message':'Hola','project_state':state},headers=headers).status_code==400
+    assert len(stored['messages'])==16
+    assert stored['messages'][0]['content']=='Quiero instalar un boliche'
+    assert c.post('/api/chat',json={'message':'Hola','project_state':{}},headers=headers).status_code==400
     assert c.delete('/api/sessions/current',headers=headers).status_code==200
     assert not s.db.one('SELECT id_hash FROM chat_sessions')
 

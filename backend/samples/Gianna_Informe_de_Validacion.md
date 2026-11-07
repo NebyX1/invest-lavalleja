@@ -1,4 +1,6 @@
-# Informe de validación de la entrega
+# Informe de validación de la entrega inicial
+
+> **Documento histórico.** Registra la entrega del 28/09/2026, con el stack E5 + Qdrant + FastEmbed de esa fecha. No describe el sistema actual: desde el 29/10/2026 Gianna usa Granite + mMARCO + LanceDB con un agente de herramientas. El estado vigente está en [`../reports/VALIDACION.md`](../reports/VALIDACION.md) y en [`../docs/RAG_ENGINE.md`](../docs/RAG_ENGINE.md).
 
 **Gianna Invest 1.0.0-rc1 · 28/09/2026. No desplegada.**
 

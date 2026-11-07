@@ -1,80 +1,264 @@
-# Motor RAG · octubre de 2026
+# Arquitectura RAG y del agente
 
-Gianna usa Bekko + Horizon + LanceDB. Flask, Gunicorn de un proceso, MariaDB y la API de Ollama mantienen sus responsabilidades. MariaDB conserva documentos, versiones, aprobación editorial y el puntero activo. Cada versión pública tiene una tabla LanceDB propia y una huella que incluye pesos, tokenizadores, pooling, normalización y runtimes. Desde el 21/10/2026 ambos modelos locales usan ONNX Runtime en CPU. OpenVINO se retiró tras observar en producción que el proceso terminaba con `SIGSEGV` durante la compilación de Bekko. El cambio incrementa la versión de motor y exige reindexar con una versión nueva; la publicación activa anterior no se sobrescribe. El índice E5/Qdrant anterior también requiere reindexación; sus vectores de 384 dimensiones no se reutilizan.
+**Estado verificado el 06/11/2026** contra el código de `main` y la versión activa de la base local (`ca5f61b7…`, 262 fragmentos, motor `granite-mmarco-lance-v3`, representación `cards-context-v5`).
 
-## Modelos
+Este documento describe cómo funciona Gianna hoy. Reemplaza al diseño anterior (planificador determinista + catálogo de rubros + contrato JSON), archivado en [`historico/`](historico/RAG_ENGINE_planificador_determinista.md). Las referencias a E5, Qdrant, FastEmbed y OpenVINO pertenecen a etapas anteriores del proyecto y no describen el sistema actual.
 
-El generador se puede cambiar sin reindexar. El modelo seleccionado localmente tras la comparación es `deepseek-v4.1-flash:1017` en la API directa de Ollama (CLI: `deepseek-v4.1-flash:1017-cloud`), con `think:low` y un límite de 4.096 tokens de generación. Se comparó con `beam`/`beam:cloud` usando los mismos parámetros y tres turnos; el informe está en `reports/rag-migration/beam-vs-deepseek-1017.json`. El modelo DeepSeek sin revisión explícita mantiene su perfil anterior `think:false`. Se mantuvieron Bekko, Horizon y LanceDB. El catálogo real de `/api/tags` confirmó el nombre para la API; [Ollama documenta la distinción entre API y CLI](https://docs.ollama.com/cloud).
+## Resumen
 
-Con este MiniMax, una consulta completa agotó 2.000 tokens en `message.thinking` y dejó `message.content` vacío, incluso con `think:false`. Por eso se usa su modo predeterminado y un límite local explícito de 8.192 tokens de generación **incluido el razonamiento**, no 8.192 tokens de texto visible. El límite del panel admite hasta 8.192 y no se aumenta de forma oculta en el transporte. Clasificación y conversación conservan ese presupuesto cuando se selecciona este modelo, en lugar de recortarlo a 400/500; los otros modelos mantienen sus límites breves. Esto puede aumentar latencia y consumo. Los reintentos y límites de concurrencia siguen acotados.
+Gianna es un **agente con herramientas** sobre una base de conocimiento versionada:
 
-| Componente | Modelo | Revisión fijada | Ejecución |
-|---|---|---|---|
-| Embedding | `hotchpotch/bekko-embedding-v1-a8m` | `c721113d59a1d91b447450324f51c4b3332c924a` | ONNX Runtime CPU, media enmascarada y normalización L2, 384 dimensiones |
-| Reranker | `Horizon-Labs/multilingual-reranker-small` | `c2ec8fb3e499725b168bbed2164bfee095360f77` | ONNX Runtime cuantizado CPU, pares de 384 tokens, consulta hasta 120 tokens |
+1. La guía se convierte en **fichas autosuficientes** con una cabecera contextual.
+2. Cada ficha se fragmenta con el tokenizador real del encoder y se indexa en **LanceDB** por significado (vector) y por palabras (BM25 español).
+3. Cada consulta hace una **búsqueda híbrida inicial** y el modelo recibe la evidencia numerada.
+4. Si hace falta, el modelo **busca otra vez** o **lee fichas completas** (hasta 4 pasos).
+5. El servidor **valida las citas** contra la evidencia de esa consulta y arma la respuesta con sus fuentes.
 
-Se tomó como referencia la implementación de [Patitas Lavalleja](https://github.com/NebyX1/patitas-lavalleja). Bekko no usa los prefijos `query:`/`passage:` de E5. Los pasajes se cuentan con su tokenizador real y se limitan a 480 tokens, dentro de la ventana operativa de 512. Horizon ordena pasajes; su salida sigmoid es relevancia textual, no probabilidad de verdad o éxito del negocio. Los modelos se cargan una vez por proceso y comparten un bloqueo de inferencia. Sus configuraciones y pesos se preparan explícitamente y verifican con SHA-256; las peticiones de chat no descargan modelos.
+No hay planificador de reglas, catálogo de rubros ni contrato JSON intermedio. El modelo generativo no decide qué existe en la guía: lo descubre con el mapa y las herramientas.
 
-Fuentes primarias: [Bekko](https://huggingface.co/hotchpotch/bekko-embedding-v1-a8m), [Horizon](https://huggingface.co/Horizon-Labs/multilingual-reranker-small), [LanceDB](https://docs.lancedb.com/).
+## Modelos y espacio vectorial
 
-## Recuperación general basada en evidencia
+### Perfil vigente (`granite-mmarco-lance-v3`)
 
-**Sustituye los filtros temáticos y plantillas introducidos el 19/10/2026.** El portal sigue siendo de inversiones. Desde el 19/10/2026 (segunda y tercera revisión) Gianna es un **agente de asesoría informativa** construido con PydanticAI (`services/agents.py`, patrón tomado de Gianna Lex): el modelo interpreta cada turno, sostiene la memoria del hilo e integra la evidencia en una respuesta coherente que compara las zonas u opciones de la base de conocimiento y explica la ventaja de cada una. Trata a la persona como un inversor adulto que sabe lo que quiere y pide información; no inventa hechos, disponibilidad ni beneficios y no da asesoramiento legal, fiscal o financiero definitivo. Esto sustituye el rol «solo informativo, sin orientación» de la revisión anterior. No hay una regla que decida que renovables, inventarios u otro tema carecen de información por su vocabulario.
+| Rol | Modelo | Revisión fijada | Artefacto | Runtime | Detalle |
+| --- | --- | --- | --- | --- | --- |
+| **Embedding** | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad14087e140460703cf0fae09f97d469d65c2` | `onnx/model_quint8_avx2.onnx` | ONNX Runtime CPU 1.31.0 | 384 dimensiones, pooling **CLS**, normalización L2, hasta 512 tokens, sin prefijos `query:`/`passage:` |
+| **Reranker** | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd652930e4ba29e8149678df786c240d8825` | `onnx/model_quint8_avx2.onnx` | ONNX Runtime CPU 1.31.0 | Cross-encoder de hasta 512 tokens, puntaje sigmoide; **fuera del camino del chat** |
+| **Búsqueda léxica** | BM25 de LanceDB | índice FTS de la tabla | — | LanceDB 0.40.0 | Idioma español, `stem=true`, `ascii_folding=true`, sin palabras vacías |
+| **Fusión** | Reciprocal Rank Fusion | — | — | En código (`vector_store.py`, `retrieval.py`) | `k = 60`; no se suman coseno y BM25 como si fueran la misma escala |
+| **Generación** | `deepseek-v4.1-flash:1017` (por defecto en esta instalación) | catálogo de Ollama Cloud | API `/api/chat` | Ollama Cloud | `think: low`; alternativa `deepseek-v4.1-flash` |
 
-1. **Puertas de seguridad deterministas** (`AgentHarness.hard_gate`): acusaciones a personas, delitos graves e insultos conservan sus rutas fijas y nunca llegan al modelo. Los saludos inequívocos reciben una cortesía sin interpretar.
-2. **Intérprete de turnos** (`Agents.interpret`, una llamada breve, salida estructurada `TurnPlan` validada con reintento nativo). Recibe el mensaje, la memoria actual y la conversación como mensajes nativos, y devuelve: el acto (`chat`, `knowledge`, `deescalate`, `allegation`, `refuse`), el tipo de pedido (`places`, `opportunities`, `requirements`, `facts`, `compare`, `next_steps`, `followup`), la necesidad de la persona en una frase, una consulta autosuficiente, de dos a cuatro búsquedas con el vocabulario de la base y la **memoria actualizada**. No hay regex de intención: «Quiero poner un boliche» es un pedido de *dónde y qué ofrece cada lugar*, no de trámites. Si el modelo falla o devuelve algo inválido, `AgentHarness.retrieval_plan` aporta un plan determinista de respaldo que conserva la memoria previa.
-3. Se captura una sola versión pública para toda la consulta. Se busca globalmente con la pregunta real, la consulta autosuficiente y las búsquedas del intérprete, hasta cuatro. Bekko y BM25 español consultan LanceDB y fusionan sus resultados con RRF. No se filtra por listas de temas, palabras del título, tipo de ficha, padrón, rentabilidad o localidad.
-4. Cada ID vuelve a validarse contra MariaDB y su audiencia pública. Se combinan candidatos por registro y afinidad entre búsquedas. Las referencias explícitas del usuario pueden suplementar candidatos, pero no hay prioridades sector→ficha.
-5. Horizon reordena hasta el presupuesto configurado de candidatos (16 por defecto) con las palabras de la persona y su necesidad. El orden final **fusiona con RRF (k=60) el orden por afinidad entre búsquedas y el del reranker**: el reranker pequeño en CPU es un juez inestable y por sí solo llegó a hundir los perfiles de zona que todas las búsquedas habían encontrado. Se prepara un contexto acotado con las fuentes originales y sus condiciones editoriales, sin eliminar secciones por tema. Una puntuación no se interpreta como probabilidad ni se usa un umbral para negar la respuesta.
-6. **Agente de respuesta** (`Agents.answer`). Lee la necesidad, la memoria, la evidencia y la conversación nativa; decide si puede responder total, parcialmente o no. Solo en pedidos de dato puntual (`requirements`, `facts`, `develop`) dispone de la herramienta `buscar_en_la_base`: una única **segunda lectura** de solo lectura, con IDs nuevos que continúan la numeración, que se registra en la traza sin texto. En pedidos amplios (`places`, `opportunities`, `compare`) no se ofrece porque solo añadía ruido y latencia.
-7. La respuesta sigue un contrato estructural (ver más abajo). Se conservan prevención de secretos, privacidad, seguridad, límites, estados y snapshots. Que el contrato sea válido no certifica el respaldo semántico de cada afirmación.
+Los identificadores, revisiones y hashes de los artefactos viven en `gianna/services/neural.py`. `scripts/prepare_models.py` descarga únicamente esos archivos, verifica el SHA-256 contra Hugging Face y deja un `manifest.json` por modelo. La aplicación se niega a indexar o consultar si falta un artefacto o si el hash no coincide.
 
-Las trazas registran búsqueda global, candidatos, reranking y fusión, contexto seleccionado, segundas lecturas y validación, sin almacenar consultas o texto documental en claro.
+### Cómo se elige el modelo generativo
 
-## Contrato de respuesta y falta de información
+- El modelo se selecciona en **Ajustes** y se guarda en la tabla `settings`.
+- `OLLAMA_MODEL` solo inicia instalaciones nuevas; no sobrescribe una elección hecha en el panel.
+- `OLLAMA_FALLBACK_MODELS` define la alternativa si el modelo elegido falla (por defecto `deepseek-v4.1-flash`).
+- `services/runtime.py` decide el parámetro `think` por familia: `low` para `deepseek-v4.1-flash:1017` y para los modelos no listados, `false` para `deepseek-v4.1-flash` sin revisión, y sin `think` para `minimax-m3.1-flash`.
+- Los nombres válidos se consultan en `/api/tags`; el panel tiene un botón para cargar el catálogo real y evitar identificadores inventados.
 
-Todo se redacta después de buscar y leer los resultados. El agente devuelve texto plano con un contrato acotado (`services/response_policy.py`), validado por un `output_validator` de PydanticAI que reintenta de forma nativa hasta dos veces con el recordatorio del contrato:
+### Perfil anterior (solo lectura)
 
-- Primera línea `ESTADO: RESPONDE` o `ESTADO: SIN_INFORMACION`. El modelo decide semánticamente si la evidencia alcanza, total o parcialmente; solo declara `SIN_INFORMACION` cuando ningún fragmento aporta algo útil.
-- Con `RESPONDE`: la respuesta sin IDs en el texto y una última línea `FUENTES: C1, C3`. El servidor conserva solo IDs que existen en el contexto público de esta consulta y depura (`supported_sources`) las declaradas que no comparten ni su título ni contenido sustancial con la respuesta; nunca deja la respuesta sin fuente. Las fuentes se muestran aparte en la interfaz.
-- Con `SIN_INFORMACION`: una a tres frases naturales; no hay citas.
-- Si el formato sigue inválido tras los reintentos, el resultado es `citation_guard_failed`, no una negativa.
-- Las URLs se eliminan. Un guard de atribución solo retira párrafos que nombran entidades específicas (Bomberos, RUNAEV, DINACEA, SNAP, UNESCO…) ausentes de toda la evidencia recuperada.
-- Un saneador de vocabulario (`refine_voice`) reemplaza «la guía», «la documentación consultada» y «hipótesis» por «mi base de conocimiento» y «posibilidad», respetando títulos reales de documentos oficiales. El prompt ya pide esa redacción; el saneador es la última salvaguarda.
+Las versiones publicadas con `bekko-horizon-lance-v2` conservan su propio par de modelos y su representación `bekko-context-v2`:
 
-La falta de hallazgos en una recuperación acotada no demuestra que el dato no exista en todo el corpus. La redacción debe reconocer ese límite. No hay búsqueda web ni fuentes externas durante el chat.
+| Rol | Modelo | Revisión | Pooling |
+| --- | --- | --- | --- |
+| Embedding | `hotchpotch/bekko-embedding-v1-a8m` | `c721113d59a1d91b447450324f51c4b3332c924a` | media enmascarada |
+| Reranker | `Horizon-Labs/multilingual-reranker-small` | `c2ec8fb3e499725b168bbed2164bfee095360f77` | — |
 
-## Memoria y rol
+No se mezclan vectores entre perfiles. Una versión antigua se puede consultar y restaurar, pero no se puede publicar una versión nueva con ese motor: hay que generar una versión con el perfil vigente. La huella (`fingerprint`) incluye modelo, revisión, pooling, normalización, runtime, dimensión, representación documental y hashes; si cambia, la versión deja de ser compatible.
 
-La sesión cifrada conserva doce mensajes y el estado del proyecto. El estado incluye `memory` (`InvestorMemory`): proyecto de la persona, intereses, opciones ya presentadas y preferencias, todo acotado a seis ítems por lista, validado con Pydantic y nunca tratado como evidencia. El intérprete la recibe y la devuelve actualizada en cada turno; los turnos sociales no la modifican. El agente de respuesta y el de conversación reciben los últimos turnos como mensajes nativos sin marcas de cita. Las citas y hechos redactados en turnos anteriores nunca se usan como evidencia documental nueva. El borrado/expiración siguen el ciclo de vida de la sesión anónima.
+## Flujo de una consulta
 
-El tipo de pedido elige la guía de tarea (`planning.policy_for`): describe qué contiene una respuesta útil (comparar zonas y la experiencia o público de cada una, ordenar requisitos, profundizar sin repetir lo ya presentado), no qué documentos están permitidos. El prompt (`ANSWER_SYSTEM`) fija el trato: un par informado, sin explicarle lo básico ni indicarle «primero definí…», con trámites solo si los pidió o si cambian la elección del lugar. Los módulos históricos de selección por sector no participan en `RAG.retrieve_plan`.
-
-**Transporte y pruebas.** `Ollama.agent_model` usa el endpoint compatible con OpenAI de Ollama Cloud (`/v1`) con un transporte por solicitud, necesario porque PydanticAI ejecuta cada llamada síncrona en su propio bucle de eventos. Las pruebas usan `chat_function_model`, que ejecuta los mismos agentes sobre cualquier transporte con `chat(messages, settings, think)`; no hay llamadas pagas en la suite.
-
-## Regresión general reproducible
-
-`python -m scripts.evaluate_general_rag --run-provider --output RUTA_NUEVA` ejecuta consultas por la API pública con CAPTCHA/sesión y pares de corpus sintéticos aislados. Estos últimos usan Bekko, Horizon, LanceDB y el proveedor reales: la misma pregunta se ejecuta con y sin el documento pertinente, incluyendo paráfrasis y un tema fuera del antiguo catálogo. Solo se crean almacenamientos temporales aislados; no se reemplaza ni publica contenido en la base del portal. La versión pública se comprueba antes y después.
-
-Las trazas permiten verificar que una negativa no salió de una regla previa a búsqueda/reranking/generación. Son regresiones pequeñas conocidas, no una garantía factual ni de cobertura exhaustiva. Las pruebas unitarias con dobles se reportan por separado. Los escenarios anteriores que exigían negativas específicas por tema o comparaciones territoriales fijas son históricos; no deben usarse como criterio de aceptación de este flujo.
-
-## Qué se tomó de Harness²
-
-Se revisaron [README](https://github.com/google-research/harness2), [recursion.py](https://github.com/google-research/harness2/blob/main/harness2/core/recursion.py), [spec.py](https://github.com/google-research/harness2/blob/main/harness2/core/spec.py) y [prompts.py](https://github.com/google-research/harness2/blob/main/harness2/core/prompts.py). Las ideas aplicadas son comparar ejecuciones sobre la misma tarea, conservar evidencia de cada fase, acotar intentos y mover instrucciones específicas fuera del prompt permanente. El propio framework ejecuta agentes de tareas mediante Codex/OpenCode y múltiples rollouts; no se instaló como dependencia del chat ni se habilitaron comandos o autoedición de reglas desde conversaciones. Se trata de una adaptación de diseño, no de una ejecución o benchmark de Harness².
-
-## Preparar y reindexar en local
-
-Desde `backend/` en una instalación exclusiva de pruebas, con `DATABASE_URL` apuntando a su esquema MariaDB aislado:
-
-```powershell
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env build api
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env run --rm --no-deps api python -m scripts.prepare_models
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env up -d api
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.enable_human_test /app/data/invest_lavalleja_2026.gianna.json
+```text
+pregunta
+  │
+  ├─ compuerta de seguridad determinista (safety.py)
+  │     acusaciones, insultos o delitos graves → respuesta fija, sin modelo
+  │
+  ├─ cortesía pura ("hola", "gracias") → modelo sin herramientas ni citas
+  │
+  └─ consulta de contenido
+        │
+        ├─ búsqueda híbrida inicial (retrieval.py)
+        │     vector Granite + BM25 español → RRF
+        │     seguimiento corto ("¿y en Varela?") = pregunta anterior + actual
+        │
+        ├─ agente con herramientas (agent.py, hasta 4 pasos, 100 s)
+        │     buscar_en_la_guia(consulta, zonas?, tipo?)
+        │     ver_ficha(identificador | [n])
+        │
+        ├─ respuesta con citas [n]
+        │
+        └─ validación: citas inexistentes se descartan, se renumeran 1..n,
+              códigos internos se traducen a nombres, se adjuntan fuentes
 ```
 
-LanceDB y modelos quedan dentro de `/app/data`, en el volumen persistente `gianna_data` del proyecto Compose correspondiente. Compose aísla este volumen; la base MariaDB depende de la única `DATABASE_URL` de esa instalación. El servicio Qdrant deja de ser una dependencia; sus datos anteriores pueden conservarse como respaldo histórico. Un rollback de datos dentro del motor nuevo requiere una versión compatible; volver al motor antiguo exige además su imagen y servicio anteriores.
+Si el proveedor falla después de los reintentos y del modelo alternativo, y ya hay evidencia, la respuesta pasa a estado `degraded` con las tres fichas más relacionadas. Sin evidencia, se devuelve un error `ollama_unavailable` claro. El prompt incluye el **mapa de la guía** (identificador y título de las fichas públicas, agrupadas por tema) para que el modelo sepa qué existe antes de afirmar que algo no está.
 
-## Medición
+## Diagramas
 
-`tests/data/retrieval_cases.json` contiene ocho consultas con grupos de registros esperados revisados contra el corpus público. `python -m scripts.evaluate_retrieval --cases tests/data/retrieval_cases.json --output RUTA_NUEVA` evalúa el contexto final sin llamar a Ollama. Los informes antes/después están en `reports/rag-migration/`. Es una batería pequeña de regresión conocida, no un benchmark independiente ni una garantía factual de respuestas generadas. Las respuestas reales se revisan además por API pública con CAPTCHA y sesión.
+### Componentes
+
+```mermaid
+flowchart LR
+    subgraph Portal["Portal Astro"]
+        UI["Isla React GiannaChat<br/>captcha, sesión, fuentes"]
+    end
+
+    subgraph API["Backend Flask + Gunicorn (1 proceso)"]
+        PUB["routes/public.py<br/>sesión anónima, límites, historial cifrado"]
+        RAG["services/rag.py<br/>orquestación, citas, métricas"]
+        SAFE["services/safety.py<br/>compuerta determinista"]
+        AG["services/agent.py<br/>bucle de herramientas, citas"]
+        RET["services/retrieval.py<br/>búsqueda híbrida, fichas"]
+        VEC["services/vector_store.py<br/>LanceDB: coseno + FTS"]
+        NEU["services/neural.py<br/>Granite y mMARCO ONNX"]
+        OLL["services/runtime.py<br/>cliente Ollama Cloud"]
+        ADM["Panel admin<br/>bases, versiones, laboratorio, ajustes"]
+        JOBS["services/jobs.py<br/>cola de indexación"]
+    end
+
+    MDB[("MariaDB<br/>registros, versiones, chunks,<br/>sesiones, métricas")]
+    LDB[("LanceDB<br/>vectores + BM25 español")]
+    GRA["Granite 97M R2<br/>ONNX CPU, 384 dim"]
+    MMA["mMARCO MiniLM<br/>ONNX CPU (evaluación)"]
+    CLOUD["Ollama Cloud<br/>deepseek-v4.1-flash:1017"]
+
+    UI -->|HTTPS| PUB --> RAG
+    RAG --> SAFE
+    RAG --> AG --> RET
+    AG --> OLL --> CLOUD
+    RET --> VEC --> LDB
+    RET --> NEU --> GRA
+    NEU -.-> MMA
+    RET --> MDB
+    PUB --> MDB
+    ADM --> JOBS
+    JOBS --> NEU
+    JOBS --> VEC
+    JOBS --> MDB
+```
+
+### Indexación y publicación
+
+```mermaid
+flowchart LR
+    DOCX["Documento fuente<br/>.docx"] --> CONV["Conversión<br/>gianna.corpus.v1"]
+    CONV --> RESTR["restructure.py<br/>fichas autosuficientes"]
+    RESTR --> IMP["Importación<br/>borrador en MariaDB"]
+    IMP --> REV["Revisión y aprobación<br/>editorial"]
+    REV --> BUILD["Construcción de versión<br/>inmutable"]
+    BUILD --> CHUNK["Chunking<br/>420 tokens, 40 de solapamiento<br/>cabecera cards-context-v5"]
+    CHUNK --> EMB["Embeddings Granite<br/>384 dim, CLS/L2"]
+    EMB --> LANCE["Tabla LanceDB<br/>vector + FTS español"]
+    LANCE --> CHECK["Verificación de conteo<br/>y huella"]
+    CHECK --> LAB["Laboratorio y evaluación"]
+    LAB --> PUBL["Publicación<br/>puntero transaccional"]
+    PUBL --> CHAT["Chat público"]
+    PUBL -.->|rollback| BUILD
+```
+
+### Una consulta, en detalle
+
+```mermaid
+sequenceDiagram
+    participant P as Persona
+    participant API as API (rag.py)
+    participant AG as Agente (agent.py)
+    participant RET as Recuperación
+    participant DB as MariaDB / LanceDB
+    participant M as Ollama Cloud
+
+    P->>API: pregunta + historial cifrado
+    API->>AG: run(pregunta, ajustes, historial)
+    AG->>AG: compuerta de seguridad
+    alt acusación, insulto o delito
+        AG-->>API: respuesta fija
+    else cortesía
+        AG->>M: mensaje sin herramientas
+        M-->>AG: respuesta breve
+    else consulta de contenido
+        AG->>RET: búsqueda híbrida inicial
+        RET->>DB: vector + BM25, RRF
+        DB-->>RET: fragmentos
+        RET-->>AG: fichas numeradas
+        AG->>M: reglas + mapa + historial + evidencia
+        loop hasta 4 pasos
+            M->>AG: buscar_en_la_guia / ver_ficha
+            AG->>RET: búsqueda o lectura
+            RET->>DB: consulta
+            DB-->>RET: fichas
+            RET-->>AG: evidencia nueva
+        end
+        M-->>AG: respuesta con citas [n]
+        AG->>AG: validar y renumerar citas
+        AG->>AG: traducir códigos internos
+    end
+    AG-->>API: resultado + fichas citadas
+    API-->>P: respuesta + fuentes
+```
+
+### Recuperación híbrida (detalle)
+
+```mermaid
+flowchart TB
+    Q["Consulta + zonas opcionales"] --> TOK["Tokenizador Granite"]
+    TOK --> DENSE["Búsqueda vectorial<br/>coseno exacto, 28 candidatos"]
+    Q --> FTS["BM25 español<br/>28 candidatos"]
+    DENSE --> RRF["Fusión RRF (k=60)"]
+    FTS --> RRF
+    RRF --> DEDUP["Deduplicar por ficha<br/>small-to-big"]
+    DEDUP --> FILTER["Solo registros públicos<br/>de la versión activa"]
+    FILTER --> CARDS["Hasta 8 fichas numeradas<br/>texto, condiciones, evidencia, corte"]
+    CARDS --> AGENT["Agente"]
+```
+
+El **reranker no participa de este camino**. Se conserva para dos usos explícitos: la verificación de `prepare_models` y la comparación de `scripts/evaluate_retrieval.py --modes fused rerank`, que mide si aporta sobre el conjunto de oro. El laboratorio del panel usa la búsqueda híbrida, no el cross-encoder. El parámetro `rerank_candidates` existe en Ajustes pero el camino actual no lo usa: cuando se evalúa, el cross-encoder recibe todos los candidatos de la búsqueda.
+
+## La base de conocimiento
+
+- **Formato de entrada:** `gianna.corpus.v1` (JSON). Cada registro incluye `id`, `title`, `section`, `topic`, `audience` (`public`/`internal`), `evidence_type`, `text`, `conditions`, `source_refs`, `zones`, `opportunity_id`, fechas y trazabilidad al documento original.
+- **Fichas autosuficientes:** `better-rag/tools/restructure.py` fusiona los registros contiguos de una tabla en su ficha padre. El consolidado se reorganiza en 332 fichas (257 públicas y 75 internas). La versión publicada indexa solo las 257 públicas, que producen 262 fragmentos; las internas nunca entran al índice. Evita recuperar "Ocupación supuesta: 70 %" o "2 · Contrastar mercado" sin su contexto.
+- **Cabecera contextual** (`chunking.py`, `cards-context-v5`): título, tema, sección y zonas se anteponen al texto del embedding **y** del BM25. Se corta con el tokenizador real de Granite: 420 tokens por fragmento y 40 de solapamiento por defecto. La versión activa tiene 262 fragmentos para 257 fichas.
+- **Small-to-big:** se recupera por fragmento y el agente recibe la ficha completa con sus condiciones, nivel de evidencia, fecha de corte y período.
+- **Índice:** MariaDB guarda registros, versiones, fragmentos y caché de embeddings; LanceDB guarda los vectores y el índice FTS. Las versiones son inmutables y publicar es mover un puntero transaccional.
+- **Trazabilidad:** cada cita adjunta título, extracto, nivel de evidencia, fecha de corte, localizador y fuentes primarias. El texto de la pregunta no se guarda en claro: solo su hash.
+
+## Parámetros que cambian el comportamiento
+
+| Parámetro | Valor por defecto | Dónde se ajusta |
+| --- | --- | --- |
+| Candidatos por canal | 28 | `retrieval_candidates` (Ajustes) |
+| Fichas entregadas por búsqueda | 8 | `retrieval_limit` (Ajustes) |
+| Fragmento / solapamiento | 420 / 40 tokens | `chunk_tokens`, `overlap_tokens` (Ajustes) |
+| Pasos del agente | 4 | `MAX_STEPS` (`agent.py`) |
+| Llamadas por paso | 6 | `agent.py` |
+| Evidencia máxima | 36.000 caracteres | `agent.py` |
+| Plazo total | 100 s | `agent.py` (Gunicorn corta a 120 s) |
+| Historial | 14.000 caracteres | `context_budget.py` |
+| Temperatura / salida | 0,2 / 4.096 tokens | Ajustes |
+
+## Mediciones de recuperación
+
+Conjunto de oro de 51 preguntas (`evals/retrieval_gold.json`), sin llamar al modelo. Los tres modos se midieron el 06/11/2026 sobre la versión activa:
+
+| Modo | hit@1 | hit@3 | hit@5 | hit@8 | MRR | ms por búsqueda |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Híbrido (camino de la consulta)** | 0,745 | 0,902 | 0,922 | **0,961** | 0,830 | **145** |
+| Híbrido + cross-encoder (fusión) | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | 6.023 |
+| Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | 6.571 |
+
+El híbrido es el único modo del chat. El cross-encoder no mejora el hit@8 ni el MRR y multiplica la latencia por más de 40 en CPU; por eso se mide, no se usa. Los fallos restantes del híbrido (contactos para permisos, "zona para un boliche", riesgos) los compensa el agente reformulando la búsqueda.
+
+Estas cifras miden cobertura de fichas, no exactitud factual. El conjunto lo escribió el mismo equipo que ajustó el sistema: no es un holdout ciego.
+
+## Operación
+
+```bash
+# Descargar y verificar los modelos fijados (encoder + reranker)
+python -m scripts.prepare_models --model-dir /app/data/models
+
+# Verificar el runtime sin red
+python -m scripts.check_model_runtime
+
+# Importar, indexar y publicar un corpus
+python scripts/ingest_corpus.py CORPUS.gianna.json --approve-technical --activate
+
+# Medir recuperación (sin costo de proveedor)
+python scripts/evaluate_retrieval.py --modes hybrid --verbose
+
+# Evaluar conversaciones reales (consume cuota)
+python scripts/evaluate_answers.py --report informe.md
+```
+
+En producción, la preparación de modelos es explícita y ocurre antes de indexar. El arranque no descarga pesos ni llama a Hugging Face. `prepare_models` inicializa ambos perfiles y ejecuta una inferencia de prueba; el reranker solo se valida, no se consulta en el chat.
+
+## Límites conocidos
+
+- La respuesta la redacta un modelo no determinista: puede equivocarse aunque cite. Los controles automáticos detectan cifras ausentes de la evidencia, códigos internos, longitud y estados, pero no una afirmación errónea bien citada.
+- La guía es la única fuente. No hay web, inventario de predios, precios ni contactos fuera de lo que figura en ella.
+- Las hipótesis y los ejemplos numéricos se presentan como tales, no como datos observados.
+- Las versiones publicadas con el motor anterior siguen consultables con su representación original; no se mezclan con el perfil vigente.
+- La latencia de recuperación medida (145 ms de promedio) corresponde a este equipo. En el servidor destino hay que volver a medirla con la CPU real.

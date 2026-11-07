@@ -1,12 +1,31 @@
 # Gianna · Invest Lavalleja
 
-**Versión 1.0.0-rc1 · 28 de septiembre de 2026 · Candidata para validación.**
+**Versión 1.0.0-rc1 · 28 de septiembre de 2026 · Documentación revisada el 6 de noviembre de 2026.**
 
 Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro.
 
-**Motor RAG actualizado · 21/10/2026:** Bekko ONNX Runtime CPU + Horizon ONNX Runtime CPU + LanceDB (cosine exacto y BM25 español). Se retiró OpenVINO tras confirmar un `SIGSEGV` del compilador en producción. La huella nueva requiere una nueva versión vectorial; no se reutilizan ni mezclan vectores. Ver [arquitectura y migración](docs/RAG_ENGINE.md). Los informes anteriores describen verificaciones históricas.
+**Agente RAG · estado 06/11/2026.** Gianna ya no usa un planificador de reglas ni un catálogo de rubros escrito a mano. Ahora es un **agente con herramientas** sobre una base de conocimiento híbrida:
 
-**Estado conversacional:** Gianna usa `deepseek-v4.1-flash` en la pila local de prueba. Un harness distingue conversación, consulta RAG, preguntas externas, burlas, privacidad y pedidos dañinos antes de recuperar documentos. Las respuestas sobre inversión requieren fuentes; la conversación no muestra citas irrelevantes ni rechazos en tercera persona. La pila Docker de prueba humana está aislada y avisa que el contenido no fue revisado. La base operativa permanece sin publicación y no está validada para producción. Se aprobaron 106 pruebas Python, 12 pruebas de navegador de Gianna (escritorio y móvil) y una batería real de 16/16 diálogos; esos resultados no certifican exactitud factual. SMTP real y Coolify remoto no están validados. Consultar `reports/VALIDACION.md` y completar `docs/PUESTA_EN_MARCHA.md` antes de abrirla al público.
+- La base se organiza en **fichas autosuficientes** (`better-rag/tools/restructure.py` fusiona los fragmentos sueltos de las tablas en su ficha padre) con una cabecera contextual (título, tema, sección, zonas) que se antepone al embedding y al BM25.
+- Cada consulta hace una **búsqueda híbrida inicial** (vector Granite 97M + BM25 español de LanceDB, fusión RRF, ~145 ms de promedio medido en CPU) y el modelo recibe la evidencia numerada. Si hace falta, **busca de nuevo** (`buscar_en_la_guia`, con filtros blandos de zona y tipo) o **lee una ficha** (`ver_ficha`), hasta 4 pasos.
+- Responde en prosa breve con citas `[n]` validadas contra la evidencia realmente recuperada, respeta el nivel de evidencia de cada ficha (dato documentado, hipótesis, ejemplo didáctico) y, si la guía no cubre un rubro, lo dice y aporta lo que sí está documentado (zonas, condiciones, trámites, qué validar) en vez de abstenerse.
+- **Robustez del proveedor:** reintentos con espera, modelo alternativo (`OLLAMA_FALLBACK_MODELS`), plazo total de 100 s (Gunicorn corta a los 120 s) y, si Ollama cae, respuesta degradada con las fichas recuperadas en lugar de un error.
+- El cross-encoder mMARCO está **fuera del camino de la consulta**: en la evaluación con 51 preguntas no mejoró el híbrido y costaba ~6 s por búsqueda en CPU. Solo se usa en la verificación de `prepare_models` y en la comparación de `evaluate_retrieval --modes fused rerank`; el laboratorio del panel usa la búsqueda híbrida.
+
+Ver [arquitectura](docs/RAG_ENGINE.md), [diseño del agente](docs/AGENT_DESIGN.md) y [validación con resultados reales y límites](reports/VALIDACION.md). Las versiones publicadas con el motor anterior (Bekko/Horizon) siguen consultables, sin mezclarse con el perfil vigente. El presupuesto artificial de 8.000 tokens por petición se eliminó: el corpus público completo ocupa unas 60.000 tokens (medidos con el tokenizador de Granite) y las consultas registradas promedian ~6.900 tokens de entrada, con picos de ~45.000 cuando el agente lee varias fichas.
+
+Perfil de la instalación de referencia: `deepseek-v4.1-flash:1017` (`think: low`) con `deepseek-v4.1-flash` como alternativa. El valor inicial para instalaciones nuevas es `OLLAMA_MODEL` de `.env`; el panel puede fijar otra revisión del catálogo. La evaluación automática no certifica exactitud factual ni vigencia; cualquier respuesta debe contrastarse con sus fuentes. No se publica nada automáticamente.
+
+## Modelos y versiones
+
+| Rol | Modelo | Revisión | Detalle |
+| --- | --- | --- | --- |
+| Embedding | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad140…` | ONNX `model_quint8_avx2.onnx`, 384 dim, CLS, L2, 512 tokens, sin prefijos |
+| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | ONNX CPU, 512 tokens; solo verificación y evaluación comparativa |
+| Búsqueda léxica | BM25 de LanceDB | — | Español con stemming y `ascii_folding`; fusión RRF `k=60` |
+| Generación | `deepseek-v4.1-flash:1017` | catálogo `/api/tags` | Ollama Cloud; alternativa `deepseek-v4.1-flash` |
+
+Cada versión guarda su **huella** (modelo, revisión, pooling, normalización, runtime, dimensión, representación documental y hashes). La versión activa usa el motor `granite-mmarco-lance-v3` y la representación `cards-context-v5`. Cambiar cualquiera de esos valores exige construir y evaluar una versión nueva; no se reutilizan vectores de otro perfil.
 
 ## Qué incluye
 
@@ -18,7 +37,7 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 - Exploración de chunks reales, cantidad de tokens, contenido y metadatos. Mapa PCA 2D interactivo de hasta 1.200 puntos, con etiquetas temáticas: no es un clasificador ni una prueba de calidad.
 - Laboratorio de recuperación y chat, evaluación de recuperación con preguntas cargables, publicación con confirmación, retorno a versiones previamente publicadas y borrado protegido de una base con sus versiones.
 - Analítica agregada de consultas, latencia, tokens informados por el proveedor, referencias, feedback y temas recuperados. No se inventan montos facturados ni porcentajes de exactitud.
-- Chat público de prueba `/chat`; isla React activa en `../src/components/islands/GiannaChat.tsx`; `AgentHarness` controla rutas, respuestas de seguridad y acceso al RAG; contexto corto cifrado de hasta seis intercambios, botón para olvidar y límites de uso. Ambos inicios de sesión exigen CAPTCHA.
+- Chat público de prueba `/chat`; isla React activa en `../src/components/islands/GiannaChat.tsx`; el agente (`services/agent.py`) controla la seguridad determinista, la búsqueda y la redacción con citas; historial cifrado acotado por tamaño, botón para olvidar y límites de uso. Ambos inicios de sesión exigen CAPTCHA.
 - Compose, Dockerfile, migraciones MariaDB, importador único desde SQLite y workflow de pruebas. No contiene tokens, contraseñas, embeddings precalculados ni un índice LanceDB precalculado.
 
 ## Crear administradores y superadministradores
@@ -55,18 +74,20 @@ Portal Astro / isla React
         ↓
 Flask + Gunicorn + Jinja + MariaDB
         ↓
-Bekko ONNX Runtime (384 dimensiones, CPU)
+Granite embedding 97M R2, ONNX CPU quint8 (CLS/L2, 384 dimensiones)
         ↓
-LanceDB: cosine + BM25 español + RRF → Horizon cross-encoder
+LanceDB: coseno exacto + BM25 español + RRF (≈145 ms medidos)
         ↓
-Ollama Cloud API: Authorization Bearer desde OLLAMA_API_KEY
+Agente con herramientas (buscar_en_la_guia / ver_ficha), citas [n] validadas
+        ↓
+Ollama Cloud API: deepseek-v4.1-flash:1017 (alternativa deepseek-v4.1-flash)
 ```
 
-Un servicio de API: `api`; MariaDB conserva usuarios, sesiones, analítica, corpus y cola; LanceDB y los modelos permanecen en el volumen privado local. El trabajo de indexación usa un hilo supervisado dentro del único proceso de la API y una cola durable en MariaDB. No se agregan Redis, Celery, MinIO, un servidor de embeddings ni un Ollama local. Bekko y Horizon comparten el control de inferencia CPU. LanceDB se ejecuta embebido.
+Un servicio de API: `api`; MariaDB conserva usuarios, sesiones, analítica, corpus y cola; LanceDB y los modelos permanecen en el volumen privado local. La indexación usa un hilo supervisado dentro del único proceso y una cola durable en MariaDB. No se agregan Redis, Celery, MinIO, un servidor de embeddings ni un Ollama local. Los perfiles de inferencia comparten el control de CPU. LanceDB se ejecuta embebido.
 
 `D:\Ai Projects\chat-onnx-local` se tomó como referencia de separación navegador → API → proveedor y de interacción conversacional. Aquí la interfaz se adapta a una isla React en Astro y la API a RAG con citas; no se trasladó su SPA ni su servidor llama.cpp local.
 
-**Controlador de Gianna.** Primero aplica barreras locales para acusaciones directas sobre personas y pedidos explícitos de daño o ilícitos; las críticas a la asistente pasan a una respuesta conversacional contextual. Para los demás mensajes, el modelo propone una de seis rutas en JSON: `rag`, `chat`, `deescalate`, `allegation`, `refuse` u `out_of_scope`. El servidor valida la propuesta y solo `rag` puede consultar el índice público; una decisión inválida pide reformulación sin buscar. Las preguntas externas también reciben conversación natural, sin plantillas de “fuera del alcance”. Los saludos inequívocos evitan una clasificación. [Ollama Cloud no admite salidas con esquema](https://github.com/ollama/ollama/blob/main/docs/capabilities/structured-outputs.mdx), por lo que Python valida el JSON. `deepseek-v4.1-flash` se usa con `think: false`, probado contra el proveedor; otros modelos conservan `think: low`. Una respuesta documental sin citas válidas recibe un único intento de reparación con la misma evidencia; nunca se publican citas fabricadas como respaldo. Esto no sustituye pruebas adversariales continuas ni revisión humana de afirmaciones factuales.
+**Controlador de Gianna.** El servidor mantiene las barreras de seguridad deterministas (`services/safety.py`: acusaciones, insultos y delitos graves se resuelven sin llamar al modelo). El resto de las consultas las resuelve el agente (`services/agent.py`): búsqueda híbrida inicial, hasta cuatro pasos con herramientas, validación de las citas contra la evidencia de esa solicitud y degradación a fichas si el proveedor falla. Las reglas del agente viven en código (`services/prompts.py`); el panel solo edita el tono. Ver [arquitectura](docs/RAG_ENGINE.md).
 
 **Un proceso de Gunicorn.** No aumentar `workers` ni arrancar réplicas sin rediseñar la cola, los bloqueos de inferencia y los límites. La cuenta SQL de la API debe tener acceso solo a los esquemas de Gianna; no usar `root` ni compartir el esquema de Buzón Ciudadano.
 
@@ -95,39 +116,45 @@ Esta opción es exclusiva de una instalación de pruebas cuyo `.env` contiene su
 ```powershell
 # Desde backend/, con .env local configurado (incluida la clave de Ollama):
 docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env up -d --build
-docker cp knowledge/invest_lavalleja_2026.gianna.json gianna-invest-human-test-api-1:/app/data/invest_lavalleja_2026.gianna.json
-docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.enable_human_test /app/data/invest_lavalleja_2026.gianna.json
+docker cp ../better-rag/consolidated/Invest_Lavalleja_2026_10_19_fichas.gianna.json gianna-invest-human-test-api-1:/app/data/fichas.gianna.json
+docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.enable_human_test /app/data/fichas.gianna.json
 docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env restart api
 ```
 
 Esperar a que `http://127.0.0.1:8001/api/config` indique `available: true` y `test_mode: true`; abrir `http://localhost:4321/gianna/`. El script selecciona **solo** los registros marcados públicos, verifica conteos de MariaDB/LanceDB y activa exclusivamente el puntero de la pila aislada. Su marca de aprobación es técnica y **no** sustituye revisión editorial. No copiar su esquema ni su volumen a producción. Las preguntas y fragmentos recuperados se envían a Ollama Cloud, así que no introducir datos confidenciales. Para detener solo la pila de prueba, usar `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env stop` (sin `down -v`).
 
-La evaluación adversarial de diálogo se ejecuta **solo** por petición explícita, porque consume tokens de Ollama Cloud y usa la base técnica local: `docker compose -f compose.yaml -f compose.human-test.yaml --env-file .env exec -T api python -m scripts.evaluate_dialogue`. Cubre humor, crítica, propuestas personales, hechos externos, actualidad, actividad sensible, corrección, explotación/coerción, privacidad, inversión con seguimiento e inyección para forzar un beneficio fiscal. El script verifica rutas, ausencia de citas improcedentes y algunos fallos de redacción; no es un juez semántico ni una validación jurídica.
+Herramientas de calidad (se ejecutan con `.venv\Scripts\python.exe` desde `backend/`, o dentro del contenedor):
+
+- `python scripts/ingest_corpus.py CORPUS.gianna.json [--approve-technical] [--activate]`: importa, indexa y opcionalmente publica un corpus. `--approve-technical` es un atajo de pruebas locales, no una revisión editorial.
+- `python scripts/evaluate_retrieval.py --modes hybrid --verbose`: mide hit@k y MRR contra `evals/retrieval_gold.json` (51 preguntas con fichas esperadas). No llama a Ollama. `--modes fused rerank` agrega el cross-encoder y tarda varios minutos en CPU; no es el camino del chat.
+- `python scripts/evaluate_answers.py --report informe.md`: corre `evals/dialogues.json` (31 conversaciones) contra el agente real y revisa citas, cifras sin respaldo en la evidencia, códigos internos, longitud y estados. **Consume cuota de Ollama.** El informe se lee a mano: no es un juez semántico.
+- `python scripts/chat_cli.py "pregunta 1" "pregunta 2" [--separate] [--trace]`: conversación de prueba sin HTTP ni captcha.
+- `python scripts/run_local.py --port 8001 --human-test`: API nativa en Windows (sin Docker) para la prueba humana con `npm run dev`.
 
 ## Primera base de conocimiento
 
-1. Obtener la guía fuente por un canal autorizado, convertirla localmente con `python scripts/convert_guide.py <archivo.docx> --output knowledge` y cargar `knowledge/invest_lavalleja_2026.gianna.json` en **Bases**. El JSON de trabajo queda fuera de Git (ver nota de GitHub al final).
-2. Abrir el borrador, revisar contenido y fuentes. La conversión contiene 271 registros: 196 públicos y 75 internos. Revisar y aprobar los registros públicos que correspondan.
+1. Cargar en **Bases** el corpus canónico de fichas `better-rag/consolidated/Invest_Lavalleja_2026_10_19_fichas.gianna.json` (332 registros: 257 públicos y 75 internos). Alternativa: convertir la guía fuente con `python scripts/convert_guide.py <archivo.docx> --output knowledge` y cargar ese JSON (271 registros). Los JSON de trabajo quedan fuera de Git.
+2. Abrir el borrador, revisar contenido y fuentes. Revisar y aprobar los registros públicos que correspondan.
 3. Crear la versión vectorial. Abrir su trabajo para ver progreso y errores. Esperar que finalice antes de probar o publicar.
-4. En la versión, revisar chunks, temas y mapa. Cargar `knowledge/pruebas_recuperacion.json` en la evaluación y usar el laboratorio.
-5. Seleccionar el modelo generativo en Ajustes y revisar manualmente las respuestas de los 12 casos de `knowledge/pruebas_respuestas_revision_humana.json`.
+4. En la versión, revisar chunks, temas y mapa. Para la evaluación desde el panel, cargar un array JSON de hasta 200 preguntas con `question` y `expected_any_record_ids`; para la evaluación por consola, usar `evals/retrieval_gold.json` con `scripts/evaluate_retrieval.py`.
+5. Seleccionar el modelo generativo en Ajustes y revisar manualmente conversaciones; el conjunto de referencia es `evals/dialogues.json` (31 casos) con `scripts/evaluate_answers.py`.
 6. Publicar desde una cuenta propietaria con segundo factor reciente. Esa acción cambia el puntero activo de forma transaccional; los borradores continúan sin afectar el chat.
 
 **Aprobar es una decisión editorial, no una verificación automática de veracidad o vigencia.** La guía conserva su corte del 18/09/2026. Sus normas, contactos y estadísticas no se actualizaron con información externa durante la conversión.
 
-Para importar la guía sin aprobarla desde la consola del contenedor, copiar el JSON a `/app/data` y ejecutar `python -m scripts.load_knowledge /app/data/invest_lavalleja_2026.gianna.json`. La opción `--technical-smoke` indexa el subconjunto público en una **SQLite de prueba separada, nunca publicada** y realiza una consulta real; `--evaluations /app/data/pruebas_recuperacion.json` añade la batería de recuperación. El smoke no sustituye la revisión y publicación desde el panel.
+Para importar el corpus sin aprobarlo desde la consola, usar `python scripts/ingest_corpus.py <corpus.gianna.json>` (ver arriba). Para un corpus con fragmentos sueltos, generar antes las fichas con `python better-rag/tools/restructure.py ENTRADA.gianna.json SALIDA.gianna.json`; el JSON recomendado es `better-rag/consolidated/Invest_Lavalleja_2026_10_19_fichas.gianna.json` (257 registros públicos, mediana 1.088 caracteres). El script no sustituye la revisión y publicación desde el panel.
 
 ## Configuración
 
 Los secretos permanecen en `.env` local o en las variables de ejecución de Coolify. El panel no puede leer ni modificar sus valores. `SECRET_KEY` y `ENCRYPTION_KEY` son diferentes y deben conservarse. Cambiar la clave de cifrado sin migración vuelve ilegible el contexto cifrado.
 
-La configuración requiere una sola `DATABASE_URL` (MariaDB dedicada) por instalación, `SECRET_KEY`, `ENCRYPTION_KEY`, `CORS_ORIGINS`, los tres campos de Ollama y `MAIL_*`. El mismo nombre se usa en local y en Coolify, con el valor que corresponde a cada instalación. No necesita variables adicionales de base de datos, Qdrant, E5, CPU, tamaño de archivos, workers ni rutas de datos. `gianna/config_profiles.py` separa desarrollo, producción y pruebas; `gianna/config.py` centraliza los valores técnicos. El volumen `/app/data` conserva LanceDB, modelos, cargas y exports, no la base SQL.
+La configuración requiere una sola `DATABASE_URL` (MariaDB dedicada) por instalación, `SECRET_KEY`, `ENCRYPTION_KEY`, `CORS_ORIGINS`, los tres campos de Ollama y `MAIL_*`. El mismo nombre se usa en local y en Coolify, con el valor que corresponde a cada instalación. No necesita variables de motores anteriores (Qdrant, E5), de CPU, tamaño de archivos, workers ni rutas de datos: los valores técnicos viven en `config.py` y en `neural.py`. `gianna/config_profiles.py` separa desarrollo, producción y pruebas; `gianna/config.py` centraliza los valores técnicos. El volumen `/app/data` conserva LanceDB, modelos, cargas y exports, no la base SQL.
 
 Para simplificar una instalación existente, ejecutar `python -m scripts.simplify_env` para verificar y luego `python -m scripts.simplify_env --apply` para aplicar. El script comprueba equivalencia, conserva las claves, el modelo y el correo, y deja un respaldo `.env.before-simplify-*` excluido de Git y Docker. Si encuentra opciones personalizadas que no puede retirar sin cambios, se detiene sin sobrescribir. Los nombres antiguos siguen siendo compatibles durante la transición; no deben mezclarse con los nuevos (los nuevos tienen prioridad).
 
 En producción, `CORS_ORIGINS` debe incluir los orígenes HTTPS exactos del portal **y de la API** si usa un dominio separado. De esa lista se deriva la validación de hosts, sin comodines. El perfil de producción conserva cookies seguras, SameSite estricto, HTTPS y un único proxy de Coolify; la API no debe tener un puerto publicado directamente a Internet.
 
-Nombre, saludo, tono, aviso, modelo generativo, parámetros de recuperación, tamaño/solapamiento de chunks, límites y retención se administran desde Ajustes. `OLLAMA_MODEL` inicia el valor de instalaciones nuevas; no sobrescribe el modelo ya elegido en el panel. Los modelos Bekko/Horizon y su espacio vectorial no se cambian con un selector genérico que pudiera mezclar vectores incompatibles.
+Nombre, saludo, tono, aviso, modelo generativo, parámetros de recuperación, tamaño/solapamiento de chunks, límites y retención se administran desde Ajustes. `OLLAMA_MODEL` inicia el valor de instalaciones nuevas; no sobrescribe el modelo ya elegido en el panel. Los modelos de embedding/reranker y su espacio vectorial no se cambian con un selector genérico que pudiera mezclar vectores incompatibles.
 
 Las revisiones y artefactos están fijados en `gianna/services/neural.py`; el preparador verifica SHA-256. La aplicación detecta cambios de huella y exige una versión nueva.
 

@@ -11,15 +11,15 @@ Esta lista contiene trabajo real pendiente. No marcarla como cumplida por haber 
 
 ## Datos e indexación
 
-- Importar el JSON canónico. Confirmar 271 registros y 50 fuentes; revisar la separación 196/75 antes de aprobar.
-- Preparar y verificar Bekko/Horizon; comprobar 384 dimensiones, pooling, normalización y tokenización sin prefijos E5. Revisar que ningún chunk indexado supere el límite.
+- Importar el JSON canónico de fichas (`better-rag/consolidated/..._fichas.gianna.json`, generado con `better-rag/tools/restructure.py`). Confirmar 332 registros (257 públicos, 75 internos) y sus fuentes; revisar la separación antes de aprobar.
+- Preparar y verificar el perfil Granite/mMARCO; comprobar CLS/L2, 384 dimensiones, tokenizador exacto y presupuesto de chunks (representación `cards-context-v5`: construir una versión nueva tras actualizar el código). El reranker se verifica en `prepare_models` y se mide con `evaluate_retrieval --modes fused rerank`; no interviene en el chat. Conservar el perfil v2 de las versiones publicadas hasta la transición explícita.
 - Comprobar revisiones fijadas en `services/neural.py` y repetir carga/reinicio sin cambios inesperados de huella.
 - Confirmar que LanceDB contiene exclusivamente contenido público aprobado y los puntos coinciden con la versión MariaDB.
 - Interrumpir una construcción en un entorno de prueba, reiniciar, reintentar y verificar que no duplica puntos ni cambia la versión activa. Confirmar cancelación entre lotes.
 
 ## Recuperación y generación
 
-- Ejecutar las 62 preguntas y registrar resultados reales. El umbral de aceptación lo fija el equipo con evidencia; no hay un porcentaje precalculado de acierto.
+- Ejecutar `python scripts/evaluate_retrieval.py --modes hybrid` (51 preguntas de `evals/retrieval_gold.json`) y `python scripts/evaluate_answers.py --report informe.md` (31 conversaciones de `evals/dialogues.json`, consume cuota) en el servidor y registrar resultados reales. El umbral de aceptación lo fija el equipo con evidencia; no hay un porcentaje precalculado de acierto.
 - Configurar Ollama y completar las 12 situaciones de revisión humana. Comprobar referencias, fecha, condiciones, rechazo de premisas falsas y abstención cuando corresponda.
 - Probar continuidad de conversación, pregunta fuera de tema, inyección de instrucciones, intento de usar el anexo interno, mensaje excesivo y límite de uso.
 - Validar errores al hacer indisponible el índice LanceDB en un entorno aislado de prueba o simular fallo del proveedor: sin inventar respuesta, sin publicar borradores y sin filtrar secretos.

@@ -42,6 +42,7 @@ class Config:
     ollama_url: str = 'https://ollama.com'
     ollama_api_key: str = field(default='', repr=False)
     ollama_model: str = ''
+    ollama_fallback_models: tuple[str, ...] = ('deepseek-v4.1-flash',)
     public_origins: tuple[str, ...] = ()
     trusted_hosts: tuple[str, ...] = ()
     proxy_hops: int = 0
@@ -105,6 +106,7 @@ class Config:
             ollama_url=env_value(env, 'OLLAMA_HOST', 'OLLAMA_BASE_URL', 'https://ollama.com').rstrip('/'),
             ollama_api_key=env.get('OLLAMA_API_KEY', ''),
             ollama_model=env.get('OLLAMA_MODEL', ''),
+            ollama_fallback_models=tuple(m.strip() for m in env.get('OLLAMA_FALLBACK_MODELS', 'deepseek-v4.1-flash').split(',') if m.strip()),
             public_origins=origins,
             trusted_hosts=tuple(x.strip() for x in env['TRUSTED_HOSTS'].split(',') if x.strip()) if 'TRUSTED_HOSTS' in env else hosts,
             proxy_hops=int(env.get('PROXY_HOPS', str(profile.proxy_hops))),
