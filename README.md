@@ -2,10 +2,11 @@
 
 Invest Lavalleja es un portal de información para inversores interesados en el departamento de Lavalleja (Uruguay). Reúne zonas, sectores, datos, casos, pasos y preguntas frecuentes, y tiene un asistente conversacional llamado **Gianna Invest** que responde preguntas usando solo la base de conocimiento del proyecto.
 
-El portal y la API trabajan juntos y se mantienen en repositorios separados:
+Este repositorio central reúne el portal y una copia del backend. Los despliegues
+institucionales utilizan los repositorios independientes de frontend y backend:
 
-- **Portal web** (este repositorio): el sitio que ve el inversor. Genera las páginas con Astro y usa React solo para las herramientas interactivas, como el buscador, el mapa, el dossier y el chat.
-- **Backend de Gianna** ([repositorio backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend)): el servicio que recibe las preguntas, busca en la base de conocimiento y redacta las respuestas con sus fuentes.
+- **Portal web** (raíz de este repositorio; [frontend institucional](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-frontend)): genera las páginas con Astro y usa React para las herramientas interactivas.
+- **Backend de Gianna** (`backend/`; [backend institucional](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend)): recibe las preguntas, busca en la base de conocimiento y redacta respuestas con sus fuentes.
 
 ## Qué es Gianna Invest
 
@@ -80,7 +81,11 @@ Las herramientas de `better-rag/` usan el backend de Gianna. Si ambos repositori
 
 ## Despliegue con Coolify
 
-El portal y la API son recursos separados en Coolify. El portal se construye desde este repositorio con el `Dockerfile` de la raíz y escucha en el puerto interno `80`; configurar los argumentos de construcción indicados en [docs/COOLIFY.md](docs/COOLIFY.md). La API se despliega desde el repositorio independiente `invest-lavalleja-backend`; seguir allí las instrucciones de [despliegue de Coolify](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/docs/COOLIFY.md).
+El portal y la API son recursos separados en Coolify. En la instalación institucional,
+se despliegan desde los repositorios independientes de frontend y backend; una
+actualización de este repositorio central no actualiza automáticamente esas fuentes.
+Para el backend, revisar el [plan de persistencia, recuperación y rollback](backend/docs/RECUPERACION.md)
+antes de cualquier despliegue. El portal escucha en el puerto interno `80`.
 
 ## Puesta en marcha de Gianna
 

@@ -12,6 +12,11 @@ dist/
 .env.*
 !.env.example
 
+# Reference repositories and local worktrees must not be added to this repository.
+sample-backend/
+invest-lavalleja-backend-current/
+invest-lavalleja-frontend-current/
+
 # Test and coverage output
 coverage/
 test-results/
@@ -22,6 +27,8 @@ backend/reports/*
 !backend/reports/*.md
 !backend/reports/rag-migration/
 !backend/reports/rag-migration/*.json
+!backend/reports/persistence/
+!backend/reports/persistence/*.json
 
 # Python caches and local state
 __pycache__/

@@ -166,7 +166,7 @@ def test_retry_failed_import_after_migration_without_reupload(maria_db,cfg,corpu
     try:
         # Reproduce the previous production schema after app startup.
         s.db.execute('ALTER TABLE bases ALTER COLUMN description DROP DEFAULT')
-        s.db.execute('DELETE FROM schema_versions WHERE version=3')
+        s.db.execute('DELETE FROM schema_versions WHERE version>=3')
         with client.session_transaction(path='/admin/bases/import') as session:csrf=session['csrf']
         response=client.post('/admin/bases/import',data={'csrf':csrf,'name':'Retry original job',
             'file':(io.BytesIO(corpus.model_dump_json().encode()),'retry.gianna.json')})
@@ -204,7 +204,7 @@ def test_defaults_migration_preserves_existing_data_accounts_and_active_version(
         tables=('users','admin_sessions','auth_challenges','bases','records','sources','versions',
             'version_records','version_sources','active_knowledge','jobs','settings','audit')
         before={table:s.db.all(f'SELECT * FROM {table}') for table in tables}
-        s.db.execute('DELETE FROM schema_versions WHERE version=3')
+        s.db.execute('DELETE FROM schema_versions WHERE version>=3')
         s.db.migrate();s.db.migrate()
         assert {table:s.db.all(f'SELECT * FROM {table}') for table in tables}==before
         assert s.knowledge.active()['id']==version

@@ -77,7 +77,7 @@ class Config:
         return self.data_dir / 'lance'
 
     @classmethod
-    def from_env(cls, overrides=None, *, environ=None):
+    def from_env(cls, overrides=None, *, environ=None, initialize_storage=True):
         from dotenv import load_dotenv
         if environ is None:
             # Never depend on the directory from which a CLI or WSGI server starts.
@@ -179,7 +179,8 @@ class Config:
             raise ValueError('Perfil de CPU fuera de rango.')
         if not 1 <= cfg.max_concurrent_chat <= 16:
             raise ValueError('MAX_CONCURRENT_CHAT fuera de rango.')
-        cfg.data_dir.mkdir(parents=True, exist_ok=True)
-        for sub in ('uploads','exports','models'):
-            (cfg.data_dir/sub).mkdir(exist_ok=True)
+        if initialize_storage:
+            cfg.data_dir.mkdir(parents=True, exist_ok=True)
+            for sub in ('uploads','exports','models'):
+                (cfg.data_dir/sub).mkdir(exist_ok=True)
         return cfg

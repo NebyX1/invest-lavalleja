@@ -18,6 +18,7 @@ class Jobs:
         self.db=db;self.cfg=cfg;self.knowledge=knowledge;self.embeddings=embeddings;self.vector_store=vector_store;self.rag=rag
         self.stop_event=threading.Event();self.thread=None;self.wake=threading.Event()
         self.token=uid();self.current_job=None
+        if rag:rag.recovery.enqueue=self.ensure_warmup
 
     def enqueue(self,kind,payload=None,base_id=None,version_id=None):
         if kind not in {'import','warmup','evaluation'}:raise DomainError('Tipo de trabajo no válido.')
@@ -28,10 +29,28 @@ class Jobs:
     def start(self):
         if self.thread and self.thread.is_alive():return
         self.stop_event.clear()
+        if self.knowledge.active():self.ensure_warmup()
         self.thread=threading.Thread(target=self.run,name='gianna-jobs',daemon=True)
         self.thread.start()
         threading.Thread(target=self.heartbeat,name='gianna-job-lease',daemon=True).start()
-        if self.knowledge.active():self.enqueue('warmup')
+
+    def ensure_warmup(self, retry=False, version=None):
+        active = version or self.knowledge.active()
+        if not active:return None
+        with self.db.tx(immediate=True) as db:
+            rows = db.execute("SELECT * FROM jobs WHERE kind='warmup' AND (version_id=? OR payload_json=?) ORDER BY created_at DESC LIMIT 1",
+                              (active['id'],dumps({'version_id':active['id']}))).fetchall()
+            for row in rows:
+                if json.loads(row['payload_json']).get('version_id') != active['id']:continue
+                if row['status'] in {'queued','running'}:return row['id']
+                if row['status'] == 'failed' and row['attempts'] >= 3 and not retry:return row['id']
+                if row['status'] == 'cancelled' and not retry:return row['id']
+                break
+            id=uid()
+            db.execute('INSERT INTO jobs(id,kind,version_id,payload_json,created_at) VALUES(?,?,?,?,?)',
+                       (id,'warmup',active['id'],dumps({'version_id':active['id']}),time.time()))
+        self.wake.set()
+        return id
 
     def heartbeat(self):
         while not self.stop_event.wait(20):
@@ -43,11 +62,12 @@ class Jobs:
     def claim(self):
         now=time.time()
         with self.db.tx(immediate=True) as db:
-            db.execute("UPDATE jobs SET status='queued',owner_token=NULL,message='Reanudando después de una interrupción' WHERE status='running' AND lease_until<?",(now,))
+            db.execute("UPDATE jobs SET status='queued',owner_token=NULL,message='Reanudando después de una interrupción' WHERE status='running' AND (lease_until<? OR lease_until IS NULL)",(now,))
+            db.execute("UPDATE jobs SET status='failed',error='Recuperación interrumpida demasiadas veces; reintento administrativo requerido.' WHERE kind='warmup' AND status='queued' AND attempts>=3")
             if db.execute("SELECT 1 FROM jobs WHERE status='running' AND lease_until>=?",(now,)).fetchone():return None
-            r=db.execute("SELECT * FROM jobs WHERE status='queued' ORDER BY created_at LIMIT 1").fetchone()
+            r=db.execute("SELECT * FROM jobs WHERE status='queued' AND available_at<=? ORDER BY CASE WHEN kind='warmup' THEN 0 ELSE 1 END,created_at LIMIT 1",(now,)).fetchone()
             if not r:return None
-            db.execute("UPDATE jobs SET status='running',started_at=COALESCE(started_at,?),lease_until=?,owner_token=?,error=NULL WHERE id=?",(now,now+120,self.token,r['id']))
+            db.execute("UPDATE jobs SET status='running',attempts=attempts+1,started_at=COALESCE(started_at,?),lease_until=?,owner_token=?,error=NULL WHERE id=?",(now,now+120,self.token,r['id']))
             return dict(r)
 
     def progress(self,job_id,message,progress=None,total=None):
@@ -66,6 +86,8 @@ class Jobs:
             try:
                 job=self.claim()
                 if not job:
+                    if self.rag and self.knowledge.active() and not self.rag.recovery.status()['available']:
+                        self.ensure_warmup()
                     if time.time()-last_maintenance>3600:
                         self.maintenance();last_maintenance=time.time()
                     self.wake.wait(2);self.wake.clear();continue
@@ -97,32 +119,54 @@ class Jobs:
                 # Warm the ACTIVE snapshot first. A runtime upgrade must not
                 # turn an already published index into a different vector space.
                 target=payload.get('version_id')
-                active=self.db.one('SELECT profile_json FROM versions WHERE id=?',(target,)) if target else self.knowledge.active()
+                active=self.db.one('SELECT * FROM versions WHERE id=?',(target,)) if target else self.knowledge.active()
                 if target and not active:raise DomainError('Versión no encontrada.',404)
-                engine=self.rag.engine_for(json.loads(active['profile_json'])) if active and self.rag else self.embeddings
-                engine.load(lambda message:self.progress(id,message));result=engine.profile
-            elif kind=='build':result=self.build(job)
-            elif kind=='delete':result=self.delete(job)
+                if self.rag:
+                    result=self.rag.recovery.recover(active,apply=True,progress=lambda message:self.progress(id,message))
+                else:
+                    self.embeddings.load();result=self.embeddings.profile
+            elif kind=='build':
+                from .storage import writer_lock
+                with self.db.physical_lock(),writer_lock(self.cfg):result=self.build(job)
+            elif kind=='delete':
+                from .storage import writer_lock
+                with self.db.physical_lock(),writer_lock(self.cfg):result=self.delete(job)
             elif kind=='evaluation':result=self.evaluate(job,payload)
             else:raise DomainError('Trabajo desconocido.')
             self.db.execute("UPDATE jobs SET status='done',finished_at=?,message='Finalizado',result_json=?,lease_until=NULL WHERE id=? AND owner_token=?",
                 (time.time(),dumps(result),id,self.token))
         except Cancelled:
+            cancellation=self.db.one('SELECT cancel_requested FROM jobs WHERE id=?',(id,))
+            if self.stop_event.is_set() and cancellation and not cancellation['cancel_requested']:
+                # Process shutdown is an interruption, not an editorial/user
+                # cancellation. Resume the same job with its existing snapshot.
+                self.db.execute("UPDATE jobs SET status='queued',owner_token=NULL,lease_until=NULL,available_at=?,message='Pendiente tras detener el proceso' WHERE id=? AND owner_token=?",
+                                (time.time()+2,id,self.token))
+                return
             self.db.execute("UPDATE jobs SET status='cancelled',message='Cancelado. La base activa no cambió.',finished_at=?,lease_until=NULL WHERE id=? AND owner_token=?",(time.time(),id,self.token))
             if job.get('version_id'):self.db.execute("UPDATE versions SET status='cancelled' WHERE id=? AND status!='ready'",(job['version_id'],))
         except Exception as exc:
             message=exc.message if isinstance(exc,DomainError) else f'{type(exc).__name__}. Revisá el registro del servidor antes de reintentar.'
             self.db.execute("UPDATE jobs SET status='failed',error=?,message='El trabajo no se completó. La base activa no cambió.',finished_at=?,lease_until=NULL WHERE id=? AND owner_token=?",
                 (message[:1200],time.time(),id,self.token))
+            if kind=='warmup':
+                attempts=self.db.one('SELECT attempts FROM jobs WHERE id=?',(id,))['attempts']
+                if attempts<3:
+                    self.db.execute("UPDATE jobs SET status='queued',available_at=?,message='Recuperación pendiente de reintento controlado' WHERE id=?",
+                                    (time.time()+min(300,30*2**max(0,attempts-1)),id))
             if job.get('version_id'):self.db.execute("UPDATE versions SET status='failed' WHERE id=? AND status!='ready'",(job['version_id'],))
             LOG.exception('Trabajo %s de tipo %s falló',id,kind)
 
     def build(self,job):
+        from .storage import storage_identity
+        storage_identity(self.db,self.cfg)
         id=job['id'];vid=job['version_id']
         version=self.db.one('SELECT * FROM versions WHERE id=?',(vid,))
         if not version:raise DomainError('Versión no encontrada.',404)
         profile=json.loads(version['profile_json'])
         self.db.execute("UPDATE versions SET status='building' WHERE id=?",(vid,))
+        from .artifacts import ensure_models
+        ensure_models(self.cfg,self.embeddings.engine_version,lambda message:self.progress(id,message))
         self.embeddings.load(lambda message:self.progress(id,message))
         if profile.get('fingerprint') and profile['fingerprint']!=self.embeddings.profile['fingerprint']:
             raise DomainError('Cambió el modelo durante una reanudación. Creá una versión nueva; no mezcles vectores.')
@@ -178,6 +222,13 @@ class Jobs:
             'projection':projection,'public_only':True,'contextualizer_version':CONTEXTUALIZER_VERSION,
             'semantic_accuracy_evaluated':False}
         self.db.execute("UPDATE versions SET status='ready',chunk_count=?,report_json=? WHERE id=?",(total,dumps(report),vid))
+        if self.rag:
+            try:self.rag.recovery.verify(self.db.one('SELECT * FROM versions WHERE id=?',(vid,)))
+            except Exception:
+                # A new build has never been published. A failed integrity gate
+                # must not leave it eligible for a later publication.
+                self.db.execute("UPDATE versions SET status='failed' WHERE id=? AND published_at IS NULL",(vid,))
+                raise
         return report
 
     def project(self,vid):

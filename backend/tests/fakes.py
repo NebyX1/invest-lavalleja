@@ -1,9 +1,28 @@
 """Dobles deterministas para las pruebas del agente. No son embeddings ni una base vectorial reales."""
 import hashlib
+from unittest.mock import patch
 
 import numpy as np
 
 from gianna.errors import DomainError
+from gianna.services.jobs import Jobs
+
+
+class MechanicalJobs(Jobs):
+    """Domain/agent tests use deterministic vectors, never download real weights.
+
+    Physical recovery is exercised independently with real LanceDB and in the
+    opt-in MariaDB/ONNX container suite.
+    """
+    def build(self,job):
+        self.embeddings.engine_version='DETERMINISTIC_TEST_DOUBLE'
+        with patch('gianna.services.artifacts.ensure_models'):
+            return super().build(job)
+
+
+def isolate_physical_recovery(rag):
+    rag.recovery.require=lambda version:None
+    rag.recovery.verify=lambda version:None
 
 
 class FakeEmbeddings:

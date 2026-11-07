@@ -96,7 +96,7 @@ def main():
     rag = RAG(db, cfg, knowledge, embeddings, LanceStore(cfg), Ollama(cfg), Security(db, cfg))
     settings = get_settings(db, cfg)
     version = rag.retriever.version(args.version)
-    embeddings.for_profile(json.loads(version['profile_json'])).load()
+    rag.recovery.recover(version,apply=True)
     cases = [c for c in json.loads(args.cases.read_text(encoding='utf-8')) if not args.only or c['name'] in args.only]
     report, failures, total_s = [], 0, 0.0
     for case in cases:

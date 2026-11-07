@@ -55,7 +55,7 @@ def prepare(original, replacements=None):
         raise ValueError('Hay variables no reconocidas. Se requiere revisar antes de retirarlas.')
     if any(str(old.get(key, default)).lower() != default for key, default in CPU_DEFAULTS.items()):
         raise ValueError('Hay límites CPU personalizados; no se eliminaron silenciosamente.')
-    cfg = Config.from_env(environ=old)
+    cfg = Config.from_env(environ=old, initialize_storage=False)
     values = dict(zip(FIELDS, (
         'production' if cfg.production else ('testing' if old.get('FLASK_ENV') == 'testing' else 'development'),
         cfg.secret_key, cfg.encryption_key, old.get('DATABASE_URL', ''), ','.join(cfg.public_origins),
@@ -71,7 +71,7 @@ def prepare(original, replacements=None):
     actual = dict(dotenv_values(stream=StringIO(content.decode('utf-8'))))
     if actual != values:
         raise ValueError('La serialización alteraría una variable. No se modificó .env.')
-    updated = Config.from_env(environ=actual)
+    updated = Config.from_env(environ=actual, initialize_storage=False)
     before, after = asdict(cfg), asdict(updated)
     # Order of the allowlist has no effect on host validation.
     before['trusted_hosts'] = set(before['trusted_hosts'])

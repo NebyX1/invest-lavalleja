@@ -49,7 +49,7 @@ def main():
     rag = RAG(db, cfg, knowledge, embeddings, LanceStore(cfg), Ollama(cfg), Security(db, cfg))
     settings = get_settings(db, cfg)
     version = rag.retriever.version(args.version)
-    embeddings.for_profile(json.loads(version['profile_json'])).load()
+    rag.recovery.recover(version,apply=True)
     cases = json.loads(args.gold.read_text(encoding='utf-8'))
     for mode in args.modes:
         ranks, misses, total_ms = [], [], 0.0

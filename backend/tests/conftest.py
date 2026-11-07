@@ -12,6 +12,7 @@ from gianna.services.knowledge import Knowledge
 
 def pytest_addoption(parser):
     parser.addoption('--mariadb-docker',action='store_true',help='Run integration tests against a disposable strict MariaDB 11.4 container.')
+    parser.addoption('--recovery-docker',action='store_true',help='Run isolated MariaDB/LanceDB/pinned ONNX container replacement tests (downloads models).')
 
 @pytest.fixture
 def cfg(tmp_path):

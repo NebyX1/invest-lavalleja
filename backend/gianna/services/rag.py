@@ -8,6 +8,7 @@ from ..security import keyed_hash
 from .agent import Agent
 from .retrieval import Retriever
 from .safety import hard_gate
+from .recovery import KnowledgeRecovery
 
 LOG = logging.getLogger(__name__)
 
@@ -23,6 +24,8 @@ class RAG:
         self.ollama = ollama
         self.security = security
         self.retriever = Retriever(db, knowledge, embeddings, vector_store)
+        self.recovery = KnowledgeRecovery(db, cfg, knowledge, embeddings, vector_store)
+        self.retriever.recovery = self.recovery
         self.agent = Agent(self.retriever, ollama)
         self.semaphore = threading.BoundedSemaphore(cfg.max_concurrent_chat)
 
@@ -57,6 +60,7 @@ class RAG:
                 if not active:
                     raise DomainError('Todavía no hay una base publicada.', 503, 'no_knowledge')
                 version_id = active['id']
+                self.recovery.require(active)
             result = self.agent.run(question, settings, history or [], version_id)
             status = result.status
             return {

@@ -12,7 +12,7 @@ import pytest
 
 from gianna.corpus import Corpus, DocumentInfo, Record
 from gianna.errors import DomainError
-from gianna.services.jobs import Jobs
+from fakes import MechanicalJobs as Jobs, isolate_physical_recovery
 from gianna.services.rag import RAG
 from gianna.services.settings import Settings
 
@@ -124,6 +124,7 @@ def build_system(db, cfg, knowledge, security, corpus):
     store = FakeLanceStore()
     ollama = FakeOllama()
     rag = RAG(db, cfg, knowledge, embeddings, store, ollama, security)
+    isolate_physical_recovery(rag)
     jobs = Jobs(db, cfg, knowledge, embeddings, store, rag)
     base_id = knowledge.import_corpus(corpus, 'Base', 'actor')
     knowledge.approve_public(base_id, 'actor')

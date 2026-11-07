@@ -6,6 +6,8 @@
     "node_modules",
     "jobkler-ai",
     "backend",
+    "invest-lavalleja-backend-current",
+    "invest-lavalleja-frontend-current",
     "sample-backend",
     "better-rag",
     "test-results"

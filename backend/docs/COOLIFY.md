@@ -2,6 +2,8 @@
 
 El portal y la API se despliegan desde sus repositorios separados: `invest-lavalleja-frontend` e `invest-lavalleja-backend`. Esta configuración está preparada para un único VPS y una instancia de API; debe validarse en Coolify antes de abrir el servicio al público.
 
+Para una instalación existente, seguir primero [persistencia, recuperación y rollback](RECUPERACION.md). No cambiar el nombre del volumen ni el build pack sin inspeccionar y respaldar los datos. La declaración de un volumen en el repositorio no acredita que el recurso productivo lo esté utilizando.
+
 ## Preparar el repositorio y los secretos
 
 Extraer el proyecto y revisar los archivos antes de subir el código al repositorio elegido. No subir `.env`, `data/`, copias ni el corpus interno. No se creó ningún repositorio remoto automáticamente.
@@ -75,11 +77,13 @@ El segundo factor de todas las cuentas es el código por correo, como en Buzón 
 
 El arranque migra las cuentas existentes al método institucional por correo sin cambiar sus contraseñas ni permisos. Revoca las sesiones del autenticador anterior y los desafíos pendientes, y retira las claves y códigos de recuperación anteriores. No hay que recrear usuarios, restablecer contraseñas ni agregar variables al entorno. Desplegar la imagen nueva e iniciar sesión nuevamente para recibir el código por correo.
 
-En Ajustes, cargar el catálogo real de Ollama y elegir el modelo. Importar el JSON canónico, revisar, indexar, evaluar y publicar según el manual. En la terminal del contenedor **api**, ejecutar `python -m scripts.prepare_models --model-dir /app/data/models`. El comando verifica los artefactos e inicializa Granite y mMARCO con una inferencia de prueba (el reranker solo se valida y se usa en la evaluación comparativa, no en el chat). Para revisar pesos descargados sin red, ejecutar `python -m scripts.check_model_runtime`. Debe terminar con `Verificación de inferencia Granite/mMARCO superada`.
+En una instalación nueva, cargar el catálogo de Ollama y elegir el modelo; importar, revisar, aprobar, indexar, evaluar y publicar según el manual. En una instalación existente, conservar su publicación. El worker recupera y verifica automáticamente el perfil activo y su índice; una construcción explícita prepara el perfil nuevo cuando corresponde. `python -m scripts.prepare_models` queda para mantenimiento, no como paso rutinario después de actualizar. Para revisar los pesos sin red puede ejecutarse `python -m scripts.check_model_runtime`.
 
 La nueva huella exige generar otra versión vectorial y probarla antes de publicarla; no exige importar nuevamente el JSON ni modificar `.env`. Las versiones publicadas con el motor anterior (`bekko-horizon-lance-v2`) siguen siendo consultables hasta el cambio explícito. No borrar sus modelos ni su volumen. Durante el arranque el worker prepara el perfil activo; al construir carga el perfil nuevo. OpenVINO sigue retirado por el `SIGSEGV` confirmado. Ver [transición y rollback](RAG_ENGINE.md).
 
-La preparación ya no descarga un tokenizador de generación: el agente no usa un tope de 8.000 tokens (ver [arquitectura](RAG_ENGINE.md)). Tras actualizar el código, **crear una versión nueva** desde el panel (la representación documental cambió a `cards-context-v5`) o con `python scripts/ingest_corpus.py <corpus>`, probarla en Laboratorio y publicarla; las versiones anteriores siguen consultables. El agente hace varias llamadas al proveedor según los pasos que necesite (hasta cinco con la reparación de citas); la variable opcional `OLLAMA_FALLBACK_MODELS` (por defecto `deepseek-v4.1-flash`) define el modelo alternativo si el elegido falla. El chequeo de inferencia no publica la base ni prueba por sí solo el chat.
+La preparación no descarga un tokenizador de generación: el agente no usa un tope de 8.000 tokens (ver [arquitectura](RAG_ENGINE.md)). Solo una migración editorial deliberada a otra representación o motor exige una versión nueva, probada y publicada por el administrador. La variable opcional `OLLAMA_FALLBACK_MODELS` (por defecto `deepseek-v4.1-flash`) define el modelo alternativo si el elegido falla. El chequeo de inferencia no publica la base ni prueba por sí solo el chat.
+
+El healthcheck de Coolify continúa en `/health/live`. `/health/ready` acredita SQL/administración y `/health/knowledge` acredita el conocimiento; este último puede devolver 503 durante una recuperación normal y no debe provocar reinicios. `available:true` en `/api/config` exige modelo compatible, colección completa, esquema, FTS y validación de integridad. Ver el [procedimiento completo](RECUPERACION.md) para recuperar el índice o investigar un cambio de volumen.
 
 ## Recursos y reproducibilidad
 

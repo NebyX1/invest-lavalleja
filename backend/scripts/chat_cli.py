@@ -37,8 +37,7 @@ def main():
     rag = RAG(db, cfg, knowledge, embeddings, LanceStore(cfg), Ollama(cfg), Security(db, cfg))
     settings = get_settings(db, cfg)
     version = rag.retriever.version(args.version)
-    import json
-    embeddings.for_profile(json.loads(version['profile_json'])).load()
+    rag.recovery.recover(version,apply=True)
     history = []
     for question in args.questions:
         started = time.time()

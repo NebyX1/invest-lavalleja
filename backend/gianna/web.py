@@ -14,6 +14,7 @@ from flask import Flask, g, jsonify, render_template, request, session
 from werkzeug.exceptions import HTTPException, SecurityError
 from werkzeug.middleware.proxy_fix import ProxyFix
 from pydantic import ValidationError
+from sqlalchemy.exc import OperationalError as SQLOperationalError, TimeoutError as SQLTimeoutError
 from .config import Config
 from .db import Database, IntegrityError
 from .errors import DomainError
@@ -144,6 +145,14 @@ def create_app(overrides=None):
     @app.errorhandler(IntegrityError)
     def constraint_error(exc):return render_error('El identificador o correo ya existe, o la operación contradice una relación vigente.',409,'conflict')
 
+    @app.errorhandler(SQLOperationalError)
+    @app.errorhandler(SQLTimeoutError)
+    def database_unavailable(exc):
+        logging.getLogger(__name__).warning('Base de datos no disponible; request_id=%s',g.get('request_id'))
+        # Avoid error.html: its context processor also reads SQL.
+        return jsonify(error={'message':'El servicio de datos no está disponible temporalmente.',
+                              'code':'database_unavailable','request_id':g.get('request_id')}),503
+
     @app.errorhandler(HTTPException)
     def http_error(exc):
         if isinstance(exc,SecurityError):
@@ -167,6 +176,11 @@ def create_app(overrides=None):
         # Readiness of the HTTP/admin service is distinct from readiness of public knowledge.
         db.one('SELECT 1 AS ok')
         return jsonify(status='ready')
+
+    @app.get('/health/knowledge')
+    def knowledge_health():
+        health=rag.recovery.status()
+        return jsonify(health),200 if health['available'] else 503
 
     from .routes.auth import bp as auth
     from .routes.admin import bp as admin

@@ -107,7 +107,7 @@ Antes de ejecutar una importación antigua, detener la API y usar `scripts/migra
 
 Configurar las variables habituales `MAIL_*` para enviar el segundo factor por correo, igual que en Buzón Ciudadano. Si falla el envío, se informa el problema y no se abre una sesión autenticada.
 
-El panel permite trabajar con documentos antes de configurar Ollama. Para generar respuestas se necesita una clave válida y seleccionar un modelo que exista en el catálogo real. El botón **Cargar catálogo real de Ollama** evita adivinar nombres. Antes de indexar, ejecutar `docker compose run --rm api python -m scripts.prepare_models`. Las consultas solo leen los modelos locales verificados.
+El panel permite trabajar con documentos antes de configurar Ollama. Para generar respuestas se necesita una clave válida y seleccionar un modelo que exista en el catálogo real. El botón **Cargar catálogo real de Ollama** evita adivinar nombres. El worker prepara automáticamente los modelos fijados del perfil activo o de una indexación solicitada; la preparación manual queda como herramienta de mantenimiento. Las consultas solo leen modelos e índices verificados. Antes de actualizar una instalación existente, seguir el [procedimiento de persistencia y recuperación](docs/RECUPERACION.md).
 
 ### Prueba humana local del chat
 

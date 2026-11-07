@@ -9,6 +9,7 @@ RUN pip install --prefix=/install -r /build/requirements.txt
 
 FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
+    DATA_DIR=/app/data \
     OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false \
     HF_HOME=/app/data/models/huggingface XDG_CACHE_HOME=/app/data/cache HF_XET_CACHE=/app/data/models/xet
 WORKDIR /app

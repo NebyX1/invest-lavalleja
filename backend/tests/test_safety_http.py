@@ -85,6 +85,9 @@ def test_public_chat_rejects_evasion_by_mentioning_reporting(safety_client):
 
 def test_public_chat_allows_reporting_without_treating_it_as_a_criminal_request(safety_client):
     client, services = safety_client
+    # This test isolates reporting intent; storage readiness has its own real
+    # SQL/LanceDB and Docker regressions in test_knowledge_recovery.py.
+    services.rag.recovery.require=lambda version:None
 
     class EmptyRetriever:
         def outline(self, version_id):

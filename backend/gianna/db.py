@@ -223,6 +223,25 @@ class Database:
     from contextlib import contextmanager
 
     @contextmanager
+    def physical_lock(self):
+        """Long physical writer lease, independent of short SQL transactions/heartbeats."""
+        if not self.is_mariadb:
+            yield
+            return
+        db=self.connect(); acquired=False
+        try:
+            acquired=db.execute('SELECT GET_LOCK(?,0)',(self._lock_name+':physical',)).fetchone()[0]==1
+            if not acquired:
+                from .errors import DomainError
+                raise DomainError('Hay otra operación de recuperación o indexación.',503,'recovery_busy')
+            yield
+        finally:
+            try:
+                if acquired:db.execute('SELECT RELEASE_LOCK(?)',(self._lock_name+':physical',)).fetchone()
+            finally:
+                db.close()
+
+    @contextmanager
     def tx(self, immediate=False):
         db = self.connect()
         acquired = False

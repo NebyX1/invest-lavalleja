@@ -2,6 +2,8 @@
 
 **Estado verificado el 06/11/2026** contra el código de `main` y la versión activa de la base local (`ca5f61b7…`, 262 fragmentos, motor `granite-mmarco-lance-v3`, representación `cards-context-v5`).
 
+Actualización de persistencia del 07/11/2026: [arranque, integridad y recuperación](RECUPERACION.md). `KnowledgeRecovery` prepara en el worker el perfil de la fotografía activa y valida su huella y colección antes de habilitar consultas. Restaurar el índice utiliza sus vectores y texto lexical originales, sin cambiar la semántica del agente ni publicar otra versión. Los resultados de calidad anteriores no se atribuyen a las nuevas pruebas de persistencia.
+
 Este documento describe cómo funciona Gianna hoy. Reemplaza al diseño anterior (planificador determinista + catálogo de rubros + contrato JSON), archivado en [`historico/`](historico/RAG_ENGINE_planificador_determinista.md). Las referencias a E5, Qdrant, FastEmbed y OpenVINO pertenecen a etapas anteriores del proyecto y no describen el sistema actual.
 
 ## Resumen
@@ -28,7 +30,7 @@ No hay planificador de reglas, catálogo de rubros ni contrato JSON intermedio. 
 | **Fusión** | Reciprocal Rank Fusion | — | — | En código (`vector_store.py`, `retrieval.py`) | `k = 60`; no se suman coseno y BM25 como si fueran la misma escala |
 | **Generación** | `deepseek-v4.1-flash:1017` (por defecto en esta instalación) | catálogo de Ollama Cloud | API `/api/chat` | Ollama Cloud | `think: low`; alternativa `deepseek-v4.1-flash` |
 
-Los identificadores, revisiones y hashes de los artefactos viven en `gianna/services/neural.py`. `scripts/prepare_models.py` descarga únicamente esos archivos, verifica el SHA-256 contra Hugging Face y deja un `manifest.json` por modelo. La aplicación se niega a indexar o consultar si falta un artefacto o si el hash no coincide.
+Los identificadores, revisiones y hashes de los artefactos viven en `gianna/services/neural.py`. El worker o la herramienta `scripts/prepare_models.py` recuperan únicamente esos archivos, verifican su integridad y dejan un `manifest.json` por modelo. La aplicación bloquea consultas hasta verificar los artefactos y la colección correspondiente.
 
 ### Cómo se elige el modelo generativo
 
@@ -237,7 +239,7 @@ Estas cifras miden cobertura de fichas, no exactitud factual. El conjunto lo esc
 ## Operación
 
 ```bash
-# Descargar y verificar los modelos fijados (encoder + reranker)
+# Opcional: preparar manualmente los modelos fijados (encoder + reranker)
 python -m scripts.prepare_models --model-dir /app/data/models
 
 # Verificar el runtime sin red
@@ -253,7 +255,7 @@ python scripts/evaluate_retrieval.py --modes hybrid --verbose
 python scripts/evaluate_answers.py --report informe.md
 ```
 
-En producción, la preparación de modelos es explícita y ocurre antes de indexar. El arranque no descarga pesos ni llama a Hugging Face. `prepare_models` inicializa ambos perfiles y ejecuta una inferencia de prueba; el reranker solo se valida, no se consulta en el chat.
+El worker prepara automáticamente los modelos del perfil publicado o de la indexación solicitada, con verificaciones de integridad y reintentos acotados. Si faltan archivos, puede descargarlos desde las revisiones fijadas fuera de las solicitudes HTTP. `prepare_models` sigue disponible para mantenimiento y prueba ambos modelos; el reranker no interviene en las consultas del chat.
 
 ## Límites conocidos
 

@@ -1,4 +1,4 @@
-"""One process keeps one Granite encoder, the optional reranker and one local worker. Do not increase workers blindly."""
+"""One process, one cached model pair per requested profile, one recovery worker."""
 bind='0.0.0.0:8000'
 workers=1
 worker_class='gthread'

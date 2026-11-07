@@ -231,6 +231,13 @@ def test_migration_roundtrip_is_idempotent(env):
     assert compact == again and old_count == new_count == 15
 
 
+def test_migration_simulation_does_not_create_a_storage_directory(env, tmp_path, monkeypatch):
+    workspace = tmp_path / 'workspace-not-created'
+    monkeypatch.setattr('gianna.config.BACKEND_ROOT', workspace)
+    prepare(legacy_text(env).encode())
+    assert not workspace.exists()
+
+
 def test_migration_removes_secondary_url_without_changing_primary_database(env):
     secondary = 'mariadb+mariadbconnector://test:unused@db.example.test:3306/other_schema'
     original = legacy_text(env).replace("DATABASE_URL_HUMAN_TEST=''", 'DATABASE_URL_HUMAN_TEST=' + quote(secondary))

@@ -2,6 +2,12 @@
 
 Esta lista contiene trabajo real pendiente. No marcarla como cumplida por haber descargado el ZIP.
 
+En una instalación existente, aplicar primero el [plan de persistencia y rollback](RECUPERACION.md):
+backup recuperable, inspección del volumen real, mismo puntero/perfil y consulta
+de evidencia después de recrear el contenedor. No reimportar/publicar como parte
+de una actualización de mantenimiento. Ver resultados locales actuales en
+`reports/VALIDACION.md`; la configuración real de Coolify continúa a cargo del operador.
+
 ## Construcción y acceso
 
 - Resolver dependencias directas/transitivas y ejecutar pruebas en Python 3.12; comprobar también 3.13 si se utiliza. Ejecutar la revisión de vulnerabilidades y corregir hallazgos antes de publicar.

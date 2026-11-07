@@ -48,6 +48,8 @@ def bases():
 @access('owner','editor')
 def import_base():
     s=services();s.security.rate_limit('upload:'+g.user['id'],12,3600)
+    from ..services.storage import storage_identity
+    storage_identity(s.db,s.cfg)
     upload=request.files.get('file')
     if not upload or not upload.filename:raise DomainError('Seleccioná un archivo.')
     suffix=Path(upload.filename).suffix.lower()
@@ -195,13 +197,11 @@ def publish(version_id):
     if request.form.get('confirm_tested')!='yes':raise DomainError('Confirmá que revisaste y probaste esta versión en el laboratorio.')
     v=s.db.one('SELECT * FROM versions WHERE id=?',(version_id,))
     if not v or v['status']!='ready':raise DomainError('La versión no está lista.',409)
-    profile=json.loads(v['profile_json']);engine=s.rag.engine_for(profile)
-    if engine.model is None:
-        job=s.jobs.enqueue('warmup',{'version_id':version_id})
-        flash('Se está preparando el perfil de esta versión. Volvé a la versión y confirmá la publicación cuando termine.','info')
+    health=s.rag.recovery.status(v)
+    if not health['available']:
+        job=s.jobs.ensure_warmup(version=v,retry=True)
+        flash('Se está verificando el motor y el índice de esta versión. Volvé a confirmar la publicación cuando termine.','info')
         return redirect(url_for('admin.job_detail',job_id=job))
-    if profile.get('fingerprint')!=engine.profile['fingerprint']:raise DomainError('La versión pertenece a otro perfil de embeddings.',409)
-    if s.vector_store.count(v['collection_name'])!=v['chunk_count']:raise DomainError('La cantidad de puntos no coincide. No se puede publicar.',409)
     s.knowledge.activate(version_id,g.user['id'],request.form.get('rollback')=='yes')
     flash('Versión publicada. Las nuevas consultas usarán esta base.','success')
     return redirect(url_for('admin.version_detail',version_id=version_id))
@@ -265,7 +265,7 @@ def retry_job(job_id):
         if not row or row['status'] not in {'failed','cancelled'}:raise DomainError('Este trabajo no admite reintento.',409)
         if row['kind']=='delete' and g.user['role']!='owner':raise DomainError('Solo un administrador propietario puede eliminar bases.',403)
         if row['base_id'] and db.execute("SELECT 1 FROM jobs WHERE base_id=? AND status IN ('queued','running')",(row['base_id'],)).fetchone():raise DomainError('Ya existe un trabajo pendiente para esta base.',409)
-        db.execute("UPDATE jobs SET status='queued',cancel_requested=0,lease_until=NULL,owner_token=NULL,error=NULL,finished_at=NULL,message='Reintento solicitado' WHERE id=?",(job_id,))
+        db.execute("UPDATE jobs SET status='queued',attempts=0,available_at=0,cancel_requested=0,lease_until=NULL,owner_token=NULL,error=NULL,finished_at=NULL,message='Reintento solicitado' WHERE id=?",(job_id,))
     s.jobs.wake.set();s.db.audit(g.user['id'],'JOB_RETRY',job_id)
     return redirect(url_for('admin.job_detail',job_id=job_id))
 
@@ -343,13 +343,13 @@ def diagnostics():
     s=services();s.security.rate_limit('diagnostics:'+g.user['id'],10,60)
     vector_store_ok=False
     try:s.vector_store.health();vector_store_ok=True
-    except DomainError:pass
+    except Exception:pass
     disk=psutil.disk_usage(str(s.cfg.data_dir))
     active=s.knowledge.active()
     engine=s.rag.engine_for(json.loads(active['profile_json'])) if active else s.embeddings
     return jsonify(model_loaded=engine.model is not None,profile=engine.profile,
         build_model_loaded=s.embeddings.model is not None,build_profile=s.embeddings.profile,
-        vector_store_ok=vector_store_ok,ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
+        vector_store_ok=vector_store_ok,knowledge=s.rag.recovery.status(active),ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
         worker_alive=bool(s.jobs.thread and s.jobs.thread.is_alive()),
         process_rss_mib=round(psutil.Process().memory_info().rss/1024**2,1),data_disk_free_mib=round(disk.free/1024**2,1),
         database_mib=s.db.size_mib(),note='RAM del proceso, no de todo el VPS. No se realizó una generación de pago.')
@@ -360,7 +360,7 @@ def diagnostics():
 def warmup():
     s=services()
     existing=s.db.one("SELECT id FROM jobs WHERE kind='warmup' AND status IN ('queued','running') LIMIT 1")
-    job=existing['id'] if existing else s.jobs.enqueue('warmup')
+    job=existing['id'] if existing else (s.jobs.ensure_warmup(retry=True) or s.jobs.enqueue('warmup'))
     return redirect(url_for('admin.job_detail',job_id=job))
 
 

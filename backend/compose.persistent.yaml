@@ -1,0 +1,7 @@
+# Opt in ONLY after inspecting/backing up the EXISTING volume. This file never
+# creates an empty replacement volume. Dockerfile deployments must configure
+# the same mount explicitly in Coolify; see docs/RECUPERACION.md.
+volumes:
+  gianna_data:
+    external: true
+    name: ${GIANNA_DATA_VOLUME:?Specify the inspected existing persistent volume name}

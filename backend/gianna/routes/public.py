@@ -40,13 +40,12 @@ def chat_page():return render_template('chat.html')
 def chat_config():
     allowed_origin();s=services();settings=get_settings(s.db,s.cfg)
     active=s.knowledge.active()
-    profile=json.loads(active['profile_json']) if active else {}
-    available=bool(active and (s.embeddings.ready_for(profile) if hasattr(s.embeddings,'ready_for') else
-                   s.embeddings.model is not None and s.embeddings.profile
-                   and profile.get('fingerprint')==s.embeddings.profile.get('fingerprint')))
+    health=s.rag.recovery.status(active)
+    available=health['available']
     return jsonify(name=settings.brand_name,greeting=settings.greeting,notice=settings.knowledge_notice,
         enabled=settings.chat_enabled,available=available,
-        history_hours=settings.chat_history_hours,test_mode=s.cfg.human_test_mode)
+        history_hours=settings.chat_history_hours,test_mode=s.cfg.human_test_mode,
+        knowledge_state=health['state'],knowledge_code=health['code'],knowledge_message=health['message'])
 
 
 @bp.get('/api/captcha')

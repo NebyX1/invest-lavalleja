@@ -11,11 +11,10 @@ from gianna.corpus import Corpus, DocumentInfo, Record
 from gianna.errors import DomainError
 from gianna.services.agent import Agent, Evidence, humanize
 from gianna.services.conversation import is_social
-from gianna.services.jobs import Jobs
 from gianna.services.rag import RAG
 from gianna.services.safety import hard_gate
 from gianna.services.settings import Settings
-from fakes import FakeEmbeddings, FakeLanceStore
+from fakes import FakeEmbeddings, FakeLanceStore, MechanicalJobs as Jobs, isolate_physical_recovery
 
 
 class ScriptedOllama:
@@ -64,6 +63,7 @@ def system(db, cfg, knowledge, security):
     def build(ollama):
         embeddings, store = FakeEmbeddings(), FakeLanceStore()
         rag = RAG(db, cfg, knowledge, embeddings, store, ollama, security)
+        isolate_physical_recovery(rag)
         jobs = Jobs(db, cfg, knowledge, embeddings, store, rag)
         base_id = knowledge.import_corpus(small_corpus(), 'Base', 'actor')
         knowledge.approve_public(base_id, 'actor')

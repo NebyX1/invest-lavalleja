@@ -1,5 +1,109 @@
 # Validación del agente RAG
 
+## Persistencia y recuperación automática · 07/11/2026
+
+Implementación sobre el backend institucional `a4f996b`, rama local
+`codex/persistencia-recuperacion`. No se modificó producción ni se llamó a Ollama.
+Diagnóstico: [auditoría](PERSISTENCIA_AUDITORIA.md). Operación, migración y rollback:
+[procedimiento](../docs/RECUPERACION.md).
+
+| Comprobación ejecutada | Resultado real |
+| --- | --- |
+| Suite completa en Docker, Python 3.12 y dependencias fijadas | **273 passed, 16 skipped**, 42,77 s |
+| MariaDB 11.4 real, esquemas temporales nuevos y actualización desde v2, SQL estricto | **10 passed, 2 skipped**, 10,81 s |
+| Docker + MariaDB + LanceDB 0.40 + ONNX Runtime 1.31 + pesos reales fijados | **1 passed**, 236,32 s; ocho comprobaciones registradas en [JSON](persistence/recovery-docker.json) |
+| Frontend (mismos archivos y dependencias del repositorio institucional) | Astro check: 0 errores/advertencias; ESLint sin hallazgos; Vitest **9/9**; build estática correcta |
+| Playwright del chat en escritorio y móvil | **16 passed**, 58,8 s; incluye estados de restauración, 503 y vuelta a disponibilidad sin recarga |
+
+Al integrar la corrección en el repositorio central, se repitieron las pruebas sobre
+un árbol aislado sin `.env` ni corpus privado: **274 passed, 16 skipped** tanto en
+Python 3.12 como en 3.13, y **10 passed, 2 skipped** con MariaDB real. La verificación completa del portal
+incluyó **37 pruebas Playwright aprobadas y una omitida**, además de tipos, lint,
+unidades y build. La simulación de `simplify_env` se corrigió para no crear directorios
+de almacenamiento y tiene una prueba de regresión específica.
+
+La auditoría `pip-audit -r requirements.txt` señaló **PYSEC-2026-217** en el
+paquete Python preexistente `mariadb==1.1.14`, sin proponer una actualización de
+ese paquete que resuelva el aviso. El [aviso original de MariaDB](https://github.com/MariaDB/server/security/advisories/GHSA-pv9p-5w55-55jm)
+se refiere a versiones de Connector/C y está corregido en la 3.4.9; una [incidencia
+abierta en PyPA](https://github.com/pypa/advisory-database/issues/400) cuestiona
+la aplicación de ese rango de versiones al paquete Python. En la imagen local se
+comprobó Connector/C **3.4.9**. La versión de la biblioteca utilizada por producción
+no se inspeccionó y debe verificarse; la auditoría sigue activa y puede señalar este
+aviso hasta que se resuelva su clasificación.
+
+Las 16 omisiones de la suite general son tres pruebas del corpus privado, doce
+pruebas MariaDB optativas y una prueba Docker optativa. Las suites optativas se
+ejecutaron aparte: en MariaDB solo quedaron omitidos dos casos que necesitan la
+guía privada. No se sustituyó esa guía por contenido inventado para declararla validada.
+
+### Evidencia de recreación real
+
+El test Docker generó una base sintética de **dos fichas públicas y una interna**;
+aprobó e indexó únicamente las públicas con Granite/mMARCO reales y la publicó
+exclusivamente en la MariaDB temporal del test. El laboratorio HTTP autenticado
+recuperó el texto `PINO-314` después de:
+
+- Arranque automático con una instancia nueva del motor.
+- Reinicio del proceso/contenedor y posterior reemplazo completo del contenedor
+  API usando el mismo volumen.
+- Pérdida de la colección canónica, conservando versión/vectores en MariaDB.
+- Colección incompleta, preservada antes de restaurar.
+- Retirada de todos los modelos locales y recuperación automática por revisión fijada.
+
+Durante las dos averías de índice se comprobó `available:false` y POST `/api/chat`
+**503**, sin HTTP 500 y sin generación. En cada recuperación se comparó un digest
+de bases, borradores, fuentes, versiones, fotografías, chunks y puntero activo:
+permanecieron idénticos. Huella real del perfil utilizado:
+`2eea22e49a8edf18fa68961adc43568bfab570af7f4efe68fb9b6c45875061ab`.
+
+La muestra final de uso del contenedor fue **1,228 GiB sobre un límite de 2 GiB**,
+con límite de 2 CPU. Es una muestra de este test pequeño, no el pico de memoria,
+una prueba de concurrencia ni una garantía de capacidad para una base mayor.
+La configuración conserva un worker Gunicorn; las pruebas de idempotencia comprueban
+que un perfil ya cargado no vuelve a cargar sus pesos.
+
+### Matriz de regresión solicitada
+
+| Escenario | Cobertura |
+| --- | --- |
+| Reinicio normal y evidencia recuperada | Docker/MariaDB/LanceDB/ONNX reales y consulta al laboratorio HTTP |
+| Reemplazo de contenedor | Mismo volumen, misma publicación/digest, nueva instancia de motor, consulta real |
+| Modelos ausentes/incompletos/manifiesto inválido | Ausencia real en Docker; transporte determinista para interrupción, hashes y manifiestos |
+| Colección ausente | Incidente reproducido con modelo cargado, config no disponible, chat 503 y restauración exacta |
+| Índice incompleto/FTS ausente o incompatible | Conteo incompleto real en Docker; LanceDB real para FTS/esquema y contenido alterado |
+| Perfil incompatible | Rechazo de huella distinta, sin reinterpretar vectores ni cambiar versión |
+| Interrupción de recuperación | Staging parcial y directorio sin manifiesto en LanceDB real; reanudación sin duplicados; descarga interrumpida con transporte doble |
+| Protección editorial | Digest SQL completo antes/después, borrador interno excluido, ninguna publicación automática |
+| Perfil histórico | Fotografía representativa v2, texto lexical propio y doble de motor distinto; no carga el perfil nuevo |
+| Recursos/reintentos | Límites Docker, reutilización por perfil, deduplicación, leases vencidos/nulos, backoff y tres intentos máximos |
+
+También se verificaron: cambio de volumen y adopción explícita; rechazo de montaje
+efímero; exclusión de dos escritores; caché por huella/hash; respaldo técnico
+independiente; CLI sin escrituras; parada ordenada reencolada; SQL indisponible con
+503 mientras `/health/live` sigue respondiendo. Los dobles de modelo/transporte se
+identifican como tales: no son un benchmark semántico.
+
+### Archivos y límites de entrega
+
+| Grupo | Cambios |
+| --- | --- |
+| Motor de recuperación | `services/recovery.py`, `artifacts.py`, `storage.py`, `vector_store.py` |
+| Integración y disponibilidad | `services/jobs.py`, `rag.py`, `retrieval.py`, `routes/public.py`, `routes/admin.py`, `web.py` |
+| Persistencia/arranque | `db.py`, migraciones SQLite 006/MariaDB 004, `config.py`, `Dockerfile`, `compose.persistent.yaml`, `wsgi.py`, `gunicorn.conf.py` |
+| CLI existente y nueva | `recover_knowledge.py`, `prepare_models.py`, `chat_cli.py`, `evaluate_retrieval.py`, `evaluate_answers.py` |
+| Regresiones | `test_knowledge_recovery.py`, `test_artifact_recovery.py`, `test_recovery_docker.py`, helper y adaptación de fixtures/migraciones anteriores |
+| Operación | `AGENTS.md`, `COOLIFY.md`, `RECUPERACION.md`, `PUESTA_EN_MARCHA.md`, `RAG_ENGINE.md`, esta validación y auditoría |
+| Frontend separado | `GiannaChat.tsx`, tipo `Config`, dos casos E2E y documentación del contrato de disponibilidad |
+
+Pendiente en producción: inspeccionar los montajes y runtime reales de Coolify 4.6.0,
+respaldar/restaurar una copia verificable de la instalación, contrastar la fotografía
+real `02816091…` y aplicar el plan con autorización. No se afirma haber restaurado sus
+262 chunks. No se ejecutó generación pagada ni se evaluó otra vez la calidad factual.
+La compatibilidad histórica no se probó con los pesos reales Bekko/Horizon ni una
+publicación histórica de producción; se conservan sus revisiones y se bloquea cualquier
+huella incompatible. Las pruebas se realizaron sin desplegar ni modificar la instalación productiva.
+
 **Fecha:** 29/10/2026. **Revisión de documentación y recuperación:** 06/11/2026. **Alcance:** cambios locales; sin despliegue ni cambios en producción. La base de prueba local no tiene revisión editorial final.
 
 Este informe describe el código actual. El informe del diseño anterior (planificador determinista) está en [historico/VALIDACION_agente_anterior.md](historico/VALIDACION_agente_anterior.md) y no aplica.

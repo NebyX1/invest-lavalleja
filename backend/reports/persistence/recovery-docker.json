@@ -1,0 +1,61 @@
+{
+  "test": "real MariaDB + LanceDB + pinned ONNX, no generation",
+  "scenarios": [
+    {
+      "scenario": "real_build_and_publication",
+      "passed": true,
+      "chunks": 2,
+      "fingerprint": "2eea22e49a8edf18fa68961adc43568bfab570af7f4efe68fb9b6c45875061ab"
+    },
+    {
+      "scenario": "automatic_startup",
+      "passed": true,
+      "editorial_unchanged": true,
+      "version_id": "dd02df68802d4035a77cf8256e448179",
+      "vectors": 2
+    },
+    {
+      "scenario": "process_restart",
+      "passed": true,
+      "editorial_unchanged": true,
+      "version_id": "dd02df68802d4035a77cf8256e448179",
+      "vectors": 2
+    },
+    {
+      "scenario": "container_replacement_same_volume",
+      "passed": true,
+      "editorial_unchanged": true,
+      "version_id": "dd02df68802d4035a77cf8256e448179",
+      "vectors": 2
+    },
+    {
+      "scenario": "missing_collection",
+      "passed": true,
+      "controlled_http_status": 503,
+      "editorial_unchanged": true,
+      "version_id": "dd02df68802d4035a77cf8256e448179",
+      "vectors": 2
+    },
+    {
+      "scenario": "incomplete_collection",
+      "passed": true,
+      "controlled_http_status": 503,
+      "editorial_unchanged": true,
+      "version_id": "dd02df68802d4035a77cf8256e448179",
+      "vectors": 2
+    },
+    {
+      "scenario": "missing_models_auto_recovery",
+      "passed": true,
+      "editorial_unchanged": true,
+      "version_id": "dd02df68802d4035a77cf8256e448179",
+      "vectors": 2
+    },
+    {
+      "scenario": "bounded_resources",
+      "passed": true,
+      "memory": "1.228GiB / 2GiB",
+      "cpu": "0.02%"
+    }
+  ]
+}

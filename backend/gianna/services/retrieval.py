@@ -88,6 +88,8 @@ class Retriever:
         """
         started = time.perf_counter()
         version = self.version(version_id)
+        if hasattr(self, 'recovery'):
+            self.recovery.require(version)
         engine = self.engine(version)
         zones = [z for z in (zones or []) if z in ZONES]
         text = query.strip()
@@ -95,7 +97,10 @@ class Retriever:
             text += ' | ' + '; '.join(zone_names(zones))
         dense, lexical = engine.query(text)
         pool = settings.retrieval_candidates
-        points = self.vector_store.search(version['collection_name'], dense, lexical, pool, pool)
+        try:
+            points = self.vector_store.search(version['collection_name'], dense, lexical, pool, pool)
+        except Exception as exc:
+            raise DomainError('El índice de conocimiento no está disponible temporalmente.', 503, 'index_unavailable') from exc
         if zones:
             # Búsqueda adicional restringida a la zona: las fichas generales no se pierden
             # porque la búsqueda sin filtro ya las incluye.

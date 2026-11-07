@@ -9,6 +9,7 @@ export default tseslint.config(
       '.astro/**',
       'backend/**',
       'invest-lavalleja-backend-current/**',
+      'invest-lavalleja-frontend-current/**',
       'frontend/**',
       '.venv/**',
       'sample-backend/**',
