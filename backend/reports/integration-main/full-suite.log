@@ -1,0 +1,13 @@
+........s............................................................... [ 15%]
+........................................................................ [ 31%]
+..................sss................................................... [ 47%]
+........................................................................ [ 63%]
+..................................................s.s................... [ 79%]
+.....s.................................................................. [ 95%]
+...................                                                      [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_admin_monitoring.py:139: Set GIANNA_BROWSER_MONITOR_TEST=1 for real Chromium/WebKit monitoring tests.
+SKIPPED [3] tests\test_corpus.py:12: El paquete documental privado no est� versionado en este checkout.
+SKIPPED [2] tests\test_mariadb_import.py:137: Private guide is not available in this checkout.
+SKIPPED [1] tests\test_recovery_docker.py:41: Pass --recovery-docker for real ONNX/MariaDB/LanceDB container tests.
+444 passed, 7 skipped in 92.66s (0:01:32)

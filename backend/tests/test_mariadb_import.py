@@ -175,6 +175,8 @@ def test_retry_failed_import_after_migration_without_reupload(maria_db,cfg,corpu
         failed=s.db.one('SELECT * FROM jobs WHERE id=?',(job['id'],))
         assert failed['status']=='failed' and failed['progress']==len(corpus.records)
         assert 'IntegrityError' in failed['error']
+        assert failed['error_code']=='database_schema_incompatible'
+        assert failed['error_stage']=='schema' and not failed['retryable']
         upload=Path(json.loads(failed['payload_json'])['path'])
         assert upload.is_file() and s.db.all('SELECT * FROM bases')==[]
         assert s.db.all('SELECT * FROM records')==[] and s.db.all('SELECT * FROM sources')==[]

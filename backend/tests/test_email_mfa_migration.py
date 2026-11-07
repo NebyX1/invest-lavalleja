@@ -19,8 +19,11 @@ def test_legacy_account_migration_preserves_password_permissions_and_email_sessi
     db.execute('INSERT INTO recovery_codes VALUES(?,?)',(legacy,'legacy-recovery-hash'))
     db.execute("INSERT INTO auth_challenges(id,user_id,kind,secret,expires_at) VALUES(?,?,'enroll','legacy-secret',?)",(token_hash('legacy-challenge'),legacy,now+300))
     # Recreate the v4 schema before upgrading, including later additive changes.
-    db.execute('ALTER TABLE jobs DROP COLUMN attempts')
-    db.execute('ALTER TABLE jobs DROP COLUMN available_at')
+    for column in ('attempts','available_at','stage','error_code','error_stage','action','retryable',
+                   'heartbeat_at','last_attempt_at','boot_id','recovery_boot_id'):
+        db.execute('ALTER TABLE jobs DROP COLUMN '+column)
+    db.execute('DROP TABLE job_events')
+    db.execute('DROP TABLE operational_events')
     db.execute('DELETE FROM schema_versions WHERE version>=5')
 
     db.migrate()

@@ -1,1 +1,47 @@
-{% extends 'base.html' %}{% from 'macros.html' import csrf,heading,status with context %}{% block title %}Trabajo{% endblock %}{% block content %}{{ heading('TRABAJO '+job.id[:10],{'build':'Generar base vectorial','import':'Convertir e importar','warmup':'Preparar motor','delete':'Eliminar base','evaluation':'Evaluar recuperación'}.get(job.kind,job.kind)) }}<section class="card" id="job-monitor" data-status-url="{{ url_for('admin.job_status',job_id=job.id) }}"><div class="section-top"><h2 id="job-message">{{ job.message or 'En cola' }}</h2><span id="job-status">{{ status(job.status) }}</span></div><progress id="job-progress" max="{{ job.total or 1 }}" value="{{ job.progress }}">{{ job.progress }}</progress><p id="job-count">{{ job.progress }} / {{ job.total }}</p><p id="job-error" class="error-text">{{ job.error or '' }}</p><p class="muted">Las descargas iniciales no ofrecen porcentaje por bytes en esta pantalla. Cancelar se aplica entre etapas o lotes, no interrumpe una escritura ya iniciada.</p><div class="actions">{% if job.base_id %}<a class="button" href="{{ url_for('admin.base_detail',base_id=job.base_id) }}">Abrir base</a>{% endif %}{% if job.version_id %}<a class="button" href="{{ url_for('admin.version_detail',version_id=job.version_id) }}">Abrir versión</a>{% endif %}<a class="button" href="{{ url_for('admin.job_detail',job_id=job.id) }}">Actualizar detalles</a></div>{% if user.role!='viewer' %}{% if job.status in ['queued','running'] and job.kind!='delete' %}<form method="post" action="{{ url_for('admin.cancel_job',job_id=job.id) }}">{{ csrf() }}<button class="danger">Solicitar cancelación</button></form>{% elif job.status in ['failed','cancelled'] %}<form method="post" action="{{ url_for('admin.retry_job',job_id=job.id) }}">{{ csrf() }}<button class="button">Reintentar de forma segura</button></form>{% endif %}{% endif %}</section>{% if job.result_json %}<section class="card"><h2>Resultado registrado</h2><pre class="technical">{{ job.result_json|pretty }}</pre></section>{% endif %}{% endblock %}
+{% extends 'base.html' %}
+{% from 'macros.html' import csrf,heading with context %}
+{% block title %}Trabajo{% endblock %}
+{% block content %}
+{{ heading('TRABAJO '+job.id[:10],{'build':'Generar base vectorial','import':'Convertir e importar','warmup':'Preparar motor','delete':'Eliminar base','evaluation':'Evaluar recuperación'}.get(job.kind,job.kind)) }}
+{% set worker=job.get('worker',{}) %}{% set installation=job.get('installation',{}) %}{% set worker_error=worker.get('last_error') or {} %}
+<section class="card operational-monitor" id="job-monitor" data-status="{{ job.status }}" data-status-url="{{ url_for('admin.job_status',job_id=job.id) }}">
+  <div class="section-top"><h2 id="job-message">{{ job.message or 'En cola' }}</h2><span id="job-status" class="status status-{{ job.status }}" role="status">{{ {'queued':'En cola','running':'En curso','done':'Finalizado','failed':'Falló','cancelled':'Cancelado'}.get(job.status,job.status) }}</span></div>
+  <progress id="job-progress" aria-label="Avance del trabajo" {% if job.total %}max="{{ job.total }}" value="{{ job.progress }}"{% elif job.status in ['done','failed','cancelled'] %}hidden{% endif %}>{{ job.progress }}</progress>
+  <p id="job-count">{% if job.total %}{{ job.progress }} / {{ job.total }}{% elif job.status=='done' %}Trabajo completado.{% elif job.status=='failed' %}El intento terminó sin un total calculado.{% elif job.status=='cancelled' %}El trabajo fue cancelado.{% else %}Avance por etapas; todavía no hay un total calculado.{% endif %}</p>
+  <p id="job-wait">{% if worker.get('state')=='blocked' %}La instalación está bloqueada. Revisá la causa y la acción indicada antes de continuar.{% elif job.status=='queued' and job.get('retry_in_seconds') %}Próximo intento dentro de {{ job.retry_in_seconds }} s.{% elif job.status=='queued' %}Esperando asignación del procesador de trabajos.{% elif job.status=='running' %}El trabajo está en ejecución. Su etapa y último pulso aparecen abajo.{% endif %}</p>
+  <dl class="operational-facts">
+    <div><dt>Intentos</dt><dd id="job-attempt">{{ job.get('attempts',0) }} / {{ job.get('max_attempts',3) }}</dd></div>
+    <div><dt>Etapa</dt><dd id="job-stage">{{ job.get('stage') or 'Pendiente de asignar' }}</dd></div>
+    <div><dt>Procesador</dt><dd id="job-worker">{{ 'Deshabilitado' if worker.get('enabled') is sameas false else {'created':'Todavía no iniciado','blocked':'Bloqueado por una comprobación','disabled':'Deshabilitado','starting':'Iniciando','idle':'Disponible','running':'Procesando','waiting':'Esperando','waiting_for_lease':'Esperando el bloqueo del proceso anterior','stopped':'Detenido'}.get(worker.get('state'),worker.get('state') or 'Sin información') }}</dd></div>
+    <div><dt>Último pulso</dt><dd id="job-heartbeat">{{ job.get('heartbeat_at')|when }}</dd></div>
+    <div><dt>Último intento</dt><dd id="job-last-attempt">{{ job.get('last_attempt_at')|when }}</dd></div>
+    <div><dt>Código de causa</dt><dd><code id="job-code">{{ job.get('error_code') or 'Sin error registrado' }}</code></dd></div>
+    <div><dt>Arranque del intento</dt><dd><code id="job-boot">{{ job.get('boot_id') or 'Todavía no asignado' }}</code></dd></div>
+  </dl>
+  <p id="job-worker-message" class="muted">{{ worker_error.get('message','') }}</p>
+  <section id="job-cause" class="operational-cause" {% if job.status in ['done','cancelled'] or not (job.error or job.get('error_code') or worker_error.get('code')) %}hidden{% endif %}>
+    <h3 id="job-error-context">{{ 'Causa del fallo' if job.status=='failed' else 'Condición pendiente o fallo del intento anterior' }}</h3>
+    <p id="job-error">{{ job.error or worker_error.get('message') or ('Código: '+job.get('error_code','') if job.get('error_code') else '') }}</p>
+    <p id="job-action">{{ job.get('action') or worker_error.get('action') or 'Revisá el diagnóstico y los eventos antes de reintentar.' }}</p>
+  </section>
+  <section class="operational-installation"><h3>Verificación de la instalación</h3><p id="job-installation-message">{{ installation.get('message') or 'Consultá el diagnóstico completo de la instalación.' }}</p><small>Informe: <code id="job-report">{{ installation.get('report_id') or 'Sin informe' }}</code></small><a href="{{ url_for('admin.diagnostics_page') }}">Ver diagnóstico, inventario y plan de recuperación →</a></section>
+  <p class="muted">Las descargas muestran el archivo y los bytes recibidos cuando están disponibles. El progreso general permanece indeterminado hasta conocer su total. La cancelación se aplica entre etapas o lotes, en un límite seguro.</p>
+  <div class="operational-refresh"><p id="monitor-connection" class="muted">Comprobando la actualización del estado…</p><button type="button" id="monitor-refresh">Actualizar ahora</button></div>
+  <div class="actions">
+    {% if job.base_id %}<a class="button" href="{{ url_for('admin.base_detail',base_id=job.base_id) }}">Abrir base</a>{% endif %}
+    {% if job.version_id %}<a class="button" href="{{ url_for('admin.version_detail',version_id=job.version_id) }}">Abrir versión</a>{% endif %}
+    <a class="button" href="{{ url_for('admin.job_detail',job_id=job.id) }}">Actualizar detalles</a>
+    {% if user.role!='viewer' %}
+    <form id="job-cancel-form" method="post" action="{{ url_for('admin.cancel_job',job_id=job.id) }}" {% if job.status not in ['queued','running'] or job.kind=='delete' %}hidden{% endif %}>{{ csrf() }}<button class="danger">Solicitar cancelación</button></form>
+    <form id="job-retry-form" method="post" action="{{ url_for('admin.retry_job',job_id=job.id) }}" {% if job.status not in ['failed','cancelled'] %}hidden{% endif %}>{{ csrf() }}<button class="button">Reintentar de forma segura</button></form>
+    {% endif %}
+  </div>
+  <noscript><p class="notice">La actualización automática requiere JavaScript. Usá «Actualizar detalles» para consultar el estado actual.</p></noscript>
+</section>
+<section class="card operational-monitor"><h2>Historial de ejecución</h2><p class="muted">Cada intento conserva su etapa, código de causa y arranque. Un fallo anterior no significa que el intento actual haya fallado.</p>
+  <ol id="job-events" class="operational-events">{% for item in job.get('events',[]) %}
+    <li><strong>{{ item.get('message') or item.get('event') }}</strong><small>{{ item.get('at')|when }} · intento {{ item.get('attempt','—') }}{% if item.get('stage') %} · {{ item.stage }}{% endif %}{% if item.get('code') %} · {{ item.code }}{% endif %}</small>{% if item.get('action') %}<p>{{ item.action }}</p>{% endif %}{% if item.get('boot_id') %}<small>Arranque: <code>{{ item.boot_id }}</code></small>{% endif %}{% if item.get('details') %}<details><summary>Detalles técnicos</summary><pre class="technical">{{ item.details|pretty }}</pre></details>{% endif %}</li>
+    {% else %}<li>Todavía no hay eventos registrados para este trabajo.</li>{% endfor %}</ol>
+</section>
+<section class="card operational-monitor" id="job-result-section" {% if not job.result_json %}hidden{% endif %}><h2>Resultado registrado</h2><pre id="job-result" class="technical">{% if job.result_json %}{{ job.result_json|pretty }}{% endif %}</pre></section>
+{% endblock %}

@@ -90,8 +90,10 @@ Nunca cambiar el puntero o la huella para ocultar el fallo.
    docker volume inspect NOMBRE_REAL_DEL_VOLUMEN
    ```
 
-   Exigir un montaje de lectura/escritura en **exactamente `/app/data`**, con el
-   Source/Name que contiene los archivos existentes. Inspeccionar también el volumen
+   Exigir un montaje de lectura/escritura que cubra la **ruta efectiva de datos**,
+   por defecto `/app/data`, con el Source/Name que contiene los archivos existentes.
+   Un subdirectorio bajo un montaje persistente también es válido; el diagnóstico
+   comprueba el montaje más específico, incluidos los anidados. Inspeccionar también el volumen
    de MariaDB. Registrar nombres reales, servidor, tamaño y revisión de imagen.
    Un montaje en `/data`, un volumen anónimo nuevo o una ruta de DATA_DIR distinta
    no prueban que se esté utilizando el almacenamiento anterior.

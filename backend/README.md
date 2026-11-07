@@ -1,6 +1,8 @@
 # Gianna · Invest Lavalleja
 
-**Versión 1.0.0-rc1 · 28 de septiembre de 2026 · Documentación revisada el 6 de noviembre de 2026.**
+**Versión 1.0.0-rc2 · 7 de noviembre de 2026 · Candidata para validación.**
+
+El arranque inspecciona la instalación existente antes de ejecutar trabajos. El panel **Diagnóstico** informa esquema SQL, volumen/identidad, colecciones, modelos, publicación y plan de recuperación. La cola conserva causas, intentos, esperas y eventos correlacionados con logs JSON. Ver [arranque y diagnóstico](docs/INSTALACION_Y_DIAGNOSTICO.md), [procedimiento de recuperación](docs/RECUPERACION.md) y los resultados reales en [validación](reports/VALIDACION.md). No requiere agregar variables para el despliegue habitual.
 
 Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro.
 

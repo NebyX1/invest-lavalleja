@@ -18,10 +18,17 @@ errorlog='-'
 loglevel='info'
 
 def post_worker_init(worker):
+    import logging
+    from gianna.observability import configure_logging, event
     services=worker.wsgi.extensions['gianna']
+    configure_logging(services.cfg)
+    event(logging.getLogger('gianna.process'), 'worker.started', worker_enabled=services.cfg.worker_enabled)
     if services.cfg.worker_enabled:services.jobs.start()
 
 def worker_exit(server,worker):
     try:
+        import logging
+        from gianna.observability import event
+        event(logging.getLogger('gianna.process'), 'worker.stopping')
         services=worker.wsgi.extensions['gianna'];services.jobs.stop_event.set();services.jobs.wake.set()
     except AttributeError:pass

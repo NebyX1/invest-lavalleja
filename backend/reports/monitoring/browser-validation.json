@@ -1,0 +1,19 @@
+{
+  "profiles": [
+    "chromium",
+    "webkit"
+  ],
+  "scenarios": [
+    "real Flask/SQL SSR",
+    "HTTP 503 polling resumed",
+    "unknown progress indeterminate",
+    "cause and attempts visible",
+    "XSS text escaped",
+    "dynamic cancel/retry actions",
+    "failed job automatically observed after recovery",
+    "terminal result and polling stopped",
+    "pagehide abort and pageshow resume without duplicate requests",
+    "390/1280 layouts"
+  ],
+  "provider_calls": 0
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-07T21:42:09.833071+00:00",
+  "passed": true,
+  "sources": {
+    "vendor_advisory": "https://github.com/MariaDB/server/security/advisories/GHSA-pv9p-5w55-55jm",
+    "python_metadata_issue": "https://github.com/pypa/advisory-database/issues/400"
+  },
+  "audit_environment": {
+    "python": [
+      3,
+      12,
+      13
+    ],
+    "platform": "win32"
+  },
+  "pip_audit_version": "2.10.1",
+  "pip_audit_exit_code": 1,
+  "runtime": {
+    "driver_name": "mariadb",
+    "driver_version": "1.1.14",
+    "connector_c_version": [
+      3,
+      4,
+      9
+    ],
+    "source": "docker_image",
+    "requested_image": "gianna-restructure:validation",
+    "image_id": "sha256:f0593e7867cc5f8977eab5dbacf2ddf5cad82deaae98141b9c7b59520f5c7209"
+  },
+  "errors": [],
+  "findings": [
+    {
+      "dependency": "mariadb",
+      "version": "1.1.14",
+      "dependency_index": 15,
+      "vulnerability_index": 0,
+      "classification": "runtime_not_affected",
+      "reason": "vendor_patched_connector_c_measured_in_same_driver_image",
+      "id": "PYSEC-2026-217",
+      "image_id": "sha256:f0593e7867cc5f8977eab5dbacf2ddf5cad82deaae98141b9c7b59520f5c7209",
+      "driver_version": "1.1.14",
+      "connector_c_version": [
+        3,
+        4,
+        9
+      ]
+    }
+  ],
+  "raw_findings": 1,
+  "unresolved": 0,
+  "runtime_not_affected": 1,
+  "raw_report": {
+    "path": "pip-audit.json",
+    "sha256": "2ed4476514a51d7726cc9f627faa8b7eb753bb6010ec8f3ee668c596835fdc31",
+    "preserved": true
+  }
+}

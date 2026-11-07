@@ -26,6 +26,7 @@ npm run verify
 
 ## Reglas del proyecto
 
+- El repositorio central es `NebyX1/invest-lavalleja`; la rama de publicación es `main` y el backend vive en `backend/`. Verificar el destino del remoto antes de publicar; los repositorios independientes de backend/frontend tienen su propio historial.
 - No modificar ni sobrescribir los archivos de referencia.
 - No inventar cifras, oportunidades, beneficios fiscales, contactos o disponibilidad.
 - Mantener el contenido editorial accesible sin JavaScript.

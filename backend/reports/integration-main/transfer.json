@@ -1,0 +1,17 @@
+{
+  "target_repository": "NebyX1/invest-lavalleja",
+  "target_branch": "main",
+  "backend_directory": "backend",
+  "source_commit": "5576b6aad9051b819a62b3222ef391a80616c0b8",
+  "identical_runtime_and_test_files": 137,
+  "workflow_jobs": [
+    "python-tests",
+    "admin-monitoring",
+    "compose-config",
+    "mariadb-regression",
+    "container-recovery",
+    "dependency-audit"
+  ],
+  "artifact_paths_validated": true,
+  "production_database_accessed": false
+}

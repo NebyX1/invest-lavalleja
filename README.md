@@ -2,8 +2,11 @@
 
 Invest Lavalleja es un portal de información para inversores interesados en el departamento de Lavalleja (Uruguay). Reúne zonas, sectores, datos, casos, pasos y preguntas frecuentes, y tiene un asistente conversacional llamado **Gianna Invest** que responde preguntas usando solo la base de conocimiento del proyecto.
 
-Este repositorio central reúne el portal y una copia del backend. Los despliegues
-institucionales utilizan los repositorios independientes de frontend y backend:
+Este repositorio central reúne el portal y el backend de Gianna. La reestructura
+de arranque, recuperación y logs `1.0.0-rc2` está en `backend/`, con su
+[informe de validación](backend/reports/VALIDACION.md) y su
+[procedimiento de diagnóstico](backend/docs/INSTALACION_Y_DIAGNOSTICO.md).
+También existen repositorios institucionales independientes de frontend y backend:
 
 - **Portal web** (raíz de este repositorio; [frontend institucional](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-frontend)): genera las páginas con Astro y usa React para las herramientas interactivas.
 - **Backend de Gianna** (`backend/`; [backend institucional](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend)): recibe las preguntas, busca en la base de conocimiento y redacta respuestas con sus fuentes.
@@ -70,8 +73,8 @@ Cada versión guarda una huella con modelo, revisión, pooling, normalización, 
 
 - `src/`: portal Astro, componentes React y estilos.
 - `src/data/`: catálogo versionado y manifiesto editorial de las páginas.
-- La API, el panel y las migraciones se mantienen en el repositorio independiente [`invest-lavalleja-backend`](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend).
-- `backend/gianna/`: copia local de los servicios de Gianna (agente, recuperación, prompts, seguridad, panel web).
+- `backend/gianna/`: API, panel y servicios de Gianna (agente, recuperación, prompts, seguridad); `backend/gianna/migrations_mariadb/` contiene las migraciones.
+- `.github/workflows/backend.yml`: pruebas y auditoría del backend, ejecutadas desde `backend/`.
 - `backend/docs/RAG_ENGINE.md`: arquitectura de la base de conocimiento y del flujo; `backend/docs/AGENT_DESIGN.md`: política de respuesta.
 - `backend/evals/` y `backend/scripts/evaluate_*.py`: conjuntos de evaluación de recuperación y de conversaciones.
 - `better-rag/`: documento de conocimiento sectorial, su versión consolidada y `tools/restructure.py`, que arma las fichas.
@@ -81,15 +84,18 @@ Las herramientas de `better-rag/` usan el backend de Gianna. Si ambos repositori
 
 ## Despliegue con Coolify
 
-El portal y la API son recursos separados en Coolify. En la instalación institucional,
-se despliegan desde los repositorios independientes de frontend y backend; una
-actualización de este repositorio central no actualiza automáticamente esas fuentes.
+El portal y la API son recursos separados en Coolify. Para construir la API desde
+este repositorio, usar `backend/` como contexto y `backend/Dockerfile` como archivo
+de construcción; el comando equivalente desde la raíz es
+`docker build -f backend/Dockerfile backend`. El Dockerfile de la raíz construye
+el portal. Si un recurso utiliza uno de los repositorios independientes, su
+fuente debe actualizarse por separado.
 Para el backend, revisar el [plan de persistencia, recuperación y rollback](backend/docs/RECUPERACION.md)
 antes de cualquier despliegue. El portal escucha en el puerto interno `80`.
 
 ## Puesta en marcha de Gianna
 
-Gianna requiere el backend independiente, una base MariaDB dedicada y una clave de Ollama Cloud. Seguí las instrucciones de instalación del [repositorio backend](https://github.com/IntendenciaDeLavalleja/invest-lavalleja-backend/blob/main/README.md); cada instalación configura una sola `DATABASE_URL`, además de los secretos y las variables de Ollama y correo. Estas credenciales se configuran únicamente en la API.
+Gianna requiere la API de `backend/`, una base MariaDB dedicada y una clave de Ollama Cloud. Seguí las instrucciones de instalación del [backend](backend/README.md) desde ese directorio; cada instalación configura una sola `DATABASE_URL`, además de los secretos y las variables de Ollama y correo. Estas credenciales se configuran únicamente en la API.
 
 Cuando la API local responda `available: true` en `http://127.0.0.1:8000/api/config`, configura `.env.local` en la raíz con `PUBLIC_GIANNA_API_BASE=http://localhost:8000`. Si elegiste la pila opcional de pruebas humanas, usá su puerto `8001`. Luego inicia el portal:
 

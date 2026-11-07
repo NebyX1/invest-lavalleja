@@ -5,6 +5,7 @@ import time
 import httpx
 
 from ..errors import DomainError
+from ..observability import event, safe_exception
 from .neural import Embeddings
 from .vector_store import LanceStore
 
@@ -40,6 +41,7 @@ class Ollama:
             response.raise_for_status()
             return sorted({x.get('name', x.get('model', '')) for x in response.json().get('models', []) if x.get('name') or x.get('model')})
         except (httpx.HTTPError, ValueError) as exc:
+            event(LOG, 'provider.catalog_failed', level=logging.WARNING, exception=safe_exception(exc))
             raise DomainError('No se pudo consultar el catálogo de Ollama Cloud.', 503, 'ollama_unavailable') from exc
 
     def candidates(self, settings):
@@ -61,16 +63,25 @@ class Ollama:
             for attempt in range(3):
                 remaining = deadline - time.monotonic()
                 if remaining < 5:
+                    event(LOG, 'provider.deadline_exhausted', level=logging.WARNING,
+                          model=name, attempt=attempt+1, timeout_s=timeout)
                     raise DomainError(UNAVAILABLE, 503, 'ollama_unavailable') from last_error
                 try:
-                    return self._once(name, messages, settings, tools, max_tokens, think, remaining) + (name,)
+                    started = time.monotonic()
+                    result = self._once(name, messages, settings, tools, max_tokens, think, remaining)
+                    event(LOG, 'provider.request_completed', model=name, attempt=attempt+1,
+                          duration_ms=round((time.monotonic()-started)*1000, 1))
+                    return result + (name,)
                 except _Retry as exc:
                     last_error = exc
-                    LOG.warning('Ollama %s intento %s: %s', name, attempt + 1, exc)
+                    event(LOG, 'provider.retry_scheduled', level=logging.WARNING,
+                          model=name, attempt=attempt+1, retry_delay_s=(0.7, 1.8)[attempt] if attempt < 2 else 0,
+                          exception=safe_exception(exc))
                     time.sleep((0.7, 1.8)[attempt] if attempt < 2 else 0)
                 except _Fatal as exc:
                     last_error = exc
-                    LOG.warning('Ollama %s rechazó la solicitud: %s', name, exc)
+                    event(LOG, 'provider.request_rejected', level=logging.WARNING,
+                          model=name, attempt=attempt+1, exception=safe_exception(exc))
                     break
         raise DomainError(UNAVAILABLE, 503, 'ollama_unavailable') from last_error
 
@@ -86,33 +97,41 @@ class Ollama:
         try:
             response = self.client.post('/api/chat', json=payload, timeout=limit)
         except (httpx.TimeoutException, httpx.TransportError) as exc:
-            raise _Retry(type(exc).__name__) from exc
+            raise _Retry(type(exc).__name__, code='provider_timeout' if isinstance(exc,httpx.TimeoutException) else 'provider_transport_failed') from exc
         if response.status_code == 400 and 'think' in payload and 'think' in response.text.lower():
             payload.pop('think')
             try:
                 response = self.client.post('/api/chat', json=payload, timeout=limit)
             except (httpx.TimeoutException, httpx.TransportError) as exc:
-                raise _Retry(type(exc).__name__) from exc
+                raise _Retry(type(exc).__name__, code='provider_timeout' if isinstance(exc,httpx.TimeoutException) else 'provider_transport_failed') from exc
         if response.status_code in RETRYABLE:
-            raise _Retry(f'HTTP {response.status_code}')
+            raise _Retry(f'HTTP {response.status_code}', status=response.status_code, code='provider_http_retryable')
         if response.status_code >= 400:
-            raise _Fatal(f'HTTP {response.status_code}: {response.text[:200]}')
+            # A remote body may echo credentials, prompts or internal knowledge.
+            # Keep its HTTP status, never the body in an exception/log/traceback.
+            raise _Fatal(f'HTTP {response.status_code}', status=response.status_code, code='provider_http_rejected')
         try:
             data = response.json()
         except ValueError as exc:
-            raise _Retry('respuesta no JSON') from exc
+            raise _Retry('respuesta no JSON', code='provider_invalid_response') from exc
         message = data.get('message') or {}
         content = message.get('content') or ''
         calls = message.get('tool_calls') or []
         if not content.strip() and not calls:
-            raise _Retry('respuesta vacía')
+            raise _Retry('respuesta vacía', code='provider_empty_response')
         usage = {'prompt_tokens': data.get('prompt_eval_count'), 'output_tokens': data.get('eval_count')}
         return {'content': content, 'tool_calls': calls}, usage
 
 
 class _Retry(Exception):
-    pass
+    def __init__(self, message, *, status=None, code=None):
+        super().__init__(message)
+        self.status = status
+        self.code = code
 
 
 class _Fatal(Exception):
-    pass
+    def __init__(self, message, *, status=None, code=None):
+        super().__init__(message)
+        self.status = status
+        self.code = code

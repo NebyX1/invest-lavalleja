@@ -1,5 +1,158 @@
 # Validación del agente RAG
 
+## Integración en el repositorio central · 07/11/2026
+
+Destino de esta entrega: **`NebyX1/invest-lavalleja`, rama `main`, directorio
+`backend/`**. La implementación procede del commit validado `5576b6a` del backend
+independiente. Se comprobó que la base de `backend/` en `e408c1b` coincidía
+exactamente con la base `13fbfcb` usada durante la reestructura.
+
+Se trasladan implementación, migraciones, pruebas y evidencia, y se adapta
+`.github/workflows/backend.yml` de la raíz para ejecutar los seis jobs desde
+`backend/`, recoger sus artefactos y aislar las dependencias de Playwright.
+El Dockerfile y los requisitos de la API conservan el contenido validado.
+Las secciones siguientes documentan las pruebas de esa implementación; los
+resultados de integración en este directorio se guardan en `integration-main/`.
+La publicación del código no acredita un despliegue ni una intervención en la
+base productiva.
+
+Verificación ejecutada desde `backend/` en esta integración:
+
+- **444 passed, 7 skipped**, 92,66 s, suite completa con MariaDB real;
+  `integration-main/full-suite.xml` y `.log`.
+- **22 passed**, 38,58 s, panel/logs con Chromium y WebKit reales;
+  `integration-main/browser.xml` y `.log`. Las seis capturas de `monitoring/`
+  se regeneraron en esta ejecución.
+- Imagen `gianna-invest-main:validation` construida con `backend/` como contexto;
+  `integration-main/image-build.log`. Contrato de esquema comprobado dentro de
+  esa imagen sin red ni conexión a la base.
+- **137 archivos de implementación y pruebas idénticos** al commit validado,
+  comprobados normalizando únicamente los finales de línea; destinos y rutas de
+  artefactos de los seis jobs verificados en `integration-main/transfer.json`.
+
+Las siete omisiones son cinco casos de corpus privado y los dos opt-in. El
+opt-in de navegadores se ejecutó aquí; los once escenarios de contenedores de la
+implementación idéntica conservan su evidencia en `persistence/`.
+
+## Reestructura de instalación, cola y logs · 07/11/2026 · 1.0.0-rc2
+
+Entrega sobre `origin/main` **13fbfcb**, en la rama local
+`codex/reconciliacion-arranque`. Las secciones siguientes conservan resultados
+anteriores; esta sección describe la revisión operativa actual. No se intervino
+Coolify, la base productiva ni sus volúmenes, y no se llamó a generación pagada.
+
+### Causas verificadas y cambios
+
+- El guard anterior exigía un mountpoint exactamente igual a DATA_DIR. Ahora
+  inspecciona el montaje que realmente cubre la ruta, incluidos ancestros y
+  montajes anidados, y distingue ausencia, sólo lectura, permisos, espacio e identidad.
+- Configurar HTTP creaba directorios antes de inspeccionar persistencia. El
+  arranque administrativo ahora llega al diagnóstico incluso sin el volumen;
+  la inicialización física y la cola esperan un inventario válido.
+- Warmup reintentaba cualquier fallo y mantenía el error/fecha del intento
+  anterior en un trabajo reencolado. Hay clasificación de causas, esperas visibles,
+  límite de intentos, limpieza de estado actual e historial separado.
+- JSON corrupto se decodificaba fuera del bloque de ejecución y podía dejar
+  trabajos running hasta vencer el lease. La validación, fencing y terminación
+  identificada forman parte de cada intento.
+- `schema_versions` no acreditaba que columnas/defaults siguieran presentes.
+  Ahora se revisa el namespace, historial y contrato completo de columnas antes
+  de migrar instalaciones existentes. Sólo se reparan DDL conocidos idempotentes;
+  la pérdida editorial, un historial no verificable o una base ajena bloquean sin
+  fabricar datos ni resetear versiones.
+- Un respaldo vectorial corrupto podía bloquear vectores SQL válidos. SQL,
+  respaldo y caché se validan independientemente; dos fuentes válidas distintas
+  siguen bloqueando con una razón concreta.
+- El panel abandonaba polling ante un error de red y no seguía una recuperación
+  de failed después de redeploy. Ahora se reanuda con backoff, muestra datos
+  desactualizados y cambia acciones, resultado e historial sin recargar.
+
+La estructura, estados, decisiones y procedimiento se documentan en
+[arranque y diagnóstico](../docs/INSTALACION_Y_DIAGNOSTICO.md).
+
+### Verificación final
+
+| Comprobación | Resultado y evidencia |
+| --- | --- |
+| Python 3.12.13, pytest 9.0.3, suite completa con `--mariadb-docker` | **442 passed, 7 skipped**, 75,62 s; `persistence/full-suite.xml` y `.log` |
+| Panel SSR/API, logs y navegador con opt-in | **22 passed**, 39,17 s; `monitoring/final-browser.xml` y `.log` |
+| Navegadores | Chromium y WebKit reales, Flask/SQL aislados; 503 transitorio, failed→running sin recarga, acciones, bfcache/pagehide, XSS como texto, 390/1280 px; seis PNG y `monitoring/browser-validation.json` |
+| MariaDB: esquema real fresh y upgrade-v2 | Defaults ausentes/apóstrofos, columna técnica/journal ausentes, migración parcial e irreparable editorial; `persistence/schema-reconciliation-mariadb.xml` |
+| Namespace SQL ajeno/sin historia | Dos casos sin crear tablas o historia; `persistence/database-namespace.xml` |
+| Docker/MariaDB/LanceDB/ONNX reales | **1 passed, 11 escenarios**, 483,86 s; `persistence/container-recovery.xml`, `.log`, `recovery-docker.json` y `recovery-docker-events.jsonl` |
+| Integridad de contrato y sintaxis | `python -m scripts.schema_contract`, compilación Python y `git diff --check` correctos |
+| Imagen | Dockerfile multietapa, UID/GID 10001 y versión 1.0.0-rc2; `persistence/production-image-build.log` |
+
+Las siete omisiones generales son cinco casos de corpus privado no incluido y
+dos opt-in. Los opt-in de navegadores y contenedores se ejecutaron aparte y
+pasaron; no se presenta el corpus privado como validado.
+
+La prueba de contenedores creó **dos fichas públicas y una interna**, con
+MariaDB exclusiva temporal, volumen y red propios. Montó `/app/data` y utilizó
+`DATA_DIR=/app/data/runtime`, demostrando el montaje ancestro real. Sin volumen,
+la API administrativa siguió accesible: mostró `storage_not_mounted`, dejó el
+trabajo con cero intentos y no descargó modelos.
+
+Al reconectar el volumen original, recuperó automáticamente el **mismo trabajo**
+`4546526dd37841b59287dbaddbcaf3f4`, conservando la publicación
+`dd5dcf26f0c8492398793396583c81c4` y el digest editorial. También pasaron reinicio,
+reemplazo de contenedor, colección ausente/incompleta y retirada/restauración de
+modelos. Se registraron **457 eventos JSON** con correlación entre arranques y
+comprobaciones contra filtración de claves, contraseñas y sesión. Las búsquedas
+de evidencia recuperaron contenido real del índice, sin llamar al generador.
+
+La muestra final fue **1,232 GiB sobre 2 GiB**, con dos CPU. Es una muestra de la
+base sintética, no el pico de consumo ni garantía para una base de producción.
+Todos los contenedores, red, volumen y etiqueta de imagen aleatoria creados por
+la prueba se retiraron; se conserva la imagen de validación nombrada explícitamente.
+
+### Logs y diagnóstico
+
+JSON UTC en stderr, con boot/request/job, intento, etapa, tiempos, código,
+ubicación módulo/función/línea y cadena de tipos/causas. Las descargas registran
+perfil, revisión, archivo y bytes reales. `operational_events` y `job_events`
+conservan historia SQL después de un reemplazo; el diagnóstico presenta el
+inventario y el plan sin alterar el contenido.
+
+Los tests comprueban redacción de secretos, URLs con credenciales, parámetros
+SQL, cuerpos, prompts y excepciones. No se registra `str(exc)` arbitrario ni se
+copian documentos o respuestas del proveedor al registro técnico.
+
+### Dependencias y criterio del aviso MariaDB
+
+pytest se actualizó de 9.0.2 a **9.0.3**. La auditoría inicial se conserva como
+evidencia histórica, no como resultado de la candidata final.
+
+El gate de dependencias conserva el JSON original de pip-audit y su SHA-256.
+`PYSEC-2026-217` sigue visible: se clasifica por separado como
+`runtime_not_affected` sólo al verificar **el mismo driver** y Connector/C
+**3.4.9** en la imagen Linux inmutable. Otros hallazgos, versión desconocida,
+evidencia ausente o un cliente vulnerable hacen fallar el gate. Las 28 pruebas
+de esta política forman parte de la suite general. No se usa `--ignore-vuln`.
+
+La ejecución final está en `security/20261107T214209Z-eaa6437e/`: un hallazgo RAW
+preservado, uno clasificado con evidencia y cero sin resolver. El auditor local
+corrió en Windows, hecho registrado en el informe; **el cliente Windows 3.4.7 no
+recibe esa clasificación**. En CI la auditoría corre en Linux y construye la
+imagen del mismo commit. Esto no es un escáner completo del sistema Debian ni una
+certificación de toda la infraestructura.
+
+Criterio contrastado con el [aviso oficial de MariaDB](https://github.com/MariaDB/server/security/advisories/GHSA-pv9p-5w55-55jm)
+y la [incidencia de clasificación PyPI](https://github.com/pypa/advisory-database/issues/400).
+
+### Límites y siguiente despliegue
+
+Esta revisión prueba la mecánica de reconciliación y la integridad sobre datos
+sintéticos reales, no la fotografía privada del servidor ni la calidad factual
+de sus respuestas. No modifica modelos, espacios vectoriales, contenido,
+publicación, dominios ni claves productivas. Un montaje que no exista en el VPS
+debe corregirse en Docker/Coolify: el programa lo detecta y explica, no puede
+crearlo desde el contenedor. Antes de liberar, conservar respaldo e inspeccionar
+la instalación real con la misma imagen y el procedimiento documentado.
+
+La rama local queda preparada para revisión. No se realizó push ni despliegue
+remoto como parte de esta reestructura.
+
 ## Persistencia y recuperación automática · 07/11/2026
 
 Implementación sobre el backend institucional `a4f996b`, rama local

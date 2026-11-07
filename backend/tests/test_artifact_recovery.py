@@ -2,7 +2,9 @@
 import hashlib
 import io
 import json
+import logging
 from types import SimpleNamespace
+import urllib.error
 
 import pytest
 
@@ -75,3 +77,55 @@ def test_interrupted_download_does_not_commit_manifest_and_can_resume(transport)
     assert not (t.folder/'manifest.json').exists()
     artifacts.ensure_models(t.cfg,'fixture')
     assert (t.folder/'manifest.json').exists()
+
+
+def test_download_checkpoints_report_real_bytes_without_global_job_percentage(transport, monkeypatch, caplog):
+    t = transport
+    content = b'x' * (21 * artifacts.MIB + 17)
+    t.content['onnx/model.onnx'] = content
+    info = next(entry for entry in t.metadata['siblings'] if entry['rfilename'] == 'onnx/model.onnx')
+    info['size'] = len(content)
+    info['lfs']['sha256'] = hashlib.sha256(content).hexdigest()
+    # Hold time fixed to verify the 10 MiB checkpoint independently of timing.
+    monkeypatch.setattr(artifacts, 'time', SimpleNamespace(monotonic=lambda: 42.0, sleep=t.sleeps.append))
+    messages = []
+    with caplog.at_level(logging.INFO, logger='gianna.services.artifacts'):
+        artifacts.ensure_models(t.cfg, 'fixture', messages.append)
+    checkpoints = [record.event_fields for record in caplog.records
+                   if getattr(record, 'event_name', None) == 'artifacts.download_progress'
+                   and record.event_fields.get('artifact_file') == 'onnx/model.onnx']
+    assert [row['downloaded_bytes'] for row in checkpoints] == [0, 10*artifacts.MIB, 20*artifacts.MIB, len(content)]
+    assert all(row['expected_bytes'] == len(content) for row in checkpoints)
+    assert any('21.0 MiB de 21.0 MiB' in message for message in messages)
+    assert not any('%' in message for message in messages)
+    assert len(t.calls) == 3  # Metadata + two files; logging performs no requests.
+    completed = [record for record in caplog.records
+                 if getattr(record, 'event_name', None) == 'artifacts.download_completed'
+                 and record.event_fields.get('artifact_file') == 'onnx/model.onnx']
+    assert len(completed) == 1 and completed[0].event_fields['downloaded_bytes'] == len(content)
+
+
+def test_download_failure_reports_cause_and_checkpoints_without_exception_secrets(transport, monkeypatch, caplog):
+    t = transport
+    original = artifacts.urllib.request.urlopen
+    private = 'https://test-user:never-log-me@example.invalid/weights?token=private-token'
+    def unavailable(request, timeout):
+        if request.full_url.endswith('/onnx/model.onnx'):
+            raise urllib.error.URLError(OSError(private))
+        return original(request, timeout)
+    monkeypatch.setattr(artifacts.urllib.request, 'urlopen', unavailable)
+    with caplog.at_level(logging.INFO, logger='gianna.services.artifacts'):
+        with pytest.raises(DomainError) as error:
+            artifacts.ensure_models(t.cfg, 'fixture')
+    assert error.value.code == 'models_recovery_failed'
+    assert error.value.details['cause_code'] == 'artifact_network_unavailable'
+    failures = [record.event_fields for record in caplog.records
+                if getattr(record, 'event_name', None) == 'artifacts.download_failed']
+    assert len(failures) == 3 and t.sleeps == [1, 2]
+    assert all(row['code'] == 'artifact_network_unavailable' and row['cause_type'] == 'OSError'
+               and row['downloaded_bytes'] == 0 and row['expected_bytes'] == len(t.content['onnx/model.onnx'])
+               for row in failures)
+    encoded = json.dumps(failures)
+    assert all(secret not in encoded + caplog.text for secret in ('never-log-me', 'private-token', 'test-user'))
+    assert all(row['exception']['type'] == 'URLError' and row['exception']['frames'] for row in failures)
+    assert not (t.folder / 'manifest.json').exists()

@@ -1,22 +1,19 @@
 name: validate-gianna-backend
-
 on:
   push:
   pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-
+defaults:
+  run:
+    working-directory: backend
 jobs:
   python-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python: ['3.12', '3.13']
-    defaults:
-      run:
-        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,39 +23,93 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
-      - run: python -m pip install -r requirements-test.txt
+      - run: pip install -r requirements-test.txt
       - run: python -m compileall -q gianna scripts
-      # El corpus privado no se versiona; estas pruebas no lo necesitan.
-      - run: python -m pytest --junitxml=ci-tests.xml
+      # Guide content is intentionally not versioned. Generic/unit/web tests run without that private package.
+      - run: pytest --junitxml=reports/ci-tests.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: backend-tests-${{ matrix.python }}
-          path: backend/ci-tests.xml
-
-  compose-config:
+          name: tests-${{ matrix.python }}
+          path: backend/reports/ci-tests.xml
+  admin-monitoring:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - name: Validate Compose syntax and build context
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - run: npm install --prefix "$RUNNER_TEMP/gianna-browser" --no-save --no-package-lock playwright@1.63.0
+      - run: '"$RUNNER_TEMP/gianna-browser/node_modules/.bin/playwright" install --with-deps chromium webkit'
+      - name: Real browser monitoring, transient outage and recovery
         env:
-          SECRET_KEY: ci-only
-          ENCRYPTION_KEY: ci-only
-          DATABASE_URL: mariadb+mariadbconnector://ci:ci@mariadb:3306/gianna_ci
-          CORS_ORIGINS: https://portal.example.test,https://api.example.test
-          TRUSTED_HOSTS: localhost
-        run: |
-          test -f Dockerfile && test -f requirements.txt
+          GIANNA_BROWSER_MONITOR_TEST: '1'
+          GIANNA_PLAYWRIGHT_MODULE: ${{ runner.temp }}/gianna-browser/node_modules/playwright/index.mjs
+        run: pytest tests/test_admin_monitoring.py --junitxml=reports/monitoring/ci-browser.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-monitoring
+          path: backend/reports/monitoring/
+  compose-config:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-config-only-not-a-real-secret-32-chars
+      ENCRYPTION_KEY: ci-config-only
+      DATABASE_URL: mariadb+mariadbconnector://ci:ci@db:3306/gianna_ci
+      CORS_ORIGINS: https://portal.example.test
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
           docker compose --env-file /dev/null -f compose.yaml config --quiet
-
+          docker compose --env-file /dev/null -f compose.yaml -f compose.local.yaml config --quiet
+          docker compose --env-file /dev/null -f compose.yaml -f compose.human-test.yaml config --quiet
+  mariadb-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - name: Fresh schema and existing MariaDB upgrades
+        run: pytest tests/test_mariadb_import.py tests/test_schema_reconciliation_mariadb.py tests/test_database_namespace.py --mariadb-docker --junitxml=reports/ci-mariadb.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mariadb-regression
+          path: backend/reports/ci-mariadb.xml
+  container-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - name: Reconcile and recover real containers, volumes, SQL, LanceDB and pinned ONNX
+        run: pytest tests/test_recovery_docker.py --recovery-docker -s --junitxml=reports/ci-recovery.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: container-recovery
+          path: |
+            backend/reports/ci-recovery.xml
+            backend/reports/persistence/recovery-docker.json
+            backend/reports/persistence/recovery-docker-events.jsonl
   dependency-audit:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -68,5 +119,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
-      - run: python -m pip install pip-audit
-      - run: pip-audit -r requirements.txt
+      - run: pip install pip-audit==2.10.1
+      - name: Build the deployment runtime for dependency verification
+        run: docker build --tag gianna-dependency-audit:ci .
+      - name: Keep raw findings and verify the actual Connector/C runtime
+        run: python scripts/audit_dependencies.py --runtime-image gianna-dependency-audit:ci --output-dir reports/security
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-audit-evidence
+          path: backend/reports/security/

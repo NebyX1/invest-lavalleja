@@ -29,6 +29,31 @@ jobs:
         with:
           name: tests-${{ matrix.python }}
           path: reports/ci-tests.xml
+  admin-monitoring:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - run: npm install --no-save --no-package-lock playwright@1.63.0
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Real browser monitoring, transient outage and recovery
+        env:
+          GIANNA_BROWSER_MONITOR_TEST: '1'
+          GIANNA_PLAYWRIGHT_MODULE: ${{ github.workspace }}/node_modules/playwright/index.mjs
+        run: pytest tests/test_admin_monitoring.py --junitxml=reports/monitoring/ci-browser.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-monitoring
+          path: reports/monitoring/
   compose-config:
     runs-on: ubuntu-latest
     env:
@@ -42,8 +67,46 @@ jobs:
           docker compose --env-file /dev/null -f compose.yaml config --quiet
           docker compose --env-file /dev/null -f compose.yaml -f compose.local.yaml config --quiet
           docker compose --env-file /dev/null -f compose.yaml -f compose.human-test.yaml config --quiet
+  mariadb-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - name: Fresh schema and existing MariaDB upgrades
+        run: pytest tests/test_mariadb_import.py tests/test_schema_reconciliation_mariadb.py tests/test_database_namespace.py --mariadb-docker --junitxml=reports/ci-mariadb.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mariadb-regression
+          path: reports/ci-mariadb.xml
+  container-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - name: Reconcile and recover real containers, volumes, SQL, LanceDB and pinned ONNX
+        run: pytest tests/test_recovery_docker.py --recovery-docker -s --junitxml=reports/ci-recovery.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: container-recovery
+          path: |
+            reports/ci-recovery.xml
+            reports/persistence/recovery-docker.json
+            reports/persistence/recovery-docker-events.jsonl
   dependency-audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,5 +116,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
-      - run: pip install pip-audit
-      - run: pip-audit -r requirements.txt
+      - run: pip install pip-audit==2.10.1
+      - name: Build the deployment runtime for dependency verification
+        run: docker build --tag gianna-dependency-audit:ci .
+      - name: Keep raw findings and verify the actual Connector/C runtime
+        run: python scripts/audit_dependencies.py --runtime-image gianna-dependency-audit:ci --output-dir reports/security
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-audit-evidence
+          path: reports/security/

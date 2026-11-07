@@ -1,0 +1,60 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 1.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 175B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 14.26kB done
+#4 DONE 0.0s
+
+#5 [dependencies 1/5] FROM docker.io/library/python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54
+#5 resolve docker.io/library/python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54 0.0s done
+#5 DONE 0.0s
+
+#6 [dependencies 3/5] RUN apt-get update && apt-get install -y --no-install-recommends     build-essential libmariadb-dev pkg-config     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [stage-1 4/7] COPY --from=dependencies /install /usr/local
+#7 CACHED
+
+#8 [stage-1 3/7] RUN apt-get update && apt-get install -y --no-install-recommends     libmariadb3 mariadb-client libgomp1 ca-certificates curl     && rm -rf /var/lib/apt/lists/*     && groupadd --gid 10001 gianna && useradd --uid 10001 --gid 10001 --create-home gianna     && mkdir -p /app/data && chown -R gianna:gianna /app
+#8 CACHED
+
+#9 [dependencies 4/5] COPY requirements.txt /build/requirements.txt
+#9 CACHED
+
+#10 [dependencies 5/5] RUN pip install --prefix=/install -r /build/requirements.txt
+#10 CACHED
+
+#11 [stage-1 2/7] WORKDIR /app
+#11 CACHED
+
+#12 [dependencies 2/5] WORKDIR /build
+#12 CACHED
+
+#13 [stage-1 5/7] COPY --chown=gianna:gianna gianna /app/gianna
+#13 CACHED
+
+#14 [stage-1 6/7] COPY --chown=gianna:gianna scripts /app/scripts
+#14 DONE 0.1s
+
+#15 [stage-1 7/7] COPY --chown=gianna:gianna wsgi.py gunicorn.conf.py /app/
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers 0.1s done
+#16 exporting manifest sha256:feabcf2ae72b5aa1178002f1fd08b4691a72527e60cbad7285aa79e9ad3c6d95 0.0s done
+#16 exporting config sha256:3f92cbfcbb945f02450a8796e78d7826763f26da2ca547f07a085da1d1a3b4d9 0.0s done
+#16 exporting attestation manifest sha256:f68115e555644b9825bc7682e58bebf5c06dc4ade6454eea8b0d5d3bec9c984b 0.0s done
+#16 exporting manifest list sha256:f0593e7867cc5f8977eab5dbacf2ddf5cad82deaae98141b9c7b59520f5c7209 0.0s done
+#16 naming to docker.io/library/gianna-restructure:validation done
+#16 unpacking to docker.io/library/gianna-restructure:validation 0.1s done
+#16 DONE 0.3s

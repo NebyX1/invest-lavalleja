@@ -1,0 +1,2 @@
+WARN `--no-project` was provided, but no project was found
+{"passed": true, "raw_findings": 1, "runtime_not_affected": 1, "unresolved": 0, "errors": [], "report": "reports\\security\\20261107T214209Z-eaa6437e\\decision.json"}

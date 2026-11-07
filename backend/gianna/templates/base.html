@@ -6,7 +6,7 @@
 <body class="{% if user %}with-sidebar{% else %}guest{% endif %}"><a class="skip-link" href="#main">Saltar al contenido</a>
 {% if user %}<aside class="sidebar"><a class="brand" href="{{ url_for('admin.dashboard') }}"><span class="brand-mark">g</span><span>gianna<small>INVEST LAVALLEJA</small></span></a>
 <div class="nav-label">CENTRO DE CONOCIMIENTO</div><nav aria-label="Navegación principal">
-{% for endpoint,label,icon in [('admin.dashboard','Resumen','◈'),('admin.bases','Bases de conocimiento','▤'),('admin.jobs','Trabajos','◷'),('admin.lab','Laboratorio','⌕'),('admin.analytics','Analítica','▥')] %}
+{% for endpoint,label,icon in [('admin.dashboard','Resumen','◈'),('admin.bases','Bases de conocimiento','▤'),('admin.jobs','Trabajos','◷'),('admin.diagnostics_page','Diagnóstico','◇'),('admin.lab','Laboratorio','⌕'),('admin.analytics','Analítica','▥')] %}
 <a href="{{ url_for(endpoint) }}" {% if request.endpoint==endpoint %}aria-current="page"{% endif %}><span>{{ icon }}</span>{{ label }}</a>{% endfor %}
 {% if user.role=='owner' %}<div class="nav-label">ADMINISTRACIÓN</div>{% for endpoint,label,icon in [('admin.settings_page','Personalización','⚙'),('admin.users','Equipo y permisos','♙'),('admin.audit','Auditoría','☷')] %}<a href="{{ url_for(endpoint) }}" {% if request.endpoint==endpoint %}aria-current="page"{% endif %}><span>{{ icon }}</span>{{ label }}</a>{% endfor %}{% endif %}
 <a href="{{ url_for('auth.security_page') }}"><span>◇</span>Seguridad</a><a href="{{ url_for('public.chat_page') }}" target="_blank" rel="noopener"><span>↗</span>Abrir chat público</a></nav>

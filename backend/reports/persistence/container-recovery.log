@@ -1,0 +1,22 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.13, pytest-9.0.3, pluggy-1.7.0
+rootdir: D:\Ai Projects\invest-rag-chat-v2\invest-lavalleja-backend-restructure
+configfile: pytest.ini
+plugins: anyio-4.16.0
+collected 1 item
+
+tests\test_recovery_docker.py Container regression passed: real_build_and_publication
+Container regression passed: automatic_startup
+Container regression passed: durable_parent_mount
+Container regression passed: process_restart
+Container regression passed: container_replacement_same_volume
+Container regression passed: missing_volume_actionable_preflight
+Container regression passed: same_job_automatic_recovery_after_mount_repair
+Container regression passed: missing_collection
+Container regression passed: incomplete_collection
+Container regression passed: missing_models_auto_recovery
+Container regression passed: bounded_resources
+.
+
+- generated xml file: D:\Ai Projects\invest-rag-chat-v2\invest-lavalleja-backend-restructure\reports\persistence\container-recovery.xml -
+======================== 1 passed in 483.86s (0:08:03) ========================

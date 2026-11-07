@@ -1,0 +1,5 @@
+* text=auto eol=lf
+reports/*.log -whitespace
+reports/**/*.log -whitespace
+reports/security/**/pip-audit.json -text -whitespace
+reports/security/historical-*.json -text -whitespace

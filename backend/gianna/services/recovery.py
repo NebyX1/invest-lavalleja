@@ -10,6 +10,7 @@ import uuid
 
 from ..chunking import input_prefix
 from ..errors import Cancelled, DomainError
+from ..observability import event, safe_exception
 from .neural import DIMENSIONS, MODEL_PROFILES
 from .storage import atomic_json, storage_identity, writer_lock
 
@@ -48,6 +49,10 @@ def physical_row(chunk, dense):
 
 def snapshot(db, cfg, version):
     """Validate metadata before using a backup, SQL vector or fingerprint-scoped cache."""
+    reason = 'profile'
+    actual_count = None
+    source_counts = {'sql': 0, 'backup': 0, 'cache': 0}
+    invalid_sources = {'sql': 0, 'backup': 0, 'cache': 0}
     try:
         profile = json.loads(version['profile_json'])
         if not re.fullmatch(r'[a-zA-Z0-9_-]{1,80}', version['id']):
@@ -59,15 +64,20 @@ def snapshot(db, cfg, version):
         expected_context = 'bekko-context-v2' if profile['engine'] == 'bekko-horizon-lance-v2' else 'cards-context-v5'
         if profile.get('contextualizer_version') != expected_context:
             raise ValueError('context')
+        reason = 'metadata'
         records = {r['record_key']: json.loads(r['content_json']) for r in db.all(
             'SELECT record_key,content_json FROM version_records WHERE version_id=?', (version['id'],))}
         sources = {r['source_key']: json.loads(r['content_json']) for r in db.all(
             'SELECT source_key,content_json FROM version_sources WHERE version_id=?', (version['id'],))}
         if not records or any(r.get('audience') != 'public' or not r.get('enabled', True) for r in records.values()):
+            reason = 'audience'
             raise ValueError('audience')
         rows = db.all('SELECT * FROM chunks WHERE version_id=? ORDER BY id', (version['id'],))
+        actual_count = len(rows)
         if not rows or len(rows) != version['chunk_count']:
+            reason = 'count'
             raise ValueError('count')
+        reason = 'metadata'
         chunks = []
         for row in rows:
             c = json.loads(row['content_json']); record = records[row['record_key']]
@@ -101,39 +111,75 @@ def snapshot(db, cfg, version):
         if backup_path.exists():
             try:
                 candidate = json.loads(backup_path.read_text(encoding='utf-8'))
-                if (candidate['version_id'] == version['id'] and candidate['metadata'] == metadata
+                if not (candidate['version_id'] == version['id'] and candidate['metadata'] == metadata
                         and candidate['fingerprint'] == profile['fingerprint']
+                        and isinstance(candidate['rows'], list) and len(candidate['rows']) == len(chunks)
                         and digest(candidate['rows']) == candidate['digest']):
-                    backup = candidate['rows']
-            except (OSError, ValueError, KeyError, TypeError):
-                LOG.warning('Respaldo físico no válido para versión %s; se comprobará SQL.', version['id'])
+                    raise ValueError('backup metadata')
+                indexed = {row['id']: row for row in candidate['rows']}
+                if len(indexed) != len(chunks) or set(indexed) != {c['id'] for c in chunks}:
+                    raise ValueError('backup coverage')
+                validated = {}
+                for chunk in chunks:
+                    proposed = indexed[chunk['id']]
+                    dense = vector(proposed['vector'])
+                    if physical_row(chunk, dense) != proposed:
+                        raise ValueError('backup row metadata')
+                    validated[chunk['id']] = dense
+                backup = validated
+            except (OSError, ValueError, KeyError, TypeError, OverflowError, struct.error) as exc:
+                invalid_sources['backup'] = 1
+                event(LOG, 'recovery.backup_rejected', level=logging.WARNING,
+                      version_id=version['id'], code='backup_invalid', exception=safe_exception(exc))
         restored = []
-        for i, (row, c) in enumerate(zip(rows, chunks, strict=True)):
-            # Check an independent backup before SQL/cache fallbacks.
-            dense = None
-            if backup is not None and len(backup) == len(rows):
-                proposed = vector(backup[i]['vector'])
-                if physical_row(c, proposed) == backup[i]:
-                    dense = proposed
+        for row, c in zip(rows, chunks, strict=True):
+            # Each source is independently validated. A corrupt optional source
+            # cannot poison another verified source, while two valid sources
+            # disagreeing must never be resolved by guessing.
+            candidates = {}
+            if backup is not None:
+                candidates['backup'] = backup[c['id']]
             raw = row['vector_json']
-            if raw is None:
+            if raw is not None:
+                try:
+                    candidates['sql'] = vector(json.loads(raw))
+                except (ValueError, TypeError, OverflowError, struct.error):
+                    invalid_sources['sql'] += 1
+            if 'sql' not in candidates:
                 cached = db.one('SELECT dense_json FROM embedding_cache WHERE fingerprint=? AND embedding_hash=?',
                                 (profile['fingerprint'], row['embedding_hash']))
-                raw = cached['dense_json'] if cached else None
-            if raw:
-                sql_dense = vector(json.loads(raw))
-                if dense is not None and dense != sql_dense:
-                    raise ValueError('backup disagrees with SQL')
-                dense = sql_dense
-            if dense is None:
+                if cached:
+                    try:
+                        candidates['cache'] = vector(json.loads(cached['dense_json']))
+                    except (ValueError, TypeError, OverflowError, struct.error):
+                        invalid_sources['cache'] += 1
+            if not candidates:
+                reason = 'missing_vector'
                 raise ValueError('missing vector')
+            source = next(name for name in ('sql', 'backup', 'cache') if name in candidates)
+            dense = candidates[source]
+            if any(value != dense for value in candidates.values()):
+                reason = 'backup_sql_disagreement' if 'sql' in candidates else 'vector_sources_disagree'
+                raise ValueError('verified sources disagree')
+            source_counts[source] += 1
             restored.append(physical_row(c, dense))
         return {'version_id': version['id'], 'fingerprint': profile['fingerprint'], 'metadata': metadata,
                 'digest': digest(restored), 'rows': restored, 'profile': profile,
-                'backup_used': bool(backup and backup == restored)}
-    except (ValueError, KeyError, TypeError, OverflowError, struct.error) as exc:
-        raise DomainError('La fotografía publicada no permite una restauración exacta. Se requiere revisión supervisada; la publicación se conserva.',
-                          503, 'snapshot_invalid') from exc
+                'backup_used': bool(source_counts['backup']), 'source_counts': source_counts,
+                'invalid_sources': invalid_sources}
+    except (ValueError, KeyError, TypeError, AttributeError, OverflowError, struct.error) as exc:
+        error = DomainError('La fotografía publicada no permite una restauración exacta. Se requiere revisión supervisada; la publicación se conserva.',
+                            503, 'snapshot_invalid')
+        error.details = {'reason': reason, 'source_counts': source_counts,
+                         'invalid_sources': invalid_sources}
+        version_id = version.get('id')
+        if isinstance(version_id, str) and re.fullmatch(r'[a-zA-Z0-9_-]{1,80}', version_id):
+            error.details['version_id'] = version_id
+        if isinstance(version.get('chunk_count'), int):
+            error.details['expected_chunks'] = version['chunk_count']
+        if actual_count is not None:
+            error.details['actual_chunks'] = actual_count
+        raise error from exc
 
 
 class KnowledgeRecovery:
@@ -146,8 +192,14 @@ class KnowledgeRecovery:
 
     def state(self, value, code=None, version=None):
         with self._lock:
+            previous = self._state
             self._state, self._code, self._version = value, code, version
-        LOG.info('Conocimiento: estado=%s codigo=%s version=%s', value, code, version)
+        event(LOG, 'recovery.state_changed', previous=previous, state=value, code=code, version_id=version)
+
+    def phase(self):
+        """Cheap worker progress label; no SQL, filesystem checks or inference."""
+        with self._lock:
+            return self._state
 
     def status(self, version=None):
         """Cheap live collection checks. No downloads, model loads or editorial writes."""
@@ -180,11 +232,12 @@ class KnowledgeRecovery:
             if state == 'initializing':
                 last = self.db.one("SELECT status,attempts FROM jobs WHERE kind='warmup' AND version_id=? ORDER BY created_at DESC LIMIT 1",(version['id'],))
                 if last and last['status'] == 'failed' and last['attempts'] >= 3:state='failed'
-            if exc.code in {'storage_mismatch','storage_not_mounted','snapshot_invalid','embedding_mismatch'}:
+            if exc.code.startswith('storage_') or exc.code in {'snapshot_invalid','embedding_mismatch','database_unavailable'}:
                 state = 'failed'
             return {'state': state, 'code': code, 'available': False, 'message': MESSAGES.get(state, MESSAGES['failed'])}
-        except Exception:
-            LOG.exception('No se pudo verificar la disponibilidad del conocimiento.')
+        except Exception as exc:
+            event(LOG, 'recovery.availability_failed', level=logging.ERROR,
+                  code='knowledge_unavailable', exception=safe_exception(exc))
             return {'state': 'failed', 'code': 'knowledge_unavailable', 'available': False, 'message': MESSAGES['failed']}
 
     def require(self, version):
@@ -192,7 +245,9 @@ class KnowledgeRecovery:
         if not status['available']:
             if self.enqueue:
                 try:self.enqueue(version=version)
-                except Exception:LOG.warning('No se pudo programar la recuperación técnica.')
+                except Exception as exc:
+                    event(LOG, 'recovery.enqueue_failed', level=logging.WARNING,
+                          version_id=version['id'], exception=safe_exception(exc))
             raise DomainError(status['message'], 503, status['code'])
 
     def verify(self, version, data=None):
@@ -229,14 +284,19 @@ class KnowledgeRecovery:
             data=snapshot(self.db,self.cfg,version)
             return {'state':'diagnostic','version_id':version['id'],'vectors':len(data['rows']),
                     'fingerprint':data['fingerprint'],'backup_used':data['backup_used'],
+                    'source_counts':data['source_counts'],'invalid_sources':data['invalid_sources'],
                     'index_valid':self.store.matches(version['collection_name'],data['rows']),'changed':False}
         try:
+            # Diagnose infrastructure before even creating the writer lock.
+            # Recheck under exclusion as a deployment can change the volume.
+            storage_identity(self.db, self.cfg, adopt=adopt_storage)
             with self.db.physical_lock(), writer_lock(self.cfg):
                 storage_identity(self.db, self.cfg, adopt=adopt_storage)
                 data = snapshot(self.db, self.cfg, version)
                 matches = self.store.matches(version['collection_name'], data['rows'])
                 plan = {'version_id': version['id'], 'vectors': len(data['rows']), 'fingerprint': data['fingerprint'],
-                        'backup_used': data['backup_used'], 'index_valid': matches, 'changed': False}
+                        'backup_used': data['backup_used'], 'source_counts':data['source_counts'],
+                        'invalid_sources':data['invalid_sources'], 'index_valid': matches, 'changed': False}
                 stage('restoring_models')
                 engine = self.embeddings.for_profile(data['profile'])
                 from .artifacts import ensure_models
@@ -257,9 +317,14 @@ class KnowledgeRecovery:
             raise
         except DomainError as exc:
             self.state('failed', exc.code, version['id'])
+            event(LOG, 'recovery.blocked', level=logging.ERROR,
+                  version_id=version['id'], code=exc.code,
+                  validation=getattr(exc, 'details', {}), exception=safe_exception(exc))
             raise
         except Exception as exc:
             self.state('failed', 'recovery_failed', version['id'])
+            event(LOG, 'recovery.failed', level=logging.ERROR,
+                  version_id=version['id'], code='recovery_failed', exception=safe_exception(exc))
             raise DomainError('Falló la recuperación técnica. La publicación se conserva.', 503, 'recovery_failed') from exc
 
     def _restore(self, version, data, progress):

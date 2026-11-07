@@ -237,7 +237,9 @@ def test_changed_volume_requires_supervised_adoption(physical,tmp_path):
 
 def test_production_rejects_ephemeral_layer_and_excludes_other_writers(physical,monkeypatch):
     p=physical
-    monkeypatch.setattr('gianna.services.storage.mounted_data_dir',lambda path:False)
+    monkeypatch.setattr('gianna.services.storage._mount_report',lambda path:{
+        'observed':True,'mountpoint':str(path),'filesystem':'overlay',
+        'read_only':False,'durable':False,'code':'storage_not_mounted'})
     with pytest.raises(DomainError) as error:storage_identity(p.db,replace(p.cfg,production=True))
     assert error.value.code=='storage_not_mounted'
     with writer_lock(p.cfg):
@@ -308,8 +310,8 @@ def test_graceful_shutdown_requeues_instead_of_cancelling_publication_recovery(p
     assert editorial_state(p.db)==before
 
 
-@pytest.mark.parametrize('filesystem,point,expected',[('ext4','exact',True),('tmpfs','exact',False),('overlay','exact',False),('ext4','parent',False)])
-def test_mount_guard_requires_exact_durable_mount(cfg,monkeypatch,filesystem,point,expected):
+@pytest.mark.parametrize('filesystem,point,expected',[('ext4','exact',True),('tmpfs','exact',False),('overlay','exact',False),('ext4','parent',True)])
+def test_mount_guard_requires_covering_durable_mount(cfg,monkeypatch,filesystem,point,expected):
     from gianna.services.storage import mounted_data_dir
     target=str(cfg.data_dir if point=='exact' else cfg.data_dir.parent).replace(' ','\\040')
     monkeypatch.setattr(Path,'read_text',lambda *args,**kwargs:f'1 0 8:1 / {target} rw - {filesystem} /dev/sda rw\n')

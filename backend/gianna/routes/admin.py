@@ -232,17 +232,24 @@ def jobs():
 @bp.get('/jobs/<job_id>')
 @access()
 def job_detail(job_id):
-    row=services().db.one('SELECT * FROM jobs WHERE id=?',(job_id,))
+    s=services()
+    row=s.db.one('SELECT * FROM jobs WHERE id=?',(job_id,))
     if not row:raise DomainError('Trabajo inexistente.',404)
-    return render_template('job_detail.html',job=row)
+    job=s.jobs.describe_job(row)
+    job['result_json']=row['result_json']
+    job['installation']=_installation_summary(s.installation.status())
+    return render_template('job_detail.html',job=job)
 
 
 @bp.get('/api/jobs/<job_id>')
 @access()
 def job_status(job_id):
-    row=services().db.one('SELECT id,kind,status,base_id,version_id,progress,total,message,error,created_at,finished_at FROM jobs WHERE id=?',(job_id,))
+    s=services()
+    row=s.db.one('SELECT * FROM jobs WHERE id=?',(job_id,))
     if not row:raise DomainError('Trabajo inexistente.',404)
-    return jsonify(row)
+    job=s.jobs.describe_job(row)
+    job['installation']=_installation_summary(s.installation.status())
+    return jsonify(job)
 
 
 @bp.post('/jobs/<job_id>/cancel')
@@ -251,7 +258,7 @@ def cancel_job(job_id):
     s=services();row=s.db.one('SELECT * FROM jobs WHERE id=?',(job_id,))
     if not row or row['status'] not in {'queued','running'}:raise DomainError('Este trabajo no admite cancelación.',409)
     if row['kind']=='delete':raise DomainError('La eliminación no se cancela a mitad de camino. Si falla puede reintentarse.',409)
-    s.db.execute('UPDATE jobs SET cancel_requested=1 WHERE id=?',(job_id,));s.db.audit(g.user['id'],'JOB_CANCEL_REQUESTED',job_id)
+    s.jobs.cancel(job_id);s.db.audit(g.user['id'],'JOB_CANCEL_REQUESTED',job_id)
     flash('Cancelación solicitada. Se aplicará en el siguiente límite seguro del trabajo.','success')
     return redirect(url_for('admin.job_detail',job_id=job_id))
 
@@ -265,7 +272,7 @@ def retry_job(job_id):
         if not row or row['status'] not in {'failed','cancelled'}:raise DomainError('Este trabajo no admite reintento.',409)
         if row['kind']=='delete' and g.user['role']!='owner':raise DomainError('Solo un administrador propietario puede eliminar bases.',403)
         if row['base_id'] and db.execute("SELECT 1 FROM jobs WHERE base_id=? AND status IN ('queued','running')",(row['base_id'],)).fetchone():raise DomainError('Ya existe un trabajo pendiente para esta base.',409)
-        db.execute("UPDATE jobs SET status='queued',attempts=0,available_at=0,cancel_requested=0,lease_until=NULL,owner_token=NULL,error=NULL,finished_at=NULL,message='Reintento solicitado' WHERE id=?",(job_id,))
+    s.jobs.retry(job_id)
     s.jobs.wake.set();s.db.audit(g.user['id'],'JOB_RETRY',job_id)
     return redirect(url_for('admin.job_detail',job_id=job_id))
 
@@ -341,18 +348,52 @@ def models():
 def diagnostics():
     import psutil
     s=services();s.security.rate_limit('diagnostics:'+g.user['id'],10,60)
-    vector_store_ok=False
-    try:s.vector_store.health();vector_store_ok=True
-    except Exception:pass
-    disk=psutil.disk_usage(str(s.cfg.data_dir))
+    report=s.installation.inspect()
+    vector_store_ok=bool(report.get('lance',{}).get('active_index',{}).get('ready'))
+    disk=psutil.disk_usage(str(s.cfg.data_dir)) if s.cfg.data_dir.exists() else None
     active=s.knowledge.active()
-    engine=s.rag.engine_for(json.loads(active['profile_json'])) if active else s.embeddings
+    try:engine=s.rag.engine_for(json.loads(active['profile_json'])) if active else s.embeddings
+    except (DomainError,ValueError,KeyError,TypeError):engine=s.embeddings
     return jsonify(model_loaded=engine.model is not None,profile=engine.profile,
         build_model_loaded=s.embeddings.model is not None,build_profile=s.embeddings.profile,
         vector_store_ok=vector_store_ok,knowledge=s.rag.recovery.status(active),ollama_token_configured=bool(s.cfg.ollama_api_key),smtp_configured=bool(s.cfg.smtp_host),
         worker_alive=bool(s.jobs.thread and s.jobs.thread.is_alive()),
-        process_rss_mib=round(psutil.Process().memory_info().rss/1024**2,1),data_disk_free_mib=round(disk.free/1024**2,1),
+        worker=s.jobs.status(),installation=report,
+        process_rss_mib=round(psutil.Process().memory_info().rss/1024**2,1),data_disk_free_mib=round(disk.free/1024**2,1) if disk else None,
         database_mib=s.db.size_mib(),note='RAM del proceso, no de todo el VPS. No se realizó una generación de pago.')
+
+
+def _installation_summary(report):
+    return {key:report.get(key) for key in
+            ('state','code','message','action','report_id','boot_id','checked_at')}
+
+
+@bp.get('/diagnostics')
+@access()
+def diagnostics_page():
+    s=services()
+    report=s.installation.inspect()
+    rows=s.db.all('SELECT id,at,boot_id,job_id,event,level,code,stage,details_json '
+                  'FROM operational_events ORDER BY at DESC LIMIT 100')
+    for row in rows:
+        try:row['details']=json.loads(row['details_json'])
+        except (ValueError,TypeError):row['details']={'code':'event_details_invalid'}
+    return render_template('diagnostics.html',report=report,events=rows,worker=s.jobs.status())
+
+
+@bp.get('/api/operations')
+@access()
+def operation_events():
+    s=services();s.security.rate_limit('operations:'+g.user['id'],20,60)
+    job_id=request.args.get('job_id')
+    sql='SELECT id,at,boot_id,job_id,request_id,event,level,code,stage,details_json FROM operational_events'
+    args=()
+    if job_id:sql+=' WHERE job_id=?';args=(job_id,)
+    rows=s.db.all(sql+' ORDER BY at DESC LIMIT 100',args)
+    for row in rows:
+        try:row['details']=json.loads(row.pop('details_json'))
+        except (ValueError,TypeError):row['details']={'code':'event_details_invalid'}
+    return jsonify(events=rows)
 
 
 @bp.post('/warmup')

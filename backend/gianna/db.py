@@ -144,6 +144,7 @@ class Database:
                 pool_size=10,
                 max_overflow=10,
                 pool_timeout=30,
+                hide_parameters=True,
                 connect_args={'connect_timeout': 10},
             )
             db_name = self.target.rsplit('/', 1)[-1].split('?', 1)[0]
@@ -167,26 +168,84 @@ class Database:
                 db.execute(statement)
 
     def migrate(self):
+        import logging
+        from .errors import DomainError
+        from .observability import event, safe_exception
+        logger = logging.getLogger(__name__)
         migrations = Path(__file__).parent / ('migrations_mariadb' if self.is_mariadb else 'migrations')
+        paths = sorted(migrations.glob('*.sql'))
+        expected = [int(path.stem) for path in paths]
         with closing(self.connect()) as db:
-            if self.is_mariadb:
-                db.execute('CREATE TABLE IF NOT EXISTS schema_versions(version INTEGER PRIMARY KEY,applied_at DOUBLE NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')
-                db.commit()
-            else:
-                db.execute('PRAGMA journal_mode=WAL')
-                db.execute('CREATE TABLE IF NOT EXISTS schema_versions(version INTEGER PRIMARY KEY,applied_at REAL NOT NULL)')
-            current = db.execute('SELECT COALESCE(MAX(version),0) FROM schema_versions').fetchone()[0]
-            for path in sorted(migrations.glob('*.sql')):
-                version = int(path.stem)
-                if version <= current:
-                    continue
-                source = path.read_text(encoding='utf-8')
+            locked = False
+            current = None
+            try:
                 if self.is_mariadb:
-                    self._execute_statements(db, source)
-                    db.execute('INSERT INTO schema_versions(version,applied_at) VALUES(?,?)', (version, time.time()))
+                    locked = db.execute('SELECT GET_LOCK(?,30)', (self._lock_name + ':schema',)).fetchone()[0] == 1
+                    if not locked:
+                        raise DomainError('Otra instancia está actualizando el esquema.', 503, 'database_migration_busy')
+                    existing=db.execute('SELECT TABLE_NAME AS name FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE()').fetchall()
+                    names={row['name'] for row in existing}
+                    if names and 'schema_versions' not in names:
+                        code='database_history_missing' if {'bases','versions','active_knowledge'}<=names else 'database_namespace_conflict'
+                        event(logger,'database.namespace_blocked',level=logging.ERROR,code=code,existing_tables=len(names))
+                        raise DomainError('La base tiene tablas previas sin un historial verificable de Gianna. Revisá la conexión y el respaldo antes de migrar.',503,code)
+                    db.execute('CREATE TABLE IF NOT EXISTS schema_versions(version INTEGER PRIMARY KEY,applied_at DOUBLE NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')
                     db.commit()
                 else:
-                    db.executescript(f'BEGIN IMMEDIATE;\n{source}\nINSERT INTO schema_versions VALUES({version},{time.time()});\nCOMMIT;')
+                    db.execute('PRAGMA journal_mode=WAL')
+                    db.execute('CREATE TABLE IF NOT EXISTS schema_versions(version INTEGER PRIMARY KEY,applied_at REAL NOT NULL)')
+                applied = [row[0] for row in db.execute('SELECT version FROM schema_versions ORDER BY version').fetchall()]
+                if any(version not in expected for version in applied):
+                    raise DomainError('El esquema es más nuevo que esta imagen; usá una imagen compatible.', 503, 'database_schema_newer')
+                if applied and applied != expected[:len(applied)]:
+                    raise DomainError('El historial de migraciones tiene huecos; se requiere revisar su respaldo.', 503, 'database_schema_history_invalid')
+                event(logger, 'database.schema_inspected', engine='mariadb' if self.is_mariadb else 'sqlite',
+                      applied=applied, pending=expected[len(applied):])
+                if self.is_mariadb and applied:
+                    from .schema_review import review_schema
+                    baseline=review_schema(db,True)
+                    event(logger,'database.baseline_inspected',missing_columns=baseline['missing_columns'],
+                          default_drift=baseline['default_drift'])
+                    if baseline['requires_restore']:
+                        problem=DomainError('Faltan columnas de datos existentes; se requiere restaurar el esquema antes de migrar.',503,'database_schema_incompatible')
+                        problem.details=baseline
+                        raise problem
+                for path in paths[len(applied):]:
+                    current = int(path.stem)
+                    began = time.perf_counter()
+                    event(logger, 'database.migration_started', revision=current)
+                    source = path.read_text(encoding='utf-8')
+                    if self.is_mariadb:
+                        # MariaDB DDL can commit independently. Migrations must be
+                        # restartable; history is recorded only after completion.
+                        self._execute_statements(db, source)
+                        db.execute('INSERT INTO schema_versions(version,applied_at) VALUES(?,?)', (current, time.time()))
+                        db.commit()
+                    else:
+                        db.executescript(f'BEGIN IMMEDIATE;\n{source}\nINSERT INTO schema_versions VALUES({current},{time.time()});\nCOMMIT;')
+                    event(logger, 'database.migration_completed', revision=current,
+                          duration_ms=round((time.perf_counter() - began) * 1000, 2))
+                from .schema_review import review_schema
+                layout=review_schema(db,self.is_mariadb,apply=True)
+                if layout['repairs']:
+                    event(logger,'database.layout_repaired',revisions=layout['repairs'])
+                if not layout['ok']:
+                    event(logger,'database.layout_invalid',level=logging.ERROR,
+                          code=layout['code'],missing_columns=layout['missing_columns'],
+                          default_drift=layout['default_drift'])
+                    problem=DomainError('El esquema físico no coincide con el contrato de esta imagen.',503,'database_schema_incompatible')
+                    problem.details=layout
+                    raise problem
+            except Exception as exc:
+                event(logger, 'database.migration_failed', level=logging.ERROR,
+                      revision=current, exception=safe_exception(exc))
+                raise
+            finally:
+                if locked:
+                    try:db.execute('SELECT RELEASE_LOCK(?)', (self._lock_name + ':schema',)).fetchone()
+                    except Exception as exc:
+                        event(logger, 'database.migration_unlock_failed', level=logging.WARNING,
+                              exception=safe_exception(exc))
         if self.path:
             try:
                 self.path.chmod(0o600)
@@ -197,6 +256,11 @@ class Database:
         with self.tx() as db:
             row = db.execute(sql, args).fetchone()
             return dict(row) if row is not None else None
+
+    def review_schema(self):
+        from .schema_review import review_schema
+        with self.tx() as connection:
+            return review_schema(connection,self.is_mariadb)
 
     def all(self, sql, args=()):
         with self.tx() as db:

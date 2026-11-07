@@ -16,6 +16,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from pydantic import ValidationError
 from sqlalchemy.exc import OperationalError as SQLOperationalError, TimeoutError as SQLTimeoutError
 from .config import Config
+from . import __version__
 from .db import Database, IntegrityError
 from .errors import DomainError
 from .security import Security
@@ -24,6 +25,10 @@ from .services.runtime import Embeddings, LanceStore, Ollama
 from .services.jobs import Jobs
 from .services.rag import RAG
 from .services.settings import get_settings
+from .services.installation import Installation
+from .observability import bind_context, configure_logging, event, safe_exception
+
+LOG = logging.getLogger(__name__)
 
 
 def smtp_sender(cfg):
@@ -47,7 +52,17 @@ def smtp_sender(cfg):
 
 
 def create_app(overrides=None):
-    cfg=overrides if isinstance(overrides,Config) else Config.from_env(overrides)
+    configure_logging()
+    event(LOG, 'application.bootstrap_started')
+    try:
+        cfg=overrides if isinstance(overrides,Config) else Config.from_env(overrides,initialize_storage=False)
+        configure_logging(cfg)
+        db=Database(cfg.database_target)
+        db.migrate()
+    except Exception as exc:
+        event(LOG, 'application.bootstrap_failed', level=logging.ERROR,
+              stage='configuration_or_schema', exception=safe_exception(exc))
+        raise
     app=Flask(__name__)
     app.config.update(SECRET_KEY=cfg.secret_key,MAX_CONTENT_LENGTH=cfg.max_upload_mb*1024*1024,
         MAX_FORM_MEMORY_SIZE=1024*1024,MAX_FORM_PARTS=100,
@@ -57,17 +72,24 @@ def create_app(overrides=None):
     if cfg.proxy_hops:
         # Only enable behind a trusted proxy which overwrites incoming forwarding headers.
         app.wsgi_app=ProxyFix(app.wsgi_app,x_for=cfg.proxy_hops,x_proto=cfg.proxy_hops,x_host=0,x_port=0,x_prefix=0)
-    db=Database(cfg.database_target);db.migrate()
     security=Security(db,cfg,smtp_sender(cfg));knowledge=Knowledge(db,cfg)
     embeddings=Embeddings(cfg);vector_store=LanceStore(cfg);ollama=Ollama(cfg)
     rag=RAG(db,cfg,knowledge,embeddings,vector_store,ollama,security)
     jobs=Jobs(db,cfg,knowledge,embeddings,vector_store,rag)
+    installation=Installation(db,cfg,knowledge,vector_store,rag.recovery)
+    jobs.installation=installation
     app.extensions['gianna']=SimpleNamespace(cfg=cfg,db=db,security=security,knowledge=knowledge,
-        embeddings=embeddings,vector_store=vector_store,ollama=ollama,rag=rag,jobs=jobs)
+        embeddings=embeddings,vector_store=vector_store,ollama=ollama,rag=rag,jobs=jobs,installation=installation)
+    event(LOG, 'application.bootstrap_completed', version=__version__, worker_enabled=cfg.worker_enabled,
+          data_dir=str(cfg.data_dir), database_engine='mariadb' if db.is_mariadb else 'sqlite',
+          next_stage='installation_preflight')
 
     @app.before_request
     def request_security():
         g.request_id=secrets.token_hex(12);g.user=None
+        g.request_started=time.perf_counter()
+        g.log_context=bind_context(request_id=g.request_id)
+        g.log_context.__enter__()
         if request.path.startswith('/admin'):
             sid=session.get('sid')
             if sid:g.user=security.session_user(sid)
@@ -105,12 +127,22 @@ def create_app(overrides=None):
                 response.headers['Access-Control-Allow-Headers']='Authorization, Content-Type'
                 response.headers['Access-Control-Allow-Methods']='POST, GET, DELETE, OPTIONS'
                 response.headers['Access-Control-Max-Age']='600'
+        route=request.url_rule.rule if request.url_rule else 'unmatched'
+        event(LOG, 'http.request_completed',
+              level=logging.WARNING if response.status_code>=400 else logging.INFO,
+              method=request.method, route=route, status=response.status_code,
+              duration_ms=round((time.perf_counter()-g.get('request_started',time.perf_counter()))*1000,2))
         return response
+
+    @app.teardown_request
+    def release_log_context(error):
+        context=g.pop('log_context',None)
+        if context:context.__exit__(None,None,None)
 
     @app.context_processor
     def context():
         return dict(user=g.get('user'),settings=get_settings(db,cfg),csrf_token=lambda:session.get('csrf',''),
-                    version='1.0.0-rc1')
+                    version=__version__)
 
     @app.template_filter('when')
     def when(value):
@@ -134,7 +166,10 @@ def create_app(overrides=None):
         return response
 
     @app.errorhandler(DomainError)
-    def domain_error(exc):return render_error(str(exc),exc.status,exc.code)
+    def domain_error(exc):
+        event(LOG, 'http.operation_rejected', level=logging.WARNING,
+              code=exc.code, status=exc.status, exception=safe_exception(exc))
+        return render_error(str(exc),exc.status,exc.code)
 
     @app.errorhandler(ValidationError)
     def validation_error(exc):
@@ -148,7 +183,8 @@ def create_app(overrides=None):
     @app.errorhandler(SQLOperationalError)
     @app.errorhandler(SQLTimeoutError)
     def database_unavailable(exc):
-        logging.getLogger(__name__).warning('Base de datos no disponible; request_id=%s',g.get('request_id'))
+        event(LOG, 'http.database_unavailable', level=logging.ERROR,
+              code='database_unavailable', exception=safe_exception(exc))
         # Avoid error.html: its context processor also reads SQL.
         return jsonify(error={'message':'El servicio de datos no está disponible temporalmente.',
                               'code':'database_unavailable','request_id':g.get('request_id')}),503
@@ -165,7 +201,8 @@ def create_app(overrides=None):
 
     @app.errorhandler(Exception)
     def unexpected_error(exc):
-        logging.getLogger(__name__).exception('Error no controlado; request_id=%s',g.get('request_id'))
+        event(LOG, 'http.unexpected_error', level=logging.ERROR,
+              code='internal_error', exception=safe_exception(exc))
         return render_error('No se pudo completar la operación. El identificador de solicitud permite revisar el registro técnico.',500,'internal_error')
 
     @app.get('/health/live')
@@ -181,6 +218,11 @@ def create_app(overrides=None):
     def knowledge_health():
         health=rag.recovery.status()
         return jsonify(health),200 if health['available'] else 503
+
+    @app.get('/health/installation')
+    def installation_health():
+        health=installation.public_status()
+        return jsonify(health),200 if health['state'] in {'empty','ready','recoverable'} else 503
 
     from .routes.auth import bp as auth
     from .routes.admin import bp as admin

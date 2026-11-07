@@ -1,6 +1,34 @@
 # Despliegue con Coolify
 
-El portal y la API se despliegan desde sus repositorios separados: `invest-lavalleja-frontend` e `invest-lavalleja-backend`. Esta configuración está preparada para un único VPS y una instancia de API; debe validarse en Coolify antes de abrir el servicio al público.
+## Verificación de la instalación existente
+
+La candidata `1.0.0-rc2` incorpora inventario previo a la cola, revisión del esquema
+físico y recuperación de la publicación existente. Antes de cambiar un recurso,
+conservar el respaldo y los montajes descritos en [recuperación](RECUPERACION.md).
+La estructura y la matriz de decisiones están en [arranque y diagnóstico](INSTALACION_Y_DIAGNOSTICO.md).
+
+`DATA_DIR` no necesita agregarse al entorno habitual: su destino predeterminado es
+`/app/data`. Si el recurso usa Dockerfile, debe tener el volumen persistente
+configurado en Coolify; Dockerfile por sí solo no lo crea. Un montaje ausente
+ahora permite abrir Diagnóstico y consultar su causa, pero mantiene bloqueadas
+las escrituras. El programa no puede crear por sí mismo un volumen en el VPS.
+
+Verificar la imagen por commit y su CI completo antes de habilitar un despliegue.
+Los jobs de pruebas incluyen MariaDB real, recuperación de contenedores y los dos
+motores de navegador para el panel. No confundir `/health/live` con recuperación
+del conocimiento: revisar también `/health/installation` y `/health/knowledge`.
+
+En `NebyX1/invest-lavalleja`, el backend está en `backend/`. Para construir la API
+desde este repositorio, usar `backend/` como contexto de construcción y su
+`Dockerfile`: el comando equivalente es `docker build -f backend/Dockerfile backend`
+desde la raíz. El Dockerfile de la raíz construye el portal. Los comandos Python
+y Compose de este documento se ejecutan desde `backend/`.
+
+Los repositorios independientes `invest-lavalleja-frontend` e
+`invest-lavalleja-backend` tienen su propio historial; una publicación en uno no
+actualiza automáticamente los otros. Esta configuración está preparada para un
+único VPS y una instancia de API; debe validarse en Coolify antes de abrir el
+servicio al público.
 
 Para una instalación existente, seguir primero [persistencia, recuperación y rollback](RECUPERACION.md). No cambiar el nombre del volumen ni el build pack sin inspeccionar y respaldar los datos. La declaración de un volumen en el repositorio no acredita que el recurso productivo lo esté utilizando.
 

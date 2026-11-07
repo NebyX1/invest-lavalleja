@@ -1,0 +1,229 @@
+{
+  "active_knowledge": [
+    "singleton",
+    "version_id"
+  ],
+  "admin_sessions": [
+    "created_at",
+    "expires_at",
+    "id_hash",
+    "reauthenticated_at",
+    "touched_at",
+    "user_id"
+  ],
+  "audit": [
+    "action",
+    "at",
+    "details_json",
+    "id",
+    "target",
+    "user_id"
+  ],
+  "auth_challenges": [
+    "attempts",
+    "code_hash",
+    "consumed",
+    "expires_at",
+    "id",
+    "kind",
+    "secret",
+    "user_id"
+  ],
+  "bases": [
+    "created_at",
+    "description",
+    "document_json",
+    "id",
+    "name",
+    "report_json",
+    "revision",
+    "source_filename",
+    "source_sha256",
+    "status",
+    "updated_at"
+  ],
+  "captcha_challenges": [
+    "answer_digest",
+    "expires_at",
+    "id_hash",
+    "origin",
+    "purpose"
+  ],
+  "chat_sessions": [
+    "busy_until",
+    "created_at",
+    "expires_at",
+    "history_encrypted",
+    "id_hash",
+    "origin"
+  ],
+  "chunks": [
+    "content_json",
+    "embedding_hash",
+    "id",
+    "position",
+    "projection_x",
+    "projection_y",
+    "record_key",
+    "text",
+    "title",
+    "token_count",
+    "topic",
+    "vector_json",
+    "version_id"
+  ],
+  "embedding_cache": [
+    "created_at",
+    "dense_json",
+    "embedding_hash",
+    "fingerprint",
+    "sparse_json"
+  ],
+  "job_events": [
+    "at",
+    "attempt",
+    "boot_id",
+    "code",
+    "details_json",
+    "event",
+    "id",
+    "job_id",
+    "message",
+    "stage"
+  ],
+  "jobs": [
+    "action",
+    "attempts",
+    "available_at",
+    "base_id",
+    "boot_id",
+    "cancel_requested",
+    "created_at",
+    "error",
+    "error_code",
+    "error_stage",
+    "finished_at",
+    "heartbeat_at",
+    "id",
+    "kind",
+    "last_attempt_at",
+    "lease_until",
+    "message",
+    "owner_token",
+    "payload_json",
+    "progress",
+    "recovery_boot_id",
+    "result_json",
+    "retryable",
+    "stage",
+    "started_at",
+    "status",
+    "total",
+    "version_id"
+  ],
+  "operational_events": [
+    "at",
+    "boot_id",
+    "code",
+    "details_json",
+    "event",
+    "id",
+    "job_id",
+    "level",
+    "request_id",
+    "stage"
+  ],
+  "queries": [
+    "at",
+    "cited_source_ids_json",
+    "error_code",
+    "feedback",
+    "generation_ms",
+    "id",
+    "mode",
+    "output_tokens",
+    "prompt_tokens",
+    "question_hash",
+    "retrieval_ms",
+    "retrieval_trace_json",
+    "session_hash",
+    "source_ids_json",
+    "status",
+    "topic",
+    "total_ms",
+    "version_id"
+  ],
+  "rate_limits": [
+    "bucket",
+    "count",
+    "key"
+  ],
+  "records": [
+    "approved",
+    "audience",
+    "base_id",
+    "content_json",
+    "enabled",
+    "evidence_type",
+    "id",
+    "record_key",
+    "reviewed_by",
+    "title",
+    "topic",
+    "updated_at"
+  ],
+  "recovery_codes": [
+    "code_hash",
+    "user_id"
+  ],
+  "schema_versions": [
+    "applied_at",
+    "version"
+  ],
+  "settings": [
+    "key",
+    "value"
+  ],
+  "sources": [
+    "base_id",
+    "content_json",
+    "source_key"
+  ],
+  "users": [
+    "active",
+    "created_at",
+    "email",
+    "id",
+    "last_login",
+    "mfa_enrolled",
+    "mfa_method",
+    "must_change_password",
+    "name",
+    "password_hash",
+    "role",
+    "totp_last_step",
+    "totp_secret"
+  ],
+  "version_records": [
+    "content_json",
+    "record_key",
+    "version_id"
+  ],
+  "version_sources": [
+    "content_json",
+    "source_key",
+    "version_id"
+  ],
+  "versions": [
+    "base_id",
+    "chunk_count",
+    "collection_name",
+    "created_at",
+    "id",
+    "profile_json",
+    "published_at",
+    "report_json",
+    "revision",
+    "status"
+  ]
+}

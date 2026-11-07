@@ -5,6 +5,7 @@ data/
 !tests/data/
 !tests/data/retrieval_cases.json
 .venv/
+node_modules/
 venv/
 __pycache__/
 *.py[cod]
