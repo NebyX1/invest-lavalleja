@@ -5,6 +5,7 @@ recuperación, herramientas acotadas, citas y degradación sin proveedor.
 """
 import hashlib
 import json
+import re
 import time
 
 import numpy as np
@@ -115,10 +116,29 @@ class FakeOllama:
             return {'content':'','tool_calls':[{'function':{'name':'evaluar_seguridad','arguments':{
                 'decision':'allow','risk':'none','minors':'not_relevant','adult_access':'not_relevant'}}}]}, {}, 'mock'
         self.calls.append({'messages': messages, 'tools': tools, 'timeout': timeout})
+        names={t['function']['name'] for t in tools or []}
+        if 'interpretar_pedido' in names:
+            payload=json.loads(messages[1]['content'])
+            query=' '.join(m['content'] for m in payload['history'] if m['role']=='user')+' '+payload['question']
+            return {'content':'','tool_calls':[{'function':{'name':'interpretar_pedido','arguments':{
+                'asks':[{'text':payload['question'],'kind':'description'}], 'query':query.strip()[:500]}}}]}, {}, 'mock'
         if self.fail:
             raise DomainError('Proveedor no disponible.', 503, 'ollama_unavailable')
+        if 'comprobar_afirmaciones' in names:
+            payload=json.loads(messages[1]['content'])
+            return {'content':'','tool_calls':[{'function':{'name':'comprobar_afirmaciones','arguments':{
+                'checks':[{'statement':i,'function':'information','supported':True,'answers_ask':True,
+                           'informative':True,'material_conditions_preserved':True}
+                          for i in range(len(payload['statements']))], 'missing_asks':[]}}}]}, {}, 'mock'
         if self.responses:
             message = self.responses.pop(0)
+        elif 'redactar_informacion' in names:
+            payload=json.loads(messages[1]['content'])
+            quote=payload['evidence_text'].splitlines()[2][:100]
+            n=int(re.search(r'\[(\d+)\]',payload['evidence_text'])[1])
+            message={'content':'','tool_calls':[{'function':{'name':'redactar_informacion','arguments':{
+                'statements':[{'ask':0,'paragraph':0,'kind':'fact','text':self.answer.replace('[1]','').strip(),
+                               'support':[{'source':n,'quote':quote}]}]}}}]}
         else:
             message = {'content': self.answer, 'tool_calls': []}
         return message, {'prompt_tokens': 40, 'output_tokens': 10}, 'mock'
@@ -216,12 +236,11 @@ def test_agent_can_call_the_search_tool_and_cite_new_evidence(db, cfg, knowledge
     ollama.responses = [
         {'content': '', 'tool_calls': [{'function': {
             'name': 'buscar_en_la_guia', 'arguments': {'consulta': 'poscosecha'}}}]},
-        {'content': 'La poscosecha es una hipótesis a validar [1].', 'tool_calls': []},
     ]
     result = rag.answer('¿Qué información hay sobre poscosecha?', Settings(model='mock'))
     assert result['status'] == 'answered'
-    assert result['citations'] and result['timings']['model_requests'] == 3
-    assert len(ollama.calls) == 2
+    assert result['citations'] and result['timings']['model_requests'] == 5
+    assert len(ollama.calls) == 4
 
 
 def test_agent_degrades_to_cards_when_the_provider_fails(db, cfg, knowledge, security, corpus):
@@ -237,9 +256,9 @@ def test_agent_degrades_to_cards_when_the_provider_fails(db, cfg, knowledge, sec
 def test_answer_without_citations_is_insufficient_when_it_denies_coverage(db, cfg, knowledge, security, corpus):
     _, version_id, _, _, ollama, rag, _ = build_system(db, cfg, knowledge, security, corpus)
     knowledge.activate(version_id, 'actor')
-    ollama.answer = 'La guía no documenta ese dato.'
+    ollama.responses = [{'content':'La guía no documenta ese dato.','tool_calls':[]}]*3
     result = rag.answer('¿Qué condiciones tiene la oportunidad?', Settings(model='mock'))
-    assert result['status'] == 'insufficient_evidence' and not result['citations']
+    assert result['status'] == 'degraded' and 'La guía no documenta ese dato.' not in result['answer']
 
 
 def test_followup_search_uses_the_previous_user_question(db, cfg, knowledge, security, corpus):
@@ -249,7 +268,7 @@ def test_followup_search_uses_the_previous_user_question(db, cfg, knowledge, sec
                {'role': 'assistant', 'content': 'Hay oportunidades en el norte.'}]
     rag.answer('¿Y en Minas?', Settings(model='mock'), history=history)
     assert any('Quiero invertir en el norte' in query for query in embeddings.queries)
-    assert any(message['role'] == 'assistant' for message in ollama.calls[-1]['messages'])
+    assert json.loads(ollama.calls[1]['messages'][1]['content'])['history'] == history
 
 
 def test_social_greeting_does_not_search_or_cite(db, cfg, knowledge, security, corpus):

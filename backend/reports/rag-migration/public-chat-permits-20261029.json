@@ -1,0 +1,60 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 2,
+  "total": 2,
+  "results": [
+    {
+      "question": "Quiero invertir poniendo un boliche, ¿qué debo revisar antes de alquilar?",
+      "id": "674fb99c5acb4bf9a5072da8a2a6e1de",
+      "status": "answered",
+      "answer": "Antes de alquilar un local bailable conviene revisar el uso del suelo por padrón, dimensiones, obras, ampliación, ocupación y protección aplicable ante Arquitectura y ordenamiento territorial de la Intendencia. También el proyecto, medidas e inspecciones de incendio con Bomberos y técnicos habilitados antes de ocupar u operar, y si la actividad está sujeta a autorización ambiental previa (AAP) ante DINACEA, con categoría y estudios según corresponda. Una habilitación no reemplaza a otra, y el contrato de arrendamiento debe tratar los riesgos identificados con asesoramiento.",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s29-01-03",
+        "s29-01-10",
+        "s26-03-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 25201.6,
+        "retrieval_ms": 4171.08
+      },
+      "total_ms": 29559.05
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "13a4fea423d44f268da89ca61fdffb11",
+      "status": "answered",
+      "answer": "Para un local bailable en Minas, la información disponible no documenta un requisito específico para ocio nocturno, pero sí los frentes a comprobar antes de alquilar: en suelo y edificación, ante la Intendencia por Arquitectura y ordenamiento territorial, el uso por padrón, dimensiones, obras, ampliación, ocupación y protección aplicable; en incendios y seguridad, ante Bomberos y técnicos habilitados, proyecto, medidas, inspecciones y condiciones antes de ocupar u operar; en ambiente, ante el Ministerio de Ambiente (DINACEA), si la actividad está sujeta a autorización ambiental previa, con categoría y estudios. Una habilitación no reemplaza a otra.",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s29-01-03",
+        "s29-01-10"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "clarification": true
+      },
+      "timings": {
+        "generation_ms": 1548.84,
+        "retrieval_ms": 5901.45
+      },
+      "total_ms": 7631.5
+    }
+  ]
+}

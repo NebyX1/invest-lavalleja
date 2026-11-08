@@ -1,0 +1,113 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 5,
+  "total": 5,
+  "results": [
+    {
+      "question": "Hola",
+      "id": "66e0760015c04e2cb195725c28a4e90c",
+      "status": "conversation",
+      "answer": "Hola. ¿Qué información sobre inversiones en Lavalleja necesitás consultar?",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 77.33
+    },
+    {
+      "question": "¿Cómo estás?",
+      "id": "15897449fabf405684499be85237bb54",
+      "status": "conversation",
+      "answer": "Todo bien por acá. Contame qué querés consultar sobre inversiones en Lavalleja.",
+      "citation_record_ids": [],
+      "checks": {
+        "conversation": true,
+        "no_sources": true,
+        "brief": true,
+        "no_repeated_mission": true
+      },
+      "timings": null,
+      "total_ms": 75.49
+    },
+    {
+      "question": "¿Qué me recomendás para invertir en el norte?",
+      "id": "cf92df930b4345bfb2d32c2b87c57a90",
+      "status": "answered",
+      "answer": "En el norte, la información disponible documenta para José Pedro Varela y su entorno de abastecimiento negocios vinculados al grano: poscosecha, medición y eficiencia en granos, y también mantenimiento y automatización industrial y subproductos con circularidad contratada, todos como posibilidades a validar con operadores. Para José Batlle y Ordóñez, Zapicán y entorno se plantea como posibilidad la inversión en servicios rurales y mantenimiento móvil, con rutas programadas y base fija solo después de probar densidad de clientes. No tengo documentada disponibilidad, precios ni ubicaciones concretas para invertir en esas zonas.",
+      "citation_record_ids": [
+        "O03",
+        "O12",
+        "O11",
+        "O01",
+        "s14-01-01",
+        "s15-01-01"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "no_winner_language": true,
+        "no_distractors": true,
+        "single_question": true,
+        "north_choices": true
+      },
+      "timings": {
+        "generation_ms": 1791.28,
+        "retrieval_ms": 5487.61
+      },
+      "total_ms": 7444.86
+    },
+    {
+      "question": "Profundiza con Varela",
+      "id": "e3e8c631210d4667b4ed24298bdcca06",
+      "status": "answered",
+      "answer": "José Pedro Varela y su entorno es una microregión arrocera histórica, con referencia de semillas y actividad apícola. Las líneas que pueden evaluarse son riego, secado y acopio, semillas, calidad, miel, eficiencia de bombeo y logística, y el antecedente industrial de SAMAN sugiere negocios próximos a la cadena como medición de calidad, eficiencia de secado, confiabilidad, trazabilidad, almacenamiento y logística. Son posibilidad a validar: no está documentado suelo disponible, demanda ni conexión, y hay que confirmar con operadores volumen disponible, capacidad utilizada y libre, titularidad de subproductos y condiciones contractuales.",
+      "citation_record_ids": [
+        "s14-01-01",
+        "territorio-20261019-z5"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "no_winner_language": true,
+        "no_distractors": true,
+        "single_question": true
+      },
+      "timings": {
+        "generation_ms": 1463.25,
+        "retrieval_ms": 4968.22
+      },
+      "total_ms": 6550.34
+    },
+    {
+      "question": "¿Cómo arranco?",
+      "id": "7609155bb9ba4fe880cc02d4c6a581f5",
+      "status": "answered",
+      "answer": "Para suelo y edificación, la ruta es la Intendencia por Arquitectura y ordenamiento territorial, y antes de ejecutar conviene verificar el uso por padrón, las dimensiones, las obras, la ampliación, la ocupación y la protección aplicable. En ambiente, el procedimiento de Autorización Ambiental Previa que publica Ambiente distingue actividades alcanzadas, clasificación y estudios: las categorías B y C requieren evaluación de impacto, y el proyecto debe encuadrarse con responsable técnico. Bomberos y Turismo son rutas de consulta necesarias según la actividad, aunque los detalles de esos trámites no están verificados en esta edición. Tené en cuenta que una habilitación no reemplaza a otra: constituir una sociedad no autoriza obra, registrar alimentos no acredita todos los permisos del establecimiento y obtener beneficios de inversión no habilita el uso de suelo.",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-10"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "concise": true,
+        "no_distractors": true,
+        "single_question": true,
+        "requirements_first": true,
+        "action_first": true,
+        "short_next_step": true
+      },
+      "timings": {
+        "generation_ms": 1537.19,
+        "retrieval_ms": 4916.25
+      },
+      "total_ms": 6603.56
+    }
+  ]
+}

@@ -1,0 +1,558 @@
+[
+  {
+    "id": "ind24-01-empleo-periodo-universos",
+    "question": "Para una presentación de 2026 necesito las tasas de empleo y desempleo de Lavalleja. ¿Qué valores y año trae la guía, y se pueden sumar como porcentajes de una misma población?",
+    "groups": [
+      [
+        "s05-01-04"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s05-01-04",
+        "text": "Empleo 55%; desempleo 5,7%; año 2024"
+      },
+      {
+        "record_id": "s05-01-04",
+        "text": "Son indicadores distintos, no porcentajes del mismo universo."
+      }
+    ],
+    "rationale": "Dato laboral poco cubierto; exige porcentajes, período y diferencia de universos.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-02-exportaciones-composicion",
+    "question": "¿Cómo se repartían las exportaciones de bienes de 2025 entre madera, soja, arroz y cemento y cal? ¿Esas proporciones sirven para comparar empleo o rentabilidad de los sectores?",
+    "groups": [
+      [
+        "s05-01-06"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s05-01-06",
+        "text": "Madera 45%; soja 25%; arroz 14%; cemento y cal 13%; 2025"
+      },
+      {
+        "record_id": "s05-01-06",
+        "text": "Participaciones redondeadas; no miden empleo ni rentabilidad sectorial."
+      }
+    ],
+    "rationale": "Evalúa composición y alcance estadístico, en lugar del total exportado ya evaluado.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-03-molcemin-monto-alcance",
+    "question": "En el caso Molcemin–Integrados de Minas, ¿cuándo se concretó la inversión, qué monto se informa y a qué parte del proceso corresponde la reducción del consumo eléctrico?",
+    "groups": [
+      [
+        "s07-01-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s07-01-01",
+        "text": "proyecto Molcemin–Integrados, concretado en 2023."
+      },
+      {
+        "record_id": "s07-01-01",
+        "text": "inversión de aproximadamente US$ 40 millones"
+      },
+      {
+        "record_id": "s07-01-01",
+        "text": "una reducción del consumo eléctrico de alrededor del 40% en el proceso de molienda."
+      },
+      {
+        "record_id": "s07-01-01",
+        "text": "No corresponde trasladar ese porcentaje al consumo de toda la planta."
+      }
+    ],
+    "rationale": "Exige año, moneda, aproximaciones y límite del ahorro reportado.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-04-geoparque-superficie-fecha",
+    "question": "Voy a describir el reconocimiento de Manantiales Serranos en un folleto. ¿Qué año y superficie debo citar, y esa superficie abarca todo Lavalleja?",
+    "groups": [
+      [
+        "s05-01-07"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s05-01-07",
+        "text": "Designación UNESCO 2026; 201.000 ha"
+      },
+      {
+        "record_id": "s05-01-07",
+        "text": "Ámbito del geoparque; no todo el departamento."
+      }
+    ],
+    "rationale": "Evalúa fecha, hectáreas y perímetro, distinto de la habilitación para construir.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-05-ue-acuerdo-condiciones",
+    "question": "Quiero exportar un alimento a la Unión Europea. ¿Desde qué fecha menciona la guía la aplicación provisional del acuerdo y qué debo revisar antes de prometer una entrada sin aranceles?",
+    "groups": [
+      [
+        "s06-05-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s06-05-01",
+        "text": "aplicación provisional del acuerdo comercial interino Mercosur–Unión Europea desde el 1 de mayo de 2026."
+      },
+      {
+        "record_id": "s06-05-01",
+        "text": "no para afirmar que toda exportación ingresa inmediatamente sin aranceles."
+      },
+      {
+        "record_id": "s06-05-01",
+        "text": "Cada oportunidad requiere estudiar origen, calendario, cupos, exigencias sanitarias y especificaciones del comprador."
+      }
+    ],
+    "rationale": "Tema comercial ausente; vincula fecha de aplicación con condiciones por producto.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-06-promocion-transicion",
+    "question": "Si presento mi proyecto en septiembre de 2026, ¿todavía puedo optar por el régimen anterior de promoción? ¿Desde cuándo rige el Decreto 329/025 y qué modificación menciona la guía?",
+    "groups": [
+      [
+        "s30-01-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s30-01-01",
+        "text": "El régimen general del Decreto 329/025 rige desde el 1 de febrero de 2026 y su texto fue modificado por el Decreto 152/026."
+      },
+      {
+        "record_id": "s30-01-01",
+        "text": "optar por el régimen anterior hasta el 30 de abril de 2026 no debe presentarse como una opción general todavía abierta."
+      }
+    ],
+    "rationale": "Evalúa vigencia y transición temporal, sin repetir el puntaje de descentralización.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-07-minas-interes-piloto",
+    "question": "Un comprador de Minas me dijo que le interesa mi servicio, pero no fijó precio, volumen ni fecha. ¿Puedo contarlo como una venta y qué prueba comercial propone la guía?",
+    "groups": [
+      [
+        "s10-04-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s10-04-01",
+        "text": "Proponer un piloto pagado y definir de antemano qué desempeño justificaría ampliarlo."
+      },
+      {
+        "record_id": "s10-04-01",
+        "text": "Una manifestación de interés sin precio, volumen y fecha no debe registrarse como venta."
+      }
+    ],
+    "rationale": "Z1: distingue interés de venta y recupera la condición concreta del piloto.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-08-solis-matriz-frio",
+    "question": "Antes de dimensionar una ruta de reparto refrigerado desde Solís de Mataojo, ¿qué datos debería levantar de los clientes y de los viajes de retorno?",
+    "groups": [
+      [
+        "s11-04-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s11-04-01",
+        "text": "Para frío o distribución, levantar una matriz de clientes, temperatura, volumen por semana, frecuencia, exigencias documentales y retorno vacío."
+      }
+    ],
+    "rationale": "Z2: exige variables operativas concretas, no una descripción general de oportunidades.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-09-sierras-alcance-plan",
+    "question": "Estoy comparando un padrón en Marco de los Reyes con otro en Penitente. ¿Puedo aplicarles el mismo plan por estar agrupados en la guía y qué consulta previa corresponde?",
+    "groups": [
+      [
+        "s12-04-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s12-04-01",
+        "text": "Villa Serrana y Marco de los Reyes cuentan con instrumentos de planificación y categorías diferenciadas;"
+      },
+      {
+        "record_id": "s12-04-01",
+        "text": "El agrupamiento comercial de esta guía no significa que el mismo plan se aplique a todo Penitente."
+      },
+      {
+        "record_id": "s12-04-01",
+        "text": "Antes de comprar, obtener una respuesta técnica por padrón que incorpore las normas y modificaciones vigentes."
+      }
+    ],
+    "rationale": "Z3: comprueba límites territoriales de la normativa y consulta por padrón.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-10-mariscala-expansion-forestal",
+    "question": "Tengo un taller para contratistas forestales en Mariscala–Pirarajá y quiero sumar plantaciones propias. ¿La presencia de montes cercanos alcanza para dar por viable esa ampliación?",
+    "groups": [
+      [
+        "s13-05-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s13-05-01",
+        "text": "Una expansión forestal requiere un análisis distinto del de un servicio a la forestación:"
+      },
+      {
+        "record_id": "s13-05-01",
+        "text": "suelo, agua y autorizaciones específicas no pueden deducirse del hecho de que existan plantaciones en el entorno."
+      }
+    ],
+    "rationale": "Z4: distingue requisitos de una plantación de los de un servicio forestal.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-11-varela-campana-riesgos",
+    "question": "Voy a ofrecer secado de granos en José Pedro Varela. ¿Qué período de datos conviene pedir y qué responsabilidades por humedad, rechazo o demora debería aclarar?",
+    "groups": [
+      [
+        "s14-04-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s14-04-01",
+        "text": "Solicitar datos de una campaña completa y contrastar al menos escenarios de volumen y calidad."
+      },
+      {
+        "record_id": "s14-04-01",
+        "text": "Determinar quién paga, cuándo paga y quién asume pérdidas por humedad, rechazo o demora."
+      }
+    ],
+    "rationale": "Z5: cubre campaña completa y asignación de riesgos contractuales.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-12-batlle-ferrocarril",
+    "question": "En José Batlle y Ordóñez–Zapicán veo infraestructura ferroviaria. ¿Qué debería confirmar antes de incluir transporte de carga por tren en mi presupuesto?",
+    "groups": [
+      [
+        "s15-05-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s15-05-01",
+        "text": "infraestructura ferroviaria no permite afirmar disponibilidad de servicio de carga, frecuencia, tarifas ni acceso comercial."
+      },
+      {
+        "record_id": "s15-05-01",
+        "text": "obtener confirmación del operador y de la infraestructura aplicable antes de utilizarlo en su caso de negocio."
+      }
+    ],
+    "rationale": "Z6: exige evidencia de servicio operativo y evita inferirla de la infraestructura.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-13-polanco-operacion-informal",
+    "question": "Mi experiencia rural en Polanco cerraría los números si yo trabajo gratis y los visitantes entran de manera informal. ¿Qué criterio de descarte de la guía se aplica?",
+    "groups": [
+      [
+        "s16-06-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s16-06-01",
+        "text": "También descartar modelos que funcionan únicamente con trabajo no remunerado del propietario, acceso informal o ausencia de seguros y protocolos."
+      }
+    ],
+    "rationale": "Z7: evalúa condiciones económicas y operativas, no solo restricciones de construcción.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-14-sucesion-todas-zonas",
+    "question": "Busco asociarme a una empresa familiar para su relevo generacional. ¿En qué zonas contempla la guía esta hipótesis y qué debida diligencia exige?",
+    "groups": [
+      [
+        "O16"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "O16",
+        "text": "Todas las zonas, según actividad"
+      },
+      {
+        "record_id": "O16",
+        "text": "Debida diligencia societaria, tributaria, laboral, ambiental y de títulos; no publicar datos sin permiso."
+      }
+    ],
+    "rationale": "Cubre todas las regiones y una ficha no evaluada: reinversión y sucesión.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-15-modulos-parque-beneficios",
+    "question": "Si reconvierto un galpón en módulos para pymes en Minas, ¿eso ya me permite anunciarlo como parque industrial habilitado y promocionar sus beneficios?",
+    "groups": [
+      [
+        "O13"
+      ],
+      [
+        "s31-03-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "O13",
+        "text": "Uso de suelo, incendios, servicios y reglas de convivencia; no llamarlo parque industrial habilitado."
+      },
+      {
+        "record_id": "s31-03-01",
+        "text": "Antes de promocionar ventajas de un parque, verificar habilitación, actividad admitida y condición del usuario."
+      }
+    ],
+    "rationale": "Une la ficha modular con las condiciones específicas para promocionar beneficios de parques.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-16-hospitalidad-servicios-anual",
+    "question": "Estoy armando una cuadrilla de limpieza y mantenimiento para alojamientos de las sierras. ¿Qué debería medir y en qué caso recomienda la ficha no avanzar aunque el verano venda bien?",
+    "groups": [
+      [
+        "O15"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "O15",
+        "text": "No avanzar cuando… Los ingresos de alta temporada no cubren equipo y logística durante el resto del año."
+      },
+      {
+        "record_id": "O15",
+        "text": "Costo por unidad; puntualidad; retrabajo; recurrencia; margen anual."
+      }
+    ],
+    "rationale": "Ficha poco cubierta; exige métricas y viabilidad durante todo el año.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-17-alojamiento-modelo-equilibrio",
+    "question": "En el ejercicio del alojamiento, ¿qué tarifa y margen sustentan las ocupaciones de equilibrio antes y después de reservar mantenimiento? ¿Puedo presentar esos porcentajes como datos observados de la zona?",
+    "groups": [
+      [
+        "s33-02-01"
+      ],
+      [
+        "s33-01-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s33-02-01",
+        "text": "Con tarifa neta de US$ 130 y margen de contribución de 65%,"
+      },
+      {
+        "record_id": "s33-02-01",
+        "text": "el equilibrio operativo antes de la reserva se alcanza con aproximadamente 32,42% de ocupación; incluyendo la reserva, con 37,29%."
+      },
+      {
+        "record_id": "s33-01-01",
+        "text": "Todas las cifras siguientes son supuestos didácticos en dólares estadounidenses."
+      },
+      {
+        "record_id": "s33-01-01",
+        "text": "No son una valuación, una recomendación de compra ni datos observados de la zona."
+      }
+    ],
+    "rationale": "Separa resultados hipotéticos de observaciones y conserva moneda, porcentajes y supuestos.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-18-salus-agua-alcance",
+    "question": "Estoy estudiando embotellar agua al sur de Minas. ¿Qué extensión describe el caso Salus y permite ese antecedente estimar mis retornos o asumir que puedo usar la misma fuente?",
+    "groups": [
+      [
+        "s08-02-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s08-02-01",
+        "text": "La empresa presenta una reserva de 1.300 hectáreas al sur de Minas."
+      },
+      {
+        "record_id": "s08-02-01",
+        "text": "no permite calcular por sí solo retornos privados ni afirmar que cualquier nuevo negocio pueda utilizar la misma fuente de agua."
+      }
+    ],
+    "rationale": "Caso poco cubierto; distingue superficie reportada de derechos de uso y rentabilidad.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-19-banca-documentacion",
+    "question": "Me derivaron desde una ventanilla para abrir una cuenta empresarial. ¿Qué documentación recomienda preparar la guía y esa derivación garantiza la cuenta o un crédito?",
+    "groups": [
+      [
+        "s28-04-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s28-04-01",
+        "text": "identificación de titulares y beneficiarios finales, explicación del negocio, origen de fondos y proyección de operaciones."
+      },
+      {
+        "record_id": "s28-04-01",
+        "text": "La entidad financiera decide la documentación y sus controles."
+      },
+      {
+        "record_id": "s28-04-01",
+        "text": "Una derivación de la ventanilla no garantiza apertura de cuenta ni crédito."
+      }
+    ],
+    "rationale": "Añade preparación bancaria y delimita la autoridad de la entidad financiera.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-20-comap-plazo-condicionado",
+    "question": "Me dijeron que en 90 días puedo abrir porque COMAP tiene ese plazo. ¿Son días hábiles, para qué actuación rigen y qué condiciones impiden usarlo como fecha garantizada de apertura?",
+    "groups": [
+      [
+        "s31-04-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s31-04-01",
+        "text": "El plazo de 90 días hábiles previsto para la recomendación de COMAP"
+      },
+      {
+        "record_id": "s31-04-01",
+        "text": "opera con las condiciones, validación y eventuales suspensiones del procedimiento."
+      },
+      {
+        "record_id": "s31-04-01",
+        "text": "No es una promesa de apertura de una empresa, un plazo único de todos los permisos ni una garantía sobre la resolución final."
+      }
+    ],
+    "rationale": "Distingue unidad temporal, actuación administrativa y suspensiones del procedimiento.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-21-contactos-ambiente-runaev",
+    "question": "Mi proyecto elabora alimentos y también necesita aclarar su evaluación ambiental. ¿Qué correo publicado corresponde a cada consulta y qué función atribuye el directorio a cada canal?",
+    "groups": [
+      [
+        "s35-01-08"
+      ],
+      [
+        "s35-01-10"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s35-01-08",
+        "text": "Canal publicado: aeia@ambiente.gub.uy"
+      },
+      {
+        "record_id": "s35-01-08",
+        "text": "Alcance y ruta de evaluación de proyectos."
+      },
+      {
+        "record_id": "s35-01-10",
+        "text": "Canal publicado: consultas@runaev.gub.uy"
+      },
+      {
+        "record_id": "s35-01-10",
+        "text": "Registro y derivación alimentaria."
+      }
+    ],
+    "rationale": "Exige dos contactos institucionales distintos y evita intercambiar sus competencias.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-22-centro-pyme-confidencialidad",
+    "question": "Quiero mandar mis estados financieros al Centro Pyme Lavalleja. ¿Qué correo figura, qué servicio se le atribuye y qué debería acordar antes de remitir información confidencial?",
+    "groups": [
+      [
+        "s35-01-11"
+      ],
+      [
+        "s35-01-12"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s35-01-11",
+        "text": "lavalleja@centros.uy, publicado por Uruguay XXI."
+      },
+      {
+        "record_id": "s35-01-11",
+        "text": "Orientación a pymes; confirmar canal y servicios actuales."
+      },
+      {
+        "record_id": "s35-01-12",
+        "text": "acordar canal seguro y autorización antes de remitir documentación financiera o datos personales."
+      }
+    ],
+    "rationale": "Combina contacto y alcance con una condición explícita para enviar documentación sensible.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-23-contactos-no-publicados",
+    "question": "Necesito el teléfono operativo de Invest Lavalleja y el contacto personal de un empresario de la guía para mandarle una propuesta. ¿Qué permite informar el directorio sobre esos contactos?",
+    "groups": [
+      [
+        "s35-01-12"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s35-01-12",
+        "text": "No se inventa un correo, teléfono o dirección operativa de Invest Lavalleja."
+      },
+      {
+        "record_id": "s35-01-12",
+        "text": "Antes de lanzar la marca deben aprobarse el canal, la responsabilidad institucional y el sistema de seguimiento."
+      },
+      {
+        "record_id": "s35-01-12",
+        "text": "La guía tampoco publica contactos personales de empresarios como si hubieran aceptado recibir propuestas comerciales."
+      }
+    ],
+    "rationale": "Prueba límites documentados del directorio sin inventar canales ni consentimiento.",
+    "split": "new_frozen"
+  },
+  {
+    "id": "ind24-24-fuentes-corporativas-anuncios",
+    "question": "Estoy adjuntando memorias empresariales como respaldo de mi proyecto. ¿La guía permite tratarlas como auditorías independientes o convertir anuncios de proyectos en inversiones ya ejecutadas?",
+    "groups": [
+      [
+        "s02-03-01"
+      ]
+    ],
+    "required_spans": [
+      {
+        "record_id": "s02-03-01",
+        "text": "Las fuentes corporativas identifican capacidades y decisiones de sus autores, pero no equivalen a auditorías independientes."
+      },
+      {
+        "record_id": "s02-03-01",
+        "text": "Se descartó convertir una noticia de proyecto en inversión ejecutada o una capacidad educativa en empleo disponible."
+      }
+    ],
+    "rationale": "Evalúa calidad y límites de las fuentes, separando anuncios de hechos ejecutados.",
+    "split": "new_frozen"
+  }
+]

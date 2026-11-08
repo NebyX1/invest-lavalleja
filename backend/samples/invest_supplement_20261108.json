@@ -1,0 +1,735 @@
+{
+  "edition_date": "2026-11-08",
+  "scope_note": "Síntesis editorial de fuentes primarias consultadas. Las propuestas se distinguen de los antecedentes; la fecha de consulta no actualiza la fecha del dato. No contiene ofertas, precios ni un ranking predial de rentabilidad.",
+  "sources": [
+    {
+      "id": "GUIDE-ORIGINAL-20261108",
+      "title": "Guía del inversor de Lavalleja: corpus original y antecedentes consolidados",
+      "description": "Síntesis basada en los registros públicos de la guía entregada por el responsable. El compilador vincula esta edición al SHA-256 del original y conserva cada registro íntegro en un archivo interno. Los antecedentes mantienen su período; las líneas de actividad siguen identificadas como propuestas.",
+      "locator": "Perfiles de localidades, fichas de oportunidad y complemento territorial de octubre de 2026",
+      "verification": "derived_from_user_provided_corpus_not_independently_reverified"
+    },
+    {
+      "id": "WEB-VARELA-20261108",
+      "title": "Municipio de José Pedro Varela: sobre la ciudad",
+      "url": "https://www.municipiovarela.gub.uy/municipio/sobre-la-ciudad.html",
+      "locator": "Ubicación; Historia y cultura",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-SOLIS-CIUDAD",
+      "title": "Ley 20.285: categoría de ciudad de Solís de Mataojo",
+      "url": "https://www.impo.com.uy/bases/leyes/20285-2024",
+      "locator": "Artículo único; promulgación 14/06/2024",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-SOLIS-INDUSTRIA",
+      "title": "Intendencia de Maldonado: Industrial Serrana en Solís de Mataojo",
+      "url": "https://maldonado.gub.uy/noticias/oportunidad-empleo-procesadora-pescado-solis-mataojo",
+      "locator": "Noticia del 04/06/2026; descripción de la planta",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-SOLIS-VIALIDAD",
+      "title": "IDL: infraestructura vial en Solís de Mataojo",
+      "url": "https://www.gub.uy/intendencia-lavalleja/comunicacion/noticias/solis-mataojo-se-transforma-avanzan-80-obras-viales-toda-ciudad",
+      "locator": "Noticia del 02/02/2026",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-UXXI-LAVALLEJA-2026",
+      "title": "Uruguay XXI: Informe de Lavalleja 2026",
+      "url": "https://www.uruguayxxi.gub.uy/uploads/informacion/3ff22aa5af96a9fb42d044042a21684ab53d89ed.pdf",
+      "locator": "Páginas impresas 2, 4–7; propuestas sectoriales y conectividad",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-SOLAR-MAPA",
+      "title": "MIEM y Facultad de Ingeniería: Mapa Solar del Uruguay",
+      "url": "https://www.gub.uy/ministerio-industria-energia-mineria/sites/ministerio-industria-energia-mineria/files/documentos/publicaciones/Mapa%20Solar.pdf",
+      "locator": "Lámina única; mapas mensuales y promedio anual; edición 2009–2010",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-SOLAR-HIKARI",
+      "title": "MIEM: inauguración de la planta fotovoltaica Hikari en Lavalleja",
+      "url": "https://www.gub.uy/ministerio-industria-energia-mineria/comunicacion/noticias/inauguraron-planta-solar-fotovoltaica-hikari-parque-vacaciones-ute-antel",
+      "locator": "25/07/2019; Sobre el parque fotovoltaico Hikari",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-UTE-AUTOCONSUMO",
+      "title": "UTE: suscriptor con generación e instalaciones para autoconsumo",
+      "url": "https://ute.com.uy/suscriptores",
+      "locator": "Instalación para Autoconsumo; condiciones; trámite y actualización DNE de abril de 2026",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-MIEM-MAPAS",
+      "title": "MIEM: mapas energéticos",
+      "url": "https://www.gub.uy/ministerio-industria-energia-mineria/comunicacion/publicaciones/mapas-energeticos",
+      "locator": "Actualización abril de 2017; capas de recurso e infraestructura",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-EOLICA-MEMORIA",
+      "title": "IDL: Memoria Informativa de las Directrices Departamentales",
+      "url": "https://www.gub.uy/intendencia-lavalleja/sites/intendencia-lavalleja/files/documentos/publicaciones/Memoria%20Informativa.pdf",
+      "locator": "Apartado 5.3 y mapa eólico a 90 m; antecedente del diagnóstico territorial",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-EOLICA-MINAS-I",
+      "title": "Ministerio de Ambiente: Informe Ambiental Resumen del proyecto Parque Eólico Minas I",
+      "url": "https://www.ambiente.gub.uy/bir/manifiestos/attachments/IAR_SOWITEC_SA_GENERACIyiN_EOLICA_MINAS_SA._Pque_Eylico_Minas_I.pdf",
+      "locator": "Descripción del proyecto y localización; solicitud de autorización ambiental previa",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-MTOP-CIRCUITO5",
+      "title": "MEF: seguimiento del contrato PPP del Circuito Vial 5",
+      "url": "https://www.gub.uy/ministerio-economia-finanzas/sites/ministerio-economia-finanzas/files/2025-07/2%20Informe%20semestrales%20jul23%20jun%2024%20PPP%20C5.pdf",
+      "locator": "Secciones 3.1.1 y 3.1.2; período julio 2023–junio 2024",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-MTOP-BATLLE-ZAPICAN",
+      "title": "MTOP: Circuito Vial 5, tramo N2",
+      "url": "https://www.gub.uy/ministerio-transporte-obras-publicas/comunicacion/publicaciones/informe-auditoria-ambiental-licitacion-2117-ppp-cv5-tramo-n2",
+      "locator": "14/02/2025; alcance de la obra",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-MTOP-FERROCARRIL",
+      "title": "MTOP: mapa y velocidades de la red ferroviaria nacional",
+      "url": "https://www.gub.uy/ministerio-transporte-obras-publicas/politicas-y-gestion/informacion-mapa-velocidades-maximas-red-ferroviaria-nacional",
+      "locator": "Publicación del 16/07/2026",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-MTOP-GEO",
+      "title": "MTOP: Geoportal y geoservicios",
+      "url": "https://geoportal.mtop.gub.uy/geoservicios",
+      "locator": "Cartografía de transporte y metadatos",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-ANDE-CENTROS",
+      "title": "ANDE: Centros Pymes, informe de monitoreo 2023",
+      "url": "https://ande.org.uy/images/2024/IMA_2023_-_Compilado_con_anexos_y_con_recuadros_publicada.pdf",
+      "locator": "Apartado Centros Pymes; incorporación de Lavalleja en 2023",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-ADME-GENERADORES",
+      "title": "ADME: participantes generadores del mercado mayorista",
+      "url": "https://adme.com.uy/mme_admin/participantes/generadores_admin.php?remota=1",
+      "locator": "Fila Generación Eólica Minas S.A. (Minas I), potencia instalada y autorizada a inyectar",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-MTSS-RECURSOS",
+      "title": "MTSS/MIEM: Estudio prospectivo de mercado laboral en hidrógeno verde (2025)",
+      "url": "https://www.gub.uy/ministerio-trabajo-seguridad-social/sites/ministerio-trabajo-seguridad-social/files/documentos/publicaciones/Informe%20Prospectiva%20Empleo%20H2V%20Uruguay%20v.f.pdf",
+      "locator": "Página PDF 7, impresa 6: distribución regional de recurso solar y eólico",
+      "verification": "primary_source_consulted_2026-11-08"
+    },
+    {
+      "id": "WEB-IMPO-935-2015",
+      "title": "IMPO · Resolución 935/015 · Parque Eólico Solís de Mataojo, Canelones",
+      "url": "https://www.impo.com.uy/bases/resoluciones/935-2015"
+    }
+  ],
+  "records": [
+    {
+      "id": "web-varela-ubicacion",
+      "title": "José Pedro Varela: ubicación en el norte y conexiones por rutas 8 y 14",
+      "topic": "LOCALIDADES",
+      "zones": [
+        "Z5"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Página municipal consultada el 08/11/2026; ubicación geográfica",
+      "text": "José Pedro Varela está en el norte de Lavalleja, sobre las rutas 8 y 14 y junto al arroyo Corrales, en el límite con Treinta y Tres. El municipio sitúa la ciudad a 130 km de Minas y a 256 km de Montevideo.",
+      "source_refs": [
+        "WEB-VARELA-20261108"
+      ]
+    },
+    {
+      "id": "web-varela-agroindustria",
+      "title": "José Pedro Varela: arroz, semillas, raciones y antecedentes metalúrgicos",
+      "topic": "AGROINDUSTRIA",
+      "zones": [
+        "Z5"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Descripción municipal consultada el 08/11/2026; antecedentes históricos sin censo de capacidad",
+      "text": "El municipio describe José Pedro Varela como una ciudad agroindustrial. Su trayectoria incluye ganadería, agricultura triguera, molienda, metalurgia y fabricación de maquinaria agrícola. La industria arrocera se incorporó en la segunda mitad del siglo XX. La descripción municipal también identifica procesamiento de semillas y elaboración de raciones para la cría y el engorde de ganado.",
+      "source_refs": [
+        "WEB-VARELA-20261108"
+      ]
+    },
+    {
+      "id": "web-solis-perfil",
+      "title": "Solís de Mataojo: ciudad de Lavalleja y eje de la Ruta 8",
+      "topic": "LOCALIDADES",
+      "zones": [
+        "Z2"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Ley de 2024 y comunicación de IDL del 02/02/2026",
+      "text": "Solís de Mataojo es una ciudad de Lavalleja desde la Ley 20.285, promulgada el 14 de junio de 2024. La Ruta 8 es el principal eje de tránsito urbano mencionado por IDL. En febrero de 2026 la Intendencia documentó mejoras de calles, pluviales y caminos rurales de su entorno.",
+      "source_refs": [
+        "WEB-SOLIS-CIUDAD",
+        "WEB-SOLIS-VIALIDAD"
+      ]
+    },
+    {
+      "id": "web-solis-alimentos",
+      "title": "Solís de Mataojo: procesamiento de pescado e industria alimentaria",
+      "topic": "AGROINDUSTRIA",
+      "zones": [
+        "Z2"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Noticia institucional del 04/06/2026; antecedente industrial",
+      "text": "Industrial Serrana S.A. tiene una planta procesadora de pescado en el acceso sureste de Solís de Mataojo desde Ruta 8. Una comunicación institucional de junio de 2026 describe pescado fresco, filetes, productos ahumados y conservas, además de capacitación del personal en higiene y seguridad. Es un antecedente de transformación alimentaria localizado en Solís de Mataojo.",
+      "source_refs": [
+        "WEB-SOLIS-INDUSTRIA"
+      ]
+    },
+    {
+      "id": "web-lavalleja-logistica",
+      "title": "Lavalleja: Ruta 8, mercados regionales y servicios logísticos",
+      "topic": "LOGISTICA",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "mixed",
+      "period": "Informe de Uruguay XXI 2026; oportunidades sectoriales propuestas",
+      "text": "Uruguay XXI sitúa a Lavalleja en el este del país, conectado por Ruta 8 con Montevideo y la frontera brasileña y próximo a Maldonado, Punta del Este y Rocha. Su informe de 2026 identifica como oportunidades la infraestructura logística y los servicios especializados para cadenas agroindustriales, mineras y de construcción.",
+      "source_refs": [
+        "WEB-UXXI-LAVALLEJA-2026"
+      ]
+    },
+    {
+      "id": "web-lavalleja-alimentos",
+      "title": "Lavalleja: alimentos diferenciados y transformación de recursos locales",
+      "topic": "AGROINDUSTRIA",
+      "zones": [],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Informe de Uruguay XXI 2026; propuestas sectoriales",
+      "text": "El informe 2026 de Uruguay XXI identifica industria frigorífica, bebidas, molinería arrocera, cemento, cal y yeso en la estructura manufacturera de Lavalleja. Entre las oportunidades propuestas menciona alimentos con identidad territorial: carnes diferenciadas, quesos y lácteos artesanales, conservas, miel y experiencias gastronómicas asociadas al turismo rural.",
+      "source_refs": [
+        "WEB-UXXI-LAVALLEJA-2026"
+      ]
+    },
+    {
+      "id": "web-lavalleja-turismo",
+      "title": "Lavalleja: turismo de naturaleza, gastronomía y bienestar",
+      "topic": "TURISMO",
+      "zones": [
+        "Z1",
+        "Z3",
+        "Z7"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Informe de Uruguay XXI 2026; propuestas y entorno departamental",
+      "text": "Uruguay XXI vincula el turismo de Lavalleja con serranías, valles y cursos de agua, destacando Villa Serrana y Salto del Penitente. Propone alojamientos boutique, actividades al aire libre, bienestar, retiros y experiencias culturales o gastronómicas, como complemento del turismo costero. Estas son líneas de inversión propuestas en el informe departamental.",
+      "source_refs": [
+        "WEB-UXXI-LAVALLEJA-2026"
+      ]
+    },
+    {
+      "id": "web-solar-recurso",
+      "title": "Energía solar fotovoltaica: recurso territorial y variación estacional en Uruguay",
+      "topic": "ENERGIA SOLAR",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Mapa Solar 2009–2010; heliofanía 2000–2008 y otras series de irradiación",
+      "text": "El Mapa Solar del Uruguay elaborado por Facultad de Ingeniería y difundido por MIEM presenta la irradiación diaria media en kWh por metro cuadrado para cada mes y para el promedio anual. Permite comparar el recurso solar territorial y su variación estacional, incluyendo Lavalleja. Los valores corresponden a las series y escala del atlas; una irradiación en kWh/m² es un dato del recurso, diferente de la producción eléctrica de una instalación en kWh.",
+      "source_refs": [
+        "WEB-SOLAR-MAPA"
+      ]
+    },
+    {
+      "id": "web-solar-hikari",
+      "title": "Energía solar en Lavalleja: antecedente fotovoltaico Hikari",
+      "topic": "ENERGIA SOLAR",
+      "zones": [
+        "Z1"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Inauguración documentada el 25/07/2019",
+      "text": "La planta fotovoltaica Hikari se inauguró en julio de 2019 en el Parque de Vacaciones UTE-Antel, en Lavalleja. El MIEM documentó 250 kW de potencia instalada y conexión a una línea de distribución de 15 kV. La publicación atribuye a UTE la operación y el mantenimiento. Es un antecedente concreto de generación solar en el departamento.",
+      "source_refs": [
+        "WEB-SOLAR-HIKARI"
+      ]
+    },
+    {
+      "id": "web-energia-autoconsumo",
+      "title": "Energía solar y eólica: modalidad de autoconsumo con UTE",
+      "topic": "ENERGIA SOLAR",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Página UTE consultada el 08/11/2026; marco citado 2023–2024",
+      "text": "La modalidad de suscriptor con generación de UTE admite instalaciones para abastecer consumos propios en baja o media tensión, con generación solar, eólica y otras fuentes y posible almacenamiento. Puede incluir inyección de energía, adquirida al precio spot horario. El balance anual limita la inyección al consumo anual; si hay baterías, UTE indica un límite de inyección del 30% de ese consumo. Esta modalidad corresponde a autoconsumo, con su propio convenio y contrato.",
+      "source_refs": [
+        "WEB-UTE-AUTOCONSUMO"
+      ]
+    },
+    {
+      "id": "web-autoconsumo-tramite",
+      "title": "Autoconsumo eléctrico: conexión y registro de generación",
+      "topic": "TRAMITES ENERGETICOS",
+      "zones": [],
+      "kind": "procedure",
+      "evidence_type": "documented_in_source",
+      "period": "Página UTE consultada el 08/11/2026; actualización DNE de abril de 2026",
+      "text": "Para conectar una instalación de autoconsumo, UTE publica un formulario de solicitud de conexión y los convenios correspondientes para baja o media tensión. La documentación incluye el registro o autorización de DNE/MIEM según corresponda. La página incorpora una actualización sobre ese comprobante a partir de una resolución del 8 de abril de 2026.",
+      "source_refs": [
+        "WEB-UTE-AUTOCONSUMO"
+      ]
+    },
+    {
+      "id": "web-energia-cartografia",
+      "title": "Energía solar, eólica y redes: capas cartográficas para Lavalleja",
+      "topic": "ENERGIA EOLICA",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Edición de mapas energéticos de abril de 2017; infraestructura histórica",
+      "text": "Los mapas energéticos publicados por MIEM reúnen capas de generación, transmisión, distribución, recurso solar y recurso eólico, junto con transporte, padrones, hidrografía y cobertura forestal. La edición consultada es de abril de 2017. Sirve como cartografía de referencia para describir recursos e infraestructura; su fecha identifica la antigüedad de las redes representadas.",
+      "source_refs": [
+        "WEB-MIEM-MAPAS"
+      ]
+    },
+    {
+      "id": "web-eolica-recurso",
+      "title": "Energía eólica en Lavalleja: mapa de viento y transmisión",
+      "topic": "ENERGIA EOLICA",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Antecedente cartográfico de la Memoria Informativa departamental",
+      "text": "La Memoria Informativa de Lavalleja incluye un mapa de velocidad media anual del viento a 90 metros de altura y de líneas de transmisión. El documento permite tratar el recurso eólico y la infraestructura como características geográficas del departamento. La altura de referencia del mapa forma parte del dato: sus velocidades describen viento a 90 metros, distinto del viento a nivel del suelo.",
+      "source_refs": [
+        "WEB-EOLICA-MEMORIA"
+      ]
+    },
+    {
+      "id": "web-eolica-minas-proyecto",
+      "title": "Minas I: generación eólica registrada en ADME",
+      "topic": "ENERGIA EOLICA",
+      "zones": [
+        "Z1"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Registro de generadores de ADME consultado el 08/11/2026",
+      "text": "ADME registra a Generación Eólica Minas S.A. (Minas I) como participante eólico, con 42 MW de potencia instalada y 42 MW de potencia autorizada a inyectar en la red. La tabla fue consultada el 8 de noviembre de 2026. Es un antecedente de generación del departamento, diferente de las dimensiones propuestas en informes de proyecto anteriores.",
+      "source_refs": [
+        "WEB-ADME-GENERADORES"
+      ]
+    },
+    {
+      "id": "web-norte-corredor-logistico",
+      "title": "Norte de Lavalleja: corredor de rutas 14 y 15 y enlace con Varela",
+      "topic": "LOGISTICA",
+      "zones": [
+        "Z5",
+        "Z6"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Seguimiento contractual julio 2023–junio 2024",
+      "text": "El Circuito Vial 5 comprende tramos de Ruta 14 entre Sarandí del Yí y su cruce con Ruta 8, y entre José Pedro Varela y Lascano; incluye también Ruta 15 desde Lascano hasta el empalme Velázquez. El contrato abarca Florida, Lavalleja y Rocha. Ese trazado aporta contexto de conectividad entre el norte de Lavalleja y el este arrocero.",
+      "source_refs": [
+        "WEB-MTOP-CIRCUITO5"
+      ]
+    },
+    {
+      "id": "web-batlle-zapican-ruta14",
+      "title": "José Batlle y Ordóñez–Zapicán: conexión vial del norte por Ruta 14",
+      "topic": "LOCALIDADES",
+      "zones": [
+        "Z6"
+      ],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Publicación MTOP del 14/02/2025",
+      "text": "MTOP identifica el tramo N2 del Circuito Vial 5 como Ruta 14 entre José Batlle y Ordóñez y Zapicán. La documentación describe diseño, construcción, operación y financiamiento de infraestructura dentro de la faja pública. Es una conexión documentada para describir la movilidad regional del norte de Lavalleja.",
+      "source_refs": [
+        "WEB-MTOP-BATLLE-ZAPICAN"
+      ]
+    },
+    {
+      "id": "web-ferrocarril-fuentes",
+      "title": "Logística ferroviaria: cartografía de líneas activas e inactivas",
+      "topic": "LOGISTICA",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Publicación vigente a julio de 2026",
+      "text": "MTOP publicó en julio de 2026 un mapa ferroviario que distingue líneas activas e inactivas, velocidades del Ferrocarril Central y líneas activas con tráfico limitado. Estas categorías describen infraestructura y circulación ferroviaria. La publicación aporta una fuente específica para diferenciar un corredor histórico de las líneas que el mapa clasifica como activas.",
+      "source_refs": [
+        "WEB-MTOP-FERROCARRIL"
+      ]
+    },
+    {
+      "id": "web-logistica-geoservicios",
+      "title": "Infraestructura logística: cartografía oficial del MTOP",
+      "topic": "LOGISTICA",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Geoportal consultado el 08/11/2026; cada capa conserva sus metadatos",
+      "text": "El Geoportal del MTOP ofrece cartografía de infraestructura de transporte y geoservicios con metadatos. Incluye estaciones y casillas de control de la red ferroviaria activa, además de otros conjuntos de información territorial. Las capas permiten relacionar una localización con infraestructura documentada y consultar su fecha y organismo responsable.",
+      "source_refs": [
+        "WEB-MTOP-GEO"
+      ]
+    },
+    {
+      "id": "web-apoyo-centro-pyme",
+      "title": "Lavalleja: servicios de apoyo empresarial del Centro Pyme",
+      "topic": "APOYO EMPRESARIAL",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Informe de monitoreo de ANDE de 2023",
+      "text": "ANDE documenta la apertura del Centro Pyme de Lavalleja en 2023. El programa ofrece asistencia técnica, capacitación, orientación sobre financiamiento y programas de apoyo para empresas y emprendimientos. La atención se articula con socios territoriales y una metodología común adaptada a cada departamento.",
+      "source_refs": [
+        "WEB-ANDE-CENTROS"
+      ]
+    },
+    {
+      "id": "perfil-norte-lavalleja",
+      "title": "Norte de Lavalleja: José Pedro Varela, José Batlle y Ordóñez y Zapicán",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z5",
+        "Z6"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Antecedentes y propuestas de la guía de septiembre–octubre de 2026; referencias municipales y viales consultadas el 08/11/2026",
+      "text": "El norte de Lavalleja reúne dos perfiles tratados por la guía: José Pedro Varela y su entorno agroindustrial; y José Batlle y Ordóñez–Zapicán, vinculados al medio rural y a servicios regionales. Varela se conecta por rutas 8 y 14 y cuenta con antecedentes de arroz, semillas, raciones y metalurgia. Para Varela se proponen servicios de poscosecha, secado, calidad, acopio, mantenimiento y logística. Para Batlle y Ordóñez–Zapicán se proponen servicios ganaderos y ovinos, oficios, reparación móvil y apoyo a flotas. Ruta 14 articula localidades del norte y su enlace hacia el este.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-VARELA-20261108",
+        "WEB-MTOP-BATLLE-ZAPICAN"
+      ],
+      "catalog_entry": {
+        "kind": "region",
+        "names": [
+          "norte de Lavalleja",
+          "norte"
+        ]
+      }
+    },
+    {
+      "id": "perfil-varela-actividades",
+      "title": "José Pedro Varela: perfil productivo y actividades de inversión propuestas",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z5"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Antecedentes municipales y propuestas de la guía de septiembre–octubre de 2026",
+      "text": "José Pedro Varela combina una trayectoria arrocera y metalúrgica con procesamiento de semillas y raciones. En la guía, SAMAN es un antecedente empresarial de la cadena del arroz. Las actividades propuestas se sitúan alrededor de esa base: análisis y medición de calidad, trazabilidad, mantenimiento de maquinaria, eficiencia del secado, almacenamiento, logística y valorización de subproductos. También aparecen semillas, miel y eficiencia energética en bombeo y procesos. El perfil reúne actividades productivas, servicios a empresas y conexiones por las rutas 8 y 14.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-VARELA-20261108"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "José Pedro Varela",
+          "Varela"
+        ]
+      }
+    },
+    {
+      "id": "perfil-solis-actividades",
+      "title": "Solís de Mataojo y Aguas Blancas: alimentos, servicios y entorno rural",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z2"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Antecedentes de la guía de octubre de 2026 y noticias institucionales de 2026",
+      "text": "Solís de Mataojo se organiza sobre el eje de Ruta 8 y tiene antecedentes de industria cárnica y procesamiento de pescado. La guía propone servicios alimentarios, cadena de frío, mantenimiento y distribución alrededor de esa base. Para Solís y Aguas Blancas también menciona alimentos diferenciados, quesería, enoturismo y servicios vinculados al paisaje rural. Industria y turismo son perfiles distintos del entorno: el primero se relaciona con procesos y transporte; el segundo con hospitalidad, gastronomía y experiencias rurales.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-SOLIS-INDUSTRIA",
+        "WEB-SOLIS-VIALIDAD"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "Solís de Mataojo",
+          "Solís",
+          "Aguas Blancas"
+        ]
+      }
+    },
+    {
+      "id": "perfil-minas-actividades",
+      "title": "Minas y entorno: industria, servicios, formación y turismo",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z1"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Antecedentes y propuestas de la guía de septiembre–octubre de 2026; Hikari documentada en 2019",
+      "text": "Minas y su entorno reúnen antecedentes industriales vinculados al cemento, servicios urbanos y formación técnica. La guía propone mantenimiento industrial y energético, servicios de agua y efluentes, rehabilitación de inmuebles, cuidados, servicios digitales y coordinación empresarial. Su entorno serrano también se vincula con turismo, gastronomía y actividades de naturaleza. En energía, Hikari es un antecedente fotovoltaico documentado en el Parque de Vacaciones UTE-Antel.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-SOLAR-HIKARI"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "Minas"
+        ]
+      }
+    },
+    {
+      "id": "perfil-mariscala-piraraja",
+      "title": "Mariscala y Pirarajá: actividades rurales, madera y mantenimiento",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z4"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Antecedentes y propuestas de la guía de septiembre–octubre de 2026",
+      "text": "La guía relaciona Mariscala y Pirarajá con actividades rurales y antecedentes minerales de Pirarajá y Los Tapes. Las líneas propuestas incluyen servicios ganaderos, reparación móvil, hidráulica, neumáticos, suministros técnicos, gestión de flotas y mantenimiento preventivo. En madera menciona secado, clasificación y transformación secundaria como propuestas de agregado de valor. El rasgo común es la prestación de servicios a operaciones dispersas en el territorio y el procesamiento de recursos vinculados a esas cadenas.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "Mariscala",
+          "Pirarajá"
+        ]
+      }
+    },
+    {
+      "id": "perfil-villa-serrana-penitente",
+      "title": "Villa Serrana, Marco de los Reyes y Penitente: naturaleza, hospitalidad y gastronomía",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z3"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Propuestas de la guía de septiembre–octubre de 2026 e informe de Uruguay XXI 2026",
+      "text": "Villa Serrana y Salto del Penitente forman parte del perfil de turismo serrano de Lavalleja, con paisajes de colinas, valles y cursos de agua. La guía propone hospitalidad de pequeña escala, gastronomía, guías, observación, interpretación del paisaje y actividades de naturaleza. Para Villa Serrana, Marco de los Reyes y Penitente aparecen experiencias con programas propios y articulación con operadores.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-UXXI-LAVALLEJA-2026"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "Villa Serrana",
+          "Marco de los Reyes",
+          "Penitente"
+        ]
+      }
+    },
+    {
+      "id": "perfil-arequita-polanco-barriga-negra",
+      "title": "Arequita, Polanco y Barriga Negra: paisaje, producción e interpretación",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z7"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Antecedentes y propuestas de la guía de septiembre–octubre de 2026",
+      "text": "La guía trata Arequita, Polanco y Barriga Negra como ámbitos con paisaje, actividades rurales y antecedentes minerales. Propone interpretación del territorio, experiencias de naturaleza, servicios a producciones rurales y proveedores audiovisuales. Arequita tiene además un área protegida delimitada y antecedentes de rodaje documentados. Polanco y Barriga Negra son otros ámbitos territoriales; sus perfiles permiten describir actividades compatibles con sus propios recursos y contextos.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "Arequita",
+          "Polanco",
+          "Barriga Negra"
+        ]
+      }
+    },
+    {
+      "id": "actividad-solar-aplicaciones",
+      "title": "Energía solar en Lavalleja: autoconsumo, procesos productivos y servicios",
+      "topic": "ENERGIA SOLAR",
+      "zones": [
+        "Z1",
+        "Z2",
+        "Z4",
+        "Z5",
+        "Z6"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Síntesis editorial al 08/11/2026; antecedentes de la guía y modalidad de UTE consultada",
+      "text": "La generación solar en Lavalleja puede describirse mediante dos formatos diferentes: autoconsumo asociado a un usuario eléctrico y centrales de generación. La modalidad de autoconsumo de UTE abastece consumos propios y puede incluir inyección y almacenamiento bajo su contrato. Como líneas propuestas para la base productiva de Lavalleja, la guía menciona energía en procesos, bombeo y eficiencia energética, a lo que se vinculan servicios de instalación y mantenimiento. Varela aporta un entorno de granos y semillas; Solís, industria alimentaria; y Minas, servicios e industria. Son contextos de consumo y servicios distintos. Hikari aporta un antecedente fotovoltaico local. La cartografía solar permite comparar el recurso físico de las localizaciones. El estudio MTSS/MIEM de 2025 sitúa el mayor recurso solar del país en el norte y noroeste uruguayo, y clasifica el centro y sur como recurso medio. Esa escala nacional es distinta de una comparación entre localidades de Lavalleja.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-UTE-AUTOCONSUMO",
+        "WEB-SOLAR-HIKARI",
+        "WEB-SOLAR-MAPA",
+        "WEB-MTSS-RECURSOS"
+      ],
+      "catalog_entry": {
+        "kind": "sector",
+        "names": [
+          "energía solar",
+          "solar",
+          "fotovoltaica",
+          "paneles solares"
+        ]
+      }
+    },
+    {
+      "id": "actividad-eolica-aplicaciones",
+      "title": "Energía eólica en Lavalleja: recurso, proyectos y servicios industriales",
+      "topic": "ENERGIA EOLICA",
+      "zones": [],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Estudio MTSS/MIEM 2025; ADME consultada el 08/11/2026; cartografía departamental histórica",
+      "text": "El estudio MTSS/MIEM publicado en 2025 identifica recurso eólico de alta calidad en el límite entre Lavalleja, Florida y Treinta y Tres. Esa es una referencia territorial para comparar localizaciones por viento. En el entorno de Minas existe el antecedente de Minas I, registrado en ADME con 42 MW instalados y autorizados a inyectar al 8 de noviembre de 2026. La Memoria Informativa departamental aporta cartografía de viento medio anual a 90 metros y de transmisión eléctrica. Además de generación, la guía propone servicios de mantenimiento industrial y energético, logística y apoyo técnico relacionados con la base productiva. Son tres perfiles: recurso en el límite departamental, generación en Minas y servicios técnicos asociados a industria y energía.",
+      "source_refs": [
+        "WEB-MTSS-RECURSOS",
+        "WEB-ADME-GENERADORES",
+        "WEB-EOLICA-MEMORIA",
+        "GUIDE-ORIGINAL-20261108"
+      ],
+      "catalog_entry": {
+        "kind": "sector",
+        "names": [
+          "energía eólica",
+          "eólica",
+          "aerogeneradores"
+        ]
+      }
+    },
+    {
+      "id": "actividad-logistica-perfiles",
+      "title": "Logística en Lavalleja: granos en el norte, alimentos en Solís e industria en Minas",
+      "topic": "LOGISTICA",
+      "zones": [
+        "Z1",
+        "Z2",
+        "Z5",
+        "Z6"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Síntesis editorial al 08/11/2026; antecedentes de la guía y trazado contractual del Circuito 5",
+      "text": "La guía diferencia varios contextos para logística: en José Pedro Varela, granos, arroz, semillas y poscosecha; en Solís de Mataojo, industria alimentaria, cadena de frío y distribución; en Minas y su entorno, industria y servicios empresariales. Para Batlle y Ordóñez–Zapicán propone apoyo a flotas y servicios rurales. Ruta 8 conecta el eje departamental con Montevideo y la frontera brasileña; Ruta 14 vincula localidades del norte y el corredor hacia Lascano. Las actividades propuestas incluyen almacenamiento, distribución, mantenimiento de equipos y transporte asociado a esas cadenas, con necesidades diferentes según producto y localización.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-MTOP-CIRCUITO5",
+        "WEB-UXXI-LAVALLEJA-2026"
+      ],
+      "catalog_entry": {
+        "kind": "sector",
+        "names": [
+          "logística",
+          "distribución",
+          "transporte de cargas"
+        ]
+      }
+    },
+    {
+      "id": "perfil-batlle-zapican",
+      "title": "José Batlle y Ordóñez y Zapicán: servicios rurales y conexiones del norte",
+      "topic": "PERFILES TERRITORIALES",
+      "zones": [
+        "Z6"
+      ],
+      "kind": "proposal",
+      "evidence_type": "mixed",
+      "period": "Guía de septiembre–octubre de 2026 y referencia vial de MTOP de 2025",
+      "text": "La guía propone para José Batlle y Ordóñez, Zapicán y su entorno servicios ganaderos y ovinos, oficios, reparación móvil, mantenimiento, flotas y logística regional. MTOP identifica el tramo de Ruta 14 entre ambas localidades dentro del Circuito Vial 5. El perfil se vincula a la atención de operaciones rurales y desplazamientos regionales. Es un ámbito del norte diferente de la especialización arrocera de José Pedro Varela.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108",
+        "WEB-MTOP-BATLLE-ZAPICAN"
+      ],
+      "catalog_entry": {
+        "kind": "locality",
+        "names": [
+          "José Batlle y Ordóñez",
+          "Batlle y Ordóñez",
+          "Batlle",
+          "Zapicán"
+        ]
+      }
+    },
+    {
+      "id": "activos-inmobiliarios-alcance",
+      "title": "Información inmobiliaria: inventario de terrenos y galpones, alquileres y precios",
+      "topic": "ACTIVOS E INMUEBLES",
+      "zones": [],
+      "kind": "descriptive",
+      "evidence_type": "documented_in_source",
+      "period": "Contenido de la edición de la guía revisada el 08/11/2026; sin cotizaciones de mercado vigentes",
+      "text": "La edición de la guía no contiene un inventario certificado de terrenos o galpones disponibles ni cotizaciones vigentes de alquiler de locales. Sí presenta propuestas de reutilización de inmuebles y modelos de arrendamiento o reconversión de activos como formas posibles de entrada a una actividad. Esas propuestas describen modalidades, no anuncios inmobiliarios concretos.",
+      "source_refs": [
+        "GUIDE-ORIGINAL-20261108"
+      ],
+      "catalog_entry": {
+        "kind": "sector",
+        "names": [
+          "alquiler",
+          "alquilar",
+          "galpón",
+          "galpones",
+          "terrenos",
+          "inmuebles"
+        ]
+      }
+    }
+  ],
+  "amendments": [
+    {
+      "id": "EN-008",
+      "expected_sha256": "c7a8501db867d68a07701968ea3967feb221c2a7e409a666f594cb6ac1f9396c",
+      "changes": {
+        "text": "ADME, en la tabla consultada al 19 de octubre de 2026, registra las centrales eólicas Maldonado, de R del Sur S.A., y Maldonado II, de R del Este S.A., con 50 MW instalados cada una; las resoluciones del MIEM citadas refieren a generación en Maldonado y Lavalleja. La tabla de ADME identifica al Fideicomiso 55.993/2014 (Solís de Mataojo) como generación eólica, con 10 MW instalados. La Resolución 935/015 ubica esa central eólica en los padrones 8.541 y 39.904 de la sección catastral 8 de Canelones.",
+        "documentary": {
+          "text": "Al corte del 19/10/2026, ADME incluye las centrales eólicas Maldonado, de R del Sur S.A., y Maldonado II, de R del Este S.A., con 50 MW instalados cada una. Las fichas oficiales del MIEM de las resoluciones 583/015 y 907/015 refieren a generación en Maldonado y Lavalleja. No corresponde atribuir los 100 MW íntegramente a Lavalleja sin desagregación por ubicación. ADME también enumera la central Solís de Mataojo del fideicomiso 55.993/2014 con 10 MW instalados. En esa tabla hay campos vacíos de potencia autorizada a inyectar, que no deben interpretarse como cero. Son antecedentes para investigar servicios y operación regional; no constituyen una oferta de nuevos proyectos ni prueban que predios vecinos compartan autorización territorial, ambiental o capacidad de conexión.\n\nCondiciones y alcance: No asignar a Lavalleja toda la potencia de parques interdepartamentales. Una celda vacía de inyección en ADME no equivale a cero. Verificar padrones y permisos del proyecto específico; no inferir habilitación vecina.\n\nÁmbito y naturaleza: Z2; Hecho con aplicación o inferencia.\nCorte documental del complemento: 2026-10-19.\nPeríodo de la información: Situación documental consultada al 19/10/2026; revisar ante cada inversión..\n\nIdentificación ampliada con fuentes consultadas el 8 de noviembre de 2026: ADME clasifica al Fideicomiso 55.993/2014 (Solís de Mataojo) como eólico. La Resolución 935/015 autoriza una central eólica de 10 MW en los padrones 8.541 y 39.904, sección catastral 8 de Canelones.",
+          "conditions": [
+            "No asignar a Lavalleja toda la potencia de parques interdepartamentales. Una celda vacía de inyección en ADME no equivale a cero. Verificar padrones y permisos del proyecto específico; no inferir habilitación vecina."
+          ]
+        },
+        "source_refs": [
+          "EN032",
+          "EN034",
+          "EN035",
+          "WEB-IMPO-935-2015"
+        ],
+        "cutoff_date": "2026-11-08",
+        "period": "Registro ADME consultado en octubre–noviembre de 2026 y localización de la Resolución 935/015."
+      }
+    }
+  ]
+}

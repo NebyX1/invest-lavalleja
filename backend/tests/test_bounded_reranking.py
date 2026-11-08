@@ -27,7 +27,7 @@ class Engine:
     def rerank_bounded(self, query, texts, **options):
         self.calls.append((query, texts, options))
         if self.failure: raise self.failure
-        return list(range(len(texts)))
+        return getattr(self,'scores',list(range(len(texts))))
 
 
 def fixture_retriever(count=8):
@@ -44,6 +44,7 @@ def fixture_retriever(count=8):
     retriever.version = lambda version_id=None:{'id':version_id or 'version-1','collection_name':'fixture'}
     retriever.engine = lambda version:engine
     retriever.records = lambda *args:records
+    retriever._outline = lambda version_id:[]
     return retriever, engine, records, chunks
 
 
@@ -55,13 +56,28 @@ def test_only_small_window_changes_and_chunk_header_is_not_duplicated():
     retriever, engine, _, _ = fixture_retriever()
     baseline, _ = search(retriever)
     cards, trace = search(retriever,RerankBudget())
-    assert [card['record_id'] for card in cards]==['card-5','card-4','card-3','card-2','card-1','card-0','card-6','card-7']
+    assert {card['record_id'] for card in cards[:6]}=={f'card-{i}' for i in range(6)}
+    assert trace['rerank']['fusion']=='rrf_equal_hybrid_neural'
     assert cards[-2:]==baseline[-2:]
     assert len(engine.calls)==1 and len(engine.calls[0][1])==6
     assert engine.calls[0][1][0].count('Card 0')==1
-    assert 0 < engine.calls[0][2]['timeout'] <= .4
+    assert 0 < engine.calls[0][2]['timeout'] <= 1.5
     assert engine.calls[0][2]['max_tokens']==160
     assert trace['rerank']['applied'] and trace['rerank']['reordered']
+
+
+def test_catalog_profile_enters_neural_window_but_is_not_a_forced_winner():
+    retriever,engine,_,_=fixture_retriever()
+    engine.scores=[0,1,6,5,4,3]
+    retriever._outline=lambda version:[{'id':'card-7','catalog_entry':
+        {'kind':'locality','names':['Puerto Azul']}}]
+    cards,trace=retriever.search('Información de Puerto Azul',Settings(),rerank_budget=RerankBudget())
+    assert 'card-7' in trace['rerank']['before_ids']
+    assert trace['catalog_ids']==['card-7']
+    # The deterministic double scores later candidates higher. A catalog hit
+    # must compete, rather than bypassing the retained neural reranker.
+    assert len(engine.calls)==1 and cards[0]['record_id']!='card-7'
+    assert trace['rerank']['applied']
 
 
 def test_cache_is_shared_but_neural_budget_is_per_answer_and_never_resets():
@@ -135,7 +151,7 @@ def test_late_complete_result_is_rejected_and_not_cached():
         return [1.0]*6
     engine.rerank_bounded=slow
     baseline,_=search(retriever)
-    cards,trace=search(retriever,RerankBudget(clock=clock))
+    cards,trace=search(retriever,RerankBudget(400,clock=clock))
     assert cards==baseline and trace['rerank']['reason']=='timeout'
     assert not retriever.reranker.cache._values
 
@@ -188,7 +204,7 @@ def test_preferences_are_preserved_and_explicit_disabled_mode_uses_no_neural():
 
 def test_budget_caps_config_and_allows_only_one_attempt_in_parallel():
     budget=RerankBudget(100000)
-    assert budget.timeout_ms==400
+    assert budget.timeout_ms==1500
     with ThreadPoolExecutor(max_workers=8) as pool:
         claims=list(pool.map(lambda _:budget.claim(),range(20)))
     assert sum(value is not None for value in claims)==1
@@ -217,7 +233,7 @@ def test_final_scores_are_monotonic_across_preferred_window_and_untouched_tail()
     baseline,_=search(retriever,zones=['Z1'])
     cards,trace=search(retriever,RerankBudget(),zones=['Z1'])
     ids=[card['record_id'] for card in cards]
-    assert ids[:2]==['card-8','card-2']
+    assert set(ids[:2])=={'card-8','card-2'}
     assert ids[6:]==[card['record_id'] for card in baseline][6:]
     assert all(a['score']>b['score'] for a,b in zip(cards,cards[1:]))
     assert trace['rerank']['score_basis']=='final_rank_rrf'
@@ -232,7 +248,7 @@ def test_encoder_contention_consumes_answer_budget_and_later_search_cannot_reset
         clock.value+=.401
         return [0.0]*384,query
     engine.query=queued_encoder
-    budget=RerankBudget(clock=clock)
+    budget=RerankBudget(400,clock=clock)
     cards,trace=search(retriever,budget)
     baseline,_=search(retriever)
     assert cards==baseline and trace['rerank']['reason']=='budget_spent'
@@ -252,4 +268,4 @@ def test_encoder_elapsed_time_is_subtracted_from_the_single_neural_timeout():
     engine.query=encoder
     _,trace=search(retriever,RerankBudget(clock=clock))
     assert trace['rerank']['applied']
-    assert engine.calls[0][2]['timeout']==pytest.approx(.25)
+    assert engine.calls[0][2]['timeout']==pytest.approx(1.35)

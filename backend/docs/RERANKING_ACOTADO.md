@@ -9,10 +9,10 @@ sustituye por el reranker.
 ## Presupuesto y concurrencia
 
 `rerank_mode=bounded` habilita el camino de servicio; `hybrid` lo desactiva.
-El presupuesto predeterminado es 400 ms, con un máximo de 400 ms. Se crea una
+El presupuesto predeterminado es 1.500 ms, con un máximo de 1.500 ms. Se crea una
 única instancia `RerankBudget` por respuesta y se comparte con las herramientas.
 Su ventana empieza en la primera búsqueda, antes del encoder, para que una espera
-causada por otra inferencia no dé derecho a otros 400 ms de reordenamiento.
+causada por otra inferencia no dé derecho a otros 1.500 ms de reordenamiento.
 Se permite como máximo un intento neural por respuesta. Las búsquedas posteriores
 pueden reutilizar la caché; no abren nuevas ventanas de inferencia.
 
@@ -66,3 +66,29 @@ predeclarado se evalúan por separado; no equivalen a una evaluación factual de
 las respuestas del modelo generativo ni de la instalación productiva.
 
 Resultados y límites reales: [Validación](../reports/VALIDACION.md).
+
+## Revisión de recuperación del 08/11/2026
+
+La política de servicio `bounded-window-v4` mantiene Granite/mMARCO, seis pares,
+160 tokens, un intento por respuesta, cancelación, caché y fallback. La ventana
+se amplió porque la inferencia real medía aproximadamente 0,7–0,9 s: 400 ms
+cancelaban el reordenamiento. El antiguo valor predeterminado exacto de 400 se
+normaliza a 1.500 al leer ajustes; los presupuestos menores personalizados se
+conservan y no se escribe SQL durante esa lectura. El panel admite el mismo máximo.
+
+Los perfiles territoriales y sectoriales pueden declarar `catalog_entry` con
+nombres y alias. Se añaden hasta tres coincidencias de palabra completa al
+reservorio de candidatos, con aislamiento por versión pública. No hay respuestas
+por palabras clave ni un listado de temas inexistentes: un lugar nuevo se declara
+en el corpus. La búsqueda densa y BM25 siguen recuperando las consultas sin alias.
+
+En la ventana de seis se fusionan, con RRF de igual peso, el orden híbrido y el
+orden neural; la cola y la preferencia de zona se conservan. El reordenamiento
+neural puro empeoró el primer resultado de varias preguntas de este estudio.
+La política de fusión forma parte de la huella de caché de servicio; no cambia
+el espacio vectorial ni las versiones publicadas. Un perfil de catálogo es un
+candidato, no un ganador impuesto.
+
+Las medidas del estudio local y de Docker están en `reports/VALIDACION.md`.
+Recuperar una ficha esperada no demuestra corrección, pertinencia o tono de la
+respuesta generada. No se acredita latencia del servidor de Coolify con estas pruebas.

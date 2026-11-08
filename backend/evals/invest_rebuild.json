@@ -1,0 +1,370 @@
+[
+  {
+    "id": "varela",
+    "split": "development",
+    "q": "En qué puedo invertir en Varela?",
+    "old_any": [
+      "s14-01-01",
+      "s14-02-01",
+      "AG-005"
+    ],
+    "new_any": [
+      "perfil-varela-actividades",
+      "web-varela-agroindustria",
+      "s14-01-01"
+    ],
+    "review": "Actividades relacionadas con arroz, semillas y servicios; propuestas identificadas, sin tareas ni cambio del proyecto."
+  },
+  {
+    "id": "north",
+    "split": "development",
+    "q": "Qué oportunidades hay en el norte de Lavalleja?",
+    "old_any": [
+      "territorio-20261019-z5",
+      "territorio-20261019-z6",
+      "s14-01-01",
+      "s15-01-01"
+    ],
+    "new_any": [
+      "perfil-norte-lavalleja",
+      "perfil-varela-actividades",
+      "web-norte-corredor-logistico"
+    ],
+    "review": "Diferenciar Varela de Batlle y Ordóñez–Zapicán sin negar cobertura del norte."
+  },
+  {
+    "id": "solis",
+    "split": "development",
+    "q": "Qué actividades puedo desarrollar en Solís de Mataojo?",
+    "old_any": [
+      "s11-01-01",
+      "territorio-20261019-z2"
+    ],
+    "new_any": [
+      "perfil-solis-actividades",
+      "web-solis-alimentos",
+      "s11-01-01"
+    ],
+    "review": "Alimentos, frío, distribución y entorno rural; sin sermón administrativo."
+  },
+  {
+    "id": "solar_best",
+    "split": "development",
+    "q": "Qué lugar es mejor para invertir en energía solar en Lavalleja?",
+    "old_any": [
+      "EN-020",
+      "EN-021"
+    ],
+    "new_any": [
+      "actividad-solar-aplicaciones",
+      "web-solar-recurso",
+      "web-solar-hikari",
+      "web-energia-autoconsumo"
+    ],
+    "review": "Comparación útil entre formatos y contextos documentados. Sin ganador, rendimiento, disponibilidad o rentabilidad inventados; sin advertencias genéricas."
+  },
+  {
+    "id": "wind_best",
+    "split": "development",
+    "q": "Qué zona tiene más potencial para energía eólica?",
+    "old_any": [
+      "EN-006",
+      "EN-007",
+      "EN-008"
+    ],
+    "new_any": [
+      "actividad-eolica-aplicaciones",
+      "web-eolica-recurso",
+      "web-eolica-minas-proyecto"
+    ],
+    "review": "Referencia al recurso eólico del límite Lavalleja–Florida–Treinta y Tres y a Minas I 42 MW registrados en ADME; distinguir el diseño histórico de 66 MW. Sin velocidades locales inventadas."
+  },
+  {
+    "id": "logistics",
+    "split": "development",
+    "q": "Qué zonas sirven para invertir en logística?",
+    "old_any": [
+      "TS-028",
+      "TS-029",
+      "s14-01-01",
+      "s11-01-01"
+    ],
+    "new_any": [
+      "actividad-logistica-perfiles",
+      "web-lavalleja-logistica",
+      "web-norte-corredor-logistico"
+    ],
+    "review": "Comparar granos, alimentos/cadena de frío e industria según localidad, sin elección financiera individual."
+  },
+  {
+    "id": "serrana",
+    "split": "development",
+    "q": "Estoy pensando en una hostería pequeña en Villa Serrana. Qué información tenés del entorno?",
+    "old_any": [
+      "s12-01-01",
+      "territorio-20261019-z3"
+    ],
+    "new_any": [
+      "perfil-villa-serrana-penitente",
+      "web-lavalleja-turismo",
+      "s12-01-01"
+    ],
+    "review": "Paisaje, naturaleza, hospitalidad y actividades; procedimientos solo si se piden."
+  },
+  {
+    "id": "minas",
+    "split": "development",
+    "q": "Qué podés decirme de Minas para un emprendimiento?",
+    "old_any": [
+      "s10-01-01",
+      "territorio-20261019-z1"
+    ],
+    "new_any": [
+      "perfil-minas-actividades",
+      "s10-01-01",
+      "territorio-20261019-z1"
+    ],
+    "review": "Contexto urbano, industrial y de servicios; no entrevista comercial."
+  },
+  {
+    "id": "north_nightlife",
+    "split": "additional",
+    "q": "Quiero abrir un boliche en el norte, qué información me podés dar de esa zona?",
+    "old_any": [
+      "territorio-20261019-z5",
+      "territorio-20261019-z6",
+      "s14-01-01",
+      "s15-01-01"
+    ],
+    "new_any": [
+      "perfil-norte-lavalleja",
+      "perfil-varela-actividades",
+      "web-varela-ubicacion"
+    ],
+    "review": "Responder sobre el norte sin reemplazar el boliche por otro negocio ni inventar demanda nocturna."
+  },
+  {
+    "id": "mariscala",
+    "split": "additional",
+    "q": "Contame sobre las actividades de Mariscala y Pirarajá",
+    "old_any": [
+      "s13-01-01",
+      "s13-02-01",
+      "territorio-20261019-z4"
+    ],
+    "new_any": [
+      "perfil-mariscala-piraraja",
+      "s13-01-01",
+      "territorio-20261019-z4"
+    ],
+    "review": "Actividades rurales, madera y mantenimiento sin checklist comercial."
+  },
+  {
+    "id": "batlle",
+    "split": "additional",
+    "q": "Qué hay para invertir en Batlle y Ordóñez o Zapicán?",
+    "old_any": [
+      "s15-01-01",
+      "territorio-20261019-z6"
+    ],
+    "new_any": [
+      "perfil-batlle-zapican",
+      "perfil-norte-lavalleja",
+      "web-batlle-zapican-ruta14",
+      "territorio-20261019-z6",
+      "s15-01-01"
+    ],
+    "review": "Servicios ganaderos y ovinos, oficios, flotas, conectividad. No confundir con Varela."
+  },
+  {
+    "id": "solar_self",
+    "split": "additional",
+    "q": "Cómo funciona el autoconsumo con paneles solares y venta de excedentes a UTE?",
+    "old_any": [
+      "EN-017",
+      "EN-018",
+      "EN-019"
+    ],
+    "new_any": [
+      "web-energia-autoconsumo",
+      "web-autoconsumo-tramite"
+    ],
+    "review": "Describir modalidad UTE, precio spot y límites de balance sin prometer ingresos."
+  },
+  {
+    "id": "solar_local",
+    "split": "additional",
+    "q": "Hay antecedentes concretos de generación fotovoltaica en Lavalleja?",
+    "old_any": [],
+    "new_any": [
+      "web-solar-hikari",
+      "actividad-solar-aplicaciones"
+    ],
+    "review": "Hikari, 250 kW, publicación de 2019; no inferir rendimiento ni estado comercial actual.",
+    "old_coverage_note": "No se encontró respuesta concreta en los registros públicos originales; se informa cobertura nueva, no un fallo del buscador."
+  },
+  {
+    "id": "solar_unit",
+    "split": "additional",
+    "q": "Qué mide el mapa solar y cómo cambia durante el año?",
+    "old_any": [],
+    "new_any": [
+      "web-solar-recurso"
+    ],
+    "review": "Irradiación diaria media por superficie y mapas mensuales; no confundir kWh/m² con producción eléctrica.",
+    "old_coverage_note": "No se encontró respuesta concreta en los registros públicos originales; se informa cobertura nueva, no un fallo del buscador."
+  },
+  {
+    "id": "solar_followup",
+    "split": "additional",
+    "q": "Y en Solís?",
+    "parent": "solar_best",
+    "old_any": [
+      "EN-020",
+      "s11-01-01",
+      "territorio-20261019-z2"
+    ],
+    "new_any": [
+      "perfil-solis-actividades",
+      "actividad-solar-aplicaciones",
+      "web-energia-autoconsumo",
+      "s11-01-01"
+    ],
+    "review": "Conservar tema solar y comparar contexto alimentario; no inventar irradiación ni potencia de red."
+  },
+  {
+    "id": "cold_chain",
+    "split": "additional",
+    "q": "Qué información hay de cadena de frío y distribución de alimentos en Solís?",
+    "old_any": [
+      "s11-01-01",
+      "s11-02-01"
+    ],
+    "new_any": [
+      "perfil-solis-actividades",
+      "actividad-logistica-perfiles",
+      "s11-01-01"
+    ],
+    "review": "Antecedentes industriales y actividades propuestas, sin asumir contratación de terceros."
+  },
+  {
+    "id": "rice_services",
+    "split": "additional",
+    "q": "Hay actividad relacionada con arroz, semillas o maquinaria en José Pedro Varela?",
+    "old_any": [
+      "AG-005",
+      "AG-006",
+      "s08-03-01"
+    ],
+    "new_any": [
+      "web-varela-agroindustria",
+      "perfil-varela-actividades",
+      "AG-005",
+      "AG-006"
+    ],
+    "review": "Antecedentes con fechas; semillería y raciones municipal. No confundir hipótesis con empresas operativas certificadas."
+  },
+  {
+    "id": "water_setbacks",
+    "split": "additional",
+    "q": "Qué distancias establece el Plan Local de Villa Serrana respecto a arroyos y embalses?",
+    "old_any": [
+      "TS-002"
+    ],
+    "new_any": [
+      "TS-002"
+    ],
+    "review": "Distancias, excepciones y ámbito normativo solicitados completos; sin omisión por política de tono."
+  },
+  {
+    "id": "tourism_steps",
+    "split": "additional",
+    "q": "Qué pasos documenta la guía para registrar un alojamiento turístico?",
+    "old_any": [
+      "TS-011",
+      "TS-012"
+    ],
+    "new_any": [
+      "TS-011",
+      "TS-012"
+    ],
+    "review": "Procedimiento solicitado, sin omitir requisitos sustantivos."
+  },
+  {
+    "id": "prices",
+    "split": "additional",
+    "q": "Cuánto cuesta alquilar un galpón en Varela hoy?",
+    "old_any": [
+      "s36-03-01",
+      "s36-09-01"
+    ],
+    "new_any": [
+      "activos-inmobiliarios-alcance",
+      "s36-03-01",
+      "s36-09-01"
+    ],
+    "review": "Ausencia puntual sin precios inventados ni tareas para conseguirlos."
+  },
+  {
+    "id": "compare_localities",
+    "split": "additional",
+    "q": "Compará Solís y Varela para servicios a empresas, solo con lo documentado",
+    "old_any": [
+      "s11-01-01",
+      "s14-01-01"
+    ],
+    "new_any": [
+      "actividad-logistica-perfiles",
+      "perfil-solis-actividades",
+      "perfil-varela-actividades"
+    ],
+    "review": "Distinguir contextos y propuestas sin ranking absoluto."
+  },
+  {
+    "id": "rural_scenery",
+    "split": "additional",
+    "q": "Qué información tenés de Arequita, Polanco y Barriga Negra?",
+    "old_any": [
+      "territorio-20261019-z7",
+      "s16-01-01"
+    ],
+    "new_any": [
+      "perfil-arequita-polanco-barriga-negra",
+      "territorio-20261019-z7",
+      "s16-01-01"
+    ],
+    "review": "Ámbitos distintos, paisaje y actividades; delimitar protección solo si se la menciona."
+  },
+  {
+    "id": "food_value",
+    "split": "additional",
+    "q": "Qué posibilidades aparecen para quesos artesanales y alimentos diferenciados?",
+    "old_any": [
+      "AG-009",
+      "AG-010",
+      "s11-01-01"
+    ],
+    "new_any": [
+      "web-lavalleja-alimentos",
+      "perfil-solis-actividades",
+      "AG-009",
+      "AG-010"
+    ],
+    "review": "Describir oportunidades propuestas sin garantías de demanda."
+  },
+  {
+    "id": "business_support",
+    "split": "additional",
+    "q": "Qué servicios ofrece el Centro Pyme de Lavalleja?",
+    "old_any": [
+      "s31-06-01",
+      "s35-01"
+    ],
+    "new_any": [
+      "web-apoyo-centro-pyme",
+      "s31-06-01",
+      "s35-01"
+    ],
+    "review": "Servicios documentados; sin derivación no solicitada ni contactos inventados."
+  }
+]

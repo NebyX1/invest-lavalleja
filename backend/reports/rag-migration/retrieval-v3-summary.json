@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-24",
+  "scope": "Isolated local evaluation, not a production deployment or factual certification",
+  "production_modified": false,
+  "env_modified": false,
+  "reference_repository_commit": "b1ce4826d36dfed9ea48c961ce645b82ab4adcc4",
+  "corpus": {
+    "sha256": "cc59c1c01b21420c959ed5e48e22ca3486752a4ddd8f421b77c544fae73d58de",
+    "records": 271,
+    "public_records_indexed": 196,
+    "internal_records_excluded": 75,
+    "sources": 50,
+    "original_text_modified": false
+  },
+  "models": {
+    "engine": "granite-mmarco-lance-v3",
+    "encoder": "ibm-granite/granite-embedding-97m-multilingual-r2",
+    "encoder_revision": "835ad14087e140460703cf0fae09f97d469d65c2",
+    "encoder_onnx_sha256": "a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78772e",
+    "reranker": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+    "reranker_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+    "reranker_onnx_sha256": "6c2513767fb63d008a4377bef7a7a3555433d9436342bb53e35a3a72ffc52d4b",
+    "pooling": "cls",
+    "normalize": true,
+    "dimensions": 384,
+    "onnxruntime": "1.31.0",
+    "core_fingerprint": "2eea22e49a8edf18fa68961adc43568bfab570af7f4efe68fb9b6c45875061ab",
+    "representation": "source-context-v3",
+    "gemma_benchmarked": false
+  },
+  "ablations": {
+    "runs": 720,
+    "questions": 36,
+    "combinations": 20,
+    "blind_holdout": false,
+    "legacy_raw_horizon": {"passed": 30, "total": 36},
+    "granite_previous_headers_resolved_horizon": {"passed": 34, "total": 36},
+    "granite_source_headers_resolved_mmarco_before_full_harness": {"passed": 32, "total": 36},
+    "metric": "Every expected source group present in final context; not answer truth"
+  },
+  "application_retrieval": {
+    "windows_passed": 36,
+    "linux_passed": 36,
+    "total": 36,
+    "retrieval_candidates": 28,
+    "rerank_candidates": 24,
+    "max_context_records": 8,
+    "max_context_chars": 20000,
+    "linux_cpus": 2,
+    "linux_memory_gib": 2,
+    "linux_network_disabled": true,
+    "linux_old_20_16_limits_passed": 35,
+    "linux_old_limits_failures": ["population"]
+  },
+  "real_provider": {
+    "model": "deepseek-v4.1-flash:1017",
+    "answered": 9,
+    "total": 9,
+    "expected_source_groups_cited": 16,
+    "expected_source_groups": 16,
+    "synthetic_evidence_controls_passed": 4,
+    "synthetic_evidence_controls_total": 4,
+    "private_control_citations": 0,
+    "initial_synthetic_controls_passed": 3,
+    "independent_factual_audit": false
+  },
+  "verification": {
+    "command": "python -m pytest --mariadb-docker -q",
+    "passed": 331,
+    "skipped": 3,
+    "failed": 0,
+    "warnings": 1,
+    "mariadb_real_integration_cases": 12,
+    "both_model_profiles_infer_in_linux": true,
+    "legacy_fingerprint_unchanged": true,
+    "legacy_fingerprint": "b11af1fdc1d700f3342bed184e79fb864f00a773d3e5ef53125b803a3ebf8aa2",
+    "dual_profile_smoke_max_rss_mib": 1764.9,
+    "production_memory_minimum_certified": false
+  },
+  "tested_service_sha256": {
+    "rag.py": "6617afb000e49117e6c9c76a77b4fccb77467a005523e9f84287447ed8be5314",
+    "harness.py": "46ead36def60fa8a4c03edc6bffeed891d673ce168816092630f1ff23816dc05",
+    "agents.py": "ea1b273e94f2f08d16ffb02e4c85054e762d5bfa7d3a993a052f097ecb6ad278"
+  },
+  "limitations": [
+    "Inspected evaluation cases were used during iteration, not a blind benchmark",
+    "Correct source IDs do not guarantee every generated statement is supported",
+    "No external revalidation of source currency or legal/financial claims",
+    "Container measurements do not certify VPS performance or migration peak memory",
+    "No production activation, deployment or remote repository update was performed"
+  ]
+}

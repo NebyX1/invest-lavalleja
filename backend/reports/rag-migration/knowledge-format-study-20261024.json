@@ -1,0 +1,2337 @@
+{
+  "scope": "Offline controlled CPU retrieval study on public source records; no generated-answer or independent factual accuracy certificate.",
+  "runner_sha256": "9c8d37753ef22aba8a0fd5781afbac7f81139100a2c8cc7d036def34a41b371f",
+  "source_hashes": {
+    "gianna\\corpus.py": "8e4647ebebde6fe6e6505e4d0e7c4aba5912d5df3e027a819bded56250e22e3a",
+    "gianna\\chunking.py": "98ac4e796d84bd881c19be590092e716fc52a9c7ace3b7e8ce75500f25e05a8d",
+    "gianna\\services\\neural.py": "74cb458a08fde6be5b0128f240398e579919858036c0091252c10c314acbcd83",
+    "gianna\\services\\vector_store.py": "01ddaf4d2f98b99231aa2be92cf9646cfb83c67c0bf25ab36f9b38134b255592",
+    "gianna\\services\\context_budget.py": "a4e64378741d7323b705aca67e7aa8c297b44ad11e06d7419ef0cb4218b13d70"
+  },
+  "fixture_sha256": {
+    "canonical.json": "a262008d55ac057d84436fbfe33a8a921c819852fd016911b6d4d6b6ba6bd0ef",
+    "canonical.jsonl": "d762913c216b48be549e116c4ad6d79a9f06690489031f2aea78c003dfd9a46d",
+    "records.csv": "57ef50e20019a25228582f42608d8dbb30b92d3f46d1b9e1a00def4be121d90c",
+    "structured.docx": "5092a602f820d059057640668f8fe9f142c0b43002cd830a44a3b522da8bd49b",
+    "structured.html": "526b51a64a566fb1651a909cf9ac9e58091209d3ba6f8cc0252b7432f6c8e09c",
+    "structured.md": "19fb74af349231ddff00a09489e2acf90fd738c607d0d2b14d39a6596b0d1535",
+    "structured.pdf": "a26ec62c98aa69e367904e1e27379c68ee21aceddbae0024e57c31086df8e223",
+    "structured.txt": "1657272d665ff0a3ba9bcfca16976dddacd051547f3a0664f703f98b7b981f06",
+    "transport-extraction.json": "f9614d36ff644d6c3c4479373b4a8f1ff56072dcdbd72f8fc8003937756b51dd"
+  },
+  "corpus_sha256": "cc59c1c01b21420c959ed5e48e22ca3486752a4ddd8f421b77c544fae73d58de",
+  "cases_sha256": "398d6d2fe9716f7ad9962106e8e3ed18511304b33041311891a6ce288b969f75",
+  "extra_cases_sha256": "8aefc63d5153c949723c0b493d8076035681528a4dff78747ec03f16386accef",
+  "public_records": 196,
+  "expected_metadata": {
+    "records_with_zones": 65,
+    "records_with_conditions": 196,
+    "sources": 50
+  },
+  "models": {
+    "engine": "granite-mmarco-lance-v3",
+    "model": "ibm-granite/granite-embedding-97m-multilingual-r2",
+    "revision_resolved": "835ad14087e140460703cf0fae09f97d469d65c2",
+    "dim": 384,
+    "pooling": "cls",
+    "normalize": true,
+    "query_prefix": "",
+    "passage_prefix": "",
+    "runtime": "onnx-cpu",
+    "max_input_tokens": 512,
+    "sparse": "lancedb/bm25-spanish",
+    "reranker": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+    "reranker_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+    "reranker_tokens": 512,
+    "onnxruntime": "1.31.0",
+    "artifact_hashes": {
+      "granite": {
+        "tokenizer.json": "4f2842d568e2724370aec203652a42ac783c7937f8347a1a2cc7506d71f1582f",
+        "tokenizer_config.json": "6ed69389e30a8ecabfce2f9ebcdf0c908b34056f24d994340f2f216521c057d5",
+        "config.json": "de948b0bdc6f356afad7a84b276d8dd7e7fe10fb9add1bb5e610621c28e41ebc",
+        "1_Pooling/config.json": "8bc5c9a40814fcf48d2fbe7cfeff4bee6736c3c2a823ba0ce098985c59d12ab7",
+        "onnx/model_quint8_avx2.onnx": "a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78772e"
+      },
+      "mmarco": {
+        "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+        "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+        "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+        "onnx/model_quint8_avx2.onnx": "6c2513767fb63d008a4377bef7a7a3555433d9436342bb53e35a3a72ffc52d4b"
+      }
+    },
+    "fingerprint": "2eea22e49a8edf18fa68961adc43568bfab570af7f4efe68fb9b6c45875061ab"
+  },
+  "model_load_ms": 8857.427399998414,
+  "threads": 2,
+  "onnx_threads": 2,
+  "process_cpu_quota": null,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "dependencies": {
+    "lancedb": "0.40.0",
+    "onnxruntime": "1.31.0",
+    "tokenizers": "0.23.3",
+    "numpy": "2.4.6"
+  },
+  "frozen_protocol": {
+    "context_tokens": 2000,
+    "max_contexts": 8,
+    "candidates_per_channel": 28,
+    "rerank_pool": 24,
+    "rrf_k": 60,
+    "query": "source-independent existing locality alias resolver, one resolved question; no LLM, no topic/gold mappings",
+    "context": "same source conditions attached to every returned unit; no truncation to game budgets",
+    "reranker_limit": "Pinned mMARCO: query bounded to 120 tokenizer tokens, query-passage pair to 512 with only_second truncation, unchanged across strategies; large windows may lose trailing ranking text, never delivered evidence.",
+    "transport": "stable markers removed; original metadata sidecar equalized only in controlled extraction track, not native import",
+    "timing": "local warm OS cache; cold model load reported separately; no cache sharing between strategies; semantic sentence encoding included in prep"
+  },
+  "formats": [
+    {
+      "format": "canonical.json",
+      "bytes": 306982,
+      "extract_first_ms": 24.144,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": true,
+        "import_accepted": true,
+        "records": 196,
+        "public_records": 196,
+        "ids_matching_canonical": 196,
+        "identities_preserved": 196,
+        "source_registry": 50,
+        "records_with_zones": 65,
+        "records_with_conditions": 196,
+        "load_p50_ms": 9.37,
+        "all_record_fields_equal": true
+      }
+    },
+    {
+      "format": "canonical.jsonl",
+      "bytes": 267525,
+      "extract_first_ms": 24.768,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": true,
+        "import_accepted": true,
+        "records": 196,
+        "public_records": 196,
+        "ids_matching_canonical": 196,
+        "identities_preserved": 196,
+        "source_registry": 50,
+        "records_with_zones": 65,
+        "records_with_conditions": 196,
+        "load_p50_ms": 17.293,
+        "all_record_fields_equal": true
+      }
+    },
+    {
+      "format": "structured.md",
+      "bytes": 172894,
+      "extract_first_ms": 19.993,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": true,
+        "import_accepted": true,
+        "records": 196,
+        "public_records": 0,
+        "ids_matching_canonical": 0,
+        "identities_preserved": 0,
+        "source_registry": 0,
+        "records_with_zones": 0,
+        "records_with_conditions": 0,
+        "load_p50_ms": 10.898
+      }
+    },
+    {
+      "format": "structured.txt",
+      "bytes": 171522,
+      "extract_first_ms": 21.223,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": true,
+        "import_accepted": false,
+        "error_type": "ValidationError"
+      }
+    },
+    {
+      "format": "structured.docx",
+      "bytes": 72149,
+      "extract_first_ms": 157.041,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": true,
+        "import_accepted": true,
+        "records": 196,
+        "public_records": 0,
+        "ids_matching_canonical": 29,
+        "identities_preserved": 16,
+        "source_registry": 0,
+        "records_with_zones": 24,
+        "records_with_conditions": 0,
+        "load_p50_ms": 1805.277
+      }
+    },
+    {
+      "format": "structured.pdf",
+      "bytes": 171093,
+      "extract_first_ms": 937.013,
+      "transport_records": 196,
+      "body_exact": 61,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": false,
+        "import_accepted": false,
+        "error_type": "DomainError"
+      }
+    },
+    {
+      "format": "records.csv",
+      "bytes": 191949,
+      "extract_first_ms": 23.993,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": false,
+        "import_accepted": false,
+        "error_type": "DomainError"
+      }
+    },
+    {
+      "format": "structured.html",
+      "bytes": 180724,
+      "extract_first_ms": 58.217,
+      "transport_records": 196,
+      "body_exact": 196,
+      "body_whitespace_equal": 196,
+      "missing_ids": [],
+      "changed_bodies": [],
+      "native": {
+        "supported_extension": false,
+        "import_accepted": false,
+        "error_type": "DomainError"
+      }
+    }
+  ],
+  "resume_snapshot": "results.resume-91a89697.json",
+  "protocol_amendments": [
+    "Before examining nonbaseline configuration outcomes: fixed split-span/whitespace scoring, duplicate conditions in evidence, preparation/token cost reuse and public source filtering. Baseline index inputs/evidence unchanged; its stored selections rescored.",
+    "Final scoring revision: union literal body and attached-condition intervals, accept any exact repeated occurrence, reject changed word boundaries during transport alignment. Frozen questions, gold spans, model inputs and stored selections unchanged. All stored selections rescored; no claim of external preregistration.",
+    "Two exploratory controls specified after inspecting the first four structural results, before inspecting semantic/overlap outcomes: semantic boundaries on body sentences without shared headers, and real 30-token overlap at the 180-token split. A third later control uses body-only dense and source-context BM25, motivated by read-only inspection of Giana Turismo ingestion code. Not an independent confirmatory family."
+  ],
+  "transport_embedding_inputs": {
+    "canonical.json": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    },
+    "canonical.jsonl": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    },
+    "structured.md": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    },
+    "structured.txt": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    },
+    "structured.docx": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    },
+    "structured.pdf": {
+      "embedding_inputs_sha256": "b4281a14da986c454a39ff9aada85ecff6ef9d55713472e3703db349de85fb01",
+      "chunks": 196
+    },
+    "records.csv": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    },
+    "structured.html": {
+      "embedding_inputs_sha256": "16e2beebdbbc197749b531115717c959bc4fa8709b811f80ce764be87bd51707",
+      "chunks": 196
+    }
+  },
+  "completed": true,
+  "repeatability_observation": {"profile":"transport_pdf","completed_run_1_p50_ms":3649.61435,"completed_run_2_p50_ms":4355.048,"source_cases_both":56,"passage_cases_both":24,"note":"Same inputs and coverage; first-run aggregate from recorded tool output, second from final JSON. Different local process/run conditions, not an interleaved statistical experiment. Roughly 19% time variation; do not treat the semantic candidate's roughly 15% observed speed difference as established."},
+  "study_started": "2026-10-24",
+  "study_completed": "2026-10-25",
+  "questions": 60,
+  "expected_source_groups": 71,
+  "new_frozen_questions": 24,
+  "literal_spans": 58,
+  "structures": 17,
+  "distinct_indexes": 14,
+  "logical_results": 4320,
+  "full_result_sha256": "f63a0db8e0fe0ad445071cd6f8eff4450587be856f5fc35405647845f80473e6",
+  "profiles": [
+    {
+      "strategy": "current_420_40",
+      "signature": "95c0017d7446208ac0324e08e9a99db6d4ec3ed210ac16025fba327b76e62fee",
+      "units": 196,
+      "index_bytes": 458108,
+      "prep_ms": 548.61,
+      "encoding_ms": 37790.48,
+      "index_ms": 199.68,
+      "total_build_ms": 38538.77,
+      "embedded_tokens": 21866,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 21866,
+      "modes": {
+        "dense": {
+          "passed": 47,
+          "group_recall": 0.8028,
+          "evidence_span_passed": 18,
+          "evidence_span_recall": 0.8276,
+          "mean_context_tokens": 1536.8167,
+          "p50_ms": 54.008,
+          "p95_ms": 92.688,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-08-solis-matriz-frio",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 18
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1620,
+          "p50_ms": 15.8775,
+          "p95_ms": 31.7252,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1575.7833,
+          "p50_ms": 70.0777,
+          "p95_ms": 122.4408,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 56,
+          "group_recall": 0.9296,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1689,
+          "p50_ms": 4131.7361,
+          "p95_ms": 5803.0011,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "plain_420_40",
+      "signature": "19849e36da0523d232abca87ebcc4fdbeba9fd63a9cacd6ab139a1555181d902",
+      "units": 196,
+      "index_bytes": 442182,
+      "prep_ms": 724.52,
+      "encoding_ms": 31748.33,
+      "index_ms": 224.38,
+      "total_build_ms": 32697.22,
+      "embedded_tokens": 16946,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 16946,
+      "modes": {
+        "dense": {
+          "passed": 46,
+          "group_recall": 0.7746,
+          "evidence_span_passed": 18,
+          "evidence_span_recall": 0.8103,
+          "mean_context_tokens": 1297.2833,
+          "p50_ms": 47.5256,
+          "p95_ms": 68.2826,
+          "failures": [
+            "north-potential",
+            "north-short",
+            "north-opportunities",
+            "varela",
+            "minas",
+            "compare-zones",
+            "bar",
+            "company",
+            "ind24-08-solis-matriz-frio",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 18
+        },
+        "bm25": {
+          "passed": 52,
+          "group_recall": 0.8451,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1418.7167,
+          "p50_ms": 14.1142,
+          "p95_ms": 29.7536,
+          "failures": [
+            "north-opportunities",
+            "water-paraphrase",
+            "byproducts",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 52,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1368.1,
+          "p50_ms": 63.0901,
+          "p95_ms": 101.3594,
+          "failures": [
+            "north-opportunities",
+            "minas",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "population",
+            "ind24-11-varela-campana-riesgos"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1405.6833,
+          "p50_ms": 3298.1284,
+          "p95_ms": 4072.2413,
+          "failures": [
+            "north-opportunities",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "ind24-08-solis-matriz-frio",
+            "ind24-13-polanco-operacion-informal"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-13-polanco-operacion-informal"
+          ],
+          "new_source_cases": 22
+        }
+      }
+    },
+    {
+      "strategy": "title_240_0",
+      "signature": "47037a79a4d8c6778b5edfa294ac25154ccebff1c81648abf3e2b114ad93ce38",
+      "units": 197,
+      "index_bytes": 451195,
+      "prep_ms": 816.48,
+      "encoding_ms": 28436.04,
+      "index_ms": 189.77,
+      "total_build_ms": 29442.29,
+      "embedded_tokens": 19178,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 19178,
+      "modes": {
+        "dense": {
+          "passed": 47,
+          "group_recall": 0.8028,
+          "evidence_span_passed": 18,
+          "evidence_span_recall": 0.8276,
+          "mean_context_tokens": 1408.4833,
+          "p50_ms": 46.0696,
+          "p95_ms": 67.8552,
+          "failures": [
+            "north-opportunities",
+            "minas",
+            "compare-zones",
+            "energy-paraphrase",
+            "bar",
+            "land",
+            "company",
+            "ind24-08-solis-matriz-frio",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 18
+        },
+        "bm25": {
+          "passed": 54,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1490.6667,
+          "p50_ms": 13.4527,
+          "p95_ms": 22.2151,
+          "failures": [
+            "north-opportunities",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.931,
+          "mean_context_tokens": 1454.2,
+          "p50_ms": 61.3208,
+          "p95_ms": 88.8471,
+          "failures": [
+            "north-opportunities",
+            "bar",
+            "land",
+            "company",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1481.1167,
+          "p50_ms": 3206.2292,
+          "p95_ms": 3840.7682,
+          "failures": [
+            "north-opportunities",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "ind24-08-solis-matriz-frio",
+            "ind24-13-polanco-operacion-informal"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-13-polanco-operacion-informal"
+          ],
+          "new_source_cases": 22
+        }
+      }
+    },
+    {
+      "strategy": "context_180_0",
+      "signature": "46927c04160e646288ad3ade64e94a2b208729c76de3f1cd4aa4a88720ba4560",
+      "units": 224,
+      "index_bytes": 506110,
+      "prep_ms": 1066.43,
+      "encoding_ms": 31609.07,
+      "index_ms": 239.32,
+      "total_build_ms": 32914.82,
+      "embedded_tokens": 22974,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 22974,
+      "modes": {
+        "dense": {
+          "passed": 50,
+          "group_recall": 0.8451,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8621,
+          "mean_context_tokens": 1420.8333,
+          "p50_ms": 45.9665,
+          "p95_ms": 71.8763,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "land",
+            "company",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 20
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1461.2833,
+          "p50_ms": 13.5614,
+          "p95_ms": 24.4628,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 21,
+          "evidence_span_recall": 0.9138,
+          "mean_context_tokens": 1418.8833,
+          "p50_ms": 61.7095,
+          "p95_ms": 93.6575,
+          "failures": [
+            "bar",
+            "land",
+            "population",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1487.4,
+          "p50_ms": 2959.6114,
+          "p95_ms": 3656.0832,
+          "failures": [
+            "north-potential",
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "context_240_0",
+      "signature": "e07a9e6b4d70e45e7b9f9ded477832b050b43fb10c16ac2106622437f57031c7",
+      "units": 203,
+      "index_bytes": 470781,
+      "prep_ms": 1052.63,
+      "encoding_ms": 32509,
+      "index_ms": 173.32,
+      "total_build_ms": 33734.94,
+      "embedded_tokens": 22225,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 22225,
+      "modes": {
+        "dense": {
+          "passed": 49,
+          "group_recall": 0.8169,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8966,
+          "mean_context_tokens": 1502.75,
+          "p50_ms": 46.5613,
+          "p95_ms": 65.8005,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "population",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 21
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9828,
+          "mean_context_tokens": 1562.05,
+          "p50_ms": 13.8213,
+          "p95_ms": 24.4721,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1552.5333,
+          "p50_ms": 64.5436,
+          "p95_ms": 88.1468,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "land",
+            "population",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1646.3167,
+          "p50_ms": 3675.9917,
+          "p95_ms": 4713.5823,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        }
+      }
+    },
+    {
+      "strategy": "context_300_0",
+      "signature": "95c0017d7446208ac0324e08e9a99db6d4ec3ed210ac16025fba327b76e62fee",
+      "units": 196,
+      "index_bytes": 458108,
+      "prep_ms": 840.29,
+      "encoding_ms": 37790.48,
+      "index_ms": 199.68,
+      "total_build_ms": 38830.45,
+      "embedded_tokens": 21866,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 21866,
+      "identical_to": "current_420_40",
+      "build_cost_kind": "Measured preparation plus reused encoding/index estimate; not a separate full build",
+      "modes": {
+        "dense": {
+          "passed": 47,
+          "group_recall": 0.8028,
+          "evidence_span_passed": 18,
+          "evidence_span_recall": 0.8276,
+          "mean_context_tokens": 1536.8167,
+          "p50_ms": 54.008,
+          "p95_ms": 92.688,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-08-solis-matriz-frio",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 18
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1620,
+          "p50_ms": 15.8775,
+          "p95_ms": 31.7252,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1575.7833,
+          "p50_ms": 70.0777,
+          "p95_ms": 122.4408,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 56,
+          "group_recall": 0.9296,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1689,
+          "p50_ms": 4131.7361,
+          "p95_ms": 5803.0011,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "context_420_0",
+      "signature": "95c0017d7446208ac0324e08e9a99db6d4ec3ed210ac16025fba327b76e62fee",
+      "units": 196,
+      "index_bytes": 458108,
+      "prep_ms": 901.21,
+      "encoding_ms": 37790.48,
+      "index_ms": 199.68,
+      "total_build_ms": 38891.36,
+      "embedded_tokens": 21866,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 21866,
+      "identical_to": "current_420_40",
+      "build_cost_kind": "Measured preparation plus reused encoding/index estimate; not a separate full build",
+      "modes": {
+        "dense": {
+          "passed": 47,
+          "group_recall": 0.8028,
+          "evidence_span_passed": 18,
+          "evidence_span_recall": 0.8276,
+          "mean_context_tokens": 1536.8167,
+          "p50_ms": 54.008,
+          "p95_ms": 92.688,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-08-solis-matriz-frio",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 18
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1620,
+          "p50_ms": 15.8775,
+          "p95_ms": 31.7252,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1575.7833,
+          "p50_ms": 70.0777,
+          "p95_ms": 122.4408,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 56,
+          "group_recall": 0.9296,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1689,
+          "p50_ms": 4131.7361,
+          "p95_ms": 5803.0011,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "context_conditions_300_0",
+      "signature": "1edc1a0fe44ae238715e7cb106b26650a6375f4c08d7db74063acb87f7bed126",
+      "units": 199,
+      "index_bytes": 501947,
+      "prep_ms": 1450.39,
+      "encoding_ms": 44849.63,
+      "index_ms": 254.62,
+      "total_build_ms": 46554.64,
+      "embedded_tokens": 32840,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 32840,
+      "modes": {
+        "dense": {
+          "passed": 44,
+          "group_recall": 0.7606,
+          "evidence_span_passed": 17,
+          "evidence_span_recall": 0.7586,
+          "mean_context_tokens": 1564.8833,
+          "p50_ms": 47.3203,
+          "p95_ms": 66.7441,
+          "failures": [
+            "north-potential",
+            "north-opportunities",
+            "minas",
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "population",
+            "ind24-04-geoparque-superficie-fecha",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-07-minas-interes-piloto",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-04-geoparque-superficie-fecha",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-07-minas-interes-piloto",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 17
+        },
+        "bm25": {
+          "passed": 50,
+          "group_recall": 0.831,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1596.8333,
+          "p50_ms": 13.7119,
+          "p95_ms": 21.9844,
+          "failures": [
+            "north-potential",
+            "north-short",
+            "north-opportunities",
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 53,
+          "group_recall": 0.8873,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1599.4167,
+          "p50_ms": 62.2497,
+          "p95_ms": 83.8391,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 53,
+          "group_recall": 0.8873,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1687.2667,
+          "p50_ms": 4609.7472,
+          "p95_ms": 5789.2905,
+          "failures": [
+            "north-potential",
+            "north-opportunities",
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land",
+            "population"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "json_keys_300_0",
+      "signature": "82485ac6d1d8db306eacfb50b66c8608b7402ebd6f44ac339636798e7b4e2fa4",
+      "units": 196,
+      "index_bytes": 463931,
+      "prep_ms": 933.53,
+      "encoding_ms": 36864.78,
+      "index_ms": 202.45,
+      "total_build_ms": 38000.76,
+      "embedded_tokens": 25316,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 25316,
+      "modes": {
+        "dense": {
+          "passed": 49,
+          "group_recall": 0.8169,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8621,
+          "mean_context_tokens": 1557.8167,
+          "p50_ms": 46.7679,
+          "p95_ms": 68.9603,
+          "failures": [
+            "north-opportunities",
+            "minas",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "land",
+            "company",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 20
+        },
+        "bm25": {
+          "passed": 52,
+          "group_recall": 0.8592,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1662.5667,
+          "p50_ms": 14.5837,
+          "p95_ms": 24.7944,
+          "failures": [
+            "north-opportunities",
+            "mobile",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1585.6333,
+          "p50_ms": 65.4278,
+          "p95_ms": 90.8715,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 53,
+          "group_recall": 0.8873,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1690.8667,
+          "p50_ms": 4393.3487,
+          "p95_ms": 5494.6582,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        }
+      }
+    },
+    {
+      "strategy": "sentence_180_0",
+      "signature": "46927c04160e646288ad3ade64e94a2b208729c76de3f1cd4aa4a88720ba4560",
+      "units": 224,
+      "index_bytes": 506110,
+      "prep_ms": 1215.91,
+      "encoding_ms": 31609.07,
+      "index_ms": 239.32,
+      "total_build_ms": 33064.3,
+      "embedded_tokens": 22974,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 22974,
+      "identical_to": "context_180_0",
+      "build_cost_kind": "Measured preparation plus reused encoding/index estimate; not a separate full build",
+      "modes": {
+        "dense": {
+          "passed": 50,
+          "group_recall": 0.8451,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8621,
+          "mean_context_tokens": 1420.8333,
+          "p50_ms": 45.9665,
+          "p95_ms": 71.8763,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "land",
+            "company",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 20
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1461.2833,
+          "p50_ms": 13.5614,
+          "p95_ms": 24.4628,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 21,
+          "evidence_span_recall": 0.9138,
+          "mean_context_tokens": 1418.8833,
+          "p50_ms": 61.7095,
+          "p95_ms": 93.6575,
+          "failures": [
+            "bar",
+            "land",
+            "population",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1487.4,
+          "p50_ms": 2959.6114,
+          "p95_ms": 3656.0832,
+          "failures": [
+            "north-potential",
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "semantic_240_0",
+      "signature": "e07a9e6b4d70e45e7b9f9ded477832b050b43fb10c16ac2106622437f57031c7",
+      "units": 203,
+      "index_bytes": 470781,
+      "prep_ms": 57095.58,
+      "encoding_ms": 32509,
+      "index_ms": 173.32,
+      "total_build_ms": 89777.9,
+      "embedded_tokens": 22225,
+      "segmentation_embedding_tokens": 42258,
+      "total_embedding_tokens": 64483,
+      "identical_to": "context_240_0",
+      "build_cost_kind": "Measured preparation plus reused encoding/index estimate; not a separate full build",
+      "modes": {
+        "dense": {
+          "passed": 49,
+          "group_recall": 0.8169,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8966,
+          "mean_context_tokens": 1502.75,
+          "p50_ms": 46.5613,
+          "p95_ms": 65.8005,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "byproducts",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "population",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 21
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9828,
+          "mean_context_tokens": 1562.05,
+          "p50_ms": 13.8213,
+          "p95_ms": 24.4721,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1552.5333,
+          "p50_ms": 64.5436,
+          "p95_ms": 88.1468,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "land",
+            "population",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1646.3167,
+          "p50_ms": 3675.9917,
+          "p95_ms": 4713.5823,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        }
+      }
+    },
+    {
+      "strategy": "child_120_parent_record",
+      "signature": "7c378915e848ef8e7002eab8d3473e208948b329c88a7c28e9526e14ce3da122",
+      "units": 279,
+      "index_bytes": 601729,
+      "prep_ms": 979.37,
+      "encoding_ms": 27037.12,
+      "index_ms": 191.1,
+      "total_build_ms": 28207.59,
+      "embedded_tokens": 25099,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 25099,
+      "modes": {
+        "dense": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.931,
+          "mean_context_tokens": 1627.5833,
+          "p50_ms": 45.4406,
+          "p95_ms": 65.6408,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1697.55,
+          "p50_ms": 13.7081,
+          "p95_ms": 22.323,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1655.4333,
+          "p50_ms": 59.9209,
+          "p95_ms": 82.0125,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "land",
+            "population",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1698.9,
+          "p50_ms": 2234.2544,
+          "p95_ms": 2809.8894,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land",
+            "company"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "section_420_40",
+      "signature": "8dcfdc0c20dd3534e53f75224f3f9e4cd27b0ed58974481a137807bc93b7c9c1",
+      "units": 62,
+      "index_bytes": 232871,
+      "prep_ms": 1214.33,
+      "encoding_ms": 27865.45,
+      "index_ms": 174.6,
+      "total_build_ms": 29254.38,
+      "embedded_tokens": 20598,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 20598,
+      "modes": {
+        "dense": {
+          "passed": 39,
+          "group_recall": 0.662,
+          "evidence_span_passed": 15,
+          "evidence_span_recall": 0.6897,
+          "mean_context_tokens": 1914.6,
+          "p50_ms": 46.0255,
+          "p95_ms": 70.1847,
+          "failures": [
+            "north-potential",
+            "north-short",
+            "north-opportunities",
+            "varela",
+            "batlle",
+            "minas",
+            "solis",
+            "energy-paraphrase",
+            "byproducts",
+            "education",
+            "bar",
+            "company",
+            "tax-paraphrase",
+            "utec",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-07-minas-interes-piloto",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-20-comap-plazo-condicionado"
+          ],
+          "span_failures": [
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-07-minas-interes-piloto",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-12-batlle-ferrocarril",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-19-banca-documentacion",
+            "ind24-20-comap-plazo-condicionado"
+          ],
+          "new_source_cases": 17
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1904.2667,
+          "p50_ms": 13.7976,
+          "p95_ms": 19.5891,
+          "failures": [
+            "north-opportunities",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 49,
+          "group_recall": 0.8169,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8621,
+          "mean_context_tokens": 1934.3333,
+          "p50_ms": 62.0844,
+          "p95_ms": 84.8181,
+          "failures": [
+            "north-potential",
+            "north-short",
+            "north-opportunities",
+            "byproducts",
+            "education",
+            "bar",
+            "land",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-07-minas-interes-piloto",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "span_failures": [
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-07-minas-interes-piloto",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 20
+        },
+        "hybrid_rerank": {
+          "passed": 55,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1919.2667,
+          "p50_ms": 9183.1418,
+          "p95_ms": 9986.5523,
+          "failures": [
+            "north-opportunities",
+            "water-paraphrase",
+            "bar",
+            "company",
+            "ind24-12-batlle-ferrocarril"
+          ],
+          "span_failures": [
+            "ind24-12-batlle-ferrocarril"
+          ],
+          "new_source_cases": 23
+        }
+      }
+    },
+    {
+      "strategy": "flat_420_40",
+      "signature": "760616f93d20846ecafa46ab6b5ffff9dfd77d47d65ab113f2d94e85eca2d0af",
+      "units": 51,
+      "index_bytes": 212906,
+      "prep_ms": 3302.98,
+      "encoding_ms": 22554.86,
+      "index_ms": 216.05,
+      "total_build_ms": 26073.89,
+      "embedded_tokens": 20702,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 20702,
+      "modes": {
+        "dense": {
+          "passed": 40,
+          "group_recall": 0.6479,
+          "evidence_span_passed": 13,
+          "evidence_span_recall": 0.4828,
+          "mean_context_tokens": 1714.4167,
+          "p50_ms": 45.6424,
+          "p95_ms": 67.1847,
+          "failures": [
+            "north-opportunities",
+            "minas",
+            "sierras",
+            "compare-zones",
+            "mobile",
+            "education",
+            "bar",
+            "population",
+            "business-case",
+            "ind24-03-molcemin-monto-alcance",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-19-banca-documentacion",
+            "ind24-21-contactos-ambiente-runaev",
+            "ind24-22-centro-pyme-confidencialidad",
+            "ind24-23-contactos-no-publicados",
+            "ind24-24-fuentes-corporativas-anuncios"
+          ],
+          "span_failures": [
+            "ind24-03-molcemin-monto-alcance",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-19-banca-documentacion",
+            "ind24-21-contactos-ambiente-runaev",
+            "ind24-22-centro-pyme-confidencialidad",
+            "ind24-23-contactos-no-publicados",
+            "ind24-24-fuentes-corporativas-anuncios"
+          ],
+          "new_source_cases": 13
+        },
+        "bm25": {
+          "passed": 51,
+          "group_recall": 0.831,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.931,
+          "mean_context_tokens": 1722.55,
+          "p50_ms": 13.6804,
+          "p95_ms": 20.8047,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "costs",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos",
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 52,
+          "group_recall": 0.8592,
+          "evidence_span_passed": 21,
+          "evidence_span_recall": 0.8793,
+          "mean_context_tokens": 1733.7667,
+          "p50_ms": 61.6982,
+          "p95_ms": 82.5168,
+          "failures": [
+            "north-opportunities",
+            "sierras",
+            "compare-zones",
+            "bar",
+            "population",
+            "business-case",
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "span_failures": [
+            "ind24-05-ue-acuerdo-condiciones",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 49,
+          "group_recall": 0.8028,
+          "evidence_span_passed": 21,
+          "evidence_span_recall": 0.8966,
+          "mean_context_tokens": 1759.2667,
+          "p50_ms": 9497.6823,
+          "p95_ms": 10135.7543,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "water-paraphrase",
+            "byproducts",
+            "bar",
+            "bailable",
+            "company",
+            "business-case",
+            "ind24-12-batlle-ferrocarril",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-17-alojamiento-modelo-equilibrio"
+          ],
+          "span_failures": [
+            "ind24-12-batlle-ferrocarril",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-17-alojamiento-modelo-equilibrio"
+          ],
+          "new_source_cases": 21
+        }
+      }
+    },
+    {
+      "strategy": "semantic_body_240_0",
+      "signature": "e3538a84144ade1d3cf35c27ad10ad9a5f7538e73de75f2768ae0a3d926ec91e",
+      "units": 215,
+      "index_bytes": 490301,
+      "prep_ms": 26290.52,
+      "encoding_ms": 35975.46,
+      "index_ms": 185.76,
+      "total_build_ms": 62451.74,
+      "embedded_tokens": 22506,
+      "segmentation_embedding_tokens": 18665,
+      "total_embedding_tokens": 41171,
+      "modes": {
+        "dense": {
+          "passed": 51,
+          "group_recall": 0.8592,
+          "evidence_span_passed": 19,
+          "evidence_span_recall": 0.8448,
+          "mean_context_tokens": 1498.15,
+          "p50_ms": 45.2101,
+          "p95_ms": 65.623,
+          "failures": [
+            "energy-paraphrase",
+            "bar",
+            "land",
+            "company",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 19
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9828,
+          "mean_context_tokens": 1534.6,
+          "p50_ms": 13.2175,
+          "p95_ms": 24.1958,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1541.4333,
+          "p50_ms": 64.5483,
+          "p95_ms": 84.0592,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 56,
+          "group_recall": 0.9296,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1636.0167,
+          "p50_ms": 3519.1657,
+          "p95_ms": 4468.844,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "context_180_30",
+      "signature": "667806adb6c7e8d47b322ad2262c4e57da7b92e55eb88e92baa8977913a8de1e",
+      "units": 225,
+      "index_bytes": 511742,
+      "prep_ms": 1130.58,
+      "encoding_ms": 31713.54,
+      "index_ms": 215.23,
+      "total_build_ms": 33059.35,
+      "embedded_tokens": 23850,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 23850,
+      "modes": {
+        "dense": {
+          "passed": 51,
+          "group_recall": 0.8592,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8793,
+          "mean_context_tokens": 1449.9333,
+          "p50_ms": 42.2061,
+          "p95_ms": 58.7425,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "energy-paraphrase",
+            "bar",
+            "land",
+            "company",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 21
+        },
+        "bm25": {
+          "passed": 52,
+          "group_recall": 0.8592,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1497.95,
+          "p50_ms": 8.1391,
+          "p95_ms": 20.3997,
+          "failures": [
+            "north-opportunities",
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 55,
+          "group_recall": 0.9155,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.931,
+          "mean_context_tokens": 1450.6333,
+          "p50_ms": 52.4035,
+          "p95_ms": 72.3105,
+          "failures": [
+            "bar",
+            "land",
+            "company",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1508.7333,
+          "p50_ms": 1757.0624,
+          "p95_ms": 3072.5968,
+          "failures": [
+            "north-potential",
+            "compare-zones",
+            "mobile",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [
+            "ind24-16-hospitalidad-servicios-anual"
+          ],
+          "new_source_cases": 24
+        }
+      }
+    },
+    {
+      "strategy": "body_dense_context_bm25",
+      "signature": "e909382756a9efddd374cd8f488c3e423a0556f48fb8956e4ba0fa783b9cc870",
+      "units": 196,
+      "index_bytes": 457724,
+      "prep_ms": 335.78,
+      "encoding_ms": 33127.11,
+      "index_ms": 189.82,
+      "total_build_ms": 33652.71,
+      "embedded_tokens": 16946,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 16946,
+      "modes": {
+        "dense": {
+          "passed": 46,
+          "group_recall": 0.7746,
+          "evidence_span_passed": 18,
+          "evidence_span_recall": 0.8103,
+          "mean_context_tokens": 1543.5,
+          "p50_ms": 49.5898,
+          "p95_ms": 73.9056,
+          "failures": [
+            "north-potential",
+            "north-short",
+            "north-opportunities",
+            "varela",
+            "minas",
+            "compare-zones",
+            "bar",
+            "company",
+            "ind24-08-solis-matriz-frio",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-08-solis-matriz-frio",
+            "ind24-10-mariscala-expansion-forestal",
+            "ind24-11-varela-campana-riesgos",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 18
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1620,
+          "p50_ms": 15.0681,
+          "p95_ms": 23.2844,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9655,
+          "mean_context_tokens": 1618.5333,
+          "p50_ms": 66.8927,
+          "p95_ms": 95.8373,
+          "failures": [
+            "north-opportunities",
+            "bar",
+            "land",
+            "company",
+            "population",
+            "ind24-11-varela-campana-riesgos"
+          ],
+          "span_failures": [
+            "ind24-11-varela-campana-riesgos"
+          ],
+          "new_source_cases": 23
+        },
+        "hybrid_rerank": {
+          "passed": 54,
+          "group_recall": 0.8873,
+          "evidence_span_passed": 23,
+          "evidence_span_recall": 0.9828,
+          "mean_context_tokens": 1638.1333,
+          "p50_ms": 3672.4043,
+          "p95_ms": 4695.7478,
+          "failures": [
+            "north-opportunities",
+            "bar",
+            "bailable",
+            "land",
+            "company",
+            "ind24-13-polanco-operacion-informal"
+          ],
+          "span_failures": [
+            "ind24-13-polanco-operacion-informal"
+          ],
+          "new_source_cases": 23
+        }
+      }
+    },
+    {
+      "strategy": "transport_pdf",
+      "signature": "b5977fcde53e74003cb443f7daee261b135e3588b8bdf372cea98f1c5ce565dd",
+      "units": 196,
+      "index_bytes": 457852,
+      "prep_ms": 480.84,
+      "encoding_ms": 41773.53,
+      "index_ms": 209.95,
+      "total_build_ms": 42464.32,
+      "embedded_tokens": 22652,
+      "segmentation_embedding_tokens": 0,
+      "total_embedding_tokens": 22652,
+      "modes": {
+        "dense": {
+          "passed": 51,
+          "group_recall": 0.8592,
+          "evidence_span_passed": 20,
+          "evidence_span_recall": 0.8793,
+          "mean_context_tokens": 1541.9667,
+          "p50_ms": 49.7146,
+          "p95_ms": 72,
+          "failures": [
+            "compare-zones",
+            "energy-paraphrase",
+            "bar",
+            "land",
+            "company",
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-14-sucesion-todas-zonas",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-16-hospitalidad-servicios-anual",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 20
+        },
+        "bm25": {
+          "passed": 53,
+          "group_recall": 0.8732,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1655.9333,
+          "p50_ms": 15.0955,
+          "p95_ms": 22.2226,
+          "failures": [
+            "compare-zones",
+            "water-paraphrase",
+            "bar",
+            "bailable",
+            "land",
+            "population",
+            "business-case"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        },
+        "hybrid": {
+          "passed": 54,
+          "group_recall": 0.9014,
+          "evidence_span_passed": 22,
+          "evidence_span_recall": 0.9483,
+          "mean_context_tokens": 1580.6333,
+          "p50_ms": 66.0164,
+          "p95_ms": 88.5598,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "land",
+            "population",
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "span_failures": [
+            "ind24-15-modulos-parque-beneficios",
+            "ind24-21-contactos-ambiente-runaev"
+          ],
+          "new_source_cases": 22
+        },
+        "hybrid_rerank": {
+          "passed": 56,
+          "group_recall": 0.9296,
+          "evidence_span_passed": 24,
+          "evidence_span_recall": 1,
+          "mean_context_tokens": 1717.9167,
+          "p50_ms": 4355.048,
+          "p95_ms": 5527.076,
+          "failures": [
+            "compare-zones",
+            "bar",
+            "bailable",
+            "land"
+          ],
+          "span_failures": [],
+          "new_source_cases": 24
+        }
+      }
+    }
+  ],
+  "independent_questions": 60,
+  "identical_configs_are_not_independent": true,
+  "original_internal_records_excluded": 75,
+  "provider_generation_calls": 0,
+  "production_changed": false,
+  "env_changed": false,
+  "models_changed": false,
+  "github_push_or_deployment": false,
+  "current_runner_sha256": "53bc554a9bca28b17b16f6fc8314b3569b85f64c23cfe4442af7bf9755b6ed30",
+  "runner_provenance_note": "After this run started, only carrying execution incidents forward and immediately checkpointing a retry were added. Reversing those two I/O-only lines yields recorded runner_sha256 9c8d37753ef22aba8a0fd5781afbac7f81139100a2c8cc7d036def34a41b371f. Ranking, inputs and scoring unchanged.",
+  "execution_incidents": [
+    {
+      "stage": "Initial body_dense_context_bm25 attempt",
+      "code": "rerank_timeout",
+      "detail": "Aborted before first ten-case progress checkpoint; exact case not logged. A fresh full run completed 60/60 with original 30-second guard. This is execution failure, not missing knowledge."
+    }
+  ],
+  "validation": {
+    "command": "python -m pytest --mariadb-docker -q",
+    "passed": 362,
+    "skipped": 3,
+    "warnings": 1,
+    "elapsed_seconds": 161.44,
+    "mechanics_tests": 14,
+    "skips": "Legacy private documentary package absent from its expected path; actual better-rag corpus evaluated separately.",
+    "warning": "Existing PydanticGraph event-loop deprecation."
+  },
+  "recommendation": {
+    "ingestion": "Self-contained validated gianna.corpus.v1 JSON; file format itself does not improve embeddings.",
+    "conservative_default": "Keep source-context logical records and hybrid retrieval plus reranking for maximal coverage in this set.",
+    "advanced_candidate": "Body-only semantic boundary detection with contextual 240-token chunks tied maximal source coverage, modestly lower observed query time and context, but higher build cost; validate integrated pipeline before adoption.",
+    "latency_candidate": "120-token children returning the original parent record: lower observed reranking time, one additional source-case miss and more index entries.",
+    "not_recommended_here": [
+      "Flattened global windows",
+      "Whole-section grouping for reranked queries",
+      "Semantic segmentation with duplicated headings when it yields identical boundaries",
+      "Blindly adding all conditions/JSON keys to search representations"
+    ],
+    "deployment": "No production publication or automatic settings change."
+  },
+  "limitations": [
+    "All file variants derive from the same public corpus, not independent heterogeneous originals.",
+    "Narrative views encode body and a subset of metadata, not all fields/bibliography. Native metadata gaps confound view and converter; equalized retrieval explicitly uses a sidecar.",
+    "PDF is single-column selectable text; no OCR, complex tables or diagram benchmark. DOCX extraction checked, LibreOffice rendering unavailable.",
+    "60 related questions, including 24 agent-designed frozen additions and 58 literal spans; no independent human blind holdout.",
+    "17 configurations plus PDF produce 4320 logical case-mode rows, with four identical configurations reused. They are not 4320 independent questions.",
+    "Local warm non-randomized timings, ONNX two threads but no whole-process CPU quota. No peak-RAM, concurrent-VPS or end-to-end generation latency certificate.",
+    "Small latency differences require interleaved repeated measurement. Source coverage is not answer correctness or independent factual verification.",
+    "Multi-record grouping does not implement a production citation/provenance contract. Full production harness and 8K memory behavior not altered or re-evaluated here."
+  ]
+}

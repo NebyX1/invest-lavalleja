@@ -1,0 +1,14 @@
+[
+  {"q":"¿Qué servicios para la producción tendrían relación con la actividad de José Pedro Varela?","any":["perfil-varela-actividades","web-varela-agroindustria"]},
+  {"q":"Me interesa la zona norte del departamento: describime sus localidades y conexiones.","any":["perfil-norte-lavalleja","web-varela-ubicacion"]},
+  {"q":"Solís de Mataojo: contame qué base industrial y alimentaria tiene.","any":["perfil-solis-actividades","web-solis-alimentos"]},
+  {"q":"¿Dónde hay referencias de buen viento para generar energía en Lavalleja?","any":["actividad-eolica-aplicaciones","EN-006","EN-007"]},
+  {"q":"¿Qué antecedente de energía fotovoltaica tiene el departamento y de qué tamaño es?","any":["web-solar-hikari"]},
+  {"q":"¿Qué distingue a Varela, Solís y Minas desde el punto de vista de la logística?","any":["actividad-logistica-perfiles","perfil-solis-actividades","perfil-varela-actividades"]},
+  {"q":"Una hostería en el entorno de Penitente: describime los atractivos y el contexto territorial.","any":["perfil-villa-serrana-penitente","web-lavalleja-turismo"]},
+  {"q":"¿Qué servicios rurales se plantean en Zapicán y José Batlle y Ordóñez?","any":["perfil-batlle-zapican","perfil-norte-lavalleja"]},
+  {"q":"¿Cuál es el retiro previsto para construir junto a un arroyo principal en Villa Serrana?","any":["TS-002"]},
+  {"q":"¿El régimen de UTE permite almacenar energía y entregar excedentes de autoconsumo?","any":["web-energia-autoconsumo","EN-019"]},
+  {"q":"¿Qué relación tienen el paisaje rural y las actividades de Arequita y Polanco?","any":["perfil-arequita-polanco-barriga-negra"]},
+  {"q":"Busco datos de Mariscala para servicios de mantenimiento y maquinaria rural.","any":["perfil-mariscala-piraraja","s13-02-01"]}
+]

@@ -6,7 +6,7 @@ import secrets
 import time
 from pathlib import Path
 from flask import Blueprint,Response,flash,g,jsonify,redirect,render_template,request,send_file,url_for
-from ..corpus import Record,Source,export_jsonl
+from ..corpus import Record,Source,export_jsonl,information_source_hash
 from ..db import dumps,uid
 from ..errors import DomainError
 from ..security import PASSWORDS
@@ -148,7 +148,24 @@ def record_edit(base_id,row_id=None):
         data['conditions']=[x.strip() for x in request.form.get('conditions','').split('\n---\n') if x.strip()]
         data['source_refs']=[x.strip() for x in request.form.get('source_refs','').split(',') if x.strip()]
         data['zones']=[x.strip() for x in request.form.get('zones','').split(',') if x.strip()]
-        s.knowledge.save_record(base_id,data,g.user['id'],row_id)
+        if request.form.get('information_view_present') == 'yes':
+            previous_view=initial.get('information_view') or {}
+            if request.form.get('information_view_enabled') != 'yes':
+                data.pop('information_view',None)
+            else:
+                view_text=request.form.get('information_view_text','').strip()
+                view_kind=request.form.get('information_view_kind','descriptive')
+                if previous_view and view_text==previous_view['text'] and view_kind==previous_view['kind']:
+                    # Keep the original binding. A source edit invalidates an
+                    # unchanged summary instead of silently blessing stale text.
+                    data['information_view']=previous_view
+                else:
+                    source=Record.model_validate({**data,'information_view':None})
+                    data['information_view']={'text':view_text,'kind':view_kind,
+                                              'source_sha256':information_source_hash(source)}
+        saved=s.knowledge.save_record(base_id,data,g.user['id'],row_id)
+        if data.get('information_view') and saved.information_view is None:
+            flash('Cambió el origen o su alcance. La vista informativa anterior quedó invalidada; puede actualizarse antes de aprobar.','warning')
         flash('Registro guardado como pendiente de revisión. La versión pública no cambió.','success')
         return redirect(url_for('admin.base_detail',base_id=base_id))
     sources=s.db.all('SELECT source_key FROM sources WHERE base_id=? ORDER BY source_key',(base_id,))

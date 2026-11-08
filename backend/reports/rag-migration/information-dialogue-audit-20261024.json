@@ -1,0 +1,550 @@
+{
+  "format": "gianna.information-audit.v1",
+  "date": "2026-10-24",
+  "scope": "Isolated local HTTP audits with real models/provider; not a production deployment or independent factual certification.",
+  "corpus_sha256": "cc59c1c01b21420c959ed5e48e22ca3486752a4ddd8f421b77c544fae73d58de",
+  "model": "deepseek-v4.1-flash:1017",
+  "baseline": {
+    "artifact": "reports/information-audit-20261024/baseline.json",
+    "sha256": "b1966a3e2e61b5967cfc3be0b9a1868fe765171cd91519dacd17e159d4c6ece3",
+    "threads": 9,
+    "turns": 33,
+    "summary": {
+      "turns": 33,
+      "http_ok": 33,
+      "statuses": {
+        "answered": 30,
+        "insufficient_evidence": 2,
+        "conversation": 1
+      },
+      "structural_checks_passed": 31,
+      "turns_with_advice_signals": 12,
+      "provider_requests": 90,
+      "requests_over_8000_input_tokens": 4,
+      "human_semantic_review_required": true
+    },
+    "gold_turns": 26,
+    "gold_all_groups_initial": 24,
+    "gold_all_groups_after_reading": 24,
+    "gold_all_groups_cited": 24,
+    "max_input": 8454,
+    "max_total": 8770,
+    "requests_over_8000_total": 10,
+    "provider_non_200": 0,
+    "median_ms": 15695.23,
+    "p95_ms": 23470.87,
+    "strict_failures": [
+      {
+        "thread": "boliche-norte",
+        "turn": 6,
+        "status": "answered",
+        "checks": [
+          "expected_groups_retrieved",
+          "expected_groups_cited"
+        ]
+      },
+      {
+        "thread": "madera-mariscala",
+        "turn": 3,
+        "status": "answered",
+        "checks": [
+          "expected_groups_retrieved",
+          "expected_groups_cited"
+        ]
+      }
+    ],
+    "memory_probes": [
+      {
+        "thread": "memoria-y-cambio-explicito",
+        "turn": 4,
+        "remembered": true,
+        "stored_messages": 8
+      }
+    ],
+    "session_cleanup_confirmed": true,
+    "max_stored_messages": 12,
+    "max_output_tokens": 950,
+    "case_sha256": "17304e72464cc1880a6dfdfeb2775f9d7d549df5b52a1a58bbd3ddc92243656f",
+    "extra_case_sha256": {},
+    "source_hashes": {
+      "gianna\\routes\\public.py": "5aec16e6c12fea6950369e1d2037e272c2d0823aa8152981a35e08f55be4ff13",
+      "gianna\\services\\__init__.py": "26bed6b42980e8f020eb95f5820cc32739d86de9a0933a890430eb19dad497ce",
+      "gianna\\services\\agents.py": "ea1b273e94f2f08d16ffb02e4c85054e762d5bfa7d3a993a052f097ecb6ad278",
+      "gianna\\services\\analytics.py": "ec7dbb7a09c0503d4b0093707af5a1aedb9bc33355049731f0793711deef2901",
+      "gianna\\services\\catalog.py": "6df7985afb2b2340fac8082c80277f783a21e7d2bf62243dd4325374dcdcf939",
+      "gianna\\services\\context_builder.py": "a8a5186b2e77842dccb4eb7894fc35dc3617080e9d0905919dea8d94b16e5c07",
+      "gianna\\services\\conversation.py": "ac8047bddb366bd96f26e55e7d7ee0ee17eda4835112c5d3bc2f56ca119303eb",
+      "gianna\\services\\corpus_outline.py": "866c7f1d0ea80a645fed16fa9301b8bdd287e7797251a3681c6522be45ae7024",
+      "gianna\\services\\evidence_guard.py": "50d30f7032b0ae437cbda2cf39ca71bcb9c485cc25c9423c6168f71d5bb93b08",
+      "gianna\\services\\harness.py": "46ead36def60fa8a4c03edc6bffeed891d673ce168816092630f1ff23816dc05",
+      "gianna\\services\\information.py": "5face249b286a87f5d2172f466688f7f84bea5ec62e509964d14caadbf82af3e",
+      "gianna\\services\\jobs.py": "c42efd1f596c3740e423c9a97a902b0f215c6b7817b1ac51133d464c9e0d20b5",
+      "gianna\\services\\knowledge.py": "315d6fa64f38e641665f331dcc66d2c202801e45c74f456bc49261f4d9201358",
+      "gianna\\services\\neural.py": "74cb458a08fde6be5b0128f240398e579919858036c0091252c10c314acbcd83",
+      "gianna\\services\\planning.py": "077c165b254d6895c8421dc98fb11e68e86c9996787447f654f220304e80ee21",
+      "gianna\\services\\project_memory.py": "ff044c41b66dbd499c574e9e3c3d440e9e4c5638bdd6a2404be1fde258098dbf",
+      "gianna\\services\\rag.py": "6617afb000e49117e6c9c76a77b4fccb77467a005523e9f84287447ed8be5314",
+      "gianna\\services\\recommendations.py": "2f382ea2155af175b85cf6a3062ed8ff9ea02b478e8852b2e59040bd4b1d5f7e",
+      "gianna\\services\\response_policy.py": "9d4ba55f54a42fe57dd691573d7be5f0c383f4e0eefb945f5e4d349b267cd092",
+      "gianna\\services\\response_validation.py": "cd2ef6d661762fe3522d424a2f0f00ae902abf5f4a2df63111da4a9f63f67991",
+      "gianna\\services\\retrieval_queries.py": "7ffabeef734228c6886b4564d5ea00f88d1b917ac235452be1948a37ae4bd4e1",
+      "gianna\\services\\runtime.py": "30c450fddafa1bbdb025d5de1ca12c9b945d4a09451ac639a37899bff50c5e10",
+      "gianna\\services\\settings.py": "82c1241a221d2f1afac85a540e6a3451382b60d4bc14a92e0ecd5c4389232ead",
+      "gianna\\services\\territory.py": "45546c443dcce59faf0d32006514604d3b8090cbc14e8d96a63f24cfaaec1be0",
+      "gianna\\services\\vector_store.py": "01ddaf4d2f98b99231aa2be92cf9646cfb83c67c0bf25ab36f9b38134b255592"
+    },
+    "evaluator_sha256": null
+  },
+  "final_profiles": [
+    {
+      "artifact": "reports/information-audit-20261024/policy-final-950.json",
+      "sha256": "9de1169295218a9a49d0a9923f6fce7175bef0606ec344634cf5496debc5ea82",
+      "threads": 10,
+      "turns": 41,
+      "summary": {
+        "turns": 41,
+        "http_ok": 41,
+        "statuses": {
+          "answered": 31,
+          "citation_guard_failed": 1,
+          "insufficient_evidence": 2,
+          "conversation": 7
+        },
+        "structural_checks_passed": 39,
+        "turns_with_advice_signals": 6,
+        "provider_requests": 142,
+        "requests_over_8000_input_tokens": 0,
+        "requests_over_8000_total_tokens": 0,
+        "max_reported_total_tokens": 7019,
+        "human_semantic_review_required": true
+      },
+      "gold_turns": 28,
+      "gold_all_groups_initial": 27,
+      "gold_all_groups_after_reading": 27,
+      "gold_all_groups_cited": 26,
+      "max_input": 6480,
+      "max_total": 7019,
+      "requests_over_8000_total": 0,
+      "provider_non_200": 0,
+      "median_ms": 22033,
+      "p95_ms": 29495.26,
+      "strict_failures": [
+        {
+          "thread": "turismo-arequita",
+          "turn": 1,
+          "status": "citation_guard_failed",
+          "checks": [
+            "expected_status",
+            "expected_groups_cited"
+          ]
+        },
+        {
+          "thread": "turismo-arequita",
+          "turn": 3,
+          "status": "answered",
+          "checks": [
+            "expected_groups_retrieved",
+            "expected_groups_cited"
+          ]
+        }
+      ],
+      "memory_probes": [
+        {
+          "thread": "memoria-y-cambio-explicito",
+          "turn": 4,
+          "remembered": true,
+          "stored_messages": 8
+        },
+        {
+          "thread": "memoria-mas-de-tres-intercambios",
+          "turn": 7,
+          "remembered": true,
+          "stored_messages": 14
+        }
+      ],
+      "session_cleanup_confirmed": true,
+      "max_stored_messages": 16,
+      "max_output_tokens": 950,
+      "case_sha256": "17304e72464cc1880a6dfdfeb2775f9d7d549df5b52a1a58bbd3ddc92243656f",
+      "extra_case_sha256": {
+        "information_memory_long_cases.json": "845dc10cd9c883622eaf5a2d28601dc7362a980fe0dec2aed7479150e6c8dc78"
+      },
+      "source_hashes": {
+        "gianna\\routes\\public.py": "224d30fe7fa076705be9b9d20f2d00d527828fcdf56705ad61b2542dd80530d3",
+        "gianna\\services\\__init__.py": "26bed6b42980e8f020eb95f5820cc32739d86de9a0933a890430eb19dad497ce",
+        "gianna\\services\\agents.py": "1428d622b4541482c64073b8ac2e6bdc64be27285d566bab0a738afb8ff09410",
+        "gianna\\services\\analytics.py": "ec7dbb7a09c0503d4b0093707af5a1aedb9bc33355049731f0793711deef2901",
+        "gianna\\services\\catalog.py": "6df7985afb2b2340fac8082c80277f783a21e7d2bf62243dd4325374dcdcf939",
+        "gianna\\services\\context_budget.py": "a4e64378741d7323b705aca67e7aa8c297b44ad11e06d7419ef0cb4218b13d70",
+        "gianna\\services\\context_builder.py": "b6163ccfaccdbc08cef16467b90d9d5bed8f4e8b233d44743bede7e135dfa923",
+        "gianna\\services\\conversation.py": "3930cdafe12e7def3eef8a5ee76df77971fb5c1d04462c76c30d562dbc0876f4",
+        "gianna\\services\\corpus_outline.py": "866c7f1d0ea80a645fed16fa9301b8bdd287e7797251a3681c6522be45ae7024",
+        "gianna\\services\\evidence_guard.py": "50d30f7032b0ae437cbda2cf39ca71bcb9c485cc25c9423c6168f71d5bb93b08",
+        "gianna\\services\\harness.py": "646443f8bb351a29bba87a02027de65673e08e33a8fff8ec64dda004dd3df907",
+        "gianna\\services\\information.py": "5face249b286a87f5d2172f466688f7f84bea5ec62e509964d14caadbf82af3e",
+        "gianna\\services\\jobs.py": "c42efd1f596c3740e423c9a97a902b0f215c6b7817b1ac51133d464c9e0d20b5",
+        "gianna\\services\\knowledge.py": "315d6fa64f38e641665f331dcc66d2c202801e45c74f456bc49261f4d9201358",
+        "gianna\\services\\neural.py": "74cb458a08fde6be5b0128f240398e579919858036c0091252c10c314acbcd83",
+        "gianna\\services\\planning.py": "2ad3eecfbc74febaa000d610a6ed8284473817832bb9c21b8b6b9f4edfd72d47",
+        "gianna\\services\\project_memory.py": "3d0607c723329aa1931cddcd66cfd9bd61149f99e13cf5aa210505c24c68a3fc",
+        "gianna\\services\\rag.py": "cbf4e386030cc19f0cc6ba7df0d538f328a12926a2f6020c3aad3cc81b96c3ee",
+        "gianna\\services\\recommendations.py": "2f382ea2155af175b85cf6a3062ed8ff9ea02b478e8852b2e59040bd4b1d5f7e",
+        "gianna\\services\\response_policy.py": "362de1bcfbf4254ab5fd988a9e6f6877a020d0507687477aef54764559adedb3",
+        "gianna\\services\\response_validation.py": "cd2ef6d661762fe3522d424a2f0f00ae902abf5f4a2df63111da4a9f63f67991",
+        "gianna\\services\\retrieval_queries.py": "7ffabeef734228c6886b4564d5ea00f88d1b917ac235452be1948a37ae4bd4e1",
+        "gianna\\services\\runtime.py": "35b0339d35277f8537e0598317d2454d6f4f8cb1df8a169fb8d04c1f0bab9f07",
+        "gianna\\services\\settings.py": "58181b9202f080d7fe9a5ee506cd05dfc4505dc5427e3e9b1500cbbb62dd1e4a",
+        "gianna\\services\\territory.py": "45546c443dcce59faf0d32006514604d3b8090cbc14e8d96a63f24cfaaec1be0",
+        "gianna\\services\\vector_store.py": "01ddaf4d2f98b99231aa2be92cf9646cfb83c67c0bf25ab36f9b38134b255592"
+      },
+      "evaluator_sha256": "d01a52431976e195d7f13d8af87978841f5c2c41724ad5998cbd1ccc1bd15872",
+      "current_source_differences": [
+        "gianna\\services\\settings.py"
+      ]
+    },
+    {
+      "artifact": "reports/information-audit-20261024/policy-final-4096.json",
+      "sha256": "a6ed6242b61d92fb552a572fd5740bbaecd86467e7889934c05d8257deb2413f",
+      "threads": 10,
+      "turns": 41,
+      "summary": {
+        "turns": 41,
+        "http_ok": 41,
+        "statuses": {
+          "answered": 32,
+          "insufficient_evidence": 2,
+          "conversation": 7
+        },
+        "structural_checks_passed": 41,
+        "turns_with_advice_signals": 2,
+        "provider_requests": 142,
+        "requests_over_8000_input_tokens": 0,
+        "requests_over_8000_total_tokens": 0,
+        "max_reported_total_tokens": 6599,
+        "human_semantic_review_required": true
+      },
+      "gold_turns": 28,
+      "gold_all_groups_initial": 28,
+      "gold_all_groups_after_reading": 28,
+      "gold_all_groups_cited": 28,
+      "max_input": 5771,
+      "max_total": 6599,
+      "requests_over_8000_total": 0,
+      "provider_non_200": 0,
+      "median_ms": 23482.71,
+      "p95_ms": 29710.75,
+      "strict_failures": [],
+      "memory_probes": [
+        {
+          "thread": "memoria-y-cambio-explicito",
+          "turn": 4,
+          "remembered": true,
+          "stored_messages": 8
+        },
+        {
+          "thread": "memoria-mas-de-tres-intercambios",
+          "turn": 7,
+          "remembered": true,
+          "stored_messages": 14
+        }
+      ],
+      "session_cleanup_confirmed": true,
+      "max_stored_messages": 16,
+      "max_output_tokens": 4096,
+      "case_sha256": "17304e72464cc1880a6dfdfeb2775f9d7d549df5b52a1a58bbd3ddc92243656f",
+      "extra_case_sha256": {
+        "information_memory_long_cases.json": "845dc10cd9c883622eaf5a2d28601dc7362a980fe0dec2aed7479150e6c8dc78"
+      },
+      "source_hashes": {
+        "gianna\\routes\\public.py": "224d30fe7fa076705be9b9d20f2d00d527828fcdf56705ad61b2542dd80530d3",
+        "gianna\\services\\__init__.py": "26bed6b42980e8f020eb95f5820cc32739d86de9a0933a890430eb19dad497ce",
+        "gianna\\services\\agents.py": "1428d622b4541482c64073b8ac2e6bdc64be27285d566bab0a738afb8ff09410",
+        "gianna\\services\\analytics.py": "ec7dbb7a09c0503d4b0093707af5a1aedb9bc33355049731f0793711deef2901",
+        "gianna\\services\\catalog.py": "6df7985afb2b2340fac8082c80277f783a21e7d2bf62243dd4325374dcdcf939",
+        "gianna\\services\\context_budget.py": "a4e64378741d7323b705aca67e7aa8c297b44ad11e06d7419ef0cb4218b13d70",
+        "gianna\\services\\context_builder.py": "b6163ccfaccdbc08cef16467b90d9d5bed8f4e8b233d44743bede7e135dfa923",
+        "gianna\\services\\conversation.py": "3930cdafe12e7def3eef8a5ee76df77971fb5c1d04462c76c30d562dbc0876f4",
+        "gianna\\services\\corpus_outline.py": "866c7f1d0ea80a645fed16fa9301b8bdd287e7797251a3681c6522be45ae7024",
+        "gianna\\services\\evidence_guard.py": "50d30f7032b0ae437cbda2cf39ca71bcb9c485cc25c9423c6168f71d5bb93b08",
+        "gianna\\services\\harness.py": "646443f8bb351a29bba87a02027de65673e08e33a8fff8ec64dda004dd3df907",
+        "gianna\\services\\information.py": "5face249b286a87f5d2172f466688f7f84bea5ec62e509964d14caadbf82af3e",
+        "gianna\\services\\jobs.py": "c42efd1f596c3740e423c9a97a902b0f215c6b7817b1ac51133d464c9e0d20b5",
+        "gianna\\services\\knowledge.py": "315d6fa64f38e641665f331dcc66d2c202801e45c74f456bc49261f4d9201358",
+        "gianna\\services\\neural.py": "74cb458a08fde6be5b0128f240398e579919858036c0091252c10c314acbcd83",
+        "gianna\\services\\planning.py": "2ad3eecfbc74febaa000d610a6ed8284473817832bb9c21b8b6b9f4edfd72d47",
+        "gianna\\services\\project_memory.py": "3d0607c723329aa1931cddcd66cfd9bd61149f99e13cf5aa210505c24c68a3fc",
+        "gianna\\services\\rag.py": "cbf4e386030cc19f0cc6ba7df0d538f328a12926a2f6020c3aad3cc81b96c3ee",
+        "gianna\\services\\recommendations.py": "2f382ea2155af175b85cf6a3062ed8ff9ea02b478e8852b2e59040bd4b1d5f7e",
+        "gianna\\services\\response_policy.py": "362de1bcfbf4254ab5fd988a9e6f6877a020d0507687477aef54764559adedb3",
+        "gianna\\services\\response_validation.py": "cd2ef6d661762fe3522d424a2f0f00ae902abf5f4a2df63111da4a9f63f67991",
+        "gianna\\services\\retrieval_queries.py": "7ffabeef734228c6886b4564d5ea00f88d1b917ac235452be1948a37ae4bd4e1",
+        "gianna\\services\\runtime.py": "35b0339d35277f8537e0598317d2454d6f4f8cb1df8a169fb8d04c1f0bab9f07",
+        "gianna\\services\\settings.py": "58181b9202f080d7fe9a5ee506cd05dfc4505dc5427e3e9b1500cbbb62dd1e4a",
+        "gianna\\services\\territory.py": "45546c443dcce59faf0d32006514604d3b8090cbc14e8d96a63f24cfaaec1be0",
+        "gianna\\services\\vector_store.py": "01ddaf4d2f98b99231aa2be92cf9646cfb83c67c0bf25ab36f9b38134b255592"
+      },
+      "evaluator_sha256": "d01a52431976e195d7f13d8af87978841f5c2c41724ad5998cbd1ccc1bd15872",
+      "current_source_differences": [
+        "gianna\\services\\settings.py"
+      ]
+    }
+  ],
+  "current_source_sha256": {
+    "gianna\\routes\\public.py": "224d30fe7fa076705be9b9d20f2d00d527828fcdf56705ad61b2542dd80530d3",
+    "gianna\\services\\__init__.py": "26bed6b42980e8f020eb95f5820cc32739d86de9a0933a890430eb19dad497ce",
+    "gianna\\services\\agents.py": "1428d622b4541482c64073b8ac2e6bdc64be27285d566bab0a738afb8ff09410",
+    "gianna\\services\\analytics.py": "ec7dbb7a09c0503d4b0093707af5a1aedb9bc33355049731f0793711deef2901",
+    "gianna\\services\\catalog.py": "6df7985afb2b2340fac8082c80277f783a21e7d2bf62243dd4325374dcdcf939",
+    "gianna\\services\\context_budget.py": "a4e64378741d7323b705aca67e7aa8c297b44ad11e06d7419ef0cb4218b13d70",
+    "gianna\\services\\context_builder.py": "b6163ccfaccdbc08cef16467b90d9d5bed8f4e8b233d44743bede7e135dfa923",
+    "gianna\\services\\conversation.py": "3930cdafe12e7def3eef8a5ee76df77971fb5c1d04462c76c30d562dbc0876f4",
+    "gianna\\services\\corpus_outline.py": "866c7f1d0ea80a645fed16fa9301b8bdd287e7797251a3681c6522be45ae7024",
+    "gianna\\services\\evidence_guard.py": "50d30f7032b0ae437cbda2cf39ca71bcb9c485cc25c9423c6168f71d5bb93b08",
+    "gianna\\services\\harness.py": "646443f8bb351a29bba87a02027de65673e08e33a8fff8ec64dda004dd3df907",
+    "gianna\\services\\information.py": "5face249b286a87f5d2172f466688f7f84bea5ec62e509964d14caadbf82af3e",
+    "gianna\\services\\jobs.py": "c42efd1f596c3740e423c9a97a902b0f215c6b7817b1ac51133d464c9e0d20b5",
+    "gianna\\services\\knowledge.py": "315d6fa64f38e641665f331dcc66d2c202801e45c74f456bc49261f4d9201358",
+    "gianna\\services\\neural.py": "74cb458a08fde6be5b0128f240398e579919858036c0091252c10c314acbcd83",
+    "gianna\\services\\planning.py": "2ad3eecfbc74febaa000d610a6ed8284473817832bb9c21b8b6b9f4edfd72d47",
+    "gianna\\services\\project_memory.py": "3d0607c723329aa1931cddcd66cfd9bd61149f99e13cf5aa210505c24c68a3fc",
+    "gianna\\services\\rag.py": "cbf4e386030cc19f0cc6ba7df0d538f328a12926a2f6020c3aad3cc81b96c3ee",
+    "gianna\\services\\recommendations.py": "2f382ea2155af175b85cf6a3062ed8ff9ea02b478e8852b2e59040bd4b1d5f7e",
+    "gianna\\services\\response_policy.py": "362de1bcfbf4254ab5fd988a9e6f6877a020d0507687477aef54764559adedb3",
+    "gianna\\services\\response_validation.py": "cd2ef6d661762fe3522d424a2f0f00ae902abf5f4a2df63111da4a9f63f67991",
+    "gianna\\services\\retrieval_queries.py": "7ffabeef734228c6886b4564d5ea00f88d1b917ac235452be1948a37ae4bd4e1",
+    "gianna\\services\\runtime.py": "35b0339d35277f8537e0598317d2454d6f4f8cb1df8a169fb8d04c1f0bab9f07",
+    "gianna\\services\\settings.py": "102e715d0dfaf98830c2a94d8f14ca811125faaa58122e1bfd64510eadff5745",
+    "gianna\\services\\territory.py": "45546c443dcce59faf0d32006514604d3b8090cbc14e8d96a63f24cfaaec1be0",
+    "gianna\\services\\vector_store.py": "01ddaf4d2f98b99231aa2be92cf9646cfb83c67c0bf25ab36f9b38134b255592"
+  },
+  "discarded_iterations": [
+    {
+      "artifact": "reports/information-audit-20261024/corrected.json",
+      "sha256": "9871649c3fc1f665e2021c65c80693a0075b668c7a11cbd45f9ecd4612315f97",
+      "turns": 24,
+      "checks_passed": 24,
+      "statuses": {
+        "answered": 24
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/deliberate-final.json",
+      "sha256": "595e004ae97153fbae0fadc0b182508f87c3b1bda62ac3ea1e5c317ca0d00a82",
+      "turns": 6,
+      "checks_passed": 4,
+      "statuses": {
+        "answered": 4,
+        "citation_guard_failed": 2
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/final.json",
+      "sha256": "cb5f2a6c1cdaf6040ce56b2b3eebb9cbc37921b97b42988b2ed263a56189eba9",
+      "turns": 6,
+      "checks_passed": 1,
+      "statuses": {
+        "citation_guard_failed": 5,
+        "answered": 1
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/information-2048.json",
+      "sha256": "dfd87c343f56385646c2c42ba38a848e6273f7daab4ae592d5cbab7cfc081585",
+      "turns": 41,
+      "checks_passed": 39,
+      "statuses": {
+        "answered": 34,
+        "conversation": 7
+      },
+      "completed": true
+    },
+    {
+      "artifact": "reports/information-audit-20261024/informational-final.json",
+      "sha256": "09a919b286c642e8d5b2f7995c996b4abfdc84403d976d82e43072225823714a",
+      "turns": 14,
+      "checks_passed": 13,
+      "statuses": {
+        "answered": 14
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/literal-2048.json",
+      "sha256": "9316957560a542f4fb3037c990a2cca1d904b063df00240d7c7ddb813c9b2579",
+      "turns": 2,
+      "checks_passed": 2,
+      "statuses": {
+        "answered": 2
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/literal-request-final.json",
+      "sha256": "63176ab4afb5ea993f0b3ea8a0fc58e3f057bd87a61249a62599df33f14f3097",
+      "turns": 41,
+      "checks_passed": 38,
+      "statuses": {
+        "answered": 32,
+        "insufficient_evidence": 2,
+        "conversation": 7
+      },
+      "completed": true
+    },
+    {
+      "artifact": "reports/information-audit-20261024/profile-4096-final.json",
+      "sha256": "3a831711aa6fc2802e3dd1332e9747fdd74639cb65bf8acee1363777cdadd9b9",
+      "turns": 25,
+      "checks_passed": 23,
+      "statuses": {
+        "answered": 23,
+        "citation_guard_failed": 1,
+        "insufficient_evidence": 1
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/reviewed-final.json",
+      "sha256": "aaca2cfe3cbfa847c3dbb4d352d727345f72e0da5bb3db42eb6a191251a718d1",
+      "turns": 11,
+      "checks_passed": 10,
+      "statuses": {
+        "answered": 11
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/selection-4096-final.json",
+      "sha256": "bf4f8873fb41990e463d22ecddf67cd774dd983eac2972a591a87dad4a267cb5",
+      "turns": 22,
+      "checks_passed": 10,
+      "statuses": {
+        "answered": 11,
+        "citation_guard_failed": 11
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/selection-950-final.json",
+      "sha256": "395d1e7e8140bb58c2d31a65f8c5d1ae4ab49e041142e12fdcf87a2f1a9473d1",
+      "turns": 24,
+      "checks_passed": 14,
+      "statuses": {
+        "answered": 14,
+        "citation_guard_failed": 10
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/structured-editor-final.json",
+      "sha256": "92328fb32d19a401b3025db70078a3198c5e2b2edf39d98e5a5991e0642b608b",
+      "turns": 41,
+      "checks_passed": 40,
+      "statuses": {
+        "answered": 31,
+        "insufficient_evidence": 2,
+        "conversation": 7,
+        "citation_guard_failed": 1
+      },
+      "completed": true
+    },
+    {
+      "artifact": "reports/information-audit-20261024/tone-editor-final.json",
+      "sha256": "8dde5665f04dcdb785886abcbb92e865c4f79524da9f0615a4f3c08e015527d1",
+      "turns": 41,
+      "checks_passed": 40,
+      "statuses": {
+        "answered": 31,
+        "insufficient_evidence": 3,
+        "conversation": 7
+      },
+      "completed": true
+    },
+    {
+      "artifact": "reports/information-audit-20261024/validated-selection-4096.json",
+      "sha256": "2fe0e5f68a169133bb3520c4dd1a2c7fbce855d933128ef71a513ae388b1aa3a",
+      "turns": 14,
+      "checks_passed": 14,
+      "statuses": {
+        "answered": 14
+      },
+      "completed": false
+    },
+    {
+      "artifact": "reports/information-audit-20261024/validated-selection-950.json",
+      "sha256": "b55f2074f07e195ca42df811620bcf8300fcca3ed5d703cecfa90df5af38c828",
+      "turns": 17,
+      "checks_passed": 17,
+      "statuses": {
+        "answered": 17
+      },
+      "completed": false
+    }
+  ],
+  "synthetic_controls": {
+    "artifact": "reports/information-audit-20261024/default-final-synthetic.json",
+    "sha256": "8705ff4d30f59a57d4396a45bfd3e5f286e7bdef918ff75f878303243b4ae189",
+    "passed": 4,
+    "total": 4,
+    "max_output_tokens": 4096,
+    "results": [
+      {
+        "source_present": true,
+        "status": "answered",
+        "passed": true
+      },
+      {
+        "source_present": false,
+        "status": "insufficient_evidence",
+        "passed": true
+      },
+      {
+        "source_present": true,
+        "status": "answered",
+        "passed": true
+      },
+      {
+        "source_present": false,
+        "status": "insufficient_evidence",
+        "passed": true
+      }
+    ]
+  },
+  "default_promotion_note": "Only settings.py differs from the final dialogue hashes: default output cap was promoted from 950 to the explicitly tested 4096 after comparison. Explicit stored limits are not raised. No other application-source changes followed those dialogue runs.",
+  "verification": {
+    "pytest": {
+      "passed": 348,
+      "skipped": 3,
+      "warnings": 1,
+      "real_mariadb": true
+    },
+    "linux": {
+      "cpus": 2,
+      "memory_gib": 2,
+      "network": "none",
+      "retrieval_source_groups_passed": 36,
+      "retrieval_total": 36,
+      "verified_generation_tokenizer": true,
+      "estimated_near_boundary_request_with_output_and_margin": 7993
+    }
+  },
+  "manual_review": {
+    "method": "Assistant read final answers; automatic citations/regex are not a semantic or factual certification.",
+    "core_north_profiles_recovered": true,
+    "project_names_and_exclusions_recalled": true,
+    "explicit_topic_reset_observed": true,
+    "residuals": [
+      "Unrequested source conditions, strategic questions and cautionary language can still appear in the information bucket.",
+      "Some answers repeat the missing-information sentence or give unnecessarily broad caveats.",
+      "The 950 profile had a primary-generation validation failure and missed an oracle source group for the geopark follow-up.",
+      "Known source IDs and source-group coverage do not independently establish every claim."
+    ],
+    "universal_perfection_claimed": false,
+    "independent_factual_verification": false
+  },
+  "production_changed": false,
+  "env_changed": false,
+  "remote_repositories_changed": false
+}

@@ -1,0 +1,82 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 3,
+  "total": 3,
+  "results": [
+    {
+      "question": "Quiero estudiar la posibilidad de instalar un boliche, qué me recomendás?",
+      "id": "81c091796a0248e0affc7e082ea29376",
+      "status": "answered",
+      "answer": "No tengo documentado un perfil de oportunidad para local bailable u ocio nocturno en Lavalleja. Lo que sí figura son las habilitaciones a cubrir: uso del suelo y edificación ante Arquitectura de la Intendencia, seguridad e inspecciones ante Bomberos, y la consulta ambiental ante DINACEA si la actividad queda sujeta a autorización ambiental previa.",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s29-01-03"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "mentions_gap": true,
+        "has_adjacent": true,
+        "no_interrogation": true
+      },
+      "timings": {
+        "generation_ms": 1511.89,
+        "retrieval_ms": 4412.6
+      },
+      "total_ms": 6108.97
+    },
+    {
+      "question": "Ok, pero qué lugares me recomendás para ponerlo?",
+      "id": "f6756db90acf446da0b430ebf24aaac3",
+      "status": "answered",
+      "answer": "No tengo documentado un lugar concreto ni disponibilidad de locales para un bailable u ocio nocturno en Lavalleja. La información disponible describe zonas de trabajo por perfil comercial, no puntos de inversión verificados: Minas y entorno apunta a servicios industriales y empresariales, Villa Serrana–Marco de los Reyes–Penitente a experiencias y hospitalidad, y José Pedro Varela y entorno a arroz y granos. Para habilitarlo habría que verificar uso por padrón ante Arquitectura de la Intendencia y las condiciones de seguridad ante Bomberos.",
+      "citation_record_ids": [
+        "s09-01-09",
+        "s09-01-02",
+        "s09-01-04",
+        "s09-01-06",
+        "s29-01-02",
+        "s29-01-07"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "names_zones": true,
+        "mentions_gap": true,
+        "no_interrogation": true
+      },
+      "timings": {
+        "generation_ms": 1665.54,
+        "retrieval_ms": 5592.55
+      },
+      "total_ms": 7468.21
+    },
+    {
+      "question": "Me refiero a un local bailable en Minas, ¿qué debo comprobar antes de alquilar?",
+      "id": "9f2081da73994a49ac3f72a7b8f3fcd9",
+      "status": "answered",
+      "answer": "Para un local bailable en Minas, antes de alquilar tenés que verificar el uso del suelo por padrón, dimensiones, obras, ampliación, ocupación y protección aplicable ante Arquitectura u ordenamiento territorial de la Intendencia. También el proyecto, las medidas, las inspecciones y las condiciones de seguridad antes de ocupar u operar, con la Dirección Nacional de Bomberos y técnicos habilitados. Y si la actividad está sujeta a autorización ambiental previa, con su categoría y estudios, ante el Ministerio de Ambiente. Tené en cuenta que una habilitación no reemplaza a otra.",
+      "citation_record_ids": [
+        "s29-01-02",
+        "s29-01-07",
+        "s29-01-03",
+        "s29-01-10"
+      ],
+      "checks": {
+        "answered": true,
+        "sources": true,
+        "fire_source": true,
+        "premises_source": true,
+        "private_state_absent": true,
+        "activity_preserved": true,
+        "no_interrogation": true
+      },
+      "timings": {
+        "generation_ms": 1935.51,
+        "retrieval_ms": 6470.34
+      },
+      "total_ms": 8607.83
+    }
+  ]
+}

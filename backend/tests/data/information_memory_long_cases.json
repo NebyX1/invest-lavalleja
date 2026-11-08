@@ -1,0 +1,16 @@
+[
+  {
+    "id": "memoria-mas-de-tres-intercambios",
+    "focus": "Recordar datos del proyecto tras cortesías, sin recorte arbitrario a tres intercambios",
+    "turns": [
+      {"question": "Mi proyecto se llama Ceibo Azul: música y baile para adultos en Zapicán, sin restaurante y sin alojamiento. Quiero información de esa localidad, no recomendaciones.", "groups": [["s09-01-07", "s15-01-01", "s15-02-01"]]},
+      {"question": "Gracias", "allowed_statuses": ["conversation"]},
+      {"question": "Muchas gracias", "allowed_statuses": ["conversation"]},
+      {"question": "Bien, gracias", "allowed_statuses": ["conversation"]},
+      {"question": "Gracias por la información", "allowed_statuses": ["conversation"]},
+      {"question": "Muchas gracias por responder", "allowed_statuses": ["conversation"]},
+      {"question": "Recordame el nombre de mi proyecto, la localidad y las dos actividades que no va a incluir. Respondé solo eso.", "allowed_statuses": ["conversation", "answered"], "memory_terms": ["Ceibo Azul", "Zapicán", "restaurante", "alojamiento"]},
+      {"question": "Para ese mismo proyecto, ¿qué perfil de la zona tenés documentado? No necesito una recomendación de otro negocio.", "groups": [["s09-01-07", "s15-01-01", "s15-02-01"]]}
+    ]
+  }
+]

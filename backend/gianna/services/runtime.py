@@ -93,13 +93,18 @@ class Ollama:
         mode = thinking_mode(model) if think == 'auto' else think
         if mode is not None:
             payload['think'] = mode
-        limit = httpx.Timeout(timeout, connect=8)
+        deadline = time.monotonic() + timeout
+        limit = httpx.Timeout(timeout, connect=min(8, timeout))
         try:
             response = self.client.post('/api/chat', json=payload, timeout=limit)
         except (httpx.TimeoutException, httpx.TransportError) as exc:
             raise _Retry(type(exc).__name__, code='provider_timeout' if isinstance(exc,httpx.TimeoutException) else 'provider_transport_failed') from exc
         if response.status_code == 400 and 'think' in payload and 'think' in response.text.lower():
             payload.pop('think')
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise _Retry('provider deadline exhausted', code='provider_timeout')
+            limit = httpx.Timeout(remaining, connect=min(8, remaining))
             try:
                 response = self.client.post('/api/chat', json=payload, timeout=limit)
             except (httpx.TimeoutException, httpx.TransportError) as exc:

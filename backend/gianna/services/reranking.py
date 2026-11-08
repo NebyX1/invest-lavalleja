@@ -20,8 +20,8 @@ from ..observability import event, safe_exception
 LOG = logging.getLogger(__name__)
 MAX_CANDIDATES = 6
 MAX_TOKENS = 160
-MAX_BUDGET_MS = 400
-POLICY = 'bounded-window-v2'
+MAX_BUDGET_MS = 1500
+POLICY = 'bounded-window-v4'
 _MISS = object()
 _BUSY = object()
 

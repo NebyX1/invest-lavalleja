@@ -1,0 +1,89 @@
+[
+  {
+    "id": "boliche-norte",
+    "focus": "Informar sobre el proyecto elegido, sin sustituirlo por actividades agropecuarias",
+    "turns": [
+      {"question": "Quiero invertir en un boliche en el norte, ¿qué información me podés dar de esa zona?", "groups": [["s09-01-06", "s14-01-01", "s14-02-01"], ["s09-01-07", "s15-01-01", "s15-02-01"]]},
+      {"question": "Me refiero a música y baile, no a un restaurante. Seguí con esa idea y contame lo que hay documentado.", "groups": [["s09-01-06", "s14-01-01"], ["s09-01-07", "s15-01-01", "s15-02-01"]]},
+      {"question": "¿Y en José Pedro Varela qué información hay de conectividad y entorno? No necesito que decidas si me conviene.", "groups": [["s09-01-06", "s14-01-01", "s14-05-01", "s14-06-01"]]},
+      {"question": "Compará esa localidad con Batlle y Ordóñez para el mismo proyecto, sin elegir una por mí.", "groups": [["s09-01-06", "s14-01-01", "s14-02-01"], ["s09-01-07", "s15-01-01", "s15-02-01"]]},
+      {"question": "¿Hay datos de cuánta gente iría cada viernes? Si no los hay, distinguí eso de lo que sí conocés de la zona.", "allowed_statuses": ["answered", "insufficient_evidence"], "missing_fact": "Demanda o asistencia semanal cuantificada al boliche"},
+      {"question": "Ahora sí, ¿qué información tenés sobre los permisos de ese local?", "groups": [["s29-01-02", "s26-01-03"], ["s29-01-07"]], "requested_requirements": true}
+    ]
+  },
+  {
+    "id": "cafeteria-solis",
+    "focus": "Datos territoriales, cambio de localidad y seguimiento sin asesoría no solicitada",
+    "turns": [
+      {"question": "Estoy pensando en una cafetería en Solís de Mataojo. Contame información sobre el lugar, no un plan de negocio.", "groups": [["s09-01-03", "s11-01-01", "s11-02-01", "s11-03-01"]]},
+      {"question": "¿Y si el mismo local estuviera en Villa Serrana? Solo quiero saber qué características tiene esa zona.", "groups": [["s09-01-04", "s12-01-01", "s12-02-01"]]},
+      {"question": "Mostrame las diferencias entre ambas para mi cafetería, sin decirme cuál elegir.", "groups": [["s09-01-03", "s11-01-01", "s11-03-01"], ["s09-01-04", "s12-01-01", "s12-02-01"]]},
+      {"question": "¿La base trae cifras de clientes diarios o locales que estén en alquiler ahí?", "allowed_statuses": ["answered", "insufficient_evidence"], "missing_fact": "Clientes diarios y disponibilidad actual de locales"}
+    ]
+  },
+  {
+    "id": "madera-mariscala",
+    "focus": "Información sobre un sector documentado sin convertir las condiciones de la fuente en tareas",
+    "turns": [
+      {"question": "Quiero conocer qué información hay sobre fabricar muebles en Mariscala y Pirarajá. No me recomiendes cambiar de rubro.", "groups": [["O04", "s13-01-01", "s13-02-01"]]},
+      {"question": "¿Qué dice sobre madera y procesos que agregarían valor? Seguí con el mismo emprendimiento.", "groups": [["O04", "s13-02-01", "s17-01-03"]]},
+      {"question": "¿Y cómo aparece Minas en comparación con esa zona? Quiero una comparación descriptiva.", "groups": [["s09-01-02", "s10-01-01", "s10-02-01"], ["s09-01-05", "s13-01-01", "s13-02-01"]]}
+    ]
+  },
+  {
+    "id": "digital-minas",
+    "focus": "No intercambiar un proyecto digital por servicios industriales ni garantizar demanda",
+    "turns": [
+      {"question": "Tengo una empresa de software y quiero información sobre Minas para instalar un equipo allí.", "groups": [["O08", "s10-01-01", "s10-02-01"]]},
+      {"question": "¿Qué información figura sobre formación y vinculación con UTEC en esa ciudad?", "groups": [["s08-04-01", "s35-01-07"]]},
+      {"question": "Entonces, ¿está confirmado que tendría clientes por estar ahí?", "groups": [["s36-08-01", "s10-04-01", "s10-06-01"]], "missing_fact": "Cartera de clientes garantizada por instalarse"}
+    ]
+  },
+  {
+    "id": "energia-y-limites",
+    "focus": "Distinguir información parcial de inexistencia del tema y no reemplazar generación por eficiencia",
+    "turns": [
+      {"question": "Me interesa generar electricidad con paneles solares en Lavalleja. ¿Qué información específica tiene la base?", "allowed_statuses": ["answered", "insufficient_evidence"], "missing_fact": "Predios, radiación solar o habilitación de un parque fotovoltaico concreto"},
+      {"question": "No te pregunté qué negocio elegir. ¿Qué datos de energía tenés y cuáles no?", "allowed_statuses": ["answered", "insufficient_evidence"]},
+      {"question": "Ahora sí contame la línea de eficiencia energética, sin decir que es mejor que mi idea inicial.", "groups": [["O09"]]}
+    ]
+  },
+  {
+    "id": "datos-y-comap",
+    "focus": "Cifras, seguimiento y aclaración factual respetuosa sin corregir la intención",
+    "turns": [
+      {"question": "Solo quiero el dato: ¿cuánto exportó Lavalleja en bienes en 2025?", "groups": [["s05-01-05"]]},
+      {"question": "¿Y qué composición tuvieron esas exportaciones?", "groups": [["s05-01-06", "s07-01-01", "s07-02-01", "s07-03-01"]]},
+      {"question": "Además, ¿cinco puntos de descentralización COMAP significa cinco por ciento de descuento? Explicámelo sin recomendaciones.", "groups": [["s30-03-01", "s05-01-08", "s36-04-01"]]}
+    ]
+  },
+  {
+    "id": "turismo-arequita",
+    "focus": "Entorno natural documentado sin inventar demanda, rentabilidad ni habilitación",
+    "turns": [
+      {"question": "Quiero información para una experiencia de observación e interpretación de la naturaleza en Arequita, Polanco y Barriga Negra.", "groups": [["s16-01-01", "s16-02-01", "O06", "O15"]]},
+      {"question": "¿Qué entorno describe para esa actividad y qué diferencias entre esas subzonas figuran?", "groups": [["s16-01-01", "s16-02-01", "s16-03-01", "s16-04-01"]]},
+      {"question": "¿El geoparque significa que el lugar ya está habilitado para cualquier actividad turística?", "groups": [["s36-07-01", "s16-03-01", "s12-04-01"]]}
+    ]
+  },
+  {
+    "id": "tema-no-documentado",
+    "focus": "No inventar una respuesta ni ofrecer un cambio de negocio ante falta de evidencia",
+    "turns": [
+      {"question": "¿Qué información concreta hay sobre un laboratorio de micropropagación de orquídeas instalado en Lavalleja?", "allowed_statuses": ["insufficient_evidence"], "missing_fact": "Laboratorio instalado de micropropagación de orquídeas"},
+      {"question": "¿Y su capacidad de producción anual y sus clientes?", "allowed_statuses": ["insufficient_evidence"], "missing_fact": "Capacidad y clientes del laboratorio inexistente en las fuentes"}
+    ]
+  },
+  {
+    "id": "memoria-y-cambio-explicito",
+    "focus": "Retener proyecto y preferencias, resolver referencias y abandonar el hilo solo si el usuario cambia",
+    "turns": [
+      {"question": "Mi proyecto se llama Brújula: un local de música y baile para adultos en el norte. No incluirá restaurante ni alojamiento. Quiero datos de la zona, no recomendaciones.", "groups": [["s09-01-06", "s14-01-01"], ["s09-01-07", "s15-01-01", "s15-02-01"]]},
+      {"question": "Concentrémonos en Zapicán. ¿Qué perfil territorial tiene para ese mismo local?", "groups": [["s09-01-07", "s15-01-01", "s15-02-01"]]},
+      {"question": "¿Y qué se sabe sobre movilidad y servicios en esa zona?", "groups": [["s15-01-01", "s15-02-01", "s15-05-01", "s15-06-01", "s09-01-07"]]},
+      {"question": "¿Te acordás cómo se llama mi proyecto y qué actividades dije que no iba a incluir? Respondé solo eso.", "allowed_statuses": ["conversation", "answered"], "memory_terms": ["Brújula", "restaurante", "alojamiento"]},
+      {"question": "Cambio de tema: olvidá el boliche. Ahora quiero información sobre agua y efluentes de una planta en Solís de Mataojo.", "groups": [["O10", "s29-01-04"]]},
+      {"question": "¿Qué autoridades aparecen para los permisos de ese proyecto nuevo?", "groups": [["s29-01-04", "s29-01-03", "s29-01-10"]], "requested_requirements": true}
+    ]
+  }
+]

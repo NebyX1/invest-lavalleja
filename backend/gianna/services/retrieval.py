@@ -6,15 +6,18 @@ nivel de evidencia y fuentes, listas para citar.
 """
 import json
 import logging
+import re
 import time
 from functools import lru_cache
 
 from ..domain import ZONES, record_kind, zone_names
+from ..corpus import Record
 from ..chunking import CONTEXTUALIZER_VERSION, input_prefix
 from ..errors import DomainError
 from ..observability import event
 from .neural import LEGACY_ENGINE_VERSION
 from .reranking import BoundedReranker, MAX_CANDIDATES
+from .conversation import fold
 
 RRF_K = 60
 LOG = logging.getLogger(__name__)
@@ -40,6 +43,22 @@ class Retriever:
 
     def clear_rerank_cache(self):
         self.reranker.cache.clear()
+
+    def catalog_matches(self,query,version_id):
+        """Entity/profile matches declared in the corpus, not topic routing in code.
+
+        These are candidate reservoirs, not final winners. They still compete
+        with semantic and lexical results in the same bounded neural window.
+        """
+        normalized=fold(query)
+        matches=[]
+        for item in self._outline(version_id):
+            entry=item.get('catalog_entry')
+            if not entry:continue
+            lengths=[len(name) for name in entry['names']
+                     if re.search(r'(?<!\w)'+re.escape(fold(name))+r'(?!\w)',normalized)]
+            if lengths:matches.append((max(lengths),item['id']))
+        return [key for _,key in sorted(matches,key=lambda x:(-x[0],x[1]))[:3]]
 
     def version(self, version_id=None):
         version = self.db.one('SELECT * FROM versions WHERE id=?', (version_id,)) if version_id else self.knowledge.active()
@@ -77,7 +96,7 @@ class Retriever:
         return result
 
     def card(self, version_id, record, score=0.0, channels=()):
-        return {
+        card = {
             'record_id': record['id'], 'title': record['title'], 'topic': record['topic'],
             'section': record.get('section', ''), 'kind': record_kind(record), 'text': record['text'],
             'conditions': record.get('conditions', []), 'zones': record.get('zones', []),
@@ -86,6 +105,15 @@ class Retriever:
             'locator': record.get('source_locator', ''), 'source_refs': record.get('source_refs', []),
             'score': round(score, 5), 'channels': list(channels), 'version_id': version_id,
         }
+        if record.get('information_view'):
+            # Validation binds the additive view to this exact source revision.
+            # Original text and conditions remain the citation/documentary data.
+            view = Record.model_validate(record).information_view
+            if view is not None:
+                card['information_view'] = view.model_dump()
+        if record.get('documentary'):
+            card['documentary'] = Record.model_validate(record).documentary.model_dump()
+        return card
 
     def search(self, query, settings, version_id=None, zones=None, kinds=None, limit=8, mode='hybrid',
                rerank_budget=None):
@@ -151,6 +179,24 @@ class Retriever:
             seen.add(record['id'])
             candidates.append({'record': record, 'chunk': chunk['text'], 'hybrid': point['score'], 'channels': point.get('channels', [])})
 
+        catalog_ids=self.catalog_matches(query,version['id'])
+        if catalog_ids:
+            extra_records=self.records(version['id'],catalog_ids)
+            known={c['record']['id']:c for c in candidates}
+            for key in catalog_ids:
+                if key in known or key not in extra_records:continue
+                record=extra_records[key]
+                if record.get('audience')!='public':continue
+                row=self.db.one('SELECT text FROM chunks WHERE version_id=? AND record_key=? ORDER BY position LIMIT 1',
+                                (version['id'],key))
+                if row:
+                    candidate={'record':record,'chunk':row['text'],'hybrid':0.0,'channels':['catalog']}
+                    candidates.append(candidate);known[key]=candidate
+            # Keep at most three catalog profiles in the neural candidate
+            # window; other candidates retain their previous relative order.
+            anchors=[known[key] for key in catalog_ids if key in known]
+            candidates=anchors+[c for c in candidates if c not in anchors]
+
         rerank_scores = []
         rerank_trace = {'mode':'hybrid', 'state':'skipped', 'reason':'disabled', 'applied':False,
                         'candidates':0, 'ms':0.0}
@@ -201,7 +247,10 @@ class Retriever:
                 fingerprint=(getattr(engine, 'profile', None) or {}).get('fingerprint', ''))
             if scores is not None:
                 neural = [key for key, _ in sorted(zip(ids, scores), key=lambda item: -item[1])]
-                window_scores = _fuse(neural)
+                # Preserve exact entity/catalog and lexical evidence while the
+                # neural score contributes independently with equal RRF weight.
+                window_scores = _fuse(ids,neural)
+                rerank_trace['fusion'] = 'rrf_equal_hybrid_neural'
                 # Preserve the same soft territory/type preference used by hybrid.
                 for candidate in window:
                     record = candidate['record']
@@ -221,7 +270,7 @@ class Retriever:
         ranked = ranked[:limit]
         cards = [self.card(version['id'], c['record'], fused[c['record']['id']], c['channels']) for c in ranked]
         trace = {'query': text, 'candidates': len(candidates), 'ms': round((time.perf_counter() - started) * 1000, 1),
-                 'ids': [card['record_id'] for card in cards], 'rerank':rerank_trace}
+                 'ids': [card['record_id'] for card in cards], 'catalog_ids':catalog_ids,'rerank':rerank_trace}
         return cards, trace
 
     def get(self, record_id, version_id=None):
@@ -240,7 +289,9 @@ class Retriever:
             if record.get('audience') == 'public':
                 outline.append({'id': record['id'], 'title': record['title'], 'topic': record['topic'], 'kind': record_kind(record),
                                 'zones': record.get('zones', []), 'opportunity_id': record.get('opportunity_id'),
-                                'evidence_type': record['evidence_type']})
+                                'evidence_type': record['evidence_type'],
+                                'content_kind': self.card(version_id, record).get('information_view', {}).get('kind'),
+                                'catalog_entry':record.get('catalog_entry')})
         return outline
 
     def outline(self, version_id=None):

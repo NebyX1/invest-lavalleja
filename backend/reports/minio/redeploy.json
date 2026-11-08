@@ -9,7 +9,7 @@
       "scenario": "fresh_cache_restored_without_volume",
       "passed": true,
       "editorial_unchanged": true,
-      "version_id": "7ac66d61de8f4cea833d9413dc23ecdf",
+      "version_id": "e694ff1c20ad4f9288872821338a1455",
       "vectors": 2
     },
     {
@@ -20,7 +20,7 @@
       "scenario": "second_replacement_preserves_publication_and_evidence",
       "passed": true,
       "editorial_unchanged": true,
-      "version_id": "7ac66d61de8f4cea833d9413dc23ecdf",
+      "version_id": "e694ff1c20ad4f9288872821338a1455",
       "vectors": 2
     },
     {
@@ -35,5 +35,5 @@
   "api_persistent_mounts": 0,
   "generator_calls": 0,
   "editorial_unchanged": true,
-  "events": 164
+  "events": 183
 }

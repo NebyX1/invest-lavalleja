@@ -205,6 +205,23 @@ def test_provider_rejection_does_not_store_or_log_remote_response_content(cfg, c
     assert confidential not in caplog.text and 'private-question' not in caplog.text
 
 
+def test_thinking_compatibility_retry_shares_the_original_timeout(cfg, monkeypatch):
+    from gianna.services.runtime import Ollama
+    from gianna.services.settings import Settings
+    now=[0.0]; requests=[]
+    monkeypatch.setattr('gianna.services.runtime.time.monotonic',lambda:now[0])
+    def respond(request):
+        requests.append(request)
+        if len(requests)==1:
+            now[0]=7.0
+            return httpx.Response(400,text='think parameter unsupported')
+        return httpx.Response(200,json={'message':{'content':'response'}})
+    client=httpx.Client(base_url='https://provider.example.test',transport=httpx.MockTransport(respond))
+    Ollama(cfg,client)._once('model',[{'role':'user','content':'question'}],Settings(model='model'),None,None,'auto',10)
+    assert requests[0].extensions['timeout']['read']==10
+    assert requests[1].extensions['timeout']['read']==3
+
+
 def test_provider_retries_keep_http_reason_and_success_timing_without_content(cfg, monkeypatch, capsys):
     from gianna.services.runtime import Ollama
     from gianna.services.settings import Settings

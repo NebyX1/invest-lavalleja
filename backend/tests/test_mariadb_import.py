@@ -23,6 +23,29 @@ from gianna.services.knowledge import Knowledge
 from gianna.services.settings import Settings
 
 
+def test_descriptive_catalog_and_documentary_detail_roundtrip_in_mariadb(maria_db,cfg,corpus):
+    from gianna.corpus import Record,information_source_hash
+    source=corpus.records[0]
+    data=source.model_dump()
+    data.update(catalog_entry={'kind':'locality','names':['Puerto de prueba']},
+                documentary={'text':'Documento íntegro con condición material.','conditions':['Condición material.']})
+    normalized=Record.model_validate(data)
+    data['information_view']={'text':'Descripción factual del lugar.','kind':'descriptive',
+                              'source_sha256':information_source_hash(normalized)}
+    corpus.records[0]=Record.model_validate(data)
+    knowledge=Knowledge(maria_db,cfg)
+    base=knowledge.import_corpus(corpus,'Descriptive metadata','test-actor')
+    exported=knowledge.export(base)
+    assert next(r for r in exported.records if r.id==source.id).model_dump()==corpus.records[0].model_dump()
+    assert knowledge.active() is None
+    knowledge.approve_public(base,'test-actor')
+    _,version=knowledge.enqueue_build(base,Settings(),'test-actor')
+    rows=maria_db.all('SELECT record_key,content_json FROM version_records WHERE version_id=?',(version,))
+    assert [r['record_key'] for r in rows]==[source.id]
+    assert Record.model_validate_json(rows[0]['content_json']).model_dump()==corpus.records[0].model_dump()
+    assert knowledge.active() is None
+
+
 @pytest.fixture(scope='module')
 def maria_server(request):
     if not request.config.getoption('--mariadb-docker'):

@@ -6,10 +6,13 @@ LEGACY_PERSONA='Sos Gianna, la asistente de inversiones de Lavalleja. Usá espa�
 PREVIOUS_INFORMATION_PERSONA='Sos Gianna, asistente de información sobre desarrollo económico de Lavalleja. Respondé únicamente la información solicitada, con tono institucional cordial y sencillo. No asesores inversiones, no agregues consejos o preguntas no pedidos y reconocé brevemente cuando no contás con el dato.'
 INFORMATION_ONLY_PERSONA='Sos Gianna, asistente de información sobre inversiones en Lavalleja. Respondé únicamente la información solicitada, con tono institucional cordial y sencillo. No asesores inversiones, no agregues consejos o preguntas no pedidos y reconocé brevemente cuando no contás con el dato.'
 PREVIOUS_DEFAULT_PERSONA='Sos Gianna, la asistente de Invest Lavalleja. Ayudás a inversores y emprendedores a entender qué oportunidades, zonas y condiciones existen en Lavalleja. Hablás en español rioplatense, con trato cercano y profesional, y respondés con claridad usando solo lo que figura en tu base de conocimiento.'
-DEFAULT_PERSONA='Tono cálido, claro y profesional; trato cercano de vos, sin jerga innecesaria y sin exagerar certezas.'
+PREVIOUS_TONE_PERSONA='Tono cálido, claro y profesional; trato cercano de vos, sin jerga innecesaria y sin exagerar certezas.'
+DEFAULT_PERSONA='Trato de igual a igual, cordial, claro y profesional, de vos y sin condescendencia. Aportá información pertinente y completa sobre lo preguntado, sin recomendaciones, tareas ni preguntas no solicitadas. Describir un lugar no es evaluar una inversión: no incluyas metodologías comerciales ni consejos indirectos atribuidos a la guía. Expresá las condiciones y los límites de las fuentes de forma descriptiva, sin sermones ni advertencias repetidas.'
 DEFAULT_GREETING='¿Qué información sobre inversiones en Lavalleja necesitás consultar?'
 PREVIOUS_INFORMATION_GREETING='¿Qué información sobre Lavalleja necesitás consultar?'
 LEGACY_GREETING='¿Qué proyecto tenés en mente? Te ayudo a explorar la guía y sus fuentes.'
+PREVIOUS_KNOWLEDGE_NOTICE='Orientación basada en documentación. La elegibilidad, los permisos y las condiciones de cada proyecto deben confirmarse con los organismos competentes.'
+DEFAULT_KNOWLEDGE_NOTICE='Información basada en la documentación de Invest Lavalleja, con sus fuentes, fechas y alcances.'
 
 class Settings(BaseModel):
     model_config=ConfigDict(extra='forbid')
@@ -22,7 +25,7 @@ class Settings(BaseModel):
     retrieval_candidates: int=Field(default=28,ge=5,le=60)
     retrieval_limit: int=Field(default=8,ge=2,le=20)
     rerank_mode: Literal['bounded','hybrid']='bounded'
-    rerank_budget_ms: int=Field(default=400,ge=50,le=400)
+    rerank_budget_ms: int=Field(default=1500,ge=50,le=1500)
     rerank_candidates: int=Field(default=6,ge=2,le=40)
     max_context_records: int=Field(default=8,ge=1,le=10)
     max_context_chars: int=Field(default=20000,ge=4000,le=40000)
@@ -34,14 +37,17 @@ class Settings(BaseModel):
     chat_history_hours: int=Field(default=24,ge=1,le=168)
     analytics_days: int=Field(default=30,ge=1,le=180)
     chat_enabled: bool=True
-    knowledge_notice: str=Field(default='Orientación basada en documentación. La elegibilidad, los permisos y las condiciones de cada proyecto deben confirmarse con los organismos competentes.',max_length=1000)
+    knowledge_notice: str=Field(default=DEFAULT_KNOWLEDGE_NOTICE,max_length=1000)
 
 
 def get_settings(db,cfg):
     values=dict(db.setting('runtime',{'model':cfg.ollama_model}))
     # Upgrade only the exact former defaults; custom editorial settings survive.
-    if values.get('persona') in {LEGACY_PERSONA,PREVIOUS_INFORMATION_PERSONA,INFORMATION_ONLY_PERSONA,PREVIOUS_DEFAULT_PERSONA}:values['persona']=DEFAULT_PERSONA
+    if values.get('persona') in {LEGACY_PERSONA,PREVIOUS_INFORMATION_PERSONA,INFORMATION_ONLY_PERSONA,PREVIOUS_DEFAULT_PERSONA,PREVIOUS_TONE_PERSONA}:values['persona']=DEFAULT_PERSONA
     if values.get('greeting') in {LEGACY_GREETING,PREVIOUS_INFORMATION_GREETING}:values['greeting']=DEFAULT_GREETING
+    if values.get('knowledge_notice')==PREVIOUS_KNOWLEDGE_NOTICE:values['knowledge_notice']=DEFAULT_KNOWLEDGE_NOTICE
+    # Upgrade the former exact default; retain explicitly smaller budgets.
+    if values.get('rerank_budget_ms')==400:values['rerank_budget_ms']=1500
     settings=Settings.model_validate(values)
     # Former installations stored 8–40 for an unused setting. Keep their JSON
     # readable while displaying/enforcing the measured serving cap of six.

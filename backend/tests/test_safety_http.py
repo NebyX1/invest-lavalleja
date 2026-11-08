@@ -179,7 +179,7 @@ def test_safe_substantive_project_can_clear_stored_risk_after_model_review(safet
     headers = session(client)
     assert client.post('/api/chat', headers=headers, json={'message':CAPTURE}).status_code == 200
     model.assessment = semantic_assessment('allow')
-    model.responses.append('La guía no documenta ese rubro específico.')
+    model.responses.extend(empty_contract())
     services.rag.recovery.require = lambda _: None
     services.rag.agent.retriever = EmptyRetriever()
     response = client.post('/api/chat', headers=headers,
@@ -187,7 +187,7 @@ def test_safe_substantive_project_can_clear_stored_risk_after_model_review(safet
     assert response.status_code == 200 and response.json['status'] not in {'clarify','refuse'}
     stored = json.loads(services.security.unseal(services.db.one('SELECT history_encrypted FROM chat_sessions')['history_encrypted']))
     assert stored['safety_context'] is None
-    assert len(model.semantic_calls) == 2 and len(model.calls) == 1
+    assert len(model.semantic_calls) == 2 and len(model.calls) == 3
 
 
 @pytest.mark.parametrize('message,status,semantic', [
@@ -251,7 +251,7 @@ def test_public_chat_allows_reporting_without_treating_it_as_a_criminal_request(
     client, services = safety_client
     services.rag.recovery.require=lambda version:None
 
-    model = ScriptedOllama('Para denunciar, acudí a las autoridades competentes.',
+    model = ScriptedOllama(*empty_contract('No encontré el procedimiento para denunciar en las fuentes consultadas.'),
                            assessment=semantic_assessment('allow', minors='benign_or_protective'))
     services.rag.agent.retriever = EmptyRetriever()
     services.rag.agent.ollama = model
@@ -259,4 +259,11 @@ def test_public_chat_allows_reporting_without_treating_it_as_a_criminal_request(
                            json={'message': '¿Cómo denunciar explotación sexual de menores?'})
     assert response.status_code == 200 and response.json['status'] != 'refuse'
     assert 'denunciar' in response.json['answer']
-    assert model.sequence == ['safety', 'business']
+    assert model.sequence == ['safety', 'business', 'business', 'business']
+
+
+def empty_contract(text='El dato solicitado no aparece en la evidencia consultada.'):
+    from test_information_flow import interpret, review, tool
+    return [interpret(kind='fact'), tool('redactar_informacion', {'statements':[{
+        'ask':0,'paragraph':0,'kind':'missing_data','text':text,'support':[]}]}),
+        review(function='requested_absence')]

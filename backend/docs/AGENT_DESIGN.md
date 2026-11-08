@@ -1,111 +1,58 @@
-# Diseño del agente conversacional
+# Flujo de información de Gianna
 
-**Candidata rc4:** el flujo de seguridad previo al RAG se describe en
-[Seguridad de consultas](SEGURIDAD_CONSULTAS.md). Sustituye las aclaraciones
-automáticas por términos de menores/locales descritas en versiones anteriores.
+Estado local: 8 de noviembre de 2026. Los resultados, incluidos los intentos rechazados, se conservan en [VALIDACION](../reports/VALIDACION.md). Este documento describe el código actual; no acredita un despliegue en producción.
 
-**Estado: candidata del 7 de noviembre de 2026.** Gianna es un agente con herramientas sobre la versión pública publicada. La evaluación de seguridad previa produce un veredicto estructurado; la respuesta empresarial continúa usando evidencia y herramientas, sin un catálogo de rubros.
+Gianna responde el pedido literal con información pertinente, de igual a igual. Una descripción de un negocio aporta contexto y no solicita por sí sola una evaluación comercial, recomendaciones, una lista de verificaciones ni una entrevista. Los procedimientos, restricciones y criterios comparativos se explican cuando se solicitan, conservando las condiciones que cambian los datos.
 
-## Qué hace
-
-Gianna orienta a inversores y emprendedores usando **solo** la guía del portal. Informa, compara zonas y oportunidades explicando el criterio con la evidencia y señala qué falta validar. No promete rentabilidad ni aprobaciones, no da asesoramiento legal, tributario o financiero individual, no declara una opción como "la mejor" en términos absolutos y no inventa cifras, contactos, beneficios fiscales ni disponibilidad de predios.
-
-## Flujo
+## Flujo actual
 
 ```mermaid
 flowchart TD
-    Q["Pregunta + historial"] --> GATE{"¿Compuerta de seguridad?"}
-    GATE -->|"acusación, insulto, delito"| FIXED["Respuesta fija<br/>sin modelo"]
-    GATE -->|"no"| SOCIAL{"¿Cortesía pura?"}
-    SOCIAL -->|"sí"| CHAT["Modelo sin herramientas<br/>sin citas"]
-    SOCIAL -->|"no"| SEARCH["Búsqueda híbrida inicial<br/>vector + BM25 → RRF + reranking acotado"]
-    SEARCH --> PROMPT["Prompt: reglas + tono + zonas<br/>+ mapa de la guía + historial + evidencia"]
-    PROMPT --> MODEL["Modelo con herramientas<br/>deepseek-v4.1-flash:1017"]
-    MODEL --> LOOP{"¿Pide herramienta<br/>y quedan pasos?"}
-    LOOP -->|"sí"| TOOL["buscar_en_la_guia / ver_ficha"]
-    TOOL --> MODEL
-    LOOP -->|"no"| ANSWER["Respuesta con citas [n]"]
-    ANSWER --> VALID["Validar y renumerar citas<br/>traducir códigos internos"]
-    VALID --> OUT["Respuesta + fuentes"]
-    MODEL -->|"proveedor caído"| DEGRADED["3 fichas más relacionadas<br/>estado degraded"]
-    DEGRADED --> OUT
+    U[Pregunta e historial] --> S[Seguridad previa]
+    S -->|permitida| I[Interpretar el pedido sin fuentes]
+    S -->|rechazo o aclaración necesaria| R[Respuesta de seguridad]
+    I --> H[Búsqueda híbrida y reranker compartido]
+    H --> D[Lectura adicional opcional de solo lectura]
+    D --> P[Plan de afirmaciones con respaldo literal]
+    P --> V[Validación de esquema y citas literales]
+    V --> C[Revisión de cada afirmación contra el pedido y las fuentes]
+    C -->|aceptado| A[Texto y citas numeradas]
+    C -->|rechazado| W[Redactar un plan completo nuevo]
+    V -->|inválido| W
+    W --> P
+    W -->|sin intentos o tiempo| E[Estado degradado sin publicar el texto rechazado]
 ```
 
-## Política de respuesta
+1. `Agent.assess` mantiene las compuertas existentes y la revisión semántica de `risk.py` antes de buscar conocimiento. Un fallo del evaluador no habilita búsquedas ni una respuesta empresarial degradada. Los saludos se contestan brevemente, después de esta evaluación.
+2. `information.py` solicita `interpretar_pedido` exclusivamente con la pregunta y el historial. No recibe fuentes ni el mapa de títulos. Fija las dimensiones solicitadas y una consulta de búsqueda; las abreviaturas se interpretan en el ámbito de Lavalleja, Uruguay. Las respuestas anteriores no crean hechos ni preferencias.
+3. La recuperación conserva Granite, BM25 y mMARCO. Un solo `RerankBudget` acompaña la búsqueda inicial y las búsquedas adicionales; su plazo comienza antes del encoder. Se conservan seis candidatos, 160 tokens y hasta 1.500 ms, caché y fallback híbrido. No se eliminó el reranker ni se cambió su perfil.
+4. Se admite una ronda adicional de investigación con hasta seis llamadas a `buscar_en_la_guia` o `ver_ficha`. El mapa público sirve para descubrir fuentes; nunca constituye evidencia. Las consultas precisas abren el contenido documental de las fichas recuperadas; la metodología comercial íntegra solo se abre si el pedido previo la solicita. Las consultas generales usan las vistas informativas.
+5. `redactar_informacion` produce hasta doce afirmaciones breves, organizadas en párrafos. Cada afirmación indica qué parte del pedido responde y sus fuentes con fragmentos literales contiguos. Los datos, propuestas e interpretaciones se distinguen. El contenido no procede de plantillas por localidad, rubro ni palabras clave.
+6. El servidor valida estructura estricta, referencias a fuentes efectivamente expuestas y citas literales. Solo normaliza espacios para comprobar estas citas; no acepta cifras aproximadas, citas inventadas ni fragmentos reconstruidos. Una ausencia puntual no puede sustituir una descripción, posibilidades o comparación.
+7. `comprobar_afirmaciones` recibe la pregunta literal, historial, pedido fijado, afirmaciones y fuentes utilizadas. Clasifica la función de cada afirmación y comprueba respaldo, pertinencia, rol informativo y condiciones materiales. Una reserva no solicitada, asesoría o tema ajeno rechaza el plan completo. Un dato ausente directamente preguntado y una condición necesaria son funciones legítimas.
+8. Se permiten hasta tres planes, cada uno sujeto a la misma revisión. El control devuelve criterios y ubicaciones de error; se solicita una nueva redacción completa. No se borran oraciones con regex ni se publica una parte del plan rechazado. Solo un plan aceptado se convierte en texto y citas renumeradas.
 
-| Situación | Qué hace |
-| --- | --- |
-| La guía responde | Respuesta directa con citas `[n]` pegadas a cada afirmación concreta |
-| Dato en estado de hipótesis o ejemplo | Lo presenta como "la guía propone / es una hipótesis a validar / ejemplo con supuestos" |
-| La guía **no** cubre el rubro (boliche, gimnasio, restaurante) | Lo dice en una frase y aporta lo documentado que sí aplica: zonas, condiciones del territorio, trámites y organismos, y qué validar. Nunca lo presenta como análisis específico del rubro |
-| Pregunta abierta ("¿qué puedo hacer con mi campo?") | Revisa el mapa de la guía y busca por varios rubros antes de responder; no afirma que "la guía no trata X" sin haberlo mirado |
-| Pide una recomendación | Indica qué zonas o caminos encajan con lo que cuenta y por qué (criterios documentados); no corona un ganador |
-| Falta un dato clave | Responde lo posible y cierra con **una** pregunta breve |
-| Seguimiento o corrección | Interpreta en el contexto de la conversación; la corrección se acepta y se ajusta sin repetir el texto anterior |
-| Saludo / gracias / fuera de tema | Una o dos frases, sin herramientas ni citas |
-| Acusaciones, insultos, delitos graves | Respuesta fija desde `safety.py`; el modelo no participa |
-| Intento de inyección de instrucciones | Rechazo breve y retoma el tema; el contenido de las fichas y del usuario se trata como dato |
-| Proveedor caído | Reintentos → modelo alternativo → respuesta `degraded` con las fichas más relacionadas |
+## Límites y persistencia
 
-Estilo: español rioplatense, trato de vos, 80–170 palabras (hasta 260 si piden detalle), párrafos cortos, listas con guion para requisitos, sin negritas ni tablas, sin teléfonos o correos si no los piden, sin códigos internos (Z3, O05, TS-011) y sin hablar de "herramientas" o "base de datos". Todo esto se pide en el prompt (`services/prompts.py`); **no hay filtros que borren oraciones** de la respuesta del modelo. Lo único que el servidor corrige es mecánico: citas inexistentes y códigos internos.
+- Presupuesto total de 100 segundos, incluido el control de seguridad; cada llamada usa el tiempo restante. La compatibilidad del parámetro `think` comparte el plazo original y no abre otro timeout completo. Gunicorn conserva su límite de 120 segundos.
+- Evidencia acotada a 36.000 caracteres. Una ficha que no cabe no se promueve a evidencia del redactor ni de la revisión. Los números de cita son locales a cada respuesta.
+- Las lecturas usan la versión pública inmutable seleccionada y sus filtros de audiencia. No hay herramientas de escritura, publicación, web ni acceso a secretos.
+- Los logs guardan códigos, índices, conteos y tiempos; no preguntas, planes, citas literales, documentos ni cuerpos del proveedor. Los artefactos de evaluación privada sí conservan entradas y salidas públicas para revisión y permanecen fuera de Git.
+- Si el proveedor falla o se agota la revisión, se informa el estado degradado con títulos de las fichas expuestas. No se entrega el texto rechazado ni se afirma que falta conocimiento sobre el tema.
+- El historial existente se conserva y llega a interpretación y redacción. Una corrección del usuario estrecha el pedido; no se hereda la asesoría anterior como una instrucción.
 
-## Modelo y proveedor
+## Modelo evaluado y configuración
 
-- **Modelo:** `deepseek-v4.1-flash:1017` en esta instalación, elegido en Ajustes. `OLLAMA_MODEL` solo inicia instalaciones nuevas.
-- **Alternativa:** `OLLAMA_FALLBACK_MODELS` (por defecto `deepseek-v4.1-flash`). Se prueba después de tres intentos con espera creciente.
-- **`think`:** `low` para `deepseek-v4.1-flash:1017`, `false` para `deepseek-v4.1-flash` sin revisión, ausente para `minimax-m3.1-flash`.
-- **Plazos:** 100 s de presupuesto total; cada llamada tiene un timeout acotado y Gunicorn corta a los 120 s.
-- **Catálogo:** los nombres se validan contra `/api/tags`; no se documentan modelos fuera del catálogo real.
+La candidata seleccionada para este flujo es `mistral-large-4`, consultada en el catálogo real de Ollama Cloud y probada con generación y seguridad reales. DeepSeek continuó produciendo contenido fuera del alcance en las comparaciones conservadas. Gemma respondió más rápido en una tanda, pero introdujo un error factual y omitió condiciones normativas; no se seleccionó por sus tiempos.
 
-## Contexto del modelo
+El modelo sigue siendo configurable; no hay selección por tema en código. Se actualizó únicamente `OLLAMA_MODEL` en el `.env` local. Si una instalación ya tiene un modelo guardado en **Personalización**, ese ajuste prevalece y debe seleccionarse allí `mistral-large-4`. No se sobrescriben personalizaciones SQL ni se modifica un despliegue remoto automáticamente. No hay alternativa automática por defecto que vuelva silenciosamente a un modelo descartado. Si se configura una alternativa explícita, también se le exige el contrato; eso no certifica su calidad semántica.
 
-1. **Reglas** (código) + tono adicional (panel) + zonas Z1–Z7 con su código para el filtro.
-2. **Mapa de la guía:** identificador → título de las 257 fichas públicas, agrupadas por tema (~6.000 tokens). Sirve para descubrir qué existe sin gastar una búsqueda y evita afirmar "la guía no lo trata" sobre algo que sí está. No es evidencia ni se cita.
-3. **Historial** reciente de la conversación (sin marcas `[n]`, ~14.000 caracteres).
-4. **Evidencia inicial:** la búsqueda híbrida con reordenamiento opcional acotado (presupuesto compartido por respuesta, caché y fallback; ver [contrato](RERANKING_ACOTADO.md)), sobre la pregunta, presentada como una llamada a `buscar_en_la_guia` ya ejecutada.
+Se usan herramientas nativas y validación del servidor: [Ollama documenta que Cloud no admite structured outputs mediante format](https://docs.ollama.com/capabilities/structured-outputs); la [API de herramientas](https://docs.ollama.com/capabilities/tool-calling) proporciona el protocolo utilizado. Las herramientas de respuesta no escriben datos.
 
-## Contrato de herramientas
+## Conocimiento corregido
 
-| Herramienta | Entrada | Salida |
-| --- | --- | --- |
-| `buscar_en_la_guia` | `consulta` (obligatoria), `zonas` (códigos Z1–Z7, opcional), `tipo` (`oportunidad`, `zona`, `ejemplo`, `ficha`, opcional) | Hasta 8 fichas numeradas: texto, tema, zonas, nivel de evidencia, corte, condiciones y alcance |
-| `ver_ficha` | `fichas`: hasta 6 identificadores del mapa o números `[n]` ya vistos | Las fichas completas; avisa de los identificadores inexistentes |
+La entrega vigente es `better-rag/consolidated/Invest_Lavalleja_2026_informativa_ampliada_r2.gianna.json`. Conserva 244 registros públicos y 332 internos, con 192 fuentes. El compilador mantiene los originales, exige hashes para aplicar enmiendas y no publica la base.
 
-Límites: 4 pasos, 6 llamadas a herramientas por paso, 36.000 caracteres de evidencia, 100 s en total. Las herramientas son de **solo lectura sobre la versión pública publicada**; no hay herramientas de escritura, publicación, web ni acceso a secretos, y agregarlas requiere autorización expresa.
+Se precisó la fuente energética y la localización de la central homónima Solís de Mataojo: ADME la identifica como eólica y la Resolución 935/015 la sitúa en Canelones. La precisión vive en el conocimiento con sus referencias, no en una respuesta especial del agente. No se cambió ninguna fuente original entregada por el usuario.
 
-La búsqueda inicial ya viene ejecutada: el modelo no empieza "a ciegas". Si la evidencia no alcanza, consulta el mapa y decide si busca de nuevo con otro vocabulario o lee fichas completas.
-
-## Citas
-
-Los números `[n]` valen dentro de una respuesta. El servidor descarta los que no existen en la evidencia recuperada, renumera los usados 1..n por orden de aparición y adjunta por cada uno título, extracto, nivel de evidencia, fecha de corte, ubicación en el documento original y las fuentes primarias.
-
-Si la respuesta usa evidencia pero no cita (y supera los 350 caracteres), se pide **una sola reescritura**. Solo se acepta si la nueva versión contiene citas válidas; si no, se conserva la original. No hay reintentos en bucle.
-
-Una cita válida **no garantiza** que la afirmación sea correcta; garantiza que proviene de una ficha realmente recuperada para esa consulta.
-
-## Recuperación
-
-- **Embedding:** `ibm-granite/granite-embedding-97m-multilingual-r2`, ONNX CPU, 384 dimensiones, pooling CLS, L2, 512 tokens.
-- **Léxico:** BM25 español de LanceDB (stemming, `ascii_folding`, sin palabras vacías).
-- **Fusión:** RRF con `k = 60`.
-- **Candidatos:** 28 por canal, hasta 8 fichas por búsqueda.
-- **Reranker:** `mmarco-mMiniLMv2-L12-H384-v1`, fuera del chat; solo se usa en `prepare_models` y en la evaluación comparativa.
-- **Fichas:** se recupera por fragmento y se entrega la ficha completa (small-to-big), con su cabecera contextual (`cards-context-v5`).
-
-## Cómo evaluar un cambio
-
-1. `python scripts/evaluate_retrieval.py --modes hybrid --verbose` (sin costo): hit@k y MRR contra `evals/retrieval_gold.json` (51 preguntas).
-2. `python scripts/evaluate_retrieval.py --modes fused rerank` solo si se quiere comparar el cross-encoder; tarda varios minutos en CPU.
-3. `python scripts/evaluate_answers.py --report informe.md` (consume cuota): 31 conversaciones con controles automáticos (fichas esperadas, cifras sin respaldo en la evidencia, códigos internos, longitud, estado).
-4. Leer el informe: los controles automáticos no detectan una afirmación errónea bien citada. El modelo no es determinista: un caso límite puede cambiar entre corridas.
-5. `python scripts/chat_cli.py ... --trace` para depurar una conversación concreta.
-
-## Referencias
-
-- Anthropic, [Contextual Retrieval](https://www.anthropic.com/research/contextual-retrieval): cabecera contextual en embedding y BM25.
-- [Granite embedding 97M multilingual R2](https://huggingface.co/ibm-granite/granite-embedding-97m-multilingual-r2): modelo, pooling y dimensión.
-- [mMARCO MiniLM](https://huggingface.co/cross-encoder/mmarco-mMiniLMv2-L12-H384-v1): cross-encoder multilingüe.
-- [LanceDB: búsqueda híbrida](https://docs.lancedb.com/search/hybrid-search) y [FTS](https://docs.lancedb.com/search/full-text-search): FTS nativo con idioma español, stemming y `ascii_folding`, fusión RRF.
-- [kotaemon](https://github.com/Cinnamon/kotaemon) y [RAGFlow](https://github.com/infiniflow/ragflow): híbrido + reranking por defecto, motor de recuperación separado del de agente, citas visibles.
-- [Haystack Agent](https://docs.haystack.deepset.ai/docs/agents) y [LlamaIndex agentes](https://developers.llamaindex.ai/python/framework/use_cases/agents/): bucle de herramientas con límite de pasos.
-- [Coveo Labs, *Most Conversational RAG Systems Work — Until They Don't*](https://www.coveo.com/blog/conversational-rag/): un solo agente con búsqueda múltiple y verificación de completitud.
+Los tests de protocolo prueban mecánica, seguridad y persistencia; no son evidencia de calidad lingüística. La aceptación de redacción requiere leer respuestas reales completas, incluidos los seguimientos, además de los veredictos del propio modelo.

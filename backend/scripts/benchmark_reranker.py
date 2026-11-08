@@ -358,7 +358,7 @@ def main(argv=None):
     parser.add_argument('--output', type=Path, default=Path('reports/rerank/integrated.json'))
     parser.add_argument('--concurrency', type=int, default=3, choices=(1, 2, 3))
     parser.add_argument('--rounds', type=int, default=20, choices=range(1, 21))
-    parser.add_argument('--budget-ms', type=int, default=400, choices=range(1, 1001))
+    parser.add_argument('--budget-ms', type=int, default=1500, choices=range(1, 1501))
     parser.add_argument('--cpu-limit', type=float, default=2)
     parser.add_argument('--memory-limit-gib', type=float, default=2)
     args = parser.parse_args(argv)

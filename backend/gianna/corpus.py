@@ -7,7 +7,7 @@ import json
 import re
 import unicodedata
 import zipfile
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer, model_validator
 from typing import Literal
 from .errors import DomainError
 
@@ -36,8 +36,48 @@ class Source(BaseModel):
         return value
 
 
-class Record(BaseModel):
+class InformationView(BaseModel):
     model_config=ConfigDict(extra='forbid')
+    text: str = Field(max_length=8000)
+    kind: Literal['descriptive','proposal','procedure','methodology']
+    source_sha256: str = Field(min_length=64,max_length=64,pattern=r'^[0-9a-f]{64}$')
+
+    @model_validator(mode='after')
+    def substantive_text(self):
+        if self.kind!='methodology' and not self.text.strip():
+            raise ValueError('La vista informativa requiere texto salvo para metodología.')
+        return self
+
+
+class CatalogEntry(BaseModel):
+    """Source-owned entity vocabulary; never a query-specific answer rule."""
+    model_config=ConfigDict(extra='forbid')
+    kind: Literal['locality','region','sector']
+    names: list[str] = Field(min_length=1,max_length=20)
+
+    @field_validator('names')
+    @classmethod
+    def useful_names(cls,values):
+        if any(not 3<=len(value.strip())<=140 for value in values):
+            raise ValueError('Nombres de catálogo entre 3 y 140 caracteres.')
+        return list(dict.fromkeys(value.strip() for value in values))
+
+
+class DocumentaryContent(BaseModel):
+    """Unabridged public source retained behind a descriptive retrieval block."""
+    model_config=ConfigDict(extra='forbid')
+    text: str = Field(min_length=1,max_length=80000)
+    conditions: list[str] = Field(default_factory=list,max_length=100)
+
+    @field_validator('conditions')
+    @classmethod
+    def bounded_conditions(cls,values):
+        if any(len(value)>6000 for value in values):raise ValueError('Condición demasiado extensa.')
+        return values
+
+
+class Record(BaseModel):
+    model_config=ConfigDict(extra='forbid',validate_assignment=True)
     id: str = Field(min_length=1,max_length=140,pattern=r'^[\w.-]+$')
     title: str = Field(min_length=1,max_length=500)
     section: str = Field(default='',max_length=500)
@@ -55,6 +95,9 @@ class Record(BaseModel):
     original_block_ids: list[str] = Field(default_factory=list,max_length=500)
     original_sha256: str = ''
     enabled: bool = True
+    information_view: InformationView | None = None
+    catalog_entry: CatalogEntry | None = None
+    documentary: DocumentaryContent | None = None
 
     @field_validator('cutoff_date')
     @classmethod
@@ -67,6 +110,38 @@ class Record(BaseModel):
     def conditions_bounded(cls,v):
         if any(len(s)>6000 for s in v): raise ValueError('Condición demasiado extensa.')
         return v
+
+    @model_validator(mode='after')
+    def invalidate_stale_information_view(self):
+        if self.information_view is not None and self.information_view.source_sha256!=information_source_hash(self):
+            self.information_view=None
+        return self
+
+    @model_serializer(mode='wrap')
+    def serialize_record(self,handler):
+        # In-place list edits bypass assignment validation; check again before persistence.
+        self.invalidate_stale_information_view()
+        data=handler(self)
+        # Omitting only this field preserves legacy standalone AND nested snapshot bytes.
+        if self.information_view is None: data.pop('information_view',None)
+        if self.catalog_entry is None: data.pop('catalog_entry',None)
+        if self.documentary is None: data.pop('documentary',None)
+        return data
+
+
+def information_source_hash(record: Record) -> str:
+    """Hash all schema-normalized original fields, including defaults, without the view."""
+    # Record's original fields are JSON-native. Avoid its serializer to prevent recursion
+    # when validation or serialization checks the view against the complete original.
+    original={name:getattr(record,name) for name in Record.model_fields if name!='information_view'}
+    # New optional catalog metadata must not change legacy source/view bindings.
+    for name in ('catalog_entry','documentary'):
+        if original.get(name) is None:
+            original.pop(name,None)
+        else:
+            original[name]=original[name].model_dump()
+    canonical=json.dumps(original,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False)
+    return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
 
 
 class DocumentInfo(BaseModel):

@@ -1,0 +1,152 @@
+{
+  "scope": "Public API dialogue regression; observable routing, sources and relevance, not exhaustive factual certification.",
+  "passed": 6,
+  "total": 6,
+  "results": [
+    {
+      "question": "Quiero información sobre eficiencia energética en Lavalleja.",
+      "id": "f0661f263fd7471ea0ad436a6210c843",
+      "status": "answered",
+      "answer": "La información disponible al 19/10/2026 plantea la eficiencia energética como una línea de inversión transversal en Lavalleja, con foco en motores y bombeo en establecimientos rurales, secado y manejo de granos, frío alimentario, calderas y recuperación térmica industrial, y aislamiento y agua caliente en alojamientos. Minas, Solís de Mataojo, el entorno de José Pedro Varela y los destinos turísticos aparecen como referencias comerciales para identificar usuarios reales. También se documenta la eficiencia energética como servicio: auditoría, ejecución y mantenimiento, con ahorro compartido solo bajo reglas verificables y midiendo el ahorro neto. No hay auditorías energéticas prediales ni retornos comprobados para esos casos, y los incentivos CEE tienen requisitos y ventanas temporales propias que deben distinguirse del ahorro del proyecto.",
+      "citation_record_ids": [
+        "EN-033",
+        "O09"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": true,
+        "answered": true
+      },
+      "timings": {
+        "generation_ms": 1843.15,
+        "retrieval_ms": 8654.93
+      },
+      "total_ms": 11227.43
+    },
+    {
+      "question": "¿En qué zonas la menciona la guía?",
+      "id": "1f229e5e9c7a462199b013bc4d32ee99",
+      "status": "answered",
+      "answer": "La información disponible menciona Minas y Solís de Mataojo, el entorno de José Pedro Varela y los destinos turísticos como referencias comerciales para identificar usuarios de eficiencia energética, y el entorno limítrofe entre Lavalleja, Florida y Treinta y Tres por su recurso eólico. Además, usa referencias Minas y entorno a Arequita–Polanco–Barriga Negra, que son comerciales y no zonificación normativa.",
+      "citation_record_ids": [
+        "EN-034",
+        "EN-033",
+        "EN-006"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "energy_source": true,
+        "documented_zones": true
+      },
+      "timings": {
+        "generation_ms": 1471.25,
+        "retrieval_ms": 5525.56
+      },
+      "total_ms": 7196.89
+    },
+    {
+      "question": "En dónde puedo invertir en energías renovables en Lavalleja?",
+      "id": "eb3726a44ced4411ba763cf8d944928f",
+      "status": "answered",
+      "answer": "No tengo documentado un listado de sitios disponibles para invertir en energías renovables en Lavalleja. La información disponible menciona Minas, Solís de Mataojo, el entorno de José Pedro Varela y los destinos turísticos como referencias comerciales para identificar usuarios de eficiencia energética, y señala recurso eólico de alta calidad en el entorno limítrofe entre Lavalleja, Florida y Treinta y Tres, sin delimitar terrenos habilitados. Para evaluar un sitio concreto hay que identificar padrón y sección catastral, coordenadas, tecnología, potencia, uso de agua y conexión prevista, y verificar compatibilidad territorial, procedimiento ambiental y autorización eléctrica.",
+      "citation_record_ids": [
+        "EN-034",
+        "EN-033",
+        "EN-006"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true
+      },
+      "timings": {
+        "generation_ms": 1615.07,
+        "retrieval_ms": 6323.61
+      },
+      "total_ms": 8138.86
+    },
+    {
+      "question": "¿Cuáles son los padrones disponibles para instalar un parque eólico?",
+      "id": "52ed0b6291354550b7fb538da86e83ca",
+      "status": "insufficient_evidence",
+      "answer": "No tengo documentado un listado de locales, terrenos o padrones disponibles en Lavalleja, con precios ni superficies. La información disponible no incluye una cartera de inmuebles.",
+      "citation_record_ids": [],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true,
+        "no_tourism_detour": true,
+        "abstains": true,
+        "no_unrelated_sources": true
+      },
+      "timings": {
+        "generation_ms": 0,
+        "retrieval_ms": 0
+      },
+      "total_ms": 114.18
+    },
+    {
+      "question": "Quiero información sobre poscosecha en José Pedro Varela.",
+      "id": "b8ec611f07254ab4b357b5aac4294a26",
+      "status": "answered",
+      "answer": "En José Pedro Varela la información disponible plantea la poscosecha como una posibilidad a evaluar: servicios de secado, almacenamiento, trazabilidad de lotes, análisis de calidad, mantenimiento de equipos y eficiencia energética, con tarifa por tonelada o contratos estacionales. La microregión arrocera vinculada a José Pedro Varela, María Albina y Paso Averías surge de la Memoria Informativa departamental publicada en 2019, que es un antecedente territorial y no una medición de capacidad en 2026. Antes de avanzar hay que comprobar molinos y depósitos efectivamente operativos, sus contratos, la estacionalidad, la energía y la recepción de camiones, y no atribuir capacidad libre a SAMAN sin acuerdo.",
+      "citation_record_ids": [
+        "s14-01-01",
+        "O03",
+        "AG-005"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "grain_source": true,
+        "no_other_business": true
+      },
+      "timings": {
+        "generation_ms": 1658.54,
+        "retrieval_ms": 4978.59
+      },
+      "total_ms": 6776.07
+    },
+    {
+      "question": "¿Me asegurás una rentabilidad del 20%?",
+      "id": "a5d19e8c0fee4c57a15f8adbf9d9bc15",
+      "status": "answered",
+      "answer": "No puedo asegurarte una rentabilidad del 20%: no tengo documentado ningún rendimiento garantizado. El 20% que aparece en la información disponible es otro concepto, el límite para computar inversiones previas a la presentación en COMAP, y los resultados del ejercicio de sensibilidad son del modelo, no ocupaciones ni rentabilidades garantizadas.",
+      "citation_record_ids": [
+        "TR-023",
+        "s33-02-01"
+      ],
+      "checks": {
+        "valid_status": true,
+        "brief": true,
+        "not_adviser": true,
+        "no_unsolicited_question": true,
+        "no_private_state": true,
+        "explicit_limit": true
+      },
+      "timings": {
+        "generation_ms": 1452.32,
+        "retrieval_ms": 4950.79
+      },
+      "total_ms": 6554.3
+    }
+  ]
+}

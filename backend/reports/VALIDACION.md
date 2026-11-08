@@ -1,5 +1,376 @@
 # Validación del agente RAG
 
+## Corrección del flujo de redacción · continuación 08/11/2026
+
+La candidata local reemplaza la salida libre por interpretación previa del pedido, afirmaciones con respaldo literal y revisión obligatoria de cada afirmación. Las tandas fallidas de la investigación anterior se conservan debajo: no acreditan la calidad del flujo nuevo. No se realizó push, despliegue remoto, aprobación editorial ni activación automática de la base.
+
+### Cambios comprobables
+
+- `Agent.run` ya no puede entregar prosa temprana que evite la fase final. `information.py` fija el pedido antes de mostrar el corpus y conserva pregunta e historial en composición y revisión.
+- `answer_contract.py` exige esquema estricto, fuente efectivamente expuesta y fragmento literal contiguo. La revisión distingue información, condición solicitada y ausencia puntual de reservas no pedidas, asesoría y temas ajenos. Rechaza el plan completo y solicita otro: no recorta frases ni selecciona respuestas por rubro o localidad.
+- Hay una ronda adicional de investigación de solo lectura, con hasta seis llamadas; hasta tres planes revisados y 100 s en total. La compatibilidad del parámetro `think` comparte el timeout, en lugar de repetir un plazo completo.
+- Se conservan las compuertas de seguridad antes del conocimiento, las versiones públicas, las fuentes y las citas. Las vistas originales de procedimientos se abren según el pedido previo. El reranker permanece en el flujo: Granite + BM25 + mMARCO, seis candidatos, 160 tokens, hasta 1.500 ms compartidos.
+- El modelo seleccionado en `.env` local y `.env.example` es `mistral-large-4`. No se agregaron variables. Se retiró la alternativa implícita a DeepSeek; las alternativas configuradas explícitamente se conservan. Un modelo guardado en Personalización prevalece y no se sobrescribió en SQL. La conexión MariaDB configurada localmente devolvió `OperationalError` durante la inspección; no se afirma haber modificado esa instalación ni una publicación remota.
+
+### Comparaciones conservadas
+
+Artefactos privados, fuera de Git: `reports/writing-fix-20261108/`.
+
+- `contract-01` y `contract-02`: afirmaciones demasiado grandes, reparaciones insuficientes, falsos rechazos de datos pertinentes y fallos de red. No aceptados.
+- `contract-deepseek-03`: una respuesta aceptada de cuatro; persistieron adiciones o incumplimientos de alcance. `contract-oss-03`: cuatro fallos de esquema. No seleccionados.
+- `contract-mistral-03`: cuatro respuestas aceptadas por máquina, con una interpretación geográfica errónea; se precisó el ámbito antes de continuar. `contract-mistral-04`: fallos de red y citas mal copiadas, conservados.
+- `flow-mistral-05` y `flow-mistral-06`: flujo integrado inicial. Aparecieron reservas no solicitadas, exceso de investigación, fallos de proveedor y un error de clasificación de una central energética. No se aceptan como resultado final.
+- `flow-mistral-07`: ocho de ocho respuestas completas, revisadas directamente para tono y alcance; incluye Varela, comparación solar, boliche en el norte, seguimiento sobre Solís, retiros de agua, precio ausente, paisaje rural y quesería. Entre 16,9 y 49,2 s por consulta en esa tanda. No es un test ciego ni una garantía para toda pregunta.
+- `flow-gemma-07`: ocho respuestas aceptadas por su propio control, pero la revisión directa encontró la central homónima tratada como solar y omisión de excepciones normativas. No se seleccionó. Este resultado muestra por qué la aprobación del propio modelo no basta como métrica factual.
+
+La interpretación y redacción no usan ejemplos de respuestas sobre esas localidades. Las preguntas de regresión viven en `evals/writing_regression.json`, separadas de la política. Los informes congelan código, corpus y preguntas mediante SHA-256 y preservan intentos, respuestas y fallos para revisión. Los logs productivos conservan solo códigos y métricas.
+
+### Aceptación final de la candidata
+
+`flow-final-08.json`: **12/12 respuestas completas**, 58 intentos HTTP reales, sobre la base R2 y el código congelado. Consultas entre 15,45 y 59,93 s, con seguridad semántica real, Granite/mMARCO y LanceDB. `evals/writing_regression.json` incluye conversaciones encadenadas, una corrección de alcance, comparaciones solares, viento, actividades rurales, servicios, pasos turísticos, excepciones de retiros, precio ausente y Centro Pyme.
+
+La revisión directa de las respuestas completas aceptó las doce para tono, alcance y utilidad. El control rechazó un cierre eólico sobre falta de habilitación no preguntada, una regla de riego ajena a la consulta sobre retiros y datos ajenos a la pregunta por servicios. Se redactaron planes nuevos; no se recortaron las frases desde el servidor. También se repararon un esquema de intención y un intento de sustituir información territorial por una ausencia.
+
+`flow-identity-09.json`: **2/2 controles factuales adicionales**, 8 intentos HTTP. Identificó la central de 10 MW como eólica, en Canelones; conservó ese referente cuando se preguntó si era solar y de la ciudad de Lavalleja.
+
+`final-direct-review.json` registra los **14/14 casos** y hashes de cada respuesta, con notas de revisión. Es una revisión directa del agente de desarrollo, no una auditoría humana externa ni un test ciego. La aceptación se limita a estas consultas; no implica exactitud universal. Las métricas del modelo revisor por sí solas no se usaron para aceptar calidad.
+
+### Conocimiento y recuperación
+
+Entrega corregida: `better-rag/consolidated/Invest_Lavalleja_2026_informativa_ampliada_r2.gianna.json`.
+SHA-256: `d6bd0ba74fd9fb223b2ff822b4dc10b4317dcb086d68c287382e9a8aa9979d91`.
+576 registros: 244 públicos y 332 internos; 192 fuentes. Se preservan originales y archivo interno. La enmienda exige el hash del registro anterior y no puede cambiar audiencia ni identidad.
+
+El bloque EN-008 identificaba de forma ambigua a Solís de Mataojo. Se precisó la tecnología eólica y la localización en Canelones con [ADME](https://adme.com.uy/mme_admin/participantes/generadores_admin.php?remota=1) y [Resolución 935/015 de IMPO](https://www.impo.com.uy/bases/resoluciones/935-2015). La precisión se incorpora al texto y su lectura documental; no existe una respuesta especial para esta consulta.
+
+`benchmark-r2b/retrieval.json`, índice nuevo con ONNX y LanceDB reales, fixture SQL aislado: 24/24 con fuente esperada entre las ocho primeras, 23/24 entre las tres primeras y 20/24 en primer lugar. Reranker aplicado en 24/24, p95 ~994 ms; caché 24/24, p95 ~200 ms. Se midió en Windows con dos hilos ONNX, sin límite de CPU impuesto por Docker. El gold fue revisado previamente y no es una evaluación independiente. La recuperación no equivale a corrección de todas las afirmaciones generadas.
+
+### Verificación de código
+
+- Suite completa: **821 aprobadas, 45 omitidas**, 193,42 s. Las omisiones corresponden a pruebas opt-in/artefactos privados; no se contabilizan como aprobadas.
+- Revisión final de configuración, transporte, contratos y flujo después de retirar la alternativa implícita: **80 aprobadas**, 6,31 s.
+- MariaDB y MinIO reales en contenedores aislados: **46 aprobadas**, 118,35 s. No se usó SQLite como base de aplicación.
+- Primera ejecución completa conservada: 815 aprobadas y dos fallos de dobles HTTP que aún esperaban prosa libre. Se adaptaron al nuevo protocolo, manteniendo la comprobación de seguridad y memoria; no se desactivaron controles.
+- Se sustituyeron pruebas del antiguo escape temprano y declaración de alcance posterior a las fuentes por pruebas de intención previa, contrato, rechazo y regeneración completos, citas literales, memoria, acceso documental, presupuesto compartido y no entrega de reservas rechazadas.
+
+La base es una entrega nueva, no una publicación activada. Las pruebas de generación consultan el agente y proveedor reales sobre un índice aislado, no el sitio de producción ni sus credenciales administrativas.
+
+---
+
+## Base ampliada, recuperación y redacción · 08/11/2026
+
+**Resultado:** se creó una base informativa nueva y mejoró la cobertura de
+recuperación con los mismos modelos Granite/mMARCO. **La redacción libre no
+superó la aceptación de tono y alcance.** No se considera resuelto el problema
+completo ni se publicó esta base o el código en producción.
+
+### Entrega y trazabilidad
+
+Archivo de entrega: `better-rag/consolidated/Invest_Lavalleja_2026_informativa_ampliada.gianna.json`
+(desde la raíz del repositorio). Formato `gianna.corpus.v1`, UTF-8, aproximadamente
+2,36 MB. SHA-256:
+`8d4c2a0e42baf180e2fbc93686ecbf39a4fb8b9a06304f1759889abebe3e456d`.
+
+- 244 registros públicos: 213 vistas revisadas de la guía y 31 bloques nuevos.
+- 332 internos: los 75 anteriores intactos y un archivo de los 257 originales
+  públicos. Los 44 bloques de metodología pura sin datos descriptivos se
+  conservan en ese archivo; no generan una copia indexable pública.
+- 191 fuentes: las 172 existentes y 19 referencias del suplemento. De las nuevas,
+  18 son páginas/PDF primarios consultados y uno es la referencia a la guía
+  pública aportada por el responsable. La consulta de esas 18 fuentes no
+  constituye una reverificación independiente de las 172 anteriores.
+- Perfiles de localidades, norte, energía solar/eólica, logística, alimentos,
+  turismo, infraestructura y apoyo empresarial. Nombres y alias en
+  `catalog_entry`; originales públicos íntegros y condiciones en `documentary`.
+- La clasificación de propuestas, antecedentes, fechas, ámbito y fuentes se
+  conserva. No se agregaron precios, disponibilidad predial, demanda, retornos
+  ni un ranking de rentabilidad que no estuvieran documentados.
+
+El suplemento público versionable está en
+`samples/invest_supplement_20261108.json`; el paquete completo contiene el anexo
+interno y permanece fuera de Git y Docker. La compilación exige vistas ligadas
+al SHA-256 de los originales. No sobrescribe entradas ni archivos de salida,
+no aprueba registros y no activa publicaciones. El paquete requiere esta versión
+del backend, que reconoce los nuevos campos opcionales; un backend anterior con
+validación estricta puede rechazarlos.
+
+Los originales de trabajo y las corridas están en la carpeta privada
+`reports/invest-rebuild-20261108/`. El corpus evaluado v4 tenía SHA-256
+`18fc4397dd759aba6bd15a8cafebef20a0c11d1cfc608408352f03c8684ca0d5`.
+La entrega conserva exactamente sus textos indexados, cabeceras, vistas,
+catálogo, audiencias y fuentes. Solo cambian la procedencia del suplemento al
+normalizar LF y dos etiquetas de período de eólica para identificar correctamente
+ADME/MTSS. `delivery-equivalence-r1.json` comprueba esa relación. Los índices y
+respuestas se evaluaron sobre v4, no sobre una supuesta instalación productiva.
+
+Se corrigió la mezcla de diseño y registro de Minas I: el suplemento utiliza
+los 42 MW instalados/autorizados registrados por
+[ADME](https://adme.com.uy/mme_admin/participantes/generadores_admin.php?remota=1),
+consultada el 08/11/2026; el diseño preliminar de 66 MW no se presenta como la
+capacidad instalada. El recurso eólico limítrofe se atribuye al
+[estudio MTSS/MIEM de 2025](https://www.gub.uy/ministerio-trabajo-seguridad-social/sites/ministerio-trabajo-seguridad-social/files/documentos/publicaciones/Informe%20Prospectiva%20Empleo%20H2V%20Uruguay%20v.f.pdf).
+
+### Recuperación real y corrección del conjunto de evaluación
+
+24 preguntas declaradas en `evals/invest_rebuild.json`. La métrica es encontrar
+**al menos una ficha esperada**, no recuperar todos los hechos necesarios ni
+certificar una respuesta. No es un conjunto ciego ni externo. Se revisaron los
+IDs esperados: algunas referencias iniciales confundían IDs de fuentes con IDs
+de registros, especialmente en energía. Las cifras preliminares basadas en esos
+IDs se descartan. `gold-before-review.json` conserva la versión anterior y
+`retrieval-reviewed-gold.json` recalcula las listas inmutables, sin repetir
+inferencia ni reutilizar los tiempos como una comparación simultánea.
+
+| Configuración | Esperada en 1.º | En tres primeros | En ocho primeros | MRR |
+|---|---:|---:|---:|---:|
+| Original, presupuesto anterior de 400 ms | 10/24 | 15/24 | 19/24 | 0,546 |
+| Base nueva, híbrido + catálogo | 21/24 | 23/24 | 24/24 | 0,918 |
+| Base nueva, híbrido + catálogo + mMARCO/RRF | 21/24 | 24/24 | 24/24 | 0,931 |
+
+Dos preguntas agregan conocimiento ausente del original: Hikari y unidades/
+estacionalidad del mapa solar. No se contabilizan como errores del buscador al
+comparar solo cobertura compartida: el original logra 19/22 en ocho y la nueva
+base 22/22. El cambio combina contenido, representación y catálogo; no permite
+atribuir toda la mejora al reranker. No se cambiaron los pesos ni el embedding.
+
+El orden neural puro había empeorado el primer resultado en parte de los casos.
+Se conserva la fusión RRF de igual peso con el orden híbrido, seis candidatos,
+160 tokens por par, una sola oportunidad neural por respuesta y fallback íntegro.
+La ventana anterior de 400 ms cancelaba todas las inferencias en este conjunto;
+con 1.500 ms se aplicaron 24/24 en la medición secuencial local. Caché 24/24,
+p50 de búsqueda aproximadamente 119 ms; sin caché, p50 801 ms. Son medidas locales.
+
+### Docker con límites efectivos
+
+`reranker-docker-2cpu.json`: Docker, red deshabilitada, dos CPU y 2 GiB, pesos
+montados de solo lectura. Índice SQL/FTS/Lance aislado; SQLite es solo la fixture
+de evaluación, no una reversión de MariaDB en la aplicación. No hay generación.
+
+- Secuencial: mMARCO aplicado 24/24; p95 de búsqueda 1.110 ms. Caché 24/24,
+  p95 265 ms.
+- Doce paráfrasis adicionales declaradas antes de medirlas: primer resultado
+  esperado 9/12 híbrido y 11/12 con reranker; ambas variantes 12/12 en tres.
+  Tampoco son un holdout externo o independiente del equipo.
+- Tres concurrentes, nueve consultas frías: una aplicación, seis fallbacks por
+  ocupación y dos por timeout; p95 1.544 ms. Con caché previamente intentada:
+  seis aciertos, dos aplicaciones y un fallback; p95 1.479 ms.
+- **El informe global de aceptación devuelve `passed=false`:** no mejoró
+  estrictamente hit@1 en el gold y la latencia de caché concurrente no quedó
+  suficientemente cerca del híbrido. Esos criterios fallidos se conservan.
+- `window-sweep-2cpu.json` comparó cuatro y seis candidatos sobre el mismo índice
+  aislado y las 36 preguntas. Cuatro redujo el coste de inferencia y logró 36/36
+  aplicaciones en esa corrida, pero bajó el gold de 24/24 a 23/24 en tres.
+  Se mantuvo el máximo/predeterminado de seis. Hubo variación entre corridas,
+  carga compartida del host y un arranque frío de búsqueda de 6,46 s: el presupuesto
+  del reranker no es un SLA de toda la recuperación ni de la respuesta.
+
+### Instrucciones y flujo: resultados negativos conservados
+
+Se ejecutaron **347 intentos HTTP de evaluación**, sin reintentos automáticos de
+los evaluadores ni publicación, autorizados por el responsable. No representan
+327 preguntas independientes. Los resultados conservan modelo, parámetros,
+fuentes, preguntas, respuestas, consumo y hashes; los secretos no se guardan.
+
+Se probaron instrucciones extensas, breves, positivas, español/inglés, conversación
+nativa con la pregunta al final, tres u ocho fichas, perfiles solamente, selección
+semántica, edición adicional y ejemplos ficticios sin localidades de Lavalleja.
+También se comparó `think=false` y modelos del catálogo: DeepSeek 1017, GLM 5.3
+Flash, MiniMax M3.1 Flash y Mistral Large 4. Las configuraciones del proyecto y
+el modelo elegido no se cambiaron. Ninguna variante certificó el tono requerido.
+MiniMax además produjo una salida defectuosa con mezcla de idiomas/marcadores.
+
+- `agent-01.json`: 24 conversaciones con seguridad, búsqueda, herramientas y
+  seguimiento; 98 intentos HTTP. Todas devolvieron `answered`, pero varias
+  resumían fichas no pertinentes o añadían límites no pedidos.
+- `agent-02.json`: selección explícita y redacción obligatoria; 24 `answered`,
+  112 intentos. Persistieron los desvíos y aumentó el coste. **Se descartó.**
+- `agent-catalog-03.json`: catálogo inicial breve, ocho casos críticos,
+  36 intentos. Persistieron límites no pedidos y comienzos negativos.
+  **Se descartó.**
+- Se restauraron agente, instrucciones y escritor de la variante medida en
+  `agent-01`. Los prototipos y sus hashes permanecen archivados en
+  `rejected-flow-decision.json` y las instantáneas de código. La conversión a LF
+  posterior no altera las cadenas que interpreta Python.
+- Se conservan las mejoras verificadas: catálogo como candidatos de recuperación,
+  vistas descriptivas con detalle documental, naturaleza de fuente sin el mandato
+  «a validar», posibilidad de comparar atributos y un contexto de escritura limpio
+  en el último paso del presupuesto y en la reparación de citas.
+
+Fallos que **siguen abiertos**: Varela puede cerrar con ausencia de activos o
+rentabilidad sin que se haya preguntado; solar puede comenzar negando un ranking
+en lugar de describir los contextos útiles; el caso del boliche en el norte puede
+arrastrar otras actividades o límites del rubro. Hay hechos pertinentes recuperados,
+pero el generador no respeta siempre el alcance. Una marca automática vacía y una
+cita estructuralmente válida no significan aprobación editorial. Tampoco se
+certificó exhaustividad o vigencia legal de todas las afirmaciones generadas.
+
+La mejora de recuperación con modelos constantes descarta que todo el problema
+sea incapacidad del embedding. La persistencia de desvíos con evidencia correcta
+muestra un problema adicional de selección/síntesis y seguimiento de instrucciones.
+La comparación realizada no identifica un modelo generativo ganador ni justifica
+un reemplazo automático.
+
+### Revisión semántica adicional: tampoco aprobada
+
+Se ensayó un crítico de alcance con citas literales ancladas al borrador,
+reescritura dirigida y una segunda evaluación, sin filtros por palabras ni
+borrado de oraciones en el servidor. En ocho casos, DeepSeek consumió 12 intentos:
+aceptó varios desvíos conocidos (Varela y la apertura sobre ranking solar) y
+marcó para revisión parte del encuadre de un procedimiento. La corrección dirigida
+mejoró un caso eólico, pero el crítico no resultó un control fiable.
+
+Un revisor independiente `gpt-oss:120b` consumió ocho intentos adicionales:
+seis resultados no cumplieron la validación del protocolo o de citas literales
+ancladas. Los dos aceptados no bastan para acreditar calidad. No se infiere
+exactitud semántica de los casos inválidos. Ambas corridas están conservadas en
+`scope-review-01.json` y `scope-review-independent-02.json`; no se integró este
+control en la aplicación ni se cambió el generador. Los 347 intentos anteriores
+incluyen estas veinte llamadas adicionales.
+
+### Qué se tomó de Gianna Turismo
+
+Se leyó el remoto
+[`b1ce4826d36dfed9ea48c961ce645b82ab4adcc4`](https://github.com/NebyX1/giana-turismo/tree/b1ce4826d36dfed9ea48c961ce645b82ab4adcc4):
+catálogo de entidades, unidades recuperables con contexto, léxico+denso fusionados,
+reranking de candidatos, anclas de catálogo y una redacción separada de la búsqueda.
+La copia local tenía cambios adicionales; no se editó ni se trató como idéntica
+al remoto. Invest adopta perfiles fuente y mejor fusión, manteniendo sus filtros,
+versiones inmutables y control semántico de seguridad previo a recuperar. La
+separación obligatoria completa se ensayó y no se incorporó por sus resultados.
+
+### Verificación técnica y estado de publicación
+
+- Suite final: **816 passed, 45 skipped**, en Windows/Python 3.12 con UTF-8
+  explícito para subprocess. El primer intento detectó un conflicto de codificación
+  del proceso hijo; no se añadió ninguna variable al `.env` de la aplicación.
+- Integraciones opt-in de MariaDB y MinIO: **42 passed**. Dos pruebas adicionales
+  verificaron catálogo, vista y documento íntegro al importar, exportar y congelar
+  snapshots públicos en MariaDB nueva y actualizada: **2 passed**.
+- Reemplazo completo de contenedor sin volumen local, con MariaDB, MinIO,
+  LanceDB y ONNX reales: **1 passed**, seis escenarios (persistencia privada,
+  caché nueva, salud, segunda sustitución, modelos restaurados y logs sin secretos).
+  Evidencia controlada en `reports/minio/redeploy.json` y `redeploy-events.jsonl`.
+- No se ejecutó el escenario de reconexión del volumen local anterior ni la prueba
+  de navegador de monitoreo. El frontend no cambió. Los tests con dobles verifican
+  contratos; la calidad generativa se juzga en las corridas reales anteriores.
+- No hubo push, despliegue, cambio de `.env`, importación a la base de aplicación
+  ni activación de conocimiento público. La base de entrega sigue siendo borrador.
+  **El proyecto no se declara listo para producción por esta evaluación.**
+
+## Personalidad informativa · segunda tanda real · 08/11/2026
+
+Se autorizaron y ejecutaron **10 intentos HTTP adicionales**, sin reintentos ni
+modelo alternativo, conservando las cinco llamadas de la tanda anterior. El
+modelo y selección local siguen siendo `deepseek-v4.1-flash:1017`, temperatura
+0,1 y 4.096 tokens de salida. La prueba usa fuentes públicas preseleccionadas y
+el formato real de citas: no prueba recuperación, el control de seguridad de
+extremo a extremo ni el runtime de producción. Los archivos de resultados
+guardan las respuestas y hashes; no se descartaron los intentos deficientes.
+
+Los primeros tres casos conservaron preguntas comerciales o advertencias
+editoriales como supuesta información del lugar. Se añadió un contrato de
+redacción del servidor después de la evidencia y el historial. Los dos casos
+siguientes seguían incluyendo condiciones no solicitadas. Se incorporaron
+ejemplos genéricos con marcadores, sin respuestas precargadas por localidad, y se
+reiteró la pregunta literal en su propio rol de usuario después del contrato;
+no se inserta contenido del usuario en instrucciones de sistema. Esto se aplica
+a cada generación y reparación de citas sin agregar una llamada al modelo.
+
+Los cinco casos de esa última configuración produjeron respuestas finales:
+
+- El reensayo de Varela pasó de 436 a 266 palabras y dejó de agregar pregunta
+  comercial de cierre o checklist de verificación; queda una expresión editorial
+  sobre «investigar negocios» dentro de una propuesta.
+- La corrección del usuario recibió información factual de Varela (212 palabras)
+  en vez de discusión, tareas o preguntas comerciales.
+- El dato ausente no produjo un precio inventado ni una tarea de investigación.
+- Se conservaron los pasos de un procedimiento expresamente solicitado; no se
+  certifica por ello su exactitud legal o factual.
+- **Incidencia pendiente:** la consulta sobre una hostería en Villa Serrana aún
+  incluyó una instrucción normativa no solicitada y demasiado detalle del plan.
+
+No se considera una validación 10/10 ni una liberación sin observaciones. La
+configuración final mejora el caso original, pero **no se da por resuelto el
+alcance en todas las variantes**. Los casos iniciales no acreditan la última
+configuración, ni viceversa. Se sustituyó una comparación inicialmente prevista
+por un reensayo de la pregunta original, con la modificación de protocolo
+registrada: es una exploración iterativa, no un benchmark ciego.
+
+Validación de código tras el ajuste: regresión focalizada **114 passed**; suite
+completa **616 passed, 43 skipped** en 167,58 s. Las integraciones Docker,
+MariaDB, MinIO, ONNX, navegador y el paquete documental privado mantienen sus
+requisitos propios y no se ejecutaron en esta corrida. Estos tests no miden
+calidad semántica del modelo.
+
+Informe compacto: [segunda tanda](rag-migration/information-style-round2-20261108.json).
+Evidencia completa local: `reports/personality-20261108/round2-results.json`,
+con diez respuestas y fuentes de prompt archivadas por hash. No se modificaron
+`.env`, modelos, corpus, índices, punteros publicados ni datos de producción.
+No se hizo push ni despliegue. El cupo autorizado está agotado; nuevas llamadas
+de pago requieren autorización.
+
+## Personalidad informativa · 08/11/2026 · cambio local
+
+La consulta «Qué podés decirme de Varela?» expuso un problema de instrucciones:
+el prompt pedía qué faltaba validar y una pregunta de cierre para orientar un
+proyecto, aunque no se hubiera solicitado asesoría. Se sustituyó ese mandato por
+un rol informativo de igual a igual, sin recomendaciones, tareas ni preguntas
+comerciales no solicitadas. La extensión depende del pedido y la evidencia, no
+de un límite fijo de palabras. Las fechas, hipótesis, condiciones sustantivas,
+citas, herramientas, memoria y evaluación previa de seguridad se conservan.
+
+El contrato se aplica después del tono adicional editable y también al reparar
+citas. Los antiguos predeterminados exactos se traducen en memoria al tono nuevo,
+sin escribir SQL ni perder personalizaciones. El fallback por caída del modelo
+mantiene sus fuentes y deja de indicar al usuario que investigue o reintente.
+No se añadieron filtros de salida, rutas por localidad ni respuestas precargadas.
+
+Validación del primer ajuste, antes de la prueba real:
+
+- Regresión focalizada de personalidad, agente, seguridad y ajustes: **111 passed**.
+- Suite completa de backend: **613 passed, 43 skipped** en 167,78 s. Las
+  integraciones Docker/MariaDB/MinIO/ONNX, navegador y corpus privado conservan
+  sus requisitos opt-in; no se ejecutaron en esta corrida.
+- Se agregaron inicialmente **14 pruebas de contrato y orquestación**; no miden la obediencia
+  real del modelo. Cubren configuraciones antiguas/personalizadas, consultas
+  abiertas y seguimientos, reparación de citas y ausencia de borrado de frases.
+
+### Prueba real autorizada y refinamiento posterior
+
+Tras autorización expresa se consumieron **exactamente 5 intentos HTTP de
+generación**, sin reintentos ni modelo alternativo, con la selección local leída
+sin escrituras: `deepseek-v4.1-flash:1017`, temperatura 0,1 y 4.096 tokens de
+salida. Se enviaron solo preguntas de prueba y evidencia pública habilitada del
+corpus consolidado. Es una prueba del componente de redacción con fuentes
+preseleccionadas, **no** del flujo RAG completo ni de la instancia productiva.
+
+El prompt anterior reprodujo las tareas comerciales y la pregunta final no
+solicitadas. El primer intento del prompt nuevo pidió más fichas sin dar una
+respuesta final en este arnés sin ejecución de herramientas; se conserva como
+incompleto. Las tres llamadas restantes emplearon el nudge real de redacción
+final y no agregaron una pregunta comercial de cierre. Sin embargo, la respuesta
+sobre Varela todavía copió metodología de inversión atribuida a «la guía
+propone…» y resultó demasiado larga. El seguimiento sobre un boliche en el norte
+no sustituyó el negocio pero conservó condiciones comerciales no pedidas. El
+pedido de pasos recibió un procedimiento, con referencias territoriales
+innecesarias. No se considera una validación 5/5 ni una certificación factual.
+
+Se afinó después la distinción entre datos territoriales y metodología de
+asesoría: compartir localidad no hace pertinente una prueba comercial, modelo
+de entrada o checklist, ni atribuirlo a la guía autoriza un consejo indirecto.
+La precisión sustantiva permanece y no se filtra la prosa generada. Esta revisión
+posterior **no se volvió a probar con el proveedor**, porque se agotó el cupo
+autorizado. La regresión focalizada del refinamiento dio **112 passed** en
+16,81 s e incluye una prueba nueva contra los consejos indirectos atribuidos a
+la guía; no se volvió a ejecutar la suite completa ni representa una nueva
+evaluación del modelo. La evaluación detallada y los hashes de las fuentes ensayadas están
+en [el informe de revisión](rag-migration/information-style-real-20261108.json).
+Los textos completos y las fuentes de prompt anteriores al refinamiento se
+conservan localmente en `reports/personality-20261108/`.
+
+No se modificaron `.env`, corpus, índices, perfiles, punteros publicados o datos
+de la instalación. No se hizo push ni despliegue de este cambio de personalidad.
+
 ## Reranking acotado · 08/11/2026 · 1.0.0-rc5
 
 **Validación local aprobada antes de publicar.** Destino: `NebyX1/invest-lavalleja`,

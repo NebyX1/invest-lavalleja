@@ -1,0 +1,14 @@
+[
+  {"id":"territory","q":"Estoy pensando en una sala de música y baile en el norte. Contame sobre esa zona.","review":"Describe localidades, conectividad, actividad y antecedentes culturales pertinentes. No sustituye el negocio ni entrevista al inversor."},
+  {"id":"varela_followup","parent":"territory","q":"¿Y Varela en particular?","review":"Conserva el tema territorial y el contexto del negocio, sin agregar una evaluación comercial."},
+  {"id":"correct_scope","parent":"varela_followup","q":"Solo me interesa cómo está conectada con otras localidades.","review":"Acepta el alcance más estrecho y responde conectividad, sin repetir actividades o consejos."},
+  {"id":"solar_comparison","q":"Compará los lugares de Lavalleja para desarrollar energía solar según sus actividades productivas.","review":"Compara atributos documentados, sin ranking inventado, sermón ni ausencia de garantías no pedida."},
+  {"id":"solis_energy","parent":"solar_comparison","q":"¿Y cómo encaja Solís en eso?","review":"Resuelve eso como energía solar y base productiva. No confunde una central eólica homónima en Canelones con energía solar en Lavalleja."},
+  {"id":"wind","q":"¿Qué información concreta hay sobre el viento como recurso energético en el departamento?","review":"Describe el recurso y sus fuentes. No transforma una consulta por el recurso en un checklist de permisos."},
+  {"id":"landscape","q":"Me interesa el paisaje rural de Polanco y Barriga Negra. ¿Qué actividades se describen para esos lugares?","review":"Describe atributos y actividades propuestas. No añade restricciones de actividades ajenas."},
+  {"id":"services","q":"¿Qué servicios para empresas se plantean en Mariscala y Pirarajá?","review":"Aporta servicios y base productiva. No niega cobertura ni propone tareas comerciales."},
+  {"id":"asked_steps","q":"¿Qué pasos documentados tiene el registro de un alojamiento turístico?","review":"Conserva requisitos, fechas y condiciones del trámite expresamente solicitado."},
+  {"id":"asked_conditions","q":"¿Cuáles son los retiros de agua y sus excepciones en el Plan Local de Villa Serrana?","review":"40, 10, 4 y 30 metros con su referencia de medición; excepciones por zona y tolerancia justificada no automática."},
+  {"id":"asked_price","q":"¿Tenés un precio actual de alquiler de depósitos en José Pedro Varela?","review":"Reconoce solamente la ausencia del precio actual; no manda investigar ni rellena con otros negocios."},
+  {"id":"support","q":"¿Qué servicios ofrece el Centro Pyme de Lavalleja?","review":"Describe los servicios documentados sin anexar ausencias de horarios, direcciones ni consejos no solicitados."}
+]

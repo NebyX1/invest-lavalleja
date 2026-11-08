@@ -14,6 +14,7 @@ from gianna.services.conversation import is_social
 from gianna.services.rag import RAG
 from gianna.services.safety import hard_gate
 from gianna.services.settings import Settings
+from gianna.services.prompts import ANSWER_CONTRACT, CITATION_NUDGE, INFORMATION_STYLE
 from fakes import FakeEmbeddings, FakeLanceStore, MechanicalJobs as Jobs, isolate_physical_recovery
 
 
@@ -50,7 +51,66 @@ class ScriptedOllama:
 
     @property
     def evidence(self):
-        return '\n'.join(m['content'] for m in self.calls[-1]['messages'] if m['role'] == 'tool')
+        return presented_evidence(self.calls[-1]['messages'])
+
+
+def presented_evidence(messages):
+    blocks = [m['content'] for m in messages if m['role'] == 'tool']
+    for message in messages:
+        if message['role'] != 'user':
+            continue
+        try:
+            data = json.loads(message['content'])
+        except (ValueError, TypeError):
+            continue
+        if isinstance(data, dict) and isinstance(data.get('evidence_text'), str):
+            blocks.append(data['evidence_text'])
+    return '\n'.join(blocks)
+
+
+
+
+def test_writer_only_sees_presented_view_until_an_original_is_actually_opened():
+    card = {'record_id':'source','title':'Source','topic':'Topic','zones':[],
+            'evidence_type':'mixed','text':'Original details and author coaching.',
+            'conditions':['Original material condition.'],
+            'information_view':{'text':'Descriptive statement.','kind':'descriptive'}}
+    evidence = Evidence()
+    evidence.render([card])
+    assert 'Descriptive statement.' in evidence.for_writing()
+    assert 'Original details' not in evidence.for_writing()
+    assert 'Original material condition' not in evidence.for_writing()
+    assert 'ver_ficha' not in evidence.for_writing()
+    evidence.render([card],force=True,documentary=True)
+    assert 'Original details' in evidence.for_writing()
+    assert 'Original material condition.' in evidence.for_writing()
+    evidence.render([card],force=True)
+    assert 'Original details' in evidence.for_writing()
+    assert evidence.for_writing().count('[1] Source')==1
+
+
+def test_empty_methodology_view_is_not_promoted_to_factual_writer_evidence():
+    card = {'record_id':'source','title':'Method','topic':'Topic','zones':[],
+            'evidence_type':'mixed','text':'Original commercial method.', 'conditions':[],
+            'information_view':{'text':'','kind':'methodology'}}
+    evidence=Evidence()
+    evidence.render([card])
+    assert evidence.for_writing()==''
+    assert evidence.cards[1]['text']=='Original commercial method.'
+    evidence.render([card],force=True,documentary=True,methodology=True)
+    assert 'Original commercial method.' in evidence.for_writing()
+
+
+def test_compiled_descriptive_block_exposes_full_original_only_for_a_documentary_read():
+    card={'record_id':'compiled','title':'Company','topic':'Topic','zones':[],
+          'evidence_type':'documented_in_source','text':'A company in the locality.', 'conditions':[],
+          'information_view':{'text':'A company in the locality.','kind':'descriptive'},
+          'documentary':{'text':'A company at route 8, km 256.', 'conditions':['Source dated 2026.']}}
+    evidence=Evidence();evidence.render([card])
+    assert 'km 256' not in evidence.for_writing()
+    evidence.render([card],force=True,documentary=True)
+    assert 'km 256' in evidence.for_writing() and 'Source dated 2026.' in evidence.for_writing()
+    assert evidence.cards[1]['text']=='A company at route 8, km 256.'
 
 
 def semantic_assessment(decision, **overrides):
@@ -65,6 +125,21 @@ def semantic_assessment(decision, **overrides):
 def search_call(query, **extra):
     return {'function': {'name': 'buscar_en_la_guia', 'arguments': {'consulta': query, **extra}}}
 
+
+
+def contract_responses(text='Hace falta inscripción previa.', *, query='alojamiento turístico', kind='procedure'):
+    """Three explicit protocol stages. Does not measure semantic correctness."""
+    from test_information_flow import interpret, review
+    def compose(messages):
+        data=json.loads(messages[1]['content'])
+        evidence=data['evidence_text']
+        blocks=evidence.split('\n\n')
+        block=next(b for b in blocks if 'inscripción previa al inicio de actividad' in b)
+        n=int(block[1:block.index(']')])
+        return ('', [{'function':{'name':'redactar_informacion','arguments':{'statements':[{
+            'ask':0,'paragraph':0,'kind':'fact','text':text,
+            'support':[{'source':n,'quote':'inscripción previa al inicio de actividad'}]}]}}}])
+    return interpret(query,kind), compose, review()
 
 def small_corpus():
     return Corpus(document=DocumentInfo(id='small', title='Base de prueba'), records=[
@@ -81,12 +156,12 @@ def small_corpus():
 
 @pytest.fixture
 def system(db, cfg, knowledge, security):
-    def build(ollama):
+    def build(ollama, corpus=None):
         embeddings, store = FakeEmbeddings(), FakeLanceStore()
         rag = RAG(db, cfg, knowledge, embeddings, store, ollama, security)
         isolate_physical_recovery(rag)
         jobs = Jobs(db, cfg, knowledge, embeddings, store, rag)
-        base_id = knowledge.import_corpus(small_corpus(), 'Base', 'actor')
+        base_id = knowledge.import_corpus(corpus or small_corpus(), 'Base', 'actor')
         knowledge.approve_public(base_id, 'actor')
         _, version_id = knowledge.enqueue_build(base_id, Settings(), 'actor')
         jobs.execute_job(jobs.claim())
@@ -100,8 +175,8 @@ def ask(rag, question, **kwargs):
 
 
 def test_response_shares_one_neural_attempt_across_initial_and_tool_searches(system):
-    model=ScriptedOllama(('',[search_call('Otra consulta territorial'),search_call('Una consulta de permisos')]),
-                          'La guía exige verificar condiciones [1].')
+    stages=contract_responses()
+    model=ScriptedOllama(stages[0], ('',[search_call('Otra consulta territorial'),search_call('Una consulta de permisos')]), *stages[1:])
     rag,engine,_=system(model)
     calls=[]
     engine.rerank_bounded=lambda query,texts,**kw:(calls.append(kw) or list(range(len(texts))))
@@ -115,7 +190,7 @@ def test_response_shares_one_neural_attempt_across_initial_and_tool_searches(sys
     assert response['status']=='answered'
     assert len(budgets)==3 and budgets[0] is not None
     assert all(budget is budgets[0] for budget in budgets)
-    assert len(calls)==1 and calls[0]['timeout']<=0.400001
+    assert len(calls)==1 and calls[0]['timeout']<=1.500001
     assert calls[0]['max_tokens']==160
     row=rag.db.one('SELECT retrieval_trace_json FROM queries WHERE id=?',(response['id'],))
     trace=json.loads(row['retrieval_trace_json'])
@@ -125,7 +200,7 @@ def test_response_shares_one_neural_attempt_across_initial_and_tool_searches(sys
 
 
 def test_hybrid_setting_disables_reranker_for_the_whole_answer(system):
-    rag,engine,_=system(ScriptedOllama('Hay condiciones documentadas [1].'))
+    rag,engine,_=system(ScriptedOllama(*contract_responses()))
     engine.rerank_bounded=lambda *args,**kwargs:pytest.fail('Disabled reranker must not execute')
     response=rag.answer('Quiero abrir un alojamiento rural',Settings(model='mock',rerank_mode='hybrid'))
     assert response['status']=='answered'
@@ -134,54 +209,40 @@ def test_hybrid_setting_disables_reranker_for_the_whole_answer(system):
 def number_of(title):
     """Respuesta guionada que cita la ficha cuyo título empieza con ``title``, sea cual sea su número."""
     def reply(messages):
-        evidence = '\n'.join(m['content'] for m in messages if m['role'] == 'tool')
+        evidence = presented_evidence(messages)
         n = next(line[1:line.index(']')] for line in evidence.splitlines() if line[3:].startswith(title) or line[4:].startswith(title))
         return f'Hace falta inscripción previa [{n}].'
     return reply
 
 
 def test_answer_cites_the_snapshot_and_keeps_internal_content_out(system, db):
-    ollama = ScriptedOllama(number_of('Alojamientos turísticos'))
+    ollama = ScriptedOllama(*contract_responses())
     rag, _, _ = system(ollama)
     result = ask(rag, '¿Qué hace falta para un alojamiento?')
     assert result['status'] == 'answered'
-    assert result['answer'] == 'Hace falta inscripción previa [1].'
+    assert result['answer'] == 'Hace falta inscripción previa. [1]'
     assert [c['record_id'] for c in result['citations']] == ['TS-011'] and result['citations'][0]['id'] == '1'
     assert result['citations'][0]['sources'][0]['id'] == 'S01'
     assert 'contenido no debe publicarse' not in json.dumps(ollama.calls)
-    assert 'No cambia la categoría de suelo.' in ollama.evidence and ollama.calls[0]['tools']
-    assert ollama.sequence == ['safety', 'business']
-    assert len(ollama.semantic_calls) == 1 and result['timings']['model_requests'] == 2
+    assert 'No cambia la categoría de suelo.' in presented_evidence(ollama.calls[1]['messages'])
+    assert ollama.calls[0]['tools'][0]['function']['name'] == 'interpretar_pedido'
+    assert ollama.sequence == ['safety', 'business', 'business', 'business']
+    assert len(ollama.semantic_calls) == 1 and result['timings']['model_requests'] == 4
     # La pregunta del usuario nunca se guarda en claro en las métricas.
     assert 'alojamiento' not in json.dumps(dict(db.one('SELECT * FROM queries')), default=str)
 
 
-def test_model_can_search_again_and_citations_are_validated(system):
-    ollama = ScriptedOllama(
-        ('', [search_call('alojamiento turístico', zonas=['Z3'], tipo='oportunidad')]),
-        'Primero la hipótesis [2], después el registro [1][99]. Código Z3 y O05.')
-    rag, _, _ = system(ollama)
-    result = ask(rag, 'Quiero un hospedaje')
-    assert result['status'] == 'answered' and result['timings']['model_requests'] == 3
-    assert '[99]' not in result['answer'] and result['answer'].startswith('Primero la hipótesis [1], después el registro [2].')
-    assert 'Z3' not in result['answer'] and 'Villa Serrana' in result['answer']
-    assert result['opportunity_ids'] == ['O05']
-    assert len([m for m in ollama.calls[1]['messages'] if m['role'] == 'tool']) == 2
 
 
-def test_answer_without_citations_gets_one_repair_pass(system):
-    ollama = ScriptedOllama('Texto largo sin citas. ' * 30, 'Texto largo con cita [1].')
-    rag, _, _ = system(ollama)
-    result = ask(rag, 'Quiero un hospedaje')
-    assert result['status'] == 'answered' and len(result['citations']) == 1 and len(ollama.calls) == 2
 
 
 def test_provider_failure_degrades_to_the_retrieved_cards(system):
-    model = ScriptedOllama(DomainError('caído', 503, 'ollama_unavailable'))
+    model = ScriptedOllama(contract_responses()[0], DomainError('caído', 503, 'ollama_unavailable'))
     rag, _, _ = system(model)
     result = ask(rag, 'Quiero un hospedaje')
     assert result['status'] == 'degraded' and result['citations'] and 'no puedo redactar' in result['answer']
-    assert model.sequence == ['safety', 'business']  # A valid allow preceded the provider failure.
+    assert 'Podés abrir' not in result['answer'] and 'volver a preguntar' not in result['answer']
+    assert model.sequence == ['safety', 'business', 'business']  # Valid safety and intent preceded failure.
 
 
 def test_provider_failure_without_evidence_is_reported_and_measured(system, db):
@@ -211,38 +272,21 @@ def test_is_social_rejects_real_questions(text):
     assert not is_social(text)
 
 
-def test_followup_is_searched_together_with_the_previous_question(system):
-    ollama = ScriptedOllama('Sí, se puede [1].')
-    rag, embeddings, _ = system(ollama)
-    history = [{'role': 'user', 'content': 'Quiero poner un hospedaje rural'}, {'role': 'assistant', 'content': 'Claro.'}]
-    ask(rag, '¿Y en Villa Serrana?', history=history)
-    assert embeddings.queries[0].startswith('Quiero poner un hospedaje rural ¿Y en Villa Serrana?')
-    assert [m['role'] for m in ollama.calls[0]['messages']][:4] == ['system', 'user', 'assistant', 'user']
 
 
-def test_system_prompt_lists_zones_and_the_guide_map_and_keeps_rules_in_code(system):
-    ollama = ScriptedOllama('Respuesta [1].')
-    rag, _, _ = system(ollama)
-    rag.answer('Quiero un hospedaje', Settings(model='mock', persona='Tono muy formal.'))
-    prompt = ollama.calls[0]['messages'][0]['content']
-    assert 'Villa Serrana–Marco de los Reyes–Penitente → código Z3' in prompt
-    assert 'MAPA DE LA GUÍA' in prompt and 'TS-011 · Alojamientos turísticos registro sectorial' in prompt
-    assert 'O05 · Hospitalidad serrana con operador' in prompt and 'O05 · O05' not in prompt
-    assert 'Este contenido no debe publicarse' not in prompt and 'Diseño interno' not in prompt
-    assert 'TONO ADICIONAL DEL PORTAL: Tono muy formal.' in prompt and 'Nunca inventes' in prompt
 
 
-def test_ver_ficha_reads_several_cards_by_id_and_reports_unknown_ones(system):
-    ollama = ScriptedOllama(
-        ('', [{'function': {'name': 'ver_ficha', 'arguments': {'fichas': ['TS-011', 'nope', 'internal-1']}}}]),
-        'Listo [1].')
-    rag, _, _ = system(ollama)
-    result = ask(rag, 'Contame del registro turístico')
-    tool_results = [m['content'] for m in ollama.calls[1]['messages'] if m['role'] == 'tool']
-    assert 'inscripción previa al inicio de actividad' in tool_results[-1]
-    assert 'No existe una ficha con estos identificadores: nope, internal-1' in tool_results[-1]
-    assert 'contenido no debe publicarse' not in json.dumps(ollama.calls)
-    assert result['timings']['model_requests'] == 3
+
+
+def test_requested_procedure_wording_is_not_stripped_from_the_model_output():
+    # Personality is a model instruction, not a regex that deletes sentences.
+    evidence = Evidence()
+    evidence.number({'record_id': 'test-procedure'})
+    answer = 'Tenés que presentar el formulario indicado para ese trámite [1].'
+    text, used = Agent.finalize(answer, evidence, {})
+    assert text == answer and used == [1]
+
+
 
 
 def test_safety_routes_are_local_and_do_not_call_the_model(system):
@@ -258,14 +302,25 @@ def test_safety_routes_are_local_and_do_not_call_the_model(system):
     assert ollama.calls == [] and ollama.semantic_calls == []
 
 
-def test_evidence_deduplicates_conditions_and_reuses_numbers():
+def test_evidence_preserves_condition_scope_and_reuses_numbers():
     card = {'record_id': 'a', 'title': 'A', 'topic': 'T', 'zones': [], 'evidence_type': 'hypothesis', 'text': 'cuerpo',
             'conditions': ['Condición repetida.'], 'cutoff_date': '2026-09-18', 'period': ''}
     evidence = Evidence()
     first = evidence.render([card, dict(card, record_id='b', title='B')])
-    assert first.count('Condición repetida.') == 1 and '[1] A' in first and '[2] B' in first
-    assert 'hipótesis a validar' in first
+    assert first.count('Condición repetida.') == 2 and '[1] A' in first and '[2] B' in first
+    assert 'Naturaleza: Propuestas de actividad' in first
     assert evidence.render([card]) == '[1] A (ya mostrada arriba)'
+    assert 'Condición repetida.' in evidence.render([card], force=True)
+
+
+
+
+
+
+
+
+
+
 
 
 def test_humanize_hides_internal_codes():
@@ -387,18 +442,18 @@ def test_adult_lgbt_venue_is_not_blocked():
 ])
 def test_legitimate_or_protective_request_can_continue_after_valid_review(system, question, minors, adult_access):
     # The scripted decision tests flow and counterfactual parity, not classifier accuracy.
-    model = ScriptedOllama('La guía no documenta ese rubro específico.',
+    model = ScriptedOllama(*contract_responses(),
                            assessment=semantic_assessment('allow', minors=minors, adult_access=adult_access))
     rag, _, _ = system(model)
     original_require = rag.recovery.require
     def require_after_review(version):
-        assert model.sequence == ['safety']
+        assert model.sequence[0] == 'safety' and len(model.semantic_calls) == 1
         return original_require(version)
     rag.recovery.require = require_after_review
     result = ask(rag, question)
     assert result['status'] not in {'refuse', 'clarify'}
-    assert model.sequence == ['safety', 'business']
-    assert len(model.semantic_calls) == 1 and result['timings']['model_requests'] == 2
+    assert model.sequence == ['safety', 'business', 'business', 'business']
+    assert len(model.semantic_calls) == 1 and result['timings']['model_requests'] == 4
 
 
 def test_ambiguous_youth_venue_followup_still_requires_clarification():

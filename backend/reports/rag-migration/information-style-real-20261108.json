@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-08",
+  "scope": "real_generation_component_with_preselected_public_evidence",
+  "provider": "ollama.com",
+  "model": "deepseek-v4.1-flash:1017",
+  "selection_source": "local_runtime_read_only",
+  "temperature": 0.1,
+  "max_output_tokens": 4096,
+  "authorization_limit": 5,
+  "http_generation_attempts": 5,
+  "reported_input_tokens": 65014,
+  "reported_output_tokens": 4074,
+  "application_or_production_mutated": false,
+  "full_rag_evaluated": false,
+  "production_runtime_evaluated": false,
+  "factual_accuracy_certified": false,
+  "baseline_commit": "bd234bb9e481e2aab4b9f404c90c278510672b4b",
+  "raw_results_path": "reports/personality-20261108/results.json",
+  "raw_results_sha256": "4705f38f7f41cfd582dcff7fce62e2ba60e059daa3aa6d0b43d7a13946e6855d",
+  "tested_prompt_source_sha256": "320cae1a13b8203eb67755cabc745d1614bc478ad1c567a3b8bc9c266e57bdc9",
+  "tested_settings_source_sha256": "171755cfeff2e875eeb5737a04e527f4c462716a2e918e6e6ced7b924dc8736e",
+  "review_method": "manual_review_of_final_answer_text_not_an_automated_model_judge",
+  "cases": [
+    {
+      "id": "old_varela",
+      "question": "Qué podés decirme de Varela?",
+      "verdict": "original_problem_reproduced",
+      "findings": ["unsolicited_commercial_verification_tasks", "unsolicited_closing_question_about_property_or_customer"]
+    },
+    {
+      "id": "new_varela",
+      "question": "Qué podés decirme de Varela?",
+      "verdict": "incomplete_not_a_successful_tone_response",
+      "findings": ["requested_more_cards_without_a_final_answer", "component_harness_did_not_execute_tools"],
+      "note": "A tool request is valid in the real agent. This case cannot establish its final tone or retrieval quality."
+    },
+    {
+      "id": "new_varela_final",
+      "question": "Qué podés decirme de Varela?",
+      "verdict": "requires_refinement",
+      "final_writing_nudge": true,
+      "findings": ["no_unsolicited_closing_question", "commercial_methodology_still_repeated_as_guide_proposals", "excessive_length_for_a_general_place_description"],
+      "note": "Same evidence as the baseline; final-writing mode was added after the incomplete attempt, so this is not a strict identical-protocol A/B test."
+    },
+    {
+      "id": "new_project_information",
+      "question": "Quiero invertir en un boliche en el norte, ¿qué información me podés dar de esa zona?",
+      "history_messages": 2,
+      "verdict": "partial_not_a_complete_tone_pass",
+      "findings": ["no_unsolicited_closing_question", "did_not_recommend_replacing_the_business", "still_includes_commercial_validation_conditions_in_a_place_description"],
+      "note": "Evidence was preselected; assertions about absent nightlife coverage were not validated against the complete retrieval flow."
+    },
+    {
+      "id": "new_requested_steps",
+      "question": "¿Qué pasos documenta la guía para registrar un alojamiento turístico?",
+      "verdict": "requested_procedure_preserved_with_scope_limitations",
+      "findings": ["answers_requested_procedure", "no_unsolicited_closing_question", "adds_place_names_not_necessary_for_the_procedure"],
+      "note": "This is not legal or factual certification of the generated procedure."
+    }
+  ],
+  "overall_tested_revision_verdict": "requires_refinement_not_5_of_5_passed",
+  "post_test_refinement": "Separate territorial or activity facts from business-entry models, commercial proofs and verification checklists. Attribution to the guide does not authorize unsolicited advice. Prefer a compact relevant overview rather than copying every card.",
+  "post_refinement_generation_evaluated": false,
+  "post_refinement_targeted_tests": {"passed": 112, "duration_seconds": 16.81, "generation_quality_evaluation": false},
+  "further_provider_calls_require_new_authorization": true
+}

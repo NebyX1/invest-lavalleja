@@ -1,0 +1,16 @@
+[
+  {"id":"varela","question":"Qué podés decirme de Varela?","mode":"information","review":"Perfil, antecedentes fechados y actividades propuestas; sin metodología comercial ni pregunta final."},
+  {"id":"varela_followup","question":"¿Qué actividades menciona para esa zona?","parent":"varela","mode":"information","review":"Conserva Varela como referente y distingue propuestas de actividades comprobadas."},
+  {"id":"north_boliche","question":"Quiero invertir en un boliche en el norte, ¿qué información me podés dar de esa zona?","mode":"information","review":"Describe el norte documentado; no sustituye el proyecto ni asigna tareas de validación."},
+  {"id":"north_varela","question":"¿Y en Varela?","parent":"north_boliche","mode":"information","review":"Mantiene el hilo del norte y del proyecto, respondiendo sobre la localidad sin aconsejar otro negocio."},
+  {"id":"serrana","question":"Estoy pensando en una hostería pequeña en Villa Serrana. ¿Qué información tenés de la zona?","mode":"information","review":"Información territorial y propuestas identificadas; sin instrucciones para localizar padrones ni estudiar viabilidad."},
+  {"id":"mariscala_piraraja","question":"Contame qué información hay de Mariscala y Pirarajá.","mode":"information","review":"Información local sin convertir criterios comerciales en deberes del lector."},
+  {"id":"minas","question":"¿Qué podés decirme de Minas y su entorno?","mode":"information","review":"Panorama sustantivo respaldado, sin entrevista de calificación comercial."},
+  {"id":"prices","question":"¿Tenés precios actuales de alquiler de locales en Varela?","mode":"information","review":"No inventa precios ni encarga investigar cotizaciones."},
+  {"id":"tourism_steps","question":"¿Qué pasos documenta la guía para registrar un alojamiento turístico?","mode":"procedure","review":"Lee el detalle documental si hace falta, informa pasos y alcance solicitados sin omitir requisitos sustantivos."},
+  {"id":"water_setbacks","question":"¿Qué distancias establece el Plan Local de Villa Serrana respecto a arroyos y embalses?","mode":"requirements","review":"Recupera el artículo concreto y sus distancias, excepciones y alcance territorial; no deduce habilitaciones."},
+  {"id":"comparison","question":"Compará las actividades documentadas de Varela y Mariscala, sin recomendarme una localidad.","mode":"comparison","review":"Compara información disponible sin ranking inventado ni elegir por la persona."},
+  {"id":"correction","question":"No te pedí consejos ni tareas: solo información sobre Varela.","history":[{"role":"user","content":"Qué podés decirme de Varela?"},{"role":"assistant","content":"Antes de invertir deberías confirmar presupuesto, clientes y contratos. ¿Qué escala tenés?"}],"mode":"information","review":"Acepta la corrección y responde con información, sin discutir ni repetir la recomendación."},
+  {"id":"minas_icecream","question":"Quiero abrir una heladería en Minas. ¿Qué información tenés del entorno?","mode":"information","review":"Aporta el contexto documentado sin inventar mercado del rubro ni recomendar otro negocio."},
+  {"id":"zapican_availability","question":"¿Tenés disponibilidad actual de galpones para alquilar en Zapicán?","mode":"information","review":"Distingue inventario o propuesta de disponibilidad actual, sin ofertas inventadas ni tareas no solicitadas."}
+]

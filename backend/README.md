@@ -12,23 +12,23 @@ Backend Python/Flask con administración web, doble factor, gestión editorial d
 **Agente RAG · estado 08/11/2026 · 1.0.0-rc5.** Gianna ya no usa un planificador de reglas ni un catálogo de rubros escrito a mano. Ahora es un **agente con herramientas** sobre una base de conocimiento híbrida:
 
 - La base se organiza en **fichas autosuficientes** (`better-rag/tools/restructure.py` fusiona los fragmentos sueltos de las tablas en su ficha padre) con una cabecera contextual (título, tema, sección, zonas) que se antepone al embedding y al BM25.
-- Cada consulta hace una **búsqueda híbrida inicial** (vector Granite 97M + BM25 español de LanceDB, fusión RRF; mediciones por modo en `reports/rerank/`) y el modelo recibe la evidencia numerada. Si hace falta, **busca de nuevo** (`buscar_en_la_guia`, con filtros blandos de zona y tipo) o **lee una ficha** (`ver_ficha`), hasta 4 pasos.
-- Responde en prosa breve con citas `[n]` validadas contra la evidencia realmente recuperada, respeta el nivel de evidencia de cada ficha (dato documentado, hipótesis, ejemplo didáctico) y, si la guía no cubre un rubro, lo dice y aporta lo que sí está documentado (zonas, condiciones, trámites, qué validar) en vez de abstenerse.
-- **Robustez del proveedor:** reintentos con espera, modelo alternativo (`OLLAMA_FALLBACK_MODELS`), plazo total de 100 s (Gunicorn corta a los 120 s) y, si Ollama cae, respuesta degradada con las fichas recuperadas en lugar de un error.
-- El reranker reordena hasta seis candidatos con una ventana de hasta 400 ms compartida por respuesta, caché por versión y fallback al híbrido. No abre un presupuesto por herramienta. Puede desactivarse desde Personalización. Ver [reranking acotado](docs/RERANKING_ACOTADO.md).
+- Cada consulta hace una **búsqueda híbrida inicial** (vector Granite 97M + BM25 español de LanceDB, fusión RRF; mediciones por modo en `reports/rerank/`) y el modelo recibe la evidencia numerada. Si hace falta, **busca de nuevo** (`buscar_en_la_guia`, con filtros blandos de zona y tipo) o **lee una ficha** (`ver_ficha`) en una ronda adicional acotada. El pedido se interpreta antes de mostrar fuentes y toda respuesta de conocimiento pasa por composición y revisión de afirmaciones.
+- Responde de igual a igual, con información pertinente y citas `[n]` validadas contra la evidencia realmente recuperada. La extensión se ajusta a la consulta; conserva fechas, condiciones y nivel de evidencia (dato documentado, propuesta, ejemplo didáctico) sin convertirlos en recomendaciones, tareas ni preguntas comerciales no solicitadas. Si la guía no cubre un rubro, lo indica y aporta la información relacionada disponible, sin sustituir el proyecto. Comparaciones y pasos se explican cuando la persona los pide.
+- **Robustez del proveedor:** reintentos con espera, alternativas solo si se configuran explícitamente (`OLLAMA_FALLBACK_MODELS`), plazo total de 100 s (Gunicorn corta a los 120 s) y, si Ollama cae, respuesta degradada con las fichas recuperadas en lugar de un error.
+- El reranker reordena hasta seis candidatos con una ventana de hasta 1.500 ms compartida por respuesta, caché por versión y fallback al híbrido. No abre un presupuesto por herramienta. Puede desactivarse desde Personalización. Ver [reranking acotado](docs/RERANKING_ACOTADO.md).
 
 Ver [arquitectura](docs/RAG_ENGINE.md), [diseño del agente](docs/AGENT_DESIGN.md) y [validación con resultados reales y límites](reports/VALIDACION.md). Las versiones publicadas con el motor anterior (Bekko/Horizon) siguen consultables, sin mezclarse con el perfil vigente. El presupuesto artificial de 8.000 tokens por petición se eliminó: el corpus público completo ocupa unas 60.000 tokens (medidos con el tokenizador de Granite) y las consultas registradas promedian ~6.900 tokens de entrada, con picos de ~45.000 cuando el agente lee varias fichas.
 
-Perfil de la instalación de referencia: `deepseek-v4.1-flash:1017` (`think: low`) con `deepseek-v4.1-flash` como alternativa. El valor inicial para instalaciones nuevas es `OLLAMA_MODEL` de `.env`; el panel puede fijar otra revisión del catálogo. La evaluación automática no certifica exactitud factual ni vigencia; cualquier respuesta debe contrastarse con sus fuentes. No se publica nada automáticamente.
+Candidata de redacción evaluada el 08/11/2026: `mistral-large-4`. El `.env` local usa ese modelo; una selección ya guardada en Personalización prevalece sobre el entorno. DeepSeek y Gemma no superaron todos los controles de tono, alcance o precisión. Ver [flujo de redacción](docs/AGENT_DESIGN.md). El valor inicial para instalaciones nuevas es `OLLAMA_MODEL` de `.env`; el panel puede fijar otra revisión del catálogo. La evaluación automática no certifica exactitud factual ni vigencia; cualquier respuesta debe contrastarse con sus fuentes. No se publica nada automáticamente.
 
 ## Modelos y versiones
 
 | Rol | Modelo | Revisión | Detalle |
 | --- | --- | --- | --- |
 | Embedding | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad140…` | ONNX `model_quint8_avx2.onnx`, 384 dim, CLS, L2, 512 tokens, sin prefijos |
-| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | ONNX CPU; capacidad de perfil 512 tokens, serving acotado a 192 |
+| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | ONNX CPU; capacidad de perfil 512 tokens, serving acotado a 160 |
 | Búsqueda léxica | BM25 de LanceDB | — | Español con stemming y `ascii_folding`; fusión RRF `k=60` |
-| Generación | `deepseek-v4.1-flash:1017` | catálogo `/api/tags` | Ollama Cloud; alternativa `deepseek-v4.1-flash` |
+| Generación | `mistral-large-4` | catálogo `/api/tags` | Ollama Cloud; contrato de afirmaciones y revisión obligatoria |
 
 Cada versión guarda su **huella** (modelo, revisión, pooling, normalización, runtime, dimensión, representación documental y hashes). La versión activa usa el motor `granite-mmarco-lance-v3` y la representación `cards-context-v5`. Cambiar cualquiera de esos valores exige construir y evaluar una versión nueva; no se reutilizan vectores de otro perfil.
 
@@ -196,3 +196,23 @@ Validar que una cita existe no demuestra que respalda una afirmación. El RAG im
 ## Código y materiales
 
 Implementación original inspirada en el patrón funcional del Buzón Ciudadano; no es una copia de su código ni de su `.env`. La guía aportada conserva su autoría y clasificación. Las licencias de bibliotecas, modelos y cualquier material institucional deben revisarse en el despliegue. `knowledge/` está excluido de Git por precaución, aunque se entrega dentro del ZIP para cargarlo administrativamente.
+
+## Nueva base informativa y evaluación (08/11/2026)
+
+El paquete local `../better-rag/consolidated/Invest_Lavalleja_2026_informativa_ampliada.gianna.json`
+se creó con el importador nativo, fuentes oficiales complementarias y preservación
+de originales. Contiene material interno: permanece excluido de Git y Docker.
+Requiere el backend actualizado que admite catálogo y detalle documental. No se activó en producción. La construcción y las pruebas usaron recursos aislados.
+
+Para reproducirlo con las entradas privadas autorizadas:
+
+```powershell
+python -m scripts.build_invest_knowledge reports/personality-20261108/canonical-original.json reports/invest-rebuild-20261108/reviewed-corpus-04.gianna.json --supplement samples/invest_supplement_20261108.json --output nueva-edicion.gianna.json
+```
+
+El resultado se carga como una base nueva en el panel. Las versiones anteriores
+son inmutables; la aprobación editorial, generación y publicación conservan sus
+controles. No reemplazar archivos del índice ni el puntero publicado a mano.
+El suplemento público, los originales privados y las salidas de experimentos
+están separados. Los resultados reales, incluidos fallos de tono y variantes
+rechazadas, se documentan en `reports/VALIDACION.md`.
