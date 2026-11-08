@@ -128,13 +128,24 @@ def test_mail_transport_matches_flags_without_sending_real_mail(env, tmp_path, m
     monkeypatch.setattr('gianna.web.smtplib.SMTP', regular)
     cfg = load({**env, 'FLASK_ENV': 'development'}, tmp_path,
         smtp_mode=mode, smtp_host='mail.example.test', smtp_from='test@example.test')
-    smtp_sender(cfg)('recipient@example.test', '123456')
+    smtp_sender(cfg)('recipient@example.test', '012345')
     chosen = secure if mode == 'ssl' else regular
     other = regular if mode == 'ssl' else secure
     assert chosen.call_count == 1 and other.call_count == 0
     client = chosen.return_value.__enter__.return_value
     assert client.starttls.call_count == (1 if mode == 'starttls' else 0)
     assert client.send_message.call_count == 1
+    message = client.send_message.call_args.args[0]
+    assert message['Subject'] == 'Tu código de acceso a Gianna'
+    assert message['From'] == cfg.smtp_from and message['To'] == 'recipient@example.test'
+    assert message.get_content_type() == 'multipart/alternative'
+    for subtype in ('plain', 'html'):
+        part = message.get_body(preferencelist=(subtype,))
+        assert part is not None and part.get_content_charset() == 'utf-8'
+        content = part.get_content()
+        assert content.count('012345') == 1
+        assert '10 minutos' in content and 'No compartas este código.' in content
+    assert '012345' not in message['Subject']
 
 
 def test_secrets_are_not_in_config_repr(env, tmp_path):

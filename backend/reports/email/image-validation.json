@@ -1,0 +1,14 @@
+{
+  "live_http": 200,
+  "login_http": 200,
+  "multipart_alternative": true,
+  "network": "none",
+  "otp_matches_email": true,
+  "otp_replay_rejected": true,
+  "provider_calls": 0,
+  "read_only": true,
+  "real_emails_sent": 0,
+  "smtp_transport": "mocked_no_delivery",
+  "synthetic_account": true,
+  "template_sha256": "eabf9b17db8e633e9ee6df8b09b00865f50ea7bffb1e42082dbec26b1caaaab4"
+}

@@ -1,0 +1,14 @@
+Gianna · Invest Lavalleja
+
+Tu código de acceso
+
+Ingresá este código en la pantalla de verificación para continuar a la consola de Gianna:
+
+{{ code }}
+
+Vence en {{ expires_minutes }} minutos y se puede usar una sola vez.
+
+No compartas este código.
+Si no intentaste ingresar, podés ignorar este correo.
+
+Este es un mensaje automático de verificación.

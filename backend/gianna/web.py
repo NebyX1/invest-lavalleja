@@ -7,7 +7,6 @@ import secrets
 import smtplib
 import ssl
 import time
-from email.message import EmailMessage
 from pathlib import Path
 from types import SimpleNamespace
 from flask import Flask, g, jsonify, render_template, request, session
@@ -19,7 +18,8 @@ from .config import Config
 from . import __version__
 from .db import Database, IntegrityError
 from .errors import DomainError
-from .security import Security
+from .security import Security, EMAIL_OTP_TTL_SECONDS
+from .mail import access_code_email
 from .services.knowledge import Knowledge
 from .services.runtime import Embeddings, LanceStore, Ollama
 from .services.jobs import Jobs
@@ -35,11 +35,8 @@ def smtp_sender(cfg):
     def send(address, code):
         if not cfg.smtp_host or not cfg.smtp_from:
             raise RuntimeError('SMTP no configurado')
-        message=EmailMessage()
-        message['Subject']='Tu código de acceso a Gianna'
-        message['From']=cfg.smtp_from
-        message['To']=address
-        message.set_content(f'Tu código de verificación es {code}. Vence en 10 minutos. No lo compartas. Si no iniciaste este acceso, ignorá este mensaje.')
+        message=access_code_email(cfg.smtp_from,address,code,
+                                  expires_minutes=EMAIL_OTP_TTL_SECONDS//60)
         context=ssl.create_default_context()
         connection=(smtplib.SMTP_SSL(cfg.smtp_host,cfg.smtp_port,timeout=12,context=context)
                     if cfg.smtp_mode=='ssl' else smtplib.SMTP(cfg.smtp_host,cfg.smtp_port,timeout=12))

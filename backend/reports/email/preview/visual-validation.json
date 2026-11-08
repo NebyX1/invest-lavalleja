@@ -1,0 +1,168 @@
+{
+  "synthetic_code": true,
+  "real_emails_sent": 0,
+  "email_clients_tested": false,
+  "html_sha256": "b379b8f75532fda0235f00e99aa47612f0874f58038ec85df45447233be1332a",
+  "scenarios": [
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "width": 320,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "width": 768,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "width": 1280,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "width": 320,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "width": 768,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "width": 1280,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "width": 320,
+      "mode": "inline_only",
+      "overflow": false,
+      "code_preserved": true
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "width": 320,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "width": 390,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "width": 768,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "width": 1280,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "width": 320,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "width": 768,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "width": 1280,
+      "overflow": false,
+      "accessibility_violations": 0,
+      "code_preserved": true,
+      "external_requests": 0
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "width": 320,
+      "mode": "inline_only",
+      "overflow": false,
+      "code_preserved": true
+    }
+  ]
+}

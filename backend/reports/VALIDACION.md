@@ -1,5 +1,39 @@
 # Validación del agente RAG
 
+## Correo de acceso · 08/11/2026
+
+El correo de verificación ahora se compone como `multipart/alternative`, con
+texto plano UTF-8 y una versión HTML de Gianna. La plantilla usa la identidad
+verde oscuro/lima de la consola, código seleccionable, vencimiento visible y
+aviso de seguridad. No necesita imágenes, fuentes remotas, JavaScript ni enlaces
+para acceder. El tiempo mostrado se obtiene de `EMAIL_OTP_TTL_SECONDS`.
+Remitente, destinatario, SMTP y condiciones de acceso se conservan.
+
+| Verificación | Resultado y evidencia |
+| --- | --- |
+| Acceso, SMTP, MFA, CAPTCHA y rutas Flask | **121 passed**, 16,62 s; `email/auth.xml` y `.log`. SMTP simulado, sin envíos reales |
+| Vista HTML en Chromium y WebKit | **18 escenarios aprobados**: 320/390/768/1280 px, claro/oscuro, más estilos sólo inline a 320 px; `email/preview/visual-validation.json` y PNG |
+| Accesibilidad automatizada de las vistas con CSS completo | Cero hallazgos en las reglas WCAG 2 A/AA y 2.1 A/AA seleccionadas. No acredita una auditoría manual completa |
+| Imagen Docker final | Construida; plantillas presentes y con SHA-256 coincidente, HTML + texto plano, código válido y rechazo de reutilización; `/admin/login` y `/health/live` 200. Sin red, sólo lectura y SMTP simulado; `email/image-validation.json` y `image-build.log` |
+
+Las vistas previas contienen únicamente el **código ficticio 012345** y direcciones
+`example.test`. No se leyeron credenciales, se enviaron correos reales ni se llamó
+al proveedor de IA. Los navegadores no sustituyen pruebas en Outlook/Gmail reales;
+las tablas de presentación, estilos inline y alternativa de texto ofrecen una
+base que no depende de las mejoras del bloque CSS.
+
+Para regenerar las vistas desde `backend/`, sin `.env`, SMTP ni servidor:
+
+```bash
+python -m scripts.preview_access_email
+node scripts/check_email_preview.mjs
+```
+
+El segundo comando usa las dependencias Playwright/axe del repositorio y requiere
+Chromium y WebKit instalados. El HTML, texto y `.eml` de ejemplo se generan desde
+el mismo compositor que utiliza el envío real. No es un despliegue comprobado en
+el servidor de la IDL.
+
 ## Seguridad semántica · 07/11/2026 · 1.0.0-rc4
 
 **Componente validado con el proveedor y modelo de la configuración local:**
