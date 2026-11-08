@@ -1,8 +1,8 @@
 """Agente RAG con herramientas: recuperación inicial garantizada + bucle acotado de búsquedas.
 
 Flujo de cada consulta:
-  1. Compuerta de seguridad determinista (insultos, delitos, acusaciones).
-  2. Búsqueda híbrida inicial sobre la pregunta (con contexto si es un seguimiento corto).
+  1. Rechazos seguros y evaluación semántica previa a cualquier orientación.
+  2. Búsqueda híbrida inicial con reranker opcional y presupuesto por respuesta.
   3. El modelo ve la evidencia numerada y puede buscar más (`buscar_en_la_guia`) o leer
      una ficha (`ver_ficha`) hasta MAX_STEPS veces.
   4. Se validan las citas [n] contra la evidencia realmente recuperada y se arma la respuesta.
@@ -18,6 +18,7 @@ from .conversation import fold, is_social
 from .prompts import CITATION_NUDGE, FINAL_NUDGE, TOOLS, system_prompt
 from .safety import MESSAGES, hard_gate
 from .risk import assess as assess_risk
+from .reranking import RerankBudget
 
 MAX_STEPS = 4
 DEADLINE_SECONDS = 100
@@ -140,6 +141,9 @@ class Agent:
         if isinstance(assessment, Result):
             return assessment
         started = assessment.started
+        rerank_budget = (RerankBudget(timeout_ms=min(settings.rerank_budget_ms,
+                            max(0, (DEADLINE_SECONDS-(time.monotonic()-started))*1000)))
+                         if settings.rerank_mode=='bounded' else None)
         social = is_social(question)
         evidence = Evidence()
         trace = {'searches': [], 'steps': 0, 'safety':assessment.trace()}
@@ -150,7 +154,8 @@ class Agent:
                     {'role': 'user', 'content': question}]
         if not social:
             query = self.contextual_query(question, history)
-            cards, search_trace = self.retriever.search(query, settings, version_id, limit=settings.retrieval_limit)
+            cards, search_trace = self.retriever.search(query, settings, version_id, limit=settings.retrieval_limit,
+                                                      rerank_budget=rerank_budget)
             trace['searches'].append(search_trace)
             messages += [
                 {'role': 'assistant', 'content': '', 'tool_calls': [
@@ -176,7 +181,8 @@ class Agent:
                     messages.append({'role': 'assistant', 'content': message['content'], 'tool_calls': calls})
                     for call in calls[:6]:
                         messages.append({'role': 'tool', 'tool_name': call['function']['name'],
-                                         'content': self.execute(call, evidence, settings, version_id, trace)})
+                                         'content': self.execute(call, evidence, settings, version_id, trace,
+                                                                 rerank_budget=rerank_budget)})
                     continue
                 answer = message['content'].strip()
                 if answer:
@@ -231,7 +237,7 @@ class Agent:
         trace['cited'] = [c['record_id'] for c in cards]
         return Result('\n'.join(lines), 'degraded', cards, trace, usage, requests)
 
-    def execute(self, call, evidence, settings, version_id, trace):
+    def execute(self, call, evidence, settings, version_id, trace, *, rerank_budget=None):
         name = call['function']['name']
         args = _args(call)
         try:
@@ -242,7 +248,8 @@ class Agent:
                 zones = args.get('zonas') if isinstance(args.get('zonas'), list) else []
                 kind = args.get('tipo') if args.get('tipo') in {'oportunidad', 'zona', 'ejemplo', 'ficha'} else None
                 cards, search_trace = self.retriever.search(query, settings, version_id, zones=zones,
-                                                            kinds=[kind] if kind else None, limit=settings.retrieval_limit)
+                                                            kinds=[kind] if kind else None, limit=settings.retrieval_limit,
+                                                            rerank_budget=rerank_budget)
                 trace['searches'].append(search_trace)
                 return evidence.render(cards)
             if name == 'ver_ficha':

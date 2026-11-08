@@ -9,13 +9,13 @@ El arranque inspecciona la instalación existente antes de ejecutar trabajos. El
 
 Backend Python/Flask con administración web, doble factor, gestión editorial de bases de conocimiento, indexación híbrida CPU y chat público. Incluye el corpus convertido de la guía entregada y una isla React para integrar en el portal Astro.
 
-**Agente RAG · estado 06/11/2026.** Gianna ya no usa un planificador de reglas ni un catálogo de rubros escrito a mano. Ahora es un **agente con herramientas** sobre una base de conocimiento híbrida:
+**Agente RAG · estado 08/11/2026 · 1.0.0-rc5.** Gianna ya no usa un planificador de reglas ni un catálogo de rubros escrito a mano. Ahora es un **agente con herramientas** sobre una base de conocimiento híbrida:
 
 - La base se organiza en **fichas autosuficientes** (`better-rag/tools/restructure.py` fusiona los fragmentos sueltos de las tablas en su ficha padre) con una cabecera contextual (título, tema, sección, zonas) que se antepone al embedding y al BM25.
-- Cada consulta hace una **búsqueda híbrida inicial** (vector Granite 97M + BM25 español de LanceDB, fusión RRF, ~145 ms de promedio medido en CPU) y el modelo recibe la evidencia numerada. Si hace falta, **busca de nuevo** (`buscar_en_la_guia`, con filtros blandos de zona y tipo) o **lee una ficha** (`ver_ficha`), hasta 4 pasos.
+- Cada consulta hace una **búsqueda híbrida inicial** (vector Granite 97M + BM25 español de LanceDB, fusión RRF; mediciones por modo en `reports/rerank/`) y el modelo recibe la evidencia numerada. Si hace falta, **busca de nuevo** (`buscar_en_la_guia`, con filtros blandos de zona y tipo) o **lee una ficha** (`ver_ficha`), hasta 4 pasos.
 - Responde en prosa breve con citas `[n]` validadas contra la evidencia realmente recuperada, respeta el nivel de evidencia de cada ficha (dato documentado, hipótesis, ejemplo didáctico) y, si la guía no cubre un rubro, lo dice y aporta lo que sí está documentado (zonas, condiciones, trámites, qué validar) en vez de abstenerse.
 - **Robustez del proveedor:** reintentos con espera, modelo alternativo (`OLLAMA_FALLBACK_MODELS`), plazo total de 100 s (Gunicorn corta a los 120 s) y, si Ollama cae, respuesta degradada con las fichas recuperadas en lugar de un error.
-- El cross-encoder mMARCO está **fuera del camino de la consulta**: en la evaluación con 51 preguntas no mejoró el híbrido y costaba ~6 s por búsqueda en CPU. Solo se usa en la verificación de `prepare_models` y en la comparación de `evaluate_retrieval --modes fused rerank`; el laboratorio del panel usa la búsqueda híbrida.
+- El reranker reordena hasta seis candidatos con una ventana de hasta 400 ms compartida por respuesta, caché por versión y fallback al híbrido. No abre un presupuesto por herramienta. Puede desactivarse desde Personalización. Ver [reranking acotado](docs/RERANKING_ACOTADO.md).
 
 Ver [arquitectura](docs/RAG_ENGINE.md), [diseño del agente](docs/AGENT_DESIGN.md) y [validación con resultados reales y límites](reports/VALIDACION.md). Las versiones publicadas con el motor anterior (Bekko/Horizon) siguen consultables, sin mezclarse con el perfil vigente. El presupuesto artificial de 8.000 tokens por petición se eliminó: el corpus público completo ocupa unas 60.000 tokens (medidos con el tokenizador de Granite) y las consultas registradas promedian ~6.900 tokens de entrada, con picos de ~45.000 cuando el agente lee varias fichas.
 
@@ -26,7 +26,7 @@ Perfil de la instalación de referencia: `deepseek-v4.1-flash:1017` (`think: low
 | Rol | Modelo | Revisión | Detalle |
 | --- | --- | --- | --- |
 | Embedding | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad140…` | ONNX `model_quint8_avx2.onnx`, 384 dim, CLS, L2, 512 tokens, sin prefijos |
-| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | ONNX CPU, 512 tokens; solo verificación y evaluación comparativa |
+| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | ONNX CPU; capacidad de perfil 512 tokens, serving acotado a 192 |
 | Búsqueda léxica | BM25 de LanceDB | — | Español con stemming y `ascii_folding`; fusión RRF `k=60` |
 | Generación | `deepseek-v4.1-flash:1017` | catálogo `/api/tags` | Ollama Cloud; alternativa `deepseek-v4.1-flash` |
 
@@ -131,7 +131,7 @@ Esperar a que `http://127.0.0.1:8001/api/config` indique `available: true` y `te
 Herramientas de calidad (se ejecutan con `.venv\Scripts\python.exe` desde `backend/`, o dentro del contenedor):
 
 - `python scripts/ingest_corpus.py CORPUS.gianna.json [--approve-technical] [--activate]`: importa, indexa y opcionalmente publica un corpus. `--approve-technical` es un atajo de pruebas locales, no una revisión editorial.
-- `python scripts/evaluate_retrieval.py --modes hybrid --verbose`: mide hit@k y MRR contra `evals/retrieval_gold.json` (51 preguntas con fichas esperadas). No llama a Ollama. `--modes fused rerank` agrega el cross-encoder y tarda varios minutos en CPU; no es el camino del chat.
+- `python scripts/evaluate_retrieval.py --modes hybrid --verbose`: mide hit@k y MRR contra `evals/retrieval_gold.json` (51 preguntas con fichas esperadas). No llama a Ollama. `--modes fused rerank` agrega el cross-encoder y tarda varios minutos en CPU; no es el camino acotado del chat. Para calidad/carga del serving se usa `python -m scripts.benchmark_reranker --run` con rutas explícitas; ver `docs/RERANKING_ACOTADO.md`.
 - `python scripts/evaluate_answers.py --report informe.md`: corre `evals/dialogues.json` (31 conversaciones) contra el agente real y revisa citas, cifras sin respaldo en la evidencia, códigos internos, longitud y estados. **Consume cuota de Ollama.** El informe se lee a mano: no es un juez semántico.
 - `python scripts/chat_cli.py "pregunta 1" "pregunta 2" [--separate] [--trace]`: conversación de prueba sin HTTP ni captcha.
 - `python scripts/run_local.py --port 8001 --human-test`: API nativa en Windows (sin Docker) para la prueba humana con `npm run dev`.

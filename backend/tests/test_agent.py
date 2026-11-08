@@ -99,6 +99,38 @@ def ask(rag, question, **kwargs):
     return rag.answer(question, Settings(model='mock'), **kwargs)
 
 
+def test_response_shares_one_neural_attempt_across_initial_and_tool_searches(system):
+    model=ScriptedOllama(('',[search_call('Otra consulta territorial'),search_call('Una consulta de permisos')]),
+                          'La guía exige verificar condiciones [1].')
+    rag,engine,_=system(model)
+    calls=[]
+    engine.rerank_bounded=lambda query,texts,**kw:(calls.append(kw) or list(range(len(texts))))
+    budgets=[]
+    search=rag.retriever.search
+    def observe(*args,**kwargs):
+        budgets.append(kwargs.get('rerank_budget'))
+        return search(*args,**kwargs)
+    rag.retriever.search=observe
+    response=ask(rag,'Quiero abrir un alojamiento rural')
+    assert response['status']=='answered'
+    assert len(budgets)==3 and budgets[0] is not None
+    assert all(budget is budgets[0] for budget in budgets)
+    assert len(calls)==1 and calls[0]['timeout']<=0.400001
+    assert calls[0]['max_tokens']==160
+    row=rag.db.one('SELECT retrieval_trace_json FROM queries WHERE id=?',(response['id'],))
+    trace=json.loads(row['retrieval_trace_json'])
+    assert trace['searches'][0]['rerank']['state']=='applied'
+    assert all(s['rerank']['reason']=='budget_spent' for s in trace['searches'][1:])
+    assert 'Quiero abrir un alojamiento rural' not in row['retrieval_trace_json']
+
+
+def test_hybrid_setting_disables_reranker_for_the_whole_answer(system):
+    rag,engine,_=system(ScriptedOllama('Hay condiciones documentadas [1].'))
+    engine.rerank_bounded=lambda *args,**kwargs:pytest.fail('Disabled reranker must not execute')
+    response=rag.answer('Quiero abrir un alojamiento rural',Settings(model='mock',rerank_mode='hybrid'))
+    assert response['status']=='answered'
+
+
 def number_of(title):
     """Respuesta guionada que cita la ficha cuyo título empieza con ``title``, sea cual sea su número."""
     def reply(messages):

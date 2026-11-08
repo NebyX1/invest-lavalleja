@@ -5,3 +5,5 @@ reports/security/**/pip-audit.json -text -whitespace
 reports/**/pip-audit.json -text -whitespace
 reports/security/historical-*.json -text -whitespace
 reports/email/preview/*.eml -text whitespace=trailing-space,space-before-tab,cr-at-eol
+# Archived measurements retain the exact source bytes used for their SHA-256.
+reports/rerank/v*-source/*.py -text whitespace=trailing-space,space-before-tab,cr-at-eol

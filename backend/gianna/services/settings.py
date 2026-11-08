@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 from ..db import dumps
 
@@ -20,7 +21,9 @@ class Settings(BaseModel):
     max_output_tokens: int=Field(default=4096,ge=100,le=8192)
     retrieval_candidates: int=Field(default=28,ge=5,le=60)
     retrieval_limit: int=Field(default=8,ge=2,le=20)
-    rerank_candidates: int=Field(default=24,ge=8,le=40)
+    rerank_mode: Literal['bounded','hybrid']='bounded'
+    rerank_budget_ms: int=Field(default=400,ge=50,le=400)
+    rerank_candidates: int=Field(default=6,ge=2,le=40)
     max_context_records: int=Field(default=8,ge=1,le=10)
     max_context_chars: int=Field(default=20000,ge=4000,le=40000)
     chunk_tokens: int=Field(default=420,ge=180,le=480)
@@ -39,7 +42,10 @@ def get_settings(db,cfg):
     # Upgrade only the exact former defaults; custom editorial settings survive.
     if values.get('persona') in {LEGACY_PERSONA,PREVIOUS_INFORMATION_PERSONA,INFORMATION_ONLY_PERSONA,PREVIOUS_DEFAULT_PERSONA}:values['persona']=DEFAULT_PERSONA
     if values.get('greeting') in {LEGACY_GREETING,PREVIOUS_INFORMATION_GREETING}:values['greeting']=DEFAULT_GREETING
-    return Settings.model_validate(values)
+    settings=Settings.model_validate(values)
+    # Former installations stored 8–40 for an unused setting. Keep their JSON
+    # readable while displaying/enforcing the measured serving cap of six.
+    return settings.model_copy(update={'rerank_candidates':min(6,settings.rerank_candidates)})
 
 
 def save_settings(db,cfg,values,actor):

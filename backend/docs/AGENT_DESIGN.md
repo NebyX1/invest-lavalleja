@@ -18,7 +18,7 @@ flowchart TD
     GATE -->|"acusación, insulto, delito"| FIXED["Respuesta fija<br/>sin modelo"]
     GATE -->|"no"| SOCIAL{"¿Cortesía pura?"}
     SOCIAL -->|"sí"| CHAT["Modelo sin herramientas<br/>sin citas"]
-    SOCIAL -->|"no"| SEARCH["Búsqueda híbrida inicial<br/>vector + BM25 → RRF"]
+    SOCIAL -->|"no"| SEARCH["Búsqueda híbrida inicial<br/>vector + BM25 → RRF + reranking acotado"]
     SEARCH --> PROMPT["Prompt: reglas + tono + zonas<br/>+ mapa de la guía + historial + evidencia"]
     PROMPT --> MODEL["Modelo con herramientas<br/>deepseek-v4.1-flash:1017"]
     MODEL --> LOOP{"¿Pide herramienta<br/>y quedan pasos?"}
@@ -62,7 +62,7 @@ Estilo: español rioplatense, trato de vos, 80–170 palabras (hasta 260 si pide
 1. **Reglas** (código) + tono adicional (panel) + zonas Z1–Z7 con su código para el filtro.
 2. **Mapa de la guía:** identificador → título de las 257 fichas públicas, agrupadas por tema (~6.000 tokens). Sirve para descubrir qué existe sin gastar una búsqueda y evita afirmar "la guía no lo trata" sobre algo que sí está. No es evidencia ni se cita.
 3. **Historial** reciente de la conversación (sin marcas `[n]`, ~14.000 caracteres).
-4. **Evidencia inicial:** la búsqueda híbrida sobre la pregunta, presentada como una llamada a `buscar_en_la_guia` ya ejecutada.
+4. **Evidencia inicial:** la búsqueda híbrida con reordenamiento opcional acotado (presupuesto compartido por respuesta, caché y fallback; ver [contrato](RERANKING_ACOTADO.md)), sobre la pregunta, presentada como una llamada a `buscar_en_la_guia` ya ejecutada.
 
 ## Contrato de herramientas
 

@@ -1,0 +1,14 @@
+{
+  "uid": 10001,
+  "version": "1.0.0-rc5",
+  "tokens": 160,
+  "budget_ms": 400,
+  "source_sha256": {
+    "neural.py": "df5a401fcf47b1fa1c9cdf141dbd13da0f0a3bd709e44176024134338406bebe",
+    "retrieval.py": "73fc24f956f4893d5b46328a3d78015e44c18a84289e192fdc962b16d3fe20f7",
+    "reranking.py": "16db6142e1cce36f0f11ea4d4f6b719a4e4819ecb521c9885e518e864576d1b7"
+  },
+  "evaluated_source_matches": true,
+  "network": "none",
+  "read_only": true
+}

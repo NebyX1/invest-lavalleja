@@ -1,5 +1,83 @@
 # Validación del agente RAG
 
+## Reranking acotado · 08/11/2026 · 1.0.0-rc5
+
+**Validación local aprobada antes de publicar.** Destino: `NebyX1/invest-lavalleja`,
+`main`, `backend/`. El agente, laboratorio y evaluación de recuperación comparten
+el contrato de servicio de [Reranking acotado](../docs/RERANKING_ACOTADO.md).
+No se desplegó ni se evaluó la instalación productiva de la IDL.
+
+El modo predeterminado `bounded` reordena hasta seis candidatos con 160 tokens
+por pareja y un presupuesto de hasta 400 ms por respuesta. El deadline empieza
+antes del encoder y se comparte con las búsquedas posteriores; no se permite
+más de un intento neural. La caché TTL 300 s/LRU 256 conserva sólo scores,
+ligados por HMAC a versión, perfil, consulta, IDs y hashes de pasajes. Ante
+ocupación, error o timeout se mantiene exactamente el híbrido. El modo `hybrid`
+permite desactivarlo desde Personalización; no hay nuevas variables de entorno.
+
+Los tokenizadores se reutilizan bajo el lock de CPU y su configuración se
+restaura incluso al fallar, sin duplicar vocabularios. Los pesos, revisiones,
+fingerprints y vectores publicados no cambian. La preparación del perfil
+completo en el worker conserva su contrato anterior; el fallback de esta
+entrega cubre el serving, no la ausencia de artefactos durante el arranque.
+
+| Comprobación final | Resultado y evidencia |
+| --- | --- |
+| Suite completa con MariaDB y MinIO reales | **634 passed, 8 skipped**, 95,60 s; `rerank/full-suite-final.xml` y `.log` |
+| Recuperación neural real | 51 preguntas, 332 fichas públicas de la colección local de prueba; `rerank/integrated.json`, `.log` y `.events.jsonl` |
+| Preguntas adicionales predeclaradas | 12 paráfrasis/contextos, todas con ficha esperada primera tanto en híbrido como en bounded; mismo informe, bloque `holdout` |
+| Concurrencia real | Tres simultáneas, **51 consultas por fase**, CPU limitada a 2 y memoria a 2 GB; gates fijados antes de medir, todos correctos |
+| Cancelación ONNX real | Tres inferencias iniciadas y canceladas con plazo 5 ms; retorno en 5,68–6,52 ms, lock liberado, configuración restaurada e inferencias siguientes válidas; `rerank/onnx-cancellation.json` |
+| Compatibilidad e imagen | Usuario 10001, 1.0.0-rc5, sin red y sólo lectura; fingerprints preservados y SHA-256 del código igual al evaluado; `rerank/image-validation.json` y `image-build.log` |
+| Panel HTTP | La suite verifica aplicación real del camino con un doble, caché en la segunda consulta, ausencia de llamadas generativas y exclusión de fichas internas. No es un benchmark neural |
+
+Calidad medida del gold, **sin llamadas al modelo generativo**:
+
+| Métrica | Híbrido | Reranking acotado |
+| --- | ---: | ---: |
+| Ficha esperada primera | 31/51 | **33/51** |
+| Entre las tres primeras | 42/51 | **44/51** |
+| Entre las cinco primeras | 44/51 | **45/51** |
+| Entre las ocho primeras | 47/51 | 47/51 |
+| MRR | 0,71944 | **0,74820** |
+
+Ocho preguntas mejoraron su posición y siete la empeoraron. No se afirma una
+mejora individual universal. El conjunto adicional no se utilizó para ajustar
+la longitud del gold, pero es una selección local de paráfrasis, sin curación
+externa independiente. No se midió la exactitud factual de respuestas generadas.
+
+Latencia de **recuperación** en la carga de tres concurrentes, no latencia total
+del chat con seguridad y generación remotas:
+
+| Modo | p50 | p95 | Máximo |
+| --- | ---: | ---: | ---: |
+| Híbrido | 87,03 ms | 115,09 ms | 135,47 ms |
+| Bounded con caché fría | 157,25 ms | 362,58 ms | 394,22 ms |
+| Bounded con caché caliente | 89,88 ms | 126,56 ms | 159,48 ms |
+
+En frío se aplicaron 17 reordenamientos y hubo 34 fallbacks por ocupación, sin
+esperar admisión neural. En caliente hubo **51/51 cache hits**. El overhead p95
+frío fue 247,49 ms, dentro del límite de 400 ms; el caliente fue 11,47 ms, dentro
+del umbral predeclarado de `baseline + max(20 ms, 25 %)`. El pico de RSS fue
+**1.392,40 MiB** en el ensayo final. Las cifras dependen de este entorno y no
+prometen coste cero ni un corte de reloj instantáneo: ONNX cancela cooperativamente.
+
+Se conservan los ensayos previos y sus fuentes exactas: `integrated-v1` falló
+calidad/cache por tres expiraciones con 192 tokens; `integrated-v2` pasó con
+160 tokens, pero conservaba clones de tokenizadores y alcanzó 1.890 MiB de RSS.
+Se eliminaron esos clones. `integrated-v3`, con 12 consultas por fase, excedió el
+umbral de caché caliente en unos 3 ms. Se amplió la muestra a 51 por fase, sin
+relajar ningún criterio, y se obtuvo el resultado final correcto. Los snapshots
+`v1-source`, `v2-source` y `v3-source` conservan los bytes medidos, no plantillas
+para regenerar el backend.
+
+Las ocho omisiones de la suite corresponden a cinco pruebas con documentación
+privada ausente y tres opt-in de navegador/recuperación de contenedores. Sus
+ensayos históricos no se atribuyen a esta ejecución. No se usaron credenciales,
+se alteraron datos productivos ni se consumió cuota de generación. La medición
+real utiliza SQLite temporal y LanceDB/ONNX reales; la suite separada incluye
+MariaDB y MinIO reales. Los corpus privados de entrada no se versionan.
+
 ## Correo de acceso · 08/11/2026
 
 El correo de verificación ahora se compone como `multipart/alternative`, con

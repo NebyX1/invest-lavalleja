@@ -29,7 +29,7 @@ No hay planificador de reglas, catálogo de rubros ni contrato JSON intermedio. 
 | Rol | Modelo | Revisión fijada | Artefacto | Runtime | Detalle |
 | --- | --- | --- | --- | --- | --- |
 | **Embedding** | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad14087e140460703cf0fae09f97d469d65c2` | `onnx/model_quint8_avx2.onnx` | ONNX Runtime CPU 1.31.0 | 384 dimensiones, pooling **CLS**, normalización L2, hasta 512 tokens, sin prefijos `query:`/`passage:` |
-| **Reranker** | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd652930e4ba29e8149678df786c240d8825` | `onnx/model_quint8_avx2.onnx` | ONNX Runtime CPU 1.31.0 | Cross-encoder de hasta 512 tokens, puntaje sigmoide; **fuera del camino del chat** |
+| **Reranker** | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd652930e4ba29e8149678df786c240d8825` | `onnx/model_quint8_avx2.onnx` | ONNX Runtime CPU 1.31.0 | Cross-encoder de hasta 512 tokens, puntaje sigmoide; serving acotado a 160 tokens y seis candidatos; ventana compartida de hasta 400 ms |
 | **Búsqueda léxica** | BM25 de LanceDB | índice FTS de la tabla | — | LanceDB 0.40.0 | Idioma español, `stem=true`, `ascii_folding=true`, sin palabras vacías |
 | **Fusión** | Reciprocal Rank Fusion | — | — | En código (`vector_store.py`, `retrieval.py`) | `k = 60`; no se suman coseno y BM25 como si fueran la misma escala |
 | **Generación** | `deepseek-v4.1-flash:1017` (por defecto en esta instalación) | catálogo de Ollama Cloud | API `/api/chat` | Ollama Cloud | `think: low`; alternativa `deepseek-v4.1-flash` |
@@ -201,7 +201,7 @@ flowchart TB
     CARDS --> AGENT["Agente"]
 ```
 
-El **reranker no participa de este camino**. Se conserva para dos usos explícitos: la verificación de `prepare_models` y la comparación de `scripts/evaluate_retrieval.py --modes fused rerank`, que mide si aporta sobre el conjunto de oro. El laboratorio del panel usa la búsqueda híbrida, no el cross-encoder. El parámetro `rerank_candidates` existe en Ajustes pero el camino actual no lo usa: cuando se evalúa, el cross-encoder recibe todos los candidatos de la búsqueda.
+El chat y el laboratorio pueden reordenar hasta seis candidatos, conservando el resto y los filtros, con un único presupuesto de hasta 400 ms por respuesta. La ventana comienza antes del encoder e incluye la espera causada por otras inferencias. La caché por versión evita repetir puntuaciones. Si falla, está ocupado o vence la ventana, se conserva exactamente el híbrido. Los modos offline explícitos se mantienen separados. Contrato y observabilidad: [Reranking acotado](RERANKING_ACOTADO.md).
 
 ## La base de conocimiento
 
@@ -236,7 +236,7 @@ Conjunto de oro de 51 preguntas (`evals/retrieval_gold.json`), sin llamar al mod
 | Híbrido + cross-encoder (fusión) | 0,725 | 0,922 | 0,941 | 0,941 | 0,825 | 6.023 |
 | Solo cross-encoder | 0,784 | 0,882 | 0,902 | 0,922 | 0,841 | 6.571 |
 
-El híbrido es el único modo del chat. El cross-encoder no mejora el hit@8 ni el MRR y multiplica la latencia por más de 40 en CPU; por eso se mide, no se usa. Los fallos restantes del híbrido (contactos para permisos, "zona para un boliche", riesgos) los compensa el agente reformulando la búsqueda.
+Esta comparación es histórica y corresponde al reranking completo, no al serving acotado incorporado en rc5. No acredita su latencia actual. Los nuevos ensayos del reranking de ventana limitada, caché, concurrencia y fallback se conservan en `reports/rerank/`; ver `reports/VALIDACION.md`.
 
 Estas cifras miden cobertura de fichas, no exactitud factual. El conjunto lo escribió el mismo equipo que ajustó el sistema: no es un holdout ciego.
 
@@ -259,7 +259,7 @@ python scripts/evaluate_retrieval.py --modes hybrid --verbose
 python scripts/evaluate_answers.py --report informe.md
 ```
 
-El worker prepara automáticamente los modelos del perfil publicado o de la indexación solicitada, con verificaciones de integridad y reintentos acotados. Si faltan archivos, puede descargarlos desde las revisiones fijadas fuera de las solicitudes HTTP. `prepare_models` sigue disponible para mantenimiento y prueba ambos modelos; el reranker no interviene en las consultas del chat.
+El worker prepara automáticamente los modelos del perfil publicado o de la indexación solicitada, con verificaciones de integridad y reintentos acotados. Si faltan archivos, puede descargarlos desde las revisiones fijadas fuera de las solicitudes HTTP. `prepare_models` sigue disponible para mantenimiento y prueba ambos modelos; el reranker puede intervenir en las consultas mediante el presupuesto y fallback descritos en `RERANKING_ACOTADO.md`.
 
 ## Límites conocidos
 

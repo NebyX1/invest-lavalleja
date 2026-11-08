@@ -1,0 +1,30 @@
+{
+  "actual_onnx_cancellation": true,
+  "cpu_limit": 2,
+  "memory_gib": 2,
+  "network": "none",
+  "provider_calls": 0,
+  "results": [
+    {
+      "native_inference_calls": 1,
+      "failure_code": "rerank_timeout",
+      "wall_ms": 6.062951999979305,
+      "cpu_lock_released": true,
+      "next_inference_valid": true
+    },
+    {
+      "native_inference_calls": 1,
+      "failure_code": "rerank_timeout",
+      "wall_ms": 5.598402000032365,
+      "cpu_lock_released": true,
+      "next_inference_valid": true
+    },
+    {
+      "native_inference_calls": 1,
+      "failure_code": "rerank_timeout",
+      "wall_ms": 6.321481999975731,
+      "cpu_lock_released": true,
+      "next_inference_valid": true
+    }
+  ]
+}

@@ -296,7 +296,10 @@ def lab():
         else:
             version=s.db.one('SELECT id FROM versions WHERE id=?',(selected,)) if selected else s.knowledge.active()
             if not version:raise DomainError('Todavía no hay una versión lista para consultar.',503,'no_knowledge')
-            hits,trace=s.rag.retriever.search(question,setting,version['id'],limit=setting.retrieval_limit)
+            from ..services.reranking import RerankBudget
+            budget=RerankBudget(setting.rerank_budget_ms) if setting.rerank_mode=='bounded' else None
+            hits,trace=s.rag.retriever.search(question,setting,version['id'],limit=setting.retrieval_limit,
+                                            rerank_budget=budget)
             result={'hits':hits,'ms':trace['ms'],'trace':trace}
     versions=s.db.all("SELECT v.id,v.revision,b.name FROM versions v JOIN bases b ON b.id=v.base_id WHERE v.status='ready' ORDER BY v.created_at DESC")
     return render_template('lab.html',result=result,question=question,versions=versions,selected=selected)

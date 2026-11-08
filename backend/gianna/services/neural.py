@@ -1,8 +1,10 @@
 """Pinned CPU-only inference profiles. Preparation is explicit, never inside HTTP."""
+from contextlib import contextmanager
 import hashlib
 import importlib.metadata
 import json
 import logging
+import math
 from pathlib import Path
 import threading
 import time
@@ -53,6 +55,26 @@ def verified_manifest(folder,model_id,revision,required):
         return manifest
     except (OSError,ValueError,KeyError,TypeError) as exc:
         raise DomainError('Faltan modelos verificados. Ejecutá python -m scripts.prepare_models.',503,'models_not_prepared') from exc
+
+
+@contextmanager
+def _serving_token_limits(ranker_tokenizer, query_tokenizer, max_tokens):
+    """Reconfigure existing vocabularies only while the shared CPU lock is held."""
+    rank_config, query_config = ranker_tokenizer.truncation, query_tokenizer.truncation
+    def restore(tokenizer, config):
+        if config is None:
+            tokenizer.no_truncation()
+        else:
+            tokenizer.enable_truncation(**config)
+    try:
+        ranker_tokenizer.enable_truncation(max_length=max_tokens, strategy='only_second')
+        query_tokenizer.no_truncation()
+        yield
+    finally:
+        try:
+            restore(ranker_tokenizer, rank_config)
+        finally:
+            restore(query_tokenizer, query_config)
 
 
 class Embeddings:
@@ -189,3 +211,69 @@ class Embeddings:
                 scores.extend((1/(1+np.exp(-np.clip(output[:,0],-60,60)))).tolist())
         if len(scores)!=len(texts) or not np.isfinite(scores).all():raise DomainError('El reranker devolvió puntajes inválidos.',503,'invalid_rerank')
         return scores
+
+    def rerank_bounded(self, query, texts, *, timeout, max_tokens=192):
+        """Best-effort serving inference, with no loading, queue or partial result.
+
+        The caller owns the response-level budget. This local deadline covers
+        tokenization and every batch; the shared CPU lock is never waited on.
+        ONNX receives only the remaining time and is actively terminated by
+        ``_onnx`` when that time expires. A late result is discarded entirely.
+        """
+        started = time.monotonic()
+        if type(timeout) not in {int, float} or not math.isfinite(timeout) or timeout <= 0:
+            raise DomainError('Se agotó el plazo de reordenación.', 503, 'rerank_timeout')
+        deadline = started + timeout
+        if not texts:
+            return []
+        if (self.model is None or self.ranker is None or
+                not hasattr(self, 'rank_tokenizer') or not hasattr(self, 'query_tokenizer')):
+            raise DomainError('El reranker no está preparado.', 503, 'rerank_not_ready')
+        if type(max_tokens) is not int or not 96 <= max_tokens <= 512:
+            raise DomainError('El presupuesto del reranker no es válido.', 503, 'invalid_rerank')
+        if not self._infer_lock.acquire(blocking=False):
+            raise DomainError('El motor local está ocupado.', 503, 'rerank_busy')
+        try:
+            def remaining():
+                value = deadline - time.monotonic()
+                if value <= 0:
+                    raise DomainError('Se agotó el plazo de reordenación.', 503, 'rerank_timeout')
+                return value
+
+            remaining()
+            with _serving_token_limits(self.rank_tokenizer, self.query_tokenizer,
+                                       min(max_tokens, self.spec['rank_tokens'])):
+                query_ids = self.query_tokenizer.encode(query, add_special_tokens=False).ids
+                # Contextual queries prepend earlier turns. Preserve the current
+                # question at the tail instead of truncating it away entirely.
+                if len(query_ids) > 64:
+                    query_ids = query_ids[:24] + query_ids[-40:]
+                query = self.query_tokenizer.decode(query_ids)
+                names = {item.name for item in self.ranker.get_inputs()}
+                scores = []
+                for start in range(0, len(texts), 4):
+                    remaining()
+                    batch = texts[start:start + 4]
+                    enc = self.rank_tokenizer.encode_batch([(query, text) for text in batch])
+                    data = {'input_ids': np.asarray([e.ids for e in enc], dtype=np.int64),
+                            'attention_mask': np.asarray([e.attention_mask for e in enc], dtype=np.int64),
+                            'token_type_ids': np.asarray([e.type_ids for e in enc], dtype=np.int64)}
+                    output = np.asarray(self._onnx(self.ranker, {k: v for k, v in data.items() if k in names}, remaining()))
+                    remaining()
+                    if output.shape != (len(batch), 1) or not np.isfinite(output).all():
+                        raise DomainError('El reranker devolvió puntajes inválidos.', 503, 'invalid_rerank')
+                    scores.extend((1 / (1 + np.exp(-np.clip(output[:, 0], -60, 60)))).tolist())
+                remaining()
+                if len(scores) != len(texts) or not np.isfinite(scores).all():
+                    raise DomainError('El reranker devolvió puntajes inválidos.', 503, 'invalid_rerank')
+            # Restoring tokenizer configuration is part of the same budget.
+            remaining()
+            return scores
+        except DomainError as exc:
+            if time.monotonic() >= deadline and exc.code != 'rerank_timeout':
+                raise DomainError('Se agotó el plazo de reordenación.', 503, 'rerank_timeout') from None
+            raise
+        except Exception as exc:
+            raise DomainError('No se pudo completar la reordenación local.', 503, 'rerank_failed') from exc
+        finally:
+            self._infer_lock.release()

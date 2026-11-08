@@ -1,0 +1,22 @@
+{"stage": "building_isolated_index", "public_records": 332}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 10, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 20, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 30, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 40, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 50, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 10, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 20, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 30, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 40, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 50, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 10, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 20, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 30, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 40, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 50, "total": 51}
+{"stage": "quality", "set": "holdout", "bounded": false, "complete": 10, "total": 12}
+{"stage": "quality", "set": "holdout", "bounded": true, "complete": 10, "total": 12}
+{"stage": "concurrency", "scenario": "hybrid", "workers": 3}
+{"stage": "concurrency", "scenario": "bounded_cold", "workers": 3}
+{"stage": "concurrency", "scenario": "bounded_warm", "workers": 3}
+{"stage": "complete", "passed": true, "quality": {"hybrid": {"hit@1": 0.6078431372549019, "hit@3": 0.8235294117647058, "hit@5": 0.8627450980392157, "hit@8": 0.9215686274509803, "mrr": 0.7194444444444446}, "bounded": {"hit@1": 0.6470588235294118, "hit@3": 0.8627450980392157, "hit@5": 0.8823529411764706, "hit@8": 0.9215686274509803, "mrr": 0.748202614379085}, "cached": {"hit@1": 0.6470588235294118, "hit@3": 0.8627450980392157, "hit@5": 0.8823529411764706, "hit@8": 0.9215686274509803, "mrr": 0.748202614379085}, "improved_cases": 8, "regressed_cases": 7}, "sequential": {"hybrid": {"responses": 51, "p50_ms": 37.81953600014276, "p95_ms": 54.82560099994771, "max_ms": 84.18678499992893, "mean_ms": 42.256196764712655, "states": {"skipped": 51}, "reasons": {"disabled": 51}}, "bounded": {"responses": 51, "p50_ms": 266.7365320000954, "p95_ms": 317.48743099990406, "max_ms": 352.4335130000509, "mean_ms": 270.03333154902083, "states": {"applied": 51}, "reasons": {"scored": 51}}, "cached": {"responses": 51, "p50_ms": 41.558939999958966, "p95_ms": 56.671697999945536, "max_ms": 69.38545800016982, "mean_ms": 45.16091350982535, "states": {"cache_hit": 51}, "reasons": {"cached": 51}}}, "concurrent": {"hybrid": {"responses": 51, "p50_ms": 87.03454200008309, "p95_ms": 115.08997000009913, "max_ms": 135.4729209999732, "mean_ms": 86.34929950980508, "states": {"skipped": 51}, "reasons": {"disabled": 51}}, "bounded_cold": {"responses": 51, "p50_ms": 157.24608899995474, "p95_ms": 362.58440849996987, "max_ms": 394.22110800001064, "mean_ms": 205.98545290196995, "states": {"fallback": 34, "applied": 17}, "reasons": {"busy": 34, "scored": 17}}, "bounded_warm": {"responses": 51, "p50_ms": 89.88265800007866, "p95_ms": 126.55915849995836, "max_ms": 159.48451700000987, "mean_ms": 90.05979360782636, "states": {"cache_hit": 51}, "reasons": {"cached": 51}}}, "holdout": {"cases": 12, "quality": {"hybrid": {"hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "hit@8": 1.0, "mrr": 1.0}, "bounded": {"hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "hit@8": 1.0, "mrr": 1.0}}, "passed": true}, "gates": {"quality_improvement_on_this_gold_set": true, "concurrent_p95_overhead_within_budget": true, "concurrent_cached_p95_near_baseline": true, "all_controls": true, "cached_quality": true, "cache_hit_fraction_at_least_95_percent": true, "predeclared_holdout_nonregression": true}}

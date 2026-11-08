@@ -198,7 +198,12 @@ def test_public_captcha_wrong_answer_expiry_and_origin(app):
 def test_lab_uses_the_context_pipeline_and_reranker_without_calling_ollama(app,corpus):
     from test_jobs_and_rag import build_system
     s=app.extensions['gianna']
+    from gianna.corpus import Record
+    corpus.records.append(Record(id='public-2',title='Otra ficha pública',audience='public',
+                                 text='Información adicional documentada para comparar la recuperación.'))
     _,vid,e,q,o,rag,jobs=build_system(s.db,s.cfg,s.knowledge,s.security,corpus)
+    ranked=[]
+    e.rerank_bounded=lambda query,texts,**kwargs:(ranked.append(query) or list(range(len(texts))))
     s.rag=rag;s.embeddings=e;s.vector_store=q;s.jobs=jobs
     client=app.test_client();authenticate(app,client)
     response=client.post('/admin/lab',data={'csrf':'csrf-test-value','version_id':vid,
@@ -207,6 +212,11 @@ def test_lab_uses_the_context_pipeline_and_reranker_without_calling_ollama(app,c
     assert response.status_code==200 and 'Búsqueda y reordenamiento' in html
     assert e.queries and o.calls==[]
     assert 'Ver recorrido de búsqueda' in html and 'contenido no debe publicarse' not in html
+    assert len(ranked)==1 and 'Aplicado' in html
+    again=client.post('/admin/lab',data={'csrf':'csrf-test-value','version_id':vid,
+        'question':'¿Qué condiciones tiene esta oportunidad?','mode':'retrieve'},headers={'Origin':'http://localhost'})
+    assert again.status_code==200 and 'Puntuaciones reutilizadas de caché' in again.get_data(as_text=True)
+    assert len(ranked)==1 and o.calls==[]
 
 
 def test_public_captcha_issue_rate_limit(app,monkeypatch):

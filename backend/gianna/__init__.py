@@ -1,5 +1,5 @@
 """Gianna Invest: Flask is imported only when the web application starts."""
-__version__ = '1.0.0-rc4'
+__version__ = '1.0.0-rc5'
 
 
 def create_app(overrides=None):

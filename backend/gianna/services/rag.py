@@ -7,6 +7,7 @@ from ..errors import DomainError
 from ..security import keyed_hash
 from .agent import Agent, Result
 from .retrieval import Retriever
+from .reranking import RerankBudget
 from ..observability import bind_context
 from .recovery import KnowledgeRecovery
 
@@ -34,6 +35,8 @@ class RAG:
 
     def retrieve(self, question, settings, version_id=None, **filters):
         """Fichas recuperadas sin llamar al modelo generativo (laboratorio y evaluación)."""
+        if 'rerank_budget' not in filters and settings.rerank_mode=='bounded':
+            filters['rerank_budget']=RerankBudget(settings.rerank_budget_ms)
         cards, trace = self.retriever.search(question, settings, version_id, **filters)
         return cards, trace['ms']
 

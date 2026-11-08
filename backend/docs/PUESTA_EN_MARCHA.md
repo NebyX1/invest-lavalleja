@@ -18,7 +18,7 @@ de una actualización de mantenimiento. Ver resultados locales actuales en
 ## Datos e indexación
 
 - Importar el JSON canónico de fichas (`better-rag/consolidated/..._fichas.gianna.json`, generado con `better-rag/tools/restructure.py`). Confirmar 332 registros (257 públicos, 75 internos) y sus fuentes; revisar la separación antes de aprobar.
-- Preparar y verificar el perfil Granite/mMARCO; comprobar CLS/L2, 384 dimensiones, tokenizador exacto y presupuesto de chunks (representación `cards-context-v5`: construir una versión nueva tras actualizar el código). El reranker se verifica en `prepare_models` y se mide con `evaluate_retrieval --modes fused rerank`; no interviene en el chat. Conservar el perfil v2 de las versiones publicadas hasta la transición explícita.
+- Preparar y verificar el perfil Granite/mMARCO; comprobar CLS/L2, 384 dimensiones, tokenizador exacto y presupuesto de chunks (representación `cards-context-v5`: construir una versión nueva tras actualizar el código). El reranker se verifica en `prepare_models` y se mide con `evaluate_retrieval --modes fused rerank`; en el chat se ejecuta mediante el presupuesto compartido y fallback de [Reranking acotado](RERANKING_ACOTADO.md). Conservar el perfil v2 de las versiones publicadas hasta la transición explícita.
 - Comprobar revisiones fijadas en `services/neural.py` y repetir carga/reinicio sin cambios inesperados de huella.
 - Confirmar que LanceDB contiene exclusivamente contenido público aprobado y los puntos coinciden con la versión MariaDB.
 - Interrumpir una construcción en un entorno de prueba, reiniciar, reintentar y verificar que no duplica puntos ni cambia la versión activa. Confirmar cancelación entre lotes.

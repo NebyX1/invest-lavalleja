@@ -801,7 +801,10 @@ class Jobs:
         settings=get_settings(self.db,self.cfg);results=[]
         for i,test in enumerate(tests):
             self.progress(job['id'],'Evaluando la recuperación; no se llama al modelo generativo',i,len(tests),stage='retrieval_evaluation')
-            found,trace=self.rag.retriever.search(test['question'],settings,job['version_id'],limit=settings.retrieval_limit)
+            from .reranking import RerankBudget
+            budget=RerankBudget(settings.rerank_budget_ms) if settings.rerank_mode=='bounded' else None
+            found,trace=self.rag.retriever.search(test['question'],settings,job['version_id'],limit=settings.retrieval_limit,
+                                               rerank_budget=budget)
             ms=trace['ms']
             ids=[x['record_id'] for x in found]
             expected=set(test.get('expected_any_record_ids',[]))

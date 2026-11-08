@@ -1,0 +1,22 @@
+{"stage": "building_isolated_index", "public_records": 332}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 10, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 20, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 30, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 40, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": false, "complete": 50, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 10, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 20, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 30, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 40, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 50, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 10, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 20, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 30, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 40, "total": 51}
+{"stage": "quality", "set": "gold", "bounded": true, "complete": 50, "total": 51}
+{"stage": "quality", "set": "holdout", "bounded": false, "complete": 10, "total": 12}
+{"stage": "quality", "set": "holdout", "bounded": true, "complete": 10, "total": 12}
+{"stage": "concurrency", "scenario": "hybrid", "workers": 3}
+{"stage": "concurrency", "scenario": "bounded_cold", "workers": 3}
+{"stage": "concurrency", "scenario": "bounded_warm", "workers": 3}
+{"stage": "complete", "passed": false, "quality": {"hybrid": {"hit@1": 0.6274509803921569, "hit@3": 0.8235294117647058, "hit@5": 0.8627450980392157, "hit@8": 0.9215686274509803, "mrr": 0.7287815126050421}, "bounded": {"hit@1": 0.6274509803921569, "hit@3": 0.8627450980392157, "hit@5": 0.8823529411764706, "hit@8": 0.9215686274509803, "mrr": 0.732376283846872}, "cached": {"hit@1": 0.6470588235294118, "hit@3": 0.8627450980392157, "hit@5": 0.8823529411764706, "hit@8": 0.9215686274509803, "mrr": 0.7487161531279178}, "improved_cases": 5, "regressed_cases": 7}, "sequential": {"hybrid": {"responses": 51, "p50_ms": 40.47702599996228, "p95_ms": 53.16408449999699, "max_ms": 109.80841700001065, "mean_ms": 43.542512156867744, "states": {"skipped": 51}, "reasons": {"disabled": 51}}, "bounded": {"responses": 51, "p50_ms": 315.14803000004576, "p95_ms": 397.7729590000081, "max_ms": 406.24204499999905, "mean_ms": 321.7030153725472, "states": {"applied": 48, "fallback": 3}, "reasons": {"timeout": 3}}, "cached": {"responses": 51, "p50_ms": 41.66139800003066, "p95_ms": 173.1665959999873, "max_ms": 303.62980500001413, "mean_ms": 57.97910300000195, "states": {"cache_hit": 48, "applied": 3}, "reasons": {}}}, "concurrent": {"hybrid": {"responses": 12, "p50_ms": 82.99812949999819, "p95_ms": 123.30021020000856, "max_ms": 128.26314400001593, "mean_ms": 86.00557516666167, "states": {"skipped": 12}, "reasons": {"disabled": 12}}, "bounded_cold": {"responses": 12, "p50_ms": 150.89928400001895, "p95_ms": 401.5760118000088, "max_ms": 401.67095499998595, "mean_ms": 226.0850202500014, "states": {"applied": 2, "fallback": 10}, "reasons": {"busy": 8, "timeout": 2}}, "bounded_warm": {"responses": 12, "p50_ms": 71.02199900000983, "p95_ms": 108.9480617999868, "max_ms": 119.17305899999064, "mean_ms": 74.23964850000193, "states": {"cache_hit": 12}, "reasons": {}}}, "holdout": {"cases": 12, "quality": {"hybrid": {"hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "hit@8": 1.0, "mrr": 1.0}, "bounded": {"hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "hit@8": 1.0, "mrr": 1.0}}, "passed": true}, "gates": {"quality_improvement_on_this_gold_set": false, "concurrent_p95_overhead_within_budget": true, "concurrent_cached_p95_near_baseline": true, "all_controls": true, "cached_quality": true, "cache_hit_fraction_at_least_95_percent": false, "predeclared_holdout_nonregression": true}}

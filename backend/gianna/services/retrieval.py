@@ -1,19 +1,23 @@
-"""Recuperación híbrida: denso + BM25 español (RRF en LanceDB) fusionado con un cross-encoder.
+"""Hybrid retrieval, with optional bounded neural reordering of a small window.
 
 La unidad de recuperación es el chunk; la unidad que ve el agente es la ficha
 completa (small-to-big). Cada llamada devuelve fichas públicas con sus condiciones,
 nivel de evidencia y fuentes, listas para citar.
 """
 import json
+import logging
 import time
 from functools import lru_cache
 
 from ..domain import ZONES, record_kind, zone_names
 from ..chunking import CONTEXTUALIZER_VERSION, input_prefix
 from ..errors import DomainError
+from ..observability import event
 from .neural import LEGACY_ENGINE_VERSION
+from .reranking import BoundedReranker, MAX_CANDIDATES
 
 RRF_K = 60
+LOG = logging.getLogger(__name__)
 
 
 def _fuse(*rankings, weights=None):
@@ -32,6 +36,10 @@ class Retriever:
         self.knowledge = knowledge
         self.embeddings = embeddings
         self.vector_store = vector_store
+        self.reranker = BoundedReranker()
+
+    def clear_rerank_cache(self):
+        self.reranker.cache.clear()
 
     def version(self, version_id=None):
         version = self.db.one('SELECT * FROM versions WHERE id=?', (version_id,)) if version_id else self.knowledge.active()
@@ -79,14 +87,22 @@ class Retriever:
             'score': round(score, 5), 'channels': list(channels), 'version_id': version_id,
         }
 
-    def search(self, query, settings, version_id=None, zones=None, kinds=None, limit=8, mode='hybrid'):
+    def search(self, query, settings, version_id=None, zones=None, kinds=None, limit=8, mode='hybrid',
+               rerank_budget=None):
         """Devuelve (fichas, trace). ``zones`` y ``kinds`` son filtros opcionales y blandos.
 
-        ``mode``: 'hybrid' (denso + BM25 con RRF, 60 ms; predeterminado), 'fused' (agrega el cross-encoder,
-        ~5 s en CPU) o 'rerank'. En la evaluación con el conjunto de oro el cross-encoder no mejoró el
-        resultado híbrido, por eso no está en el camino de las consultas.
+        No budget means the original hybrid ranking. A shared answer budget
+        permits one small, non-blocking neural attempt and subsequent cache hits.
+        Explicit 'fused'/'rerank' modes remain full offline comparisons and do
+        not use that serving budget.
         """
         started = time.perf_counter()
+        bounded = (mode == 'hybrid' and rerank_budget is not None and
+                   getattr(settings, 'rerank_mode', 'bounded') == 'bounded')
+        if bounded:
+            # Waiting behind an earlier rerank in the shared encoder lock must
+            # consume this answer's window, rather than earn another 400 ms.
+            rerank_budget.start()
         version = self.version(version_id)
         if hasattr(self, 'recovery'):
             self.recovery.require(version)
@@ -108,7 +124,8 @@ class Retriever:
         if kinds:
             points += self.vector_store.search(version['collection_name'], dense, lexical, pool, pool, record_types=kinds)
         if not points:
-            return [], {'query': text, 'candidates': 0, 'ms': round((time.perf_counter() - started) * 1000, 1)}
+            return [], {'query': text, 'candidates': 0, 'ms': round((time.perf_counter() - started) * 1000, 1),
+                        'rerank': {'mode':'hybrid', 'state':'skipped', 'reason':'no_candidates', 'applied':False}}
         by_chunk = {}
         for point in points:
             known = by_chunk.get(str(point['id']))
@@ -135,11 +152,23 @@ class Retriever:
             candidates.append({'record': record, 'chunk': chunk['text'], 'hybrid': point['score'], 'channels': point.get('channels', [])})
 
         rerank_scores = []
+        rerank_trace = {'mode':'hybrid', 'state':'skipped', 'reason':'disabled', 'applied':False,
+                        'candidates':0, 'ms':0.0}
         if mode != 'hybrid':
+            rank_started = time.perf_counter()
             try:
                 rerank_scores = engine.rerank(query, [input_prefix(c['record']) + c['chunk'] for c in candidates])
+                valid = BoundedReranker._valid(rerank_scores, len(candidates))
+                if not valid:
+                    rerank_scores = []
+                reason = 'scored' if valid else 'invalid_scores'
             except DomainError:
                 rerank_scores = []
+                reason = 'error'
+            rerank_trace = {'mode':mode, 'state':'applied' if rerank_scores else 'fallback',
+                            'reason':reason, 'applied':bool(rerank_scores), 'candidates':len(candidates),
+                            'ms':round((time.perf_counter()-rank_started)*1000, 2)}
+            event(LOG, 'retrieval.rerank_completed', version_id=version['id'], **rerank_trace)
         hybrid_rank = [c['record']['id'] for c in candidates]
         if rerank_scores:
             reranked = [c['record']['id'] for c, _ in sorted(zip(candidates, rerank_scores), key=lambda x: -x[1])]
@@ -153,10 +182,46 @@ class Retriever:
                 fused[record['id']] += 0.004
             if kinds and record_kind(record) in kinds:
                 fused[record['id']] += 0.004
-        ranked = sorted(candidates, key=lambda c: -fused[c['record']['id']])[:limit]
+        ranked = sorted(candidates, key=lambda c: -fused[c['record']['id']])
+        if bounded:
+            count = min(MAX_CANDIDATES, max(2, getattr(settings, 'rerank_candidates', MAX_CANDIDATES)))
+            window = ranked[:count]
+            ids = [c['record']['id'] for c in window]
+            texts = []
+            for candidate in window:
+                prefix = input_prefix(candidate['record'])
+                chunk = candidate['chunk']
+                # Canonical chunks already contain their contextual header.
+                # A legacy/raw chunk gets exactly one, never a duplicated one.
+                while chunk.startswith(prefix + prefix):
+                    chunk = chunk[len(prefix):]
+                texts.append(chunk if chunk.startswith(prefix) else prefix + chunk)
+            scores, rerank_trace = self.reranker.score(
+                engine, query, ids, texts, rerank_budget, version=version['id'],
+                fingerprint=(getattr(engine, 'profile', None) or {}).get('fingerprint', ''))
+            if scores is not None:
+                neural = [key for key, _ in sorted(zip(ids, scores), key=lambda item: -item[1])]
+                window_scores = _fuse(neural)
+                # Preserve the same soft territory/type preference used by hybrid.
+                for candidate in window:
+                    record = candidate['record']
+                    if zone_set and zone_set & set(record.get('zones', [])):
+                        window_scores[record['id']] += 0.004
+                    if kinds and record_kind(record) in kinds:
+                        window_scores[record['id']] += 0.004
+                reordered = sorted(window, key=lambda c: -window_scores[c['record']['id']])
+                ranked = reordered + ranked[count:]
+                # The bounded window and untouched tail have one common score
+                # scale. Preferences already decided the final order above.
+                fused = _fuse([c['record']['id'] for c in ranked])
+                rerank_trace['score_basis'] = 'final_rank_rrf'
+            rerank_trace['before_ids'] = ids
+            rerank_trace['after_ids'] = [c['record']['id'] for c in ranked[:count]]
+            rerank_trace['reordered'] = ids != rerank_trace['after_ids']
+        ranked = ranked[:limit]
         cards = [self.card(version['id'], c['record'], fused[c['record']['id']], c['channels']) for c in ranked]
         trace = {'query': text, 'candidates': len(candidates), 'ms': round((time.perf_counter() - started) * 1000, 1),
-                 'ids': [card['record_id'] for card in cards]}
+                 'ids': [card['record_id'] for card in cards], 'rerank':rerank_trace}
         return cards, trace
 
     def get(self, record_id, version_id=None):

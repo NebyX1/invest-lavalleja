@@ -1,0 +1,8132 @@
+{
+  "schema_version": 1,
+  "scope": "isolated_neural_retrieval_not_production_or_answer_generation",
+  "corpus_sha256": "0e272838a1192d3b2aa643fe948f97fd735510b7885125bcb3c781ec2726ce1f",
+  "gold_sha256": "2a3774996578678739eb2ac7a7ee82cf9fbccaeac508e82466093766231cd43a",
+  "source_sha256": {
+    "neural.py": "df5a401fcf47b1fa1c9cdf141dbd13da0f0a3bd709e44176024134338406bebe",
+    "retrieval.py": "73fc24f956f4893d5b46328a3d78015e44c18a84289e192fdc962b16d3fe20f7",
+    "reranking.py": "16db6142e1cce36f0f11ea4d4f6b719a4e4819ecb521c9885e518e864576d1b7"
+  },
+  "public_records": 332,
+  "excluded_records": 0,
+  "gold_cases": 51,
+  "provider_calls": 0,
+  "production_data_modified": false,
+  "profile": {
+    "engine": "granite-mmarco-lance-v3",
+    "model": "ibm-granite/granite-embedding-97m-multilingual-r2",
+    "revision_resolved": "835ad14087e140460703cf0fae09f97d469d65c2",
+    "dim": 384,
+    "pooling": "cls",
+    "normalize": true,
+    "query_prefix": "",
+    "passage_prefix": "",
+    "runtime": "onnx-cpu",
+    "max_input_tokens": 512,
+    "sparse": "lancedb/bm25-spanish",
+    "reranker": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+    "reranker_revision": "1427fd652930e4ba29e8149678df786c240d8825",
+    "reranker_tokens": 512,
+    "onnxruntime": "1.31.0",
+    "artifact_hashes": {
+      "granite": {
+        "tokenizer.json": "4f2842d568e2724370aec203652a42ac783c7937f8347a1a2cc7506d71f1582f",
+        "tokenizer_config.json": "6ed69389e30a8ecabfce2f9ebcdf0c908b34056f24d994340f2f216521c057d5",
+        "config.json": "de948b0bdc6f356afad7a84b276d8dd7e7fe10fb9add1bb5e610621c28e41ebc",
+        "1_Pooling/config.json": "8bc5c9a40814fcf48d2fbe7cfeff4bee6736c3c2a823ba0ce098985c59d12ab7",
+        "onnx/model_quint8_avx2.onnx": "a6022dd8220ea6f6595562a1328ee216f4a94faa55362f2f4747c80f1e78772e"
+      },
+      "mmarco": {
+        "tokenizer.json": "62c24cdc13d4c9952d63718d6c9fa4c287974249e16b7ade6d5a85e7bbb75626",
+        "tokenizer_config.json": "e7fbfbfa6347b4e414c1cee50d142e2c2f9a895dad68b068ae83a8b564c3837e",
+        "config.json": "cc2cfe51aa3fd759d21d21acf5dfd6994aa67a3c9210636d22e143699d336c77",
+        "onnx/model_quint8_avx2.onnx": "6c2513767fb63d008a4377bef7a7a3555433d9436342bb53e35a3a72ffc52d4b"
+      }
+    },
+    "fingerprint": "2eea22e49a8edf18fa68961adc43568bfab570af7f4efe68fb9b6c45875061ab"
+  },
+  "cpu_limit": 2,
+  "onnx_threads": 2,
+  "memory_limit_gib": 2,
+  "peak_rss_mib": 1392.3984375,
+  "budget_ms": 400,
+  "concurrency": 3,
+  "quality": {
+    "hybrid": {
+      "hit@1": 0.6078431372549019,
+      "hit@3": 0.8235294117647058,
+      "hit@5": 0.8627450980392157,
+      "hit@8": 0.9215686274509803,
+      "mrr": 0.7194444444444446
+    },
+    "bounded": {
+      "hit@1": 0.6470588235294118,
+      "hit@3": 0.8627450980392157,
+      "hit@5": 0.8823529411764706,
+      "hit@8": 0.9215686274509803,
+      "mrr": 0.748202614379085
+    },
+    "cached": {
+      "hit@1": 0.6470588235294118,
+      "hit@3": 0.8627450980392157,
+      "hit@5": 0.8823529411764706,
+      "hit@8": 0.9215686274509803,
+      "mrr": 0.748202614379085
+    },
+    "improved_cases": 8,
+    "regressed_cases": 7
+  },
+  "sequential": {
+    "hybrid": {
+      "responses": 51,
+      "p50_ms": 37.81953600014276,
+      "p95_ms": 54.82560099994771,
+      "max_ms": 84.18678499992893,
+      "mean_ms": 42.256196764712655,
+      "states": {
+        "skipped": 51
+      },
+      "reasons": {
+        "disabled": 51
+      }
+    },
+    "bounded": {
+      "responses": 51,
+      "p50_ms": 266.7365320000954,
+      "p95_ms": 317.48743099990406,
+      "max_ms": 352.4335130000509,
+      "mean_ms": 270.03333154902083,
+      "states": {
+        "applied": 51
+      },
+      "reasons": {
+        "scored": 51
+      }
+    },
+    "cached": {
+      "responses": 51,
+      "p50_ms": 41.558939999958966,
+      "p95_ms": 56.671697999945536,
+      "max_ms": 69.38545800016982,
+      "mean_ms": 45.16091350982535,
+      "states": {
+        "cache_hit": 51
+      },
+      "reasons": {
+        "cached": 51
+      }
+    }
+  },
+  "cache_hit_fraction": 1.0,
+  "concurrent": {
+    "hybrid": {
+      "responses": 51,
+      "p50_ms": 87.03454200008309,
+      "p95_ms": 115.08997000009913,
+      "max_ms": 135.4729209999732,
+      "mean_ms": 86.34929950980508,
+      "states": {
+        "skipped": 51
+      },
+      "reasons": {
+        "disabled": 51
+      }
+    },
+    "bounded_cold": {
+      "responses": 51,
+      "p50_ms": 157.24608899995474,
+      "p95_ms": 362.58440849996987,
+      "max_ms": 394.22110800001064,
+      "mean_ms": 205.98545290196995,
+      "states": {
+        "fallback": 34,
+        "applied": 17
+      },
+      "reasons": {
+        "busy": 34,
+        "scored": 17
+      }
+    },
+    "bounded_warm": {
+      "responses": 51,
+      "p50_ms": 89.88265800007866,
+      "p95_ms": 126.55915849995836,
+      "max_ms": 159.48451700000987,
+      "mean_ms": 90.05979360782636,
+      "states": {
+        "cache_hit": 51
+      },
+      "reasons": {
+        "cached": 51
+      }
+    }
+  },
+  "holdout": {
+    "cases": 12,
+    "sha256": "9bcda4b367f47876da64a7fe35f21ab99c766da53fcd9c3c493b995b3fe83361",
+    "scope": "predeclared_local_paraphrases_not_used_for_gold_tuning_not_external_curated",
+    "quality": {
+      "hybrid": {
+        "hit@1": 1.0,
+        "hit@3": 1.0,
+        "hit@5": 1.0,
+        "hit@8": 1.0,
+        "mrr": 1.0
+      },
+      "bounded": {
+        "hit@1": 1.0,
+        "hit@3": 1.0,
+        "hit@5": 1.0,
+        "hit@8": 1.0,
+        "mrr": 1.0
+      }
+    },
+    "timing": {
+      "hybrid": {
+        "responses": 12,
+        "p50_ms": 44.92583549995288,
+        "p95_ms": 53.78309464994118,
+        "max_ms": 55.48228499992547,
+        "mean_ms": 46.27120308329798,
+        "states": {
+          "skipped": 12
+        },
+        "reasons": {
+          "disabled": 12
+        }
+      },
+      "bounded": {
+        "responses": 12,
+        "p50_ms": 271.57211600001574,
+        "p95_ms": 286.2765912499526,
+        "max_ms": 292.8298110000469,
+        "mean_ms": 270.6407494166759,
+        "states": {
+          "applied": 12
+        },
+        "reasons": {
+          "scored": 12
+        }
+      }
+    },
+    "results": {
+      "hybrid": [
+        {
+          "case": 0,
+          "ids": [
+            "TS-006",
+            "s12-01-01",
+            "s09-01-04",
+            "s12-02-01",
+            "TS-005",
+            "s33-01-01",
+            "TS-010",
+            "TS-008"
+          ],
+          "rank": 1,
+          "wall_ms": 46.09370100001797,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 1,
+          "ids": [
+            "TS-011",
+            "TS-013",
+            "AG-027",
+            "s35-01-04",
+            "TR-009",
+            "EN-022",
+            "TS-012",
+            "territorio-20261019-z3"
+          ],
+          "rank": 1,
+          "wall_ms": 39.36289099988244,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 2,
+          "ids": [
+            "EN-019",
+            "EN-020",
+            "O09",
+            "EN-029",
+            "s08-03-01",
+            "EN-023",
+            "EN-011",
+            "s34-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 55.48228499992547,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 3,
+          "ids": [
+            "TR-011",
+            "s30-04-01",
+            "s31-02-01",
+            "TR-010",
+            "s07-02-01",
+            "EN-006",
+            "s02-02-01",
+            "s02-03-01"
+          ],
+          "rank": 1,
+          "wall_ms": 40.01141699995969,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 4,
+          "ids": [
+            "AG-010",
+            "s15-02-01",
+            "s12-02-01",
+            "O04",
+            "O02",
+            "EN-023",
+            "AG-027",
+            "AG-012"
+          ],
+          "rank": 1,
+          "wall_ms": 51.17169200002536,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 5,
+          "ids": [
+            "AG-014",
+            "AG-015",
+            "s08-02-01",
+            "TR-007",
+            "AG-023",
+            "s27-03-01",
+            "s15-02-01",
+            "territorio-20261019-z5"
+          ],
+          "rank": 1,
+          "wall_ms": 41.438944999981686,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 6,
+          "ids": [
+            "AG-017",
+            "s16-04-01",
+            "AG-019",
+            "AG-032",
+            "AG-018",
+            "TR-002",
+            "AG-029",
+            "s16-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 52.39284799995403,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 7,
+          "ids": [
+            "TS-031",
+            "s02-01-05",
+            "EN-011",
+            "TS-011",
+            "s02-01-02",
+            "TS-030",
+            "s26-03-01",
+            "AG-021"
+          ],
+          "rank": 1,
+          "wall_ms": 43.358746999956566,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 8,
+          "ids": [
+            "TR-020",
+            "TR-019",
+            "TR-017",
+            "O10",
+            "TR-024",
+            "O07",
+            "s15-02-01",
+            "AG-021"
+          ],
+          "rank": 1,
+          "wall_ms": 51.871787999971275,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 9,
+          "ids": [
+            "AG-013",
+            "TS-013",
+            "s12-01-01",
+            "AG-026",
+            "O06",
+            "s27-01-03",
+            "s11-04-01",
+            "s16-05-01"
+          ],
+          "rank": 1,
+          "wall_ms": 43.75796999988779,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 10,
+          "ids": [
+            "TR-007",
+            "AG-030",
+            "AG-026",
+            "AG-025",
+            "TR-006",
+            "TR-005",
+            "AG-033",
+            "AG-020"
+          ],
+          "rank": 1,
+          "wall_ms": 40.64371999993455,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 11,
+          "ids": [
+            "AG-034",
+            "AG-019",
+            "AG-021",
+            "AG-029",
+            "AG-033",
+            "s17-01-04",
+            "AG-002",
+            "s13-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 49.66843300007895,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        }
+      ],
+      "bounded": [
+        {
+          "case": 0,
+          "ids": [
+            "TS-006",
+            "s12-02-01",
+            "s33-01-01",
+            "s12-01-01",
+            "TS-005",
+            "s09-01-04",
+            "TS-010",
+            "TS-008"
+          ],
+          "rank": 1,
+          "wall_ms": 260.2106190001905,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 222.01,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 1,
+          "ids": [
+            "TS-011",
+            "TS-013",
+            "AG-027",
+            "EN-022",
+            "s35-01-04",
+            "TR-009",
+            "TS-012",
+            "territorio-20261019-z3"
+          ],
+          "rank": 1,
+          "wall_ms": 271.26014500004203,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 226.89,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 2,
+          "ids": [
+            "EN-020",
+            "EN-019",
+            "EN-029",
+            "EN-023",
+            "O09",
+            "s08-03-01",
+            "EN-011",
+            "s34-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 274.90250200003175,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 224.79,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 3,
+          "ids": [
+            "TR-011",
+            "TR-010",
+            "s30-04-01",
+            "s07-02-01",
+            "s31-02-01",
+            "EN-006",
+            "s02-02-01",
+            "s02-03-01"
+          ],
+          "rank": 1,
+          "wall_ms": 253.55954599990582,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 192.62,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 4,
+          "ids": [
+            "AG-010",
+            "O02",
+            "O04",
+            "s15-02-01",
+            "EN-023",
+            "s12-02-01",
+            "AG-027",
+            "AG-012"
+          ],
+          "rank": 1,
+          "wall_ms": 260.42005900012555,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 218.41,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 5,
+          "ids": [
+            "AG-014",
+            "AG-015",
+            "AG-023",
+            "s08-02-01",
+            "s27-03-01",
+            "TR-007",
+            "s15-02-01",
+            "territorio-20261019-z5"
+          ],
+          "rank": 1,
+          "wall_ms": 275.5045500000506,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 215.14,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 6,
+          "ids": [
+            "AG-017",
+            "s16-04-01",
+            "AG-018",
+            "AG-019",
+            "AG-032",
+            "TR-002",
+            "AG-029",
+            "s16-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 271.88408699998945,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 226.34,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 7,
+          "ids": [
+            "TS-031",
+            "TS-011",
+            "TS-030",
+            "s02-01-05",
+            "EN-011",
+            "s02-01-02",
+            "s26-03-01",
+            "AG-021"
+          ],
+          "rank": 1,
+          "wall_ms": 259.5133459999488,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 218.64,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 8,
+          "ids": [
+            "TR-020",
+            "TR-019",
+            "TR-017",
+            "O10",
+            "TR-024",
+            "O07",
+            "s15-02-01",
+            "AG-021"
+          ],
+          "rank": 1,
+          "wall_ms": 271.21558499993625,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 215.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": false
+          }
+        },
+        {
+          "case": 9,
+          "ids": [
+            "TS-013",
+            "s12-01-01",
+            "AG-013",
+            "s27-01-03",
+            "O06",
+            "AG-026",
+            "s11-04-01",
+            "s16-05-01"
+          ],
+          "rank": 1,
+          "wall_ms": 280.9148659998755,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 237.27,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 10,
+          "ids": [
+            "AG-030",
+            "TR-006",
+            "TR-007",
+            "AG-026",
+            "AG-025",
+            "TR-005",
+            "AG-033",
+            "AG-020"
+          ],
+          "rank": 1,
+          "wall_ms": 275.4738769999676,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 228.51,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 11,
+          "ids": [
+            "AG-034",
+            "AG-033",
+            "AG-029",
+            "AG-019",
+            "s17-01-04",
+            "AG-021",
+            "AG-002",
+            "s13-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 292.8298110000469,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 248.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        }
+      ]
+    },
+    "passed": true
+  },
+  "phase_resources": {
+    "build": {
+      "wall_s": 42.639917249000064,
+      "cpu_s": 70.26794299999999,
+      "mean_cpu_cores": 1.6479380714944474,
+      "quota_cpu_percent": 82.39690357472237
+    },
+    "hybrid_quality": {
+      "wall_s": 2.1558733090000715,
+      "cpu_s": 4.288832999999997,
+      "mean_cpu_cores": 1.9893715377872674,
+      "quota_cpu_percent": 99.46857688936336
+    },
+    "bounded_quality": {
+      "wall_s": 13.773129913000048,
+      "cpu_s": 27.517583000000016,
+      "mean_cpu_cores": 1.9979179150867508,
+      "quota_cpu_percent": 99.89589575433754
+    },
+    "cached_quality": {
+      "wall_s": 2.3038892399999895,
+      "cpu_s": 4.578858999999994,
+      "mean_cpu_cores": 1.9874475389277027,
+      "quota_cpu_percent": 99.37237694638513
+    },
+    "holdout_hybrid": {
+      "wall_s": 0.5554548430000068,
+      "cpu_s": 1.1016710000000103,
+      "mean_cpu_cores": 1.9833673499899556,
+      "quota_cpu_percent": 99.16836749949778
+    },
+    "holdout_bounded": {
+      "wall_s": 3.2479930819999936,
+      "cpu_s": 6.481104000000002,
+      "mean_cpu_cores": 1.9954180431964401,
+      "quota_cpu_percent": 99.77090215982201
+    },
+    "concurrent_hybrid": {
+      "wall_s": 1.8746307080000406,
+      "cpu_s": 3.7518739999999866,
+      "mean_cpu_cores": 2.001393652621157,
+      "quota_cpu_percent": 100.06968263105784
+    },
+    "concurrent_bounded_cold": {
+      "wall_s": 5.91357696,
+      "cpu_s": 11.808393999999993,
+      "mean_cpu_cores": 1.996827652683494,
+      "quota_cpu_percent": 99.8413826341747
+    },
+    "concurrent_bounded_warm": {
+      "wall_s": 1.943344555000067,
+      "cpu_s": 3.879811999999987,
+      "mean_cpu_cores": 1.9964611988221785,
+      "quota_cpu_percent": 99.82305994110894
+    }
+  },
+  "controls": {
+    "busy_returns_hybrid": true,
+    "deadline_returns_hybrid": true,
+    "shared_budget_maximum_one_neural_attempt": true,
+    "fingerprint_unchanged": true,
+    "published_pointer_untouched": true,
+    "cached_order_identical": true
+  },
+  "control_traces": {
+    "busy": {
+      "case": 0,
+      "ids": [
+        "TS-011",
+        "TS-013",
+        "TS-031",
+        "s36-07-01",
+        "EN-022",
+        "TS-012",
+        "s29-01-08",
+        "s35-01-04"
+      ],
+      "rank": 1,
+      "wall_ms": 41.88738700008798,
+      "rerank": {
+        "state": "fallback",
+        "reason": "busy",
+        "ms": 0.4,
+        "budget_ms": 400,
+        "candidates": 6,
+        "applied": false,
+        "reordered": false
+      }
+    },
+    "deadline": {
+      "case": 0,
+      "ids": [
+        "TS-011",
+        "TS-013",
+        "TS-031",
+        "s36-07-01",
+        "EN-022",
+        "TS-012",
+        "s29-01-08",
+        "s35-01-04"
+      ],
+      "rank": 1,
+      "wall_ms": 38.96344700001464,
+      "rerank": {
+        "state": "skipped",
+        "reason": "budget_spent",
+        "ms": 0.07,
+        "budget_ms": 1.0,
+        "candidates": 6,
+        "applied": false,
+        "reordered": false
+      }
+    },
+    "shared": [
+      {
+        "case": 0,
+        "ids": [
+          "TS-013",
+          "TS-011",
+          "TS-031",
+          "TS-012",
+          "EN-022",
+          "s36-07-01",
+          "s29-01-08",
+          "s35-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 253.56110100005935,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 215.43,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 1,
+        "ids": [
+          "TS-013",
+          "s35-01-04",
+          "s16-01-01",
+          "TS-011",
+          "s11-02-01",
+          "s29-01-06",
+          "s16-02-01",
+          "O12"
+        ],
+        "rank": 1,
+        "wall_ms": 43.14364299989393,
+        "rerank": {
+          "state": "skipped",
+          "reason": "budget_spent",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": false,
+          "reordered": false
+        }
+      }
+    ]
+  },
+  "results": {
+    "hybrid": [
+      {
+        "case": 0,
+        "ids": [
+          "TS-011",
+          "TS-013",
+          "TS-031",
+          "s36-07-01",
+          "EN-022",
+          "TS-012",
+          "s29-01-08",
+          "s35-01-04"
+        ],
+        "rank": 1,
+        "wall_ms": 38.90292500000214,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 1,
+        "ids": [
+          "TS-013",
+          "s35-01-04",
+          "s16-01-01",
+          "TS-011",
+          "s11-02-01",
+          "s29-01-06",
+          "s16-02-01",
+          "O12"
+        ],
+        "rank": 1,
+        "wall_ms": 34.18752599986874,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 2,
+        "ids": [
+          "s12-01-01",
+          "TS-006",
+          "s12-04-01",
+          "TS-010",
+          "TS-005",
+          "s09-01-04",
+          "s12-03-01",
+          "TS-009"
+        ],
+        "rank": 3,
+        "wall_ms": 36.19397000011304,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 3,
+        "ids": [
+          "TS-005",
+          "TS-008",
+          "s12-01-01",
+          "s12-03-01",
+          "TS-003",
+          "TS-006",
+          "s12-05-01",
+          "TS-010"
+        ],
+        "rank": 1,
+        "wall_ms": 50.845553000044674,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 4,
+        "ids": [
+          "TS-006",
+          "s12-01-01",
+          "s09-01-04",
+          "s12-02-01",
+          "TS-008",
+          "TS-010",
+          "s12-04-01",
+          "s33-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 37.02503399995294,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 5,
+        "ids": [
+          "TR-008",
+          "EN-008",
+          "EN-006",
+          "EN-007",
+          "EN-001",
+          "EN-016",
+          "EN-021",
+          "EN-015"
+        ],
+        "rank": 5,
+        "wall_ms": 34.99526300015532,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 6,
+        "ids": [
+          "EN-021",
+          "EN-019",
+          "EN-029",
+          "s08-03-01",
+          "TR-010",
+          "O09",
+          "EN-020",
+          "EN-011"
+        ],
+        "rank": 2,
+        "wall_ms": 50.08847299995978,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 7,
+        "ids": [
+          "s27-01-07",
+          "s30-05-01",
+          "s30-02-01",
+          "s36-04-01",
+          "TR-022",
+          "TR-023",
+          "s31-04-01",
+          "s30-01-01"
+        ],
+        "rank": 3,
+        "wall_ms": 37.19361599996773,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 8,
+        "ids": [
+          "TR-011",
+          "s30-04-01",
+          "s31-02-01",
+          "s28-03-01",
+          "s35-01-10",
+          "s35-01-08",
+          "TR-010",
+          "s27-01-10"
+        ],
+        "rank": 1,
+        "wall_ms": 54.98473600005127,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 9,
+        "ids": [
+          "AG-010",
+          "s15-02-01",
+          "s14-06-01",
+          "AG-020",
+          "s34-01-06",
+          "s11-04-01",
+          "territorio-20261019-z2",
+          "s08-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 34.12953500014737,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 10,
+        "ids": [
+          "AG-015",
+          "s11-04-01",
+          "s14-06-01",
+          "s34-02-01",
+          "s15-05-01",
+          "s11-03-01",
+          "AG-014",
+          "s05-03-01"
+        ],
+        "rank": 1,
+        "wall_ms": 36.647971999855145,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 11,
+        "ids": [
+          "s14-02-01",
+          "s09-01-06",
+          "s08-03-01",
+          "s14-01-01",
+          "s14-03-01",
+          "territorio-20261019-z5",
+          "s14-06-01",
+          "AG-014"
+        ],
+        "rank": 1,
+        "wall_ms": 43.90733300010652,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 12,
+        "ids": [
+          "AG-017",
+          "AG-032",
+          "s16-04-01",
+          "AG-021",
+          "EN-011",
+          "AG-024",
+          "consulta-predial-20261019",
+          "s13-05-01"
+        ],
+        "rank": 1,
+        "wall_ms": 37.095422999982475,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 13,
+        "ids": [
+          "AG-024",
+          "AG-015",
+          "AG-035",
+          "s29-01-10",
+          "TR-007",
+          "TR-008",
+          "AG-026",
+          "AG-030"
+        ],
+        "rank": 1,
+        "wall_ms": 45.688073999826884,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 14,
+        "ids": [
+          "TS-031",
+          "s12-03-01",
+          "s06-03-01",
+          "s02-01-05",
+          "s11-05-01",
+          "AG-021",
+          "s34-01-03",
+          "TS-030"
+        ],
+        "rank": 1,
+        "wall_ms": 36.1302969999997,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 15,
+        "ids": [
+          "s36-05-01",
+          "consulta-predial-20261019",
+          "TR-001",
+          "TR-008",
+          "TS-011",
+          "EN-011",
+          "TR-009",
+          "AG-030"
+        ],
+        "rank": null,
+        "wall_ms": 53.603745000145864,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 16,
+        "ids": [
+          "s36-03-01",
+          "s31-03-01",
+          "s26-01-01",
+          "s34-03-01",
+          "s27-02-01",
+          "s27-03-01",
+          "TR-001",
+          "TS-023"
+        ],
+        "rank": 1,
+        "wall_ms": 36.12479399998847,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 17,
+        "ids": [
+          "s36-09-01",
+          "s30-05-01",
+          "s32-02-02",
+          "s33-01-06",
+          "s15-01-01",
+          "s33-01-11",
+          "s05-02-01",
+          "s13-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 35.023990000127014,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 18,
+        "ids": [
+          "s36-06-01",
+          "TR-001",
+          "s36-03-01",
+          "s27-01-10",
+          "EN-006",
+          "consulta-predial-20261019",
+          "s07-02-01",
+          "s04-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 48.42342100005226,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 19,
+        "ids": [
+          "s28-03-01",
+          "s28-04-01",
+          "s33-01-11",
+          "s28-05-01",
+          "TR-011",
+          "s30-04-01",
+          "s10-04-01",
+          "O16"
+        ],
+        "rank": 1,
+        "wall_ms": 33.750085000065155,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 20,
+        "ids": [
+          "TR-010",
+          "s10-02-01",
+          "O08",
+          "s36-02-01",
+          "s04-03-01",
+          "s09-01-02",
+          "TR-011",
+          "s17-01-02"
+        ],
+        "rank": 1,
+        "wall_ms": 51.82032900006561,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 21,
+        "ids": [
+          "s16-03-01",
+          "s35-01-09",
+          "EN-004",
+          "s16-04-01",
+          "TR-024",
+          "territorio-20261019-z7",
+          "s16-05-01",
+          "s16-06-01"
+        ],
+        "rank": 3,
+        "wall_ms": 36.77457100002357,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 22,
+        "ids": [
+          "s36-02-01",
+          "s11-04-01",
+          "s02-02-01",
+          "s11-06-01",
+          "s11-01-01",
+          "s15-06-01",
+          "s34-02-01",
+          "s02-01-01"
+        ],
+        "rank": null,
+        "wall_ms": 34.53117200001543,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 23,
+        "ids": [
+          "TR-020",
+          "TR-019",
+          "TS-026",
+          "AG-014",
+          "AG-015",
+          "O10",
+          "EN-012",
+          "EN-011"
+        ],
+        "rank": 1,
+        "wall_ms": 51.89864299995861,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 24,
+        "ids": [
+          "TR-016",
+          "TR-017",
+          "s13-02-01",
+          "s08-02-01",
+          "s26-01-02",
+          "AG-004",
+          "AG-029",
+          "AG-015"
+        ],
+        "rank": 1,
+        "wall_ms": 34.89912400004869,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 25,
+        "ids": [
+          "TR-018",
+          "TR-001",
+          "s16-05-01",
+          "s16-06-01",
+          "s32-02-01",
+          "AG-014",
+          "s34-01-06",
+          "s16-04-01"
+        ],
+        "rank": 1,
+        "wall_ms": 45.56886999989729,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 26,
+        "ids": [
+          "s06-02-01",
+          "s05-01-07",
+          "s36-07-01",
+          "TS-008",
+          "TS-016",
+          "s12-05-01",
+          "TS-010",
+          "TS-026"
+        ],
+        "rank": 3,
+        "wall_ms": 35.909380000020974,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 27,
+        "ids": [
+          "s12-03-01",
+          "AG-013",
+          "s11-04-01",
+          "s12-01-01",
+          "s16-05-01",
+          "TS-013",
+          "s12-02-01",
+          "s33-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 47.468242999912036,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 28,
+        "ids": [
+          "s05-01-05",
+          "s27-01-10",
+          "TR-008",
+          "s07-04-01",
+          "s36-08-01",
+          "s07-02-01",
+          "s35-01-12",
+          "s10-01-01"
+        ],
+        "rank": 6,
+        "wall_ms": 39.01330100006817,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 29,
+        "ids": [
+          "s02-02-01",
+          "s17-02-01",
+          "s17-03-01",
+          "s02-01-03",
+          "s27-01-09",
+          "s33-01-05",
+          "TR-005",
+          "s09-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 38.029918999882284,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 30,
+        "ids": [
+          "TR-006",
+          "AG-030",
+          "AG-020",
+          "s08-02-01",
+          "s10-02-01",
+          "TR-007",
+          "AG-025",
+          "s11-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 47.432011999944734,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 31,
+        "ids": [
+          "EN-030",
+          "EN-011",
+          "EN-031",
+          "s15-05-01",
+          "s07-01-01",
+          "s11-06-01",
+          "s10-05-01",
+          "EN-028"
+        ],
+        "rank": 1,
+        "wall_ms": 36.12957399991501,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 32,
+        "ids": [
+          "TR-009",
+          "s10-05-01",
+          "s13-03-01",
+          "s10-02-01",
+          "s10-03-01",
+          "AG-025",
+          "AG-020",
+          "TR-005"
+        ],
+        "rank": 1,
+        "wall_ms": 47.20310100015013,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 33,
+        "ids": [
+          "AG-027",
+          "AG-015",
+          "AG-029",
+          "AG-028",
+          "TR-009",
+          "AG-035",
+          "s29-01-10",
+          "s29-01-05"
+        ],
+        "rank": 1,
+        "wall_ms": 37.81953600014276,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 34,
+        "ids": [
+          "TS-014",
+          "s29-01-08",
+          "s16-05-01",
+          "TS-011",
+          "s35-01-04",
+          "TS-013",
+          "TS-018",
+          "s09-01-03"
+        ],
+        "rank": 1,
+        "wall_ms": 38.483772000063254,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 35,
+        "ids": [
+          "s36-04-01",
+          "s05-01-02",
+          "s02-02-01",
+          "TR-001",
+          "s04-01-01",
+          "s34-03-01",
+          "s36-05-01",
+          "s34-02-01"
+        ],
+        "rank": 6,
+        "wall_ms": 55.64860399999816,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 36,
+        "ids": [
+          "EN-025",
+          "TR-007",
+          "AG-029",
+          "AG-033",
+          "TS-004",
+          "s36-07-01",
+          "AG-025",
+          "AG-035"
+        ],
+        "rank": 1,
+        "wall_ms": 37.143036000088614,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 37,
+        "ids": [
+          "s10-03-01",
+          "s36-08-01",
+          "s28-04-01",
+          "s10-02-01",
+          "O16",
+          "O14",
+          "s08-02-01",
+          "s07-04-01"
+        ],
+        "rank": 5,
+        "wall_ms": 52.72402599985071,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 38,
+        "ids": [
+          "TR-001",
+          "TR-005",
+          "TR-002",
+          "AG-026",
+          "AG-004",
+          "O10",
+          "s29-01-04",
+          "TR-018"
+        ],
+        "rank": 1,
+        "wall_ms": 36.906509999880655,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 39,
+        "ids": [
+          "s07-02-01",
+          "s05-01-05",
+          "s05-01-03",
+          "s36-05-01",
+          "s35-01-02",
+          "EN-006",
+          "EN-027",
+          "s13-04-01"
+        ],
+        "rank": null,
+        "wall_ms": 47.28705699994862,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 40,
+        "ids": [
+          "TS-027",
+          "TS-029",
+          "s15-05-01",
+          "territorio-20261019-z5",
+          "s27-01-02",
+          "TS-028",
+          "s02-02-01",
+          "s27-01-05"
+        ],
+        "rank": 1,
+        "wall_ms": 37.28506500010553,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 41,
+        "ids": [
+          "s05-01-03",
+          "s05-01-04",
+          "s05-01-07",
+          "s05-02-01",
+          "s09-01-04",
+          "s05-03-01",
+          "s31-02-01",
+          "s09-01-05"
+        ],
+        "rank": null,
+        "wall_ms": 36.43884099983552,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 42,
+        "ids": [
+          "TR-008",
+          "s31-03-01",
+          "s12-03-01",
+          "s10-02-01",
+          "O13",
+          "s04-03-01",
+          "EN-011",
+          "TR-009"
+        ],
+        "rank": 1,
+        "wall_ms": 46.53028000006998,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 43,
+        "ids": [
+          "AG-019",
+          "AG-023",
+          "s35-01-03",
+          "s26-01-02",
+          "EN-001",
+          "TS-012",
+          "s26-01-03",
+          "AG-002"
+        ],
+        "rank": 2,
+        "wall_ms": 36.69793000017307,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 44,
+        "ids": [
+          "s33-01-04",
+          "AG-035",
+          "s17-02-01",
+          "s33-01-05",
+          "O07",
+          "s02-01-03",
+          "s08-02-01",
+          "s33-01-06"
+        ],
+        "rank": 2,
+        "wall_ms": 44.80892500009759,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 45,
+        "ids": [
+          "EN-026",
+          "EN-006",
+          "EN-027",
+          "s16-05-01",
+          "TR-005",
+          "s32-02-01",
+          "s34-01-06",
+          "s28-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 84.18678499992893,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 46,
+        "ids": [
+          "s35-01-04",
+          "AG-009",
+          "TR-003",
+          "s35-01-07",
+          "EN-025",
+          "s35-01-05",
+          "EN-024",
+          "s33-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 33.38801399991098,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 47,
+        "ids": [
+          "TS-013",
+          "s29-01-08",
+          "TS-011",
+          "TS-031",
+          "TS-014",
+          "TS-012",
+          "s29-01-06",
+          "s35-01-04"
+        ],
+        "rank": 1,
+        "wall_ms": 36.2249410000004,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 48,
+        "ids": [
+          "TR-009",
+          "AG-030",
+          "AG-017",
+          "TR-001",
+          "TR-006",
+          "AG-024",
+          "consulta-predial-20261019",
+          "TR-004"
+        ],
+        "rank": 8,
+        "wall_ms": 42.484435999995185,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 49,
+        "ids": [
+          "AG-034",
+          "s12-03-01",
+          "s12-02-01",
+          "s33-01-04",
+          "s12-04-01",
+          "s12-01-01",
+          "s15-01-01",
+          "AG-002"
+        ],
+        "rank": 1,
+        "wall_ms": 34.721807000096305,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      },
+      {
+        "case": 50,
+        "ids": [
+          "s10-02-01",
+          "s15-02-01",
+          "s13-02-01",
+          "s16-02-01",
+          "s11-02-01",
+          "s14-02-01",
+          "s04-04-01",
+          "s11-03-01"
+        ],
+        "rank": 2,
+        "wall_ms": 54.66646599984415,
+        "rerank": {
+          "state": "skipped",
+          "reason": "disabled",
+          "ms": 0.0,
+          "candidates": 0,
+          "applied": false
+        }
+      }
+    ],
+    "bounded": [
+      {
+        "case": 0,
+        "ids": [
+          "TS-013",
+          "TS-011",
+          "TS-031",
+          "TS-012",
+          "EN-022",
+          "s36-07-01",
+          "s29-01-08",
+          "s35-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 248.1233710000197,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 212.14,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 1,
+        "ids": [
+          "TS-013",
+          "TS-011",
+          "s11-02-01",
+          "s16-01-01",
+          "s29-01-06",
+          "s35-01-04",
+          "s16-02-01",
+          "O12"
+        ],
+        "rank": 1,
+        "wall_ms": 332.70855799992205,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 277.87,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 2,
+        "ids": [
+          "TS-006",
+          "TS-010",
+          "TS-005",
+          "s12-01-01",
+          "s12-04-01",
+          "s09-01-04",
+          "s12-03-01",
+          "TS-009"
+        ],
+        "rank": 5,
+        "wall_ms": 285.7752279999204,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 236.05,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 3,
+        "ids": [
+          "TS-005",
+          "TS-003",
+          "TS-008",
+          "TS-006",
+          "s12-03-01",
+          "s12-01-01",
+          "s12-05-01",
+          "TS-010"
+        ],
+        "rank": 1,
+        "wall_ms": 302.2663039998861,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 248.92,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 4,
+        "ids": [
+          "TS-006",
+          "TS-008",
+          "s09-01-04",
+          "s12-02-01",
+          "s12-01-01",
+          "TS-010",
+          "s12-04-01",
+          "s33-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 292.70135899992056,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 244.34,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 5,
+        "ids": [
+          "EN-001",
+          "EN-006",
+          "EN-016",
+          "EN-008",
+          "TR-008",
+          "EN-007",
+          "EN-021",
+          "EN-015"
+        ],
+        "rank": 1,
+        "wall_ms": 274.0239019999535,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 219.14,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 6,
+        "ids": [
+          "EN-029",
+          "TR-010",
+          "EN-019",
+          "O09",
+          "s08-03-01",
+          "EN-021",
+          "EN-020",
+          "EN-011"
+        ],
+        "rank": 3,
+        "wall_ms": 249.9107930000264,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 207.96,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 7,
+        "ids": [
+          "TR-022",
+          "s27-01-07",
+          "s30-02-01",
+          "TR-023",
+          "s30-05-01",
+          "s36-04-01",
+          "s31-04-01",
+          "s30-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 264.22412300007636,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 227.22,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 8,
+        "ids": [
+          "TR-011",
+          "s30-04-01",
+          "s31-02-01",
+          "s28-03-01",
+          "s35-01-08",
+          "s35-01-10",
+          "TR-010",
+          "s27-01-10"
+        ],
+        "rank": 1,
+        "wall_ms": 255.35863599998265,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 197.12,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 9,
+        "ids": [
+          "AG-010",
+          "s15-02-01",
+          "s14-06-01",
+          "AG-020",
+          "s11-04-01",
+          "s34-01-06",
+          "territorio-20261019-z2",
+          "s08-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 247.10623000009946,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 211.16,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 10,
+        "ids": [
+          "AG-015",
+          "s14-06-01",
+          "s11-03-01",
+          "s34-02-01",
+          "s15-05-01",
+          "s11-04-01",
+          "AG-014",
+          "s05-03-01"
+        ],
+        "rank": 1,
+        "wall_ms": 273.340380000036,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 216.83,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 11,
+        "ids": [
+          "s14-02-01",
+          "s08-03-01",
+          "s14-01-01",
+          "s09-01-06",
+          "s14-03-01",
+          "territorio-20261019-z5",
+          "s14-06-01",
+          "AG-014"
+        ],
+        "rank": 1,
+        "wall_ms": 267.94871499987494,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 224.96,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 12,
+        "ids": [
+          "AG-017",
+          "AG-032",
+          "s16-04-01",
+          "AG-021",
+          "AG-024",
+          "EN-011",
+          "consulta-predial-20261019",
+          "s13-05-01"
+        ],
+        "rank": 1,
+        "wall_ms": 286.95408599992334,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 237.69,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 13,
+        "ids": [
+          "AG-024",
+          "AG-035",
+          "AG-015",
+          "TR-008",
+          "TR-007",
+          "s29-01-10",
+          "AG-026",
+          "AG-030"
+        ],
+        "rank": 1,
+        "wall_ms": 288.7775430001511,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 236.61,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 14,
+        "ids": [
+          "TS-031",
+          "s12-03-01",
+          "s11-05-01",
+          "s02-01-05",
+          "AG-021",
+          "s06-03-01",
+          "s34-01-03",
+          "TS-030"
+        ],
+        "rank": 1,
+        "wall_ms": 265.48071100000925,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 219.99,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 15,
+        "ids": [
+          "s36-05-01",
+          "consulta-predial-20261019",
+          "TS-011",
+          "TR-001",
+          "TR-008",
+          "EN-011",
+          "TR-009",
+          "AG-030"
+        ],
+        "rank": null,
+        "wall_ms": 352.4335130000509,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 278.86,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 16,
+        "ids": [
+          "s36-03-01",
+          "s31-03-01",
+          "s26-01-01",
+          "s27-02-01",
+          "s34-03-01",
+          "s27-03-01",
+          "TR-001",
+          "TS-023"
+        ],
+        "rank": 1,
+        "wall_ms": 266.7365320000954,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 225.58,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 17,
+        "ids": [
+          "s36-09-01",
+          "s33-01-06",
+          "s33-01-11",
+          "s32-02-02",
+          "s15-01-01",
+          "s30-05-01",
+          "s05-02-01",
+          "s13-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 263.9973039999859,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 209.96,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 18,
+        "ids": [
+          "s27-01-10",
+          "TR-001",
+          "s36-06-01",
+          "EN-006",
+          "consulta-predial-20261019",
+          "s36-03-01",
+          "s07-02-01",
+          "s04-01-01"
+        ],
+        "rank": 3,
+        "wall_ms": 265.7056940001894,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 223.62,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 19,
+        "ids": [
+          "s28-03-01",
+          "TR-011",
+          "s33-01-11",
+          "s28-05-01",
+          "s30-04-01",
+          "s28-04-01",
+          "s10-04-01",
+          "O16"
+        ],
+        "rank": 1,
+        "wall_ms": 250.50143899989052,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 211.11,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 20,
+        "ids": [
+          "TR-010",
+          "s09-01-02",
+          "O08",
+          "s10-02-01",
+          "s36-02-01",
+          "s04-03-01",
+          "TR-011",
+          "s17-01-02"
+        ],
+        "rank": 1,
+        "wall_ms": 251.76680800018403,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 212.69,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 21,
+        "ids": [
+          "TR-024",
+          "territorio-20261019-z7",
+          "EN-004",
+          "s35-01-09",
+          "s16-04-01",
+          "s16-03-01",
+          "s16-05-01",
+          "s16-06-01"
+        ],
+        "rank": 1,
+        "wall_ms": 281.8761789999371,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 235.48,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 22,
+        "ids": [
+          "s02-02-01",
+          "s11-06-01",
+          "s11-01-01",
+          "s36-02-01",
+          "s11-04-01",
+          "s15-06-01",
+          "s34-02-01",
+          "s02-01-01"
+        ],
+        "rank": null,
+        "wall_ms": 256.3244510001823,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 210.7,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 23,
+        "ids": [
+          "TR-020",
+          "TR-019",
+          "TS-026",
+          "O10",
+          "AG-014",
+          "AG-015",
+          "EN-012",
+          "EN-011"
+        ],
+        "rank": 1,
+        "wall_ms": 255.33989599989582,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 218.45,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 24,
+        "ids": [
+          "TR-016",
+          "TR-017",
+          "s08-02-01",
+          "s26-01-02",
+          "AG-004",
+          "s13-02-01",
+          "AG-029",
+          "AG-015"
+        ],
+        "rank": 1,
+        "wall_ms": 252.50236600004428,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 213.63,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 25,
+        "ids": [
+          "TR-018",
+          "AG-014",
+          "TR-001",
+          "s16-06-01",
+          "s32-02-01",
+          "s16-05-01",
+          "s34-01-06",
+          "s16-04-01"
+        ],
+        "rank": 1,
+        "wall_ms": 256.43534799996814,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 219.85,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 26,
+        "ids": [
+          "s06-02-01",
+          "TS-016",
+          "s05-01-07",
+          "TS-008",
+          "s36-07-01",
+          "s12-05-01",
+          "TS-010",
+          "TS-026"
+        ],
+        "rank": 2,
+        "wall_ms": 267.775697000161,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 223.46,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 27,
+        "ids": [
+          "AG-013",
+          "TS-013",
+          "s16-05-01",
+          "s12-03-01",
+          "s12-01-01",
+          "s11-04-01",
+          "s12-02-01",
+          "s33-01-04"
+        ],
+        "rank": 1,
+        "wall_ms": 274.5187570001235,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 221.83,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 28,
+        "ids": [
+          "s07-04-01",
+          "s27-01-10",
+          "s07-02-01",
+          "TR-008",
+          "s05-01-05",
+          "s36-08-01",
+          "s35-01-12",
+          "s10-01-01"
+        ],
+        "rank": 3,
+        "wall_ms": 288.8574799999333,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 243.08,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 29,
+        "ids": [
+          "s02-02-01",
+          "s17-02-01",
+          "s27-01-09",
+          "s17-03-01",
+          "s33-01-05",
+          "s02-01-03",
+          "TR-005",
+          "s09-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 235.15428399991833,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 193.59,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 30,
+        "ids": [
+          "TR-006",
+          "AG-030",
+          "s10-02-01",
+          "TR-007",
+          "AG-020",
+          "s08-02-01",
+          "AG-025",
+          "s11-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 281.3085919999594,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 219.79,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 31,
+        "ids": [
+          "EN-030",
+          "EN-031",
+          "EN-011",
+          "s07-01-01",
+          "s11-06-01",
+          "s15-05-01",
+          "s10-05-01",
+          "EN-028"
+        ],
+        "rank": 1,
+        "wall_ms": 280.6252489999679,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 208.05,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 32,
+        "ids": [
+          "TR-009",
+          "s10-05-01",
+          "s10-03-01",
+          "s10-02-01",
+          "AG-025",
+          "s13-03-01",
+          "AG-020",
+          "TR-005"
+        ],
+        "rank": 1,
+        "wall_ms": 274.73655399990093,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 235.22,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 33,
+        "ids": [
+          "AG-029",
+          "AG-027",
+          "AG-035",
+          "AG-028",
+          "AG-015",
+          "TR-009",
+          "s29-01-10",
+          "s29-01-05"
+        ],
+        "rank": 2,
+        "wall_ms": 278.6463789998379,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 235.05,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 34,
+        "ids": [
+          "TS-014",
+          "TS-013",
+          "s16-05-01",
+          "TS-011",
+          "s29-01-08",
+          "s35-01-04",
+          "TS-018",
+          "s09-01-03"
+        ],
+        "rank": 1,
+        "wall_ms": 337.5677640001413,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 287.6,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 35,
+        "ids": [
+          "s02-02-01",
+          "s36-04-01",
+          "TR-001",
+          "s04-01-01",
+          "s05-01-02",
+          "s34-03-01",
+          "s36-05-01",
+          "s34-02-01"
+        ],
+        "rank": 6,
+        "wall_ms": 274.88149099986003,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 227.72,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 36,
+        "ids": [
+          "AG-033",
+          "AG-029",
+          "EN-025",
+          "TS-004",
+          "TR-007",
+          "s36-07-01",
+          "AG-025",
+          "AG-035"
+        ],
+        "rank": 3,
+        "wall_ms": 271.50951100020393,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 229.21,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 37,
+        "ids": [
+          "O16",
+          "O14",
+          "s10-03-01",
+          "s10-02-01",
+          "s28-04-01",
+          "s36-08-01",
+          "s08-02-01",
+          "s07-04-01"
+        ],
+        "rank": 1,
+        "wall_ms": 254.14789899991774,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 195.43,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 38,
+        "ids": [
+          "TR-002",
+          "AG-004",
+          "TR-001",
+          "AG-026",
+          "TR-005",
+          "O10",
+          "s29-01-04",
+          "TR-018"
+        ],
+        "rank": 1,
+        "wall_ms": 297.7041259998714,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 247.73,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 39,
+        "ids": [
+          "s07-02-01",
+          "s35-01-02",
+          "s05-01-03",
+          "EN-006",
+          "s36-05-01",
+          "s05-01-05",
+          "EN-027",
+          "s13-04-01"
+        ],
+        "rank": null,
+        "wall_ms": 268.5655880000013,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 227.55,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 40,
+        "ids": [
+          "TS-027",
+          "s27-01-02",
+          "s15-05-01",
+          "TS-028",
+          "TS-029",
+          "territorio-20261019-z5",
+          "s02-02-01",
+          "s27-01-05"
+        ],
+        "rank": 1,
+        "wall_ms": 254.66724700004306,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 213.23,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 41,
+        "ids": [
+          "s05-01-03",
+          "s05-01-04",
+          "s05-01-07",
+          "s05-03-01",
+          "s05-02-01",
+          "s09-01-04",
+          "s31-02-01",
+          "s09-01-05"
+        ],
+        "rank": null,
+        "wall_ms": 216.97501499988903,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 179.0,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 42,
+        "ids": [
+          "TR-008",
+          "s31-03-01",
+          "s10-02-01",
+          "s04-03-01",
+          "s12-03-01",
+          "O13",
+          "EN-011",
+          "TR-009"
+        ],
+        "rank": 1,
+        "wall_ms": 276.5968379999322,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 216.82,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 43,
+        "ids": [
+          "AG-019",
+          "AG-023",
+          "TS-012",
+          "s35-01-03",
+          "s26-01-02",
+          "EN-001",
+          "s26-01-03",
+          "AG-002"
+        ],
+        "rank": 2,
+        "wall_ms": 256.9623770000362,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 216.27,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 44,
+        "ids": [
+          "AG-035",
+          "s17-02-01",
+          "s33-01-04",
+          "s33-01-05",
+          "s02-01-03",
+          "O07",
+          "s08-02-01",
+          "s33-01-06"
+        ],
+        "rank": 1,
+        "wall_ms": 246.3354049998543,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 211.18,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 45,
+        "ids": [
+          "EN-026",
+          "EN-006",
+          "TR-005",
+          "s16-05-01",
+          "s32-02-01",
+          "EN-027",
+          "s34-01-06",
+          "s28-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 253.10429100022702,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 216.31,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 46,
+        "ids": [
+          "TR-003",
+          "EN-025",
+          "AG-009",
+          "s35-01-07",
+          "s35-01-04",
+          "s35-01-05",
+          "EN-024",
+          "s33-01-04"
+        ],
+        "rank": 3,
+        "wall_ms": 248.39095500010444,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 211.72,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 47,
+        "ids": [
+          "TS-013",
+          "TS-014",
+          "TS-012",
+          "TS-011",
+          "TS-031",
+          "s29-01-08",
+          "s29-01-06",
+          "s35-01-04"
+        ],
+        "rank": 1,
+        "wall_ms": 274.66484699994,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 237.74,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 48,
+        "ids": [
+          "AG-017",
+          "AG-030",
+          "TR-006",
+          "AG-024",
+          "TR-009",
+          "TR-001",
+          "consulta-predial-20261019",
+          "TR-004"
+        ],
+        "rank": 8,
+        "wall_ms": 263.8338570000087,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 216.9,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 49,
+        "ids": [
+          "AG-034",
+          "s12-04-01",
+          "s12-03-01",
+          "s12-02-01",
+          "s12-01-01",
+          "s33-01-04",
+          "s15-01-01",
+          "AG-002"
+        ],
+        "rank": 1,
+        "wall_ms": 252.74285900013638,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 203.0,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 50,
+        "ids": [
+          "s10-02-01",
+          "s15-02-01",
+          "s13-02-01",
+          "s16-02-01",
+          "s14-02-01",
+          "s11-02-01",
+          "s04-04-01",
+          "s11-03-01"
+        ],
+        "rank": 2,
+        "wall_ms": 253.10737799986782,
+        "rerank": {
+          "state": "applied",
+          "reason": "scored",
+          "ms": 212.5,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      }
+    ],
+    "cached": [
+      {
+        "case": 0,
+        "ids": [
+          "TS-013",
+          "TS-011",
+          "TS-031",
+          "TS-012",
+          "EN-022",
+          "s36-07-01",
+          "s29-01-08",
+          "s35-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 44.104607999997825,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 1,
+        "ids": [
+          "TS-013",
+          "TS-011",
+          "s11-02-01",
+          "s16-01-01",
+          "s29-01-06",
+          "s35-01-04",
+          "s16-02-01",
+          "O12"
+        ],
+        "rank": 1,
+        "wall_ms": 40.467312000146194,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 2,
+        "ids": [
+          "TS-006",
+          "TS-010",
+          "TS-005",
+          "s12-01-01",
+          "s12-04-01",
+          "s09-01-04",
+          "s12-03-01",
+          "TS-009"
+        ],
+        "rank": 5,
+        "wall_ms": 57.49746300011793,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 3,
+        "ids": [
+          "TS-005",
+          "TS-003",
+          "TS-008",
+          "TS-006",
+          "s12-03-01",
+          "s12-01-01",
+          "s12-05-01",
+          "TS-010"
+        ],
+        "rank": 1,
+        "wall_ms": 39.10961299993687,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 4,
+        "ids": [
+          "TS-006",
+          "TS-008",
+          "s09-01-04",
+          "s12-02-01",
+          "s12-01-01",
+          "TS-010",
+          "s12-04-01",
+          "s33-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 53.63045600006444,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 5,
+        "ids": [
+          "EN-001",
+          "EN-006",
+          "EN-016",
+          "EN-008",
+          "TR-008",
+          "EN-007",
+          "EN-021",
+          "EN-015"
+        ],
+        "rank": 1,
+        "wall_ms": 39.00524699997732,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 6,
+        "ids": [
+          "EN-029",
+          "TR-010",
+          "EN-019",
+          "O09",
+          "s08-03-01",
+          "EN-021",
+          "EN-020",
+          "EN-011"
+        ],
+        "rank": 3,
+        "wall_ms": 56.51479899984224,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 7,
+        "ids": [
+          "TR-022",
+          "s27-01-07",
+          "s30-02-01",
+          "TR-023",
+          "s30-05-01",
+          "s36-04-01",
+          "s31-04-01",
+          "s30-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 36.93181900007403,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.08,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 8,
+        "ids": [
+          "TR-011",
+          "s30-04-01",
+          "s31-02-01",
+          "s28-03-01",
+          "s35-01-08",
+          "s35-01-10",
+          "TR-010",
+          "s27-01-10"
+        ],
+        "rank": 1,
+        "wall_ms": 40.675348000149825,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 9,
+        "ids": [
+          "AG-010",
+          "s15-02-01",
+          "s14-06-01",
+          "AG-020",
+          "s11-04-01",
+          "s34-01-06",
+          "territorio-20261019-z2",
+          "s08-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 46.891614000060144,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 10,
+        "ids": [
+          "AG-015",
+          "s14-06-01",
+          "s11-03-01",
+          "s34-02-01",
+          "s15-05-01",
+          "s11-04-01",
+          "AG-014",
+          "s05-03-01"
+        ],
+        "rank": 1,
+        "wall_ms": 38.677750000033484,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 11,
+        "ids": [
+          "s14-02-01",
+          "s08-03-01",
+          "s14-01-01",
+          "s09-01-06",
+          "s14-03-01",
+          "territorio-20261019-z5",
+          "s14-06-01",
+          "AG-014"
+        ],
+        "rank": 1,
+        "wall_ms": 54.226031999860425,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.08,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 12,
+        "ids": [
+          "AG-017",
+          "AG-032",
+          "s16-04-01",
+          "AG-021",
+          "AG-024",
+          "EN-011",
+          "consulta-predial-20261019",
+          "s13-05-01"
+        ],
+        "rank": 1,
+        "wall_ms": 56.82859700004883,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 13,
+        "ids": [
+          "AG-024",
+          "AG-035",
+          "AG-015",
+          "TR-008",
+          "TR-007",
+          "s29-01-10",
+          "AG-026",
+          "AG-030"
+        ],
+        "rank": 1,
+        "wall_ms": 51.598355000123775,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 14,
+        "ids": [
+          "TS-031",
+          "s12-03-01",
+          "s11-05-01",
+          "s02-01-05",
+          "AG-021",
+          "s06-03-01",
+          "s34-01-03",
+          "TS-030"
+        ],
+        "rank": 1,
+        "wall_ms": 38.088494000021456,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 15,
+        "ids": [
+          "s36-05-01",
+          "consulta-predial-20261019",
+          "TS-011",
+          "TR-001",
+          "TR-008",
+          "EN-011",
+          "TR-009",
+          "AG-030"
+        ],
+        "rank": null,
+        "wall_ms": 50.33458200000496,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 16,
+        "ids": [
+          "s36-03-01",
+          "s31-03-01",
+          "s26-01-01",
+          "s27-02-01",
+          "s34-03-01",
+          "s27-03-01",
+          "TR-001",
+          "TS-023"
+        ],
+        "rank": 1,
+        "wall_ms": 38.965131999930236,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 17,
+        "ids": [
+          "s36-09-01",
+          "s33-01-06",
+          "s33-01-11",
+          "s32-02-02",
+          "s15-01-01",
+          "s30-05-01",
+          "s05-02-01",
+          "s13-01-01"
+        ],
+        "rank": 1,
+        "wall_ms": 53.89982199994847,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.09,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 18,
+        "ids": [
+          "s27-01-10",
+          "TR-001",
+          "s36-06-01",
+          "EN-006",
+          "consulta-predial-20261019",
+          "s36-03-01",
+          "s07-02-01",
+          "s04-01-01"
+        ],
+        "rank": 3,
+        "wall_ms": 45.874863999870286,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 19,
+        "ids": [
+          "s28-03-01",
+          "TR-011",
+          "s33-01-11",
+          "s28-05-01",
+          "s30-04-01",
+          "s28-04-01",
+          "s10-04-01",
+          "O16"
+        ],
+        "rank": 1,
+        "wall_ms": 69.38545800016982,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 20,
+        "ids": [
+          "TR-010",
+          "s09-01-02",
+          "O08",
+          "s10-02-01",
+          "s36-02-01",
+          "s04-03-01",
+          "TR-011",
+          "s17-01-02"
+        ],
+        "rank": 1,
+        "wall_ms": 41.558939999958966,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.09,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 21,
+        "ids": [
+          "TR-024",
+          "territorio-20261019-z7",
+          "EN-004",
+          "s35-01-09",
+          "s16-04-01",
+          "s16-03-01",
+          "s16-05-01",
+          "s16-06-01"
+        ],
+        "rank": 1,
+        "wall_ms": 56.4065579999351,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 22,
+        "ids": [
+          "s02-02-01",
+          "s11-06-01",
+          "s11-01-01",
+          "s36-02-01",
+          "s11-04-01",
+          "s15-06-01",
+          "s34-02-01",
+          "s02-01-01"
+        ],
+        "rank": null,
+        "wall_ms": 40.04880000002231,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 23,
+        "ids": [
+          "TR-020",
+          "TR-019",
+          "TS-026",
+          "O10",
+          "AG-014",
+          "AG-015",
+          "EN-012",
+          "EN-011"
+        ],
+        "rank": 1,
+        "wall_ms": 49.56702399999813,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 24,
+        "ids": [
+          "TR-016",
+          "TR-017",
+          "s08-02-01",
+          "s26-01-02",
+          "AG-004",
+          "s13-02-01",
+          "AG-029",
+          "AG-015"
+        ],
+        "rank": 1,
+        "wall_ms": 39.66830800004573,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 25,
+        "ids": [
+          "TR-018",
+          "AG-014",
+          "TR-001",
+          "s16-06-01",
+          "s32-02-01",
+          "s16-05-01",
+          "s34-01-06",
+          "s16-04-01"
+        ],
+        "rank": 1,
+        "wall_ms": 52.754005999986475,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 26,
+        "ids": [
+          "s06-02-01",
+          "TS-016",
+          "s05-01-07",
+          "TS-008",
+          "s36-07-01",
+          "s12-05-01",
+          "TS-010",
+          "TS-026"
+        ],
+        "rank": 2,
+        "wall_ms": 38.14884200005508,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 27,
+        "ids": [
+          "AG-013",
+          "TS-013",
+          "s16-05-01",
+          "s12-03-01",
+          "s12-01-01",
+          "s11-04-01",
+          "s12-02-01",
+          "s33-01-04"
+        ],
+        "rank": 1,
+        "wall_ms": 38.951918000066144,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 28,
+        "ids": [
+          "s07-04-01",
+          "s27-01-10",
+          "s07-02-01",
+          "TR-008",
+          "s05-01-05",
+          "s36-08-01",
+          "s35-01-12",
+          "s10-01-01"
+        ],
+        "rank": 3,
+        "wall_ms": 49.13590499995735,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 29,
+        "ids": [
+          "s02-02-01",
+          "s17-02-01",
+          "s27-01-09",
+          "s17-03-01",
+          "s33-01-05",
+          "s02-01-03",
+          "TR-005",
+          "s09-01-04"
+        ],
+        "rank": 2,
+        "wall_ms": 38.00067400015905,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 30,
+        "ids": [
+          "TR-006",
+          "AG-030",
+          "s10-02-01",
+          "TR-007",
+          "AG-020",
+          "s08-02-01",
+          "AG-025",
+          "s11-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 47.41911900009654,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 31,
+        "ids": [
+          "EN-030",
+          "EN-031",
+          "EN-011",
+          "s07-01-01",
+          "s11-06-01",
+          "s15-05-01",
+          "s10-05-01",
+          "EN-028"
+        ],
+        "rank": 1,
+        "wall_ms": 38.588827000012316,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 32,
+        "ids": [
+          "TR-009",
+          "s10-05-01",
+          "s10-03-01",
+          "s10-02-01",
+          "AG-025",
+          "s13-03-01",
+          "AG-020",
+          "TR-005"
+        ],
+        "rank": 1,
+        "wall_ms": 50.151282000115316,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 33,
+        "ids": [
+          "AG-029",
+          "AG-027",
+          "AG-035",
+          "AG-028",
+          "AG-015",
+          "TR-009",
+          "s29-01-10",
+          "s29-01-05"
+        ],
+        "rank": 2,
+        "wall_ms": 36.60706999994545,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 34,
+        "ids": [
+          "TS-014",
+          "TS-013",
+          "s16-05-01",
+          "TS-011",
+          "s29-01-08",
+          "s35-01-04",
+          "TS-018",
+          "s09-01-03"
+        ],
+        "rank": 1,
+        "wall_ms": 38.6467820001144,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.1,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 35,
+        "ids": [
+          "s02-02-01",
+          "s36-04-01",
+          "TR-001",
+          "s04-01-01",
+          "s05-01-02",
+          "s34-03-01",
+          "s36-05-01",
+          "s34-02-01"
+        ],
+        "rank": 6,
+        "wall_ms": 52.30439800016029,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 36,
+        "ids": [
+          "AG-033",
+          "AG-029",
+          "EN-025",
+          "TS-004",
+          "TR-007",
+          "s36-07-01",
+          "AG-025",
+          "AG-035"
+        ],
+        "rank": 3,
+        "wall_ms": 37.71920700000919,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 37,
+        "ids": [
+          "O16",
+          "O14",
+          "s10-03-01",
+          "s10-02-01",
+          "s28-04-01",
+          "s36-08-01",
+          "s08-02-01",
+          "s07-04-01"
+        ],
+        "rank": 1,
+        "wall_ms": 45.265782000114996,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 38,
+        "ids": [
+          "TR-002",
+          "AG-004",
+          "TR-001",
+          "AG-026",
+          "TR-005",
+          "O10",
+          "s29-01-04",
+          "TR-018"
+        ],
+        "rank": 1,
+        "wall_ms": 36.99667599994427,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 39,
+        "ids": [
+          "s07-02-01",
+          "s35-01-02",
+          "s05-01-03",
+          "EN-006",
+          "s36-05-01",
+          "s05-01-05",
+          "EN-027",
+          "s13-04-01"
+        ],
+        "rank": null,
+        "wall_ms": 52.824569000222255,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 40,
+        "ids": [
+          "TS-027",
+          "s27-01-02",
+          "s15-05-01",
+          "TS-028",
+          "TS-029",
+          "territorio-20261019-z5",
+          "s02-02-01",
+          "s27-01-05"
+        ],
+        "rank": 1,
+        "wall_ms": 37.10160599985102,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 41,
+        "ids": [
+          "s05-01-03",
+          "s05-01-04",
+          "s05-01-07",
+          "s05-03-01",
+          "s05-02-01",
+          "s09-01-04",
+          "s31-02-01",
+          "s09-01-05"
+        ],
+        "rank": null,
+        "wall_ms": 38.84588000005351,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 42,
+        "ids": [
+          "TR-008",
+          "s31-03-01",
+          "s10-02-01",
+          "s04-03-01",
+          "s12-03-01",
+          "O13",
+          "EN-011",
+          "TR-009"
+        ],
+        "rank": 1,
+        "wall_ms": 53.77788700002384,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 43,
+        "ids": [
+          "AG-019",
+          "AG-023",
+          "TS-012",
+          "s35-01-03",
+          "s26-01-02",
+          "EN-001",
+          "s26-01-03",
+          "AG-002"
+        ],
+        "rank": 2,
+        "wall_ms": 38.07376400004614,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 44,
+        "ids": [
+          "AG-035",
+          "s17-02-01",
+          "s33-01-04",
+          "s33-01-05",
+          "s02-01-03",
+          "O07",
+          "s08-02-01",
+          "s33-01-06"
+        ],
+        "rank": 1,
+        "wall_ms": 44.872197999893615,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 45,
+        "ids": [
+          "EN-026",
+          "EN-006",
+          "TR-005",
+          "s16-05-01",
+          "s32-02-01",
+          "EN-027",
+          "s34-01-06",
+          "s28-02-01"
+        ],
+        "rank": 1,
+        "wall_ms": 37.500019999924916,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 46,
+        "ids": [
+          "TR-003",
+          "EN-025",
+          "AG-009",
+          "s35-01-07",
+          "s35-01-04",
+          "s35-01-05",
+          "EN-024",
+          "s33-01-04"
+        ],
+        "rank": 3,
+        "wall_ms": 50.03623599986895,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 47,
+        "ids": [
+          "TS-013",
+          "TS-014",
+          "TS-012",
+          "TS-011",
+          "TS-031",
+          "s29-01-08",
+          "s29-01-06",
+          "s35-01-04"
+        ],
+        "rank": 1,
+        "wall_ms": 39.21983899999759,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 48,
+        "ids": [
+          "AG-017",
+          "AG-030",
+          "TR-006",
+          "AG-024",
+          "TR-009",
+          "TR-001",
+          "consulta-predial-20261019",
+          "TR-004"
+        ],
+        "rank": 8,
+        "wall_ms": 39.634335000073406,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.07,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 49,
+        "ids": [
+          "AG-034",
+          "s12-04-01",
+          "s12-03-01",
+          "s12-02-01",
+          "s12-01-01",
+          "s33-01-04",
+          "s15-01-01",
+          "AG-002"
+        ],
+        "rank": 1,
+        "wall_ms": 49.54261500006396,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      },
+      {
+        "case": 50,
+        "ids": [
+          "s10-02-01",
+          "s15-02-01",
+          "s13-02-01",
+          "s16-02-01",
+          "s14-02-01",
+          "s11-02-01",
+          "s04-04-01",
+          "s11-03-01"
+        ],
+        "rank": 2,
+        "wall_ms": 41.13015699999778,
+        "rerank": {
+          "state": "cache_hit",
+          "reason": "cached",
+          "ms": 0.06,
+          "budget_ms": 400,
+          "candidates": 6,
+          "applied": true,
+          "reordered": true
+        }
+      }
+    ],
+    "concurrent": {
+      "hybrid": [
+        {
+          "case": 0,
+          "ids": [
+            "TS-011",
+            "TS-013",
+            "TS-031",
+            "s36-07-01",
+            "EN-022",
+            "TS-012",
+            "s29-01-08",
+            "s35-01-04"
+          ],
+          "rank": 1,
+          "wall_ms": 62.83451700005571,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 1,
+          "ids": [
+            "TS-013",
+            "s35-01-04",
+            "s16-01-01",
+            "TS-011",
+            "s11-02-01",
+            "s29-01-06",
+            "s16-02-01",
+            "O12"
+          ],
+          "rank": 1,
+          "wall_ms": 116.1381170002187,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 2,
+          "ids": [
+            "s12-01-01",
+            "TS-006",
+            "s12-04-01",
+            "TS-010",
+            "TS-005",
+            "s09-01-04",
+            "s12-03-01",
+            "TS-009"
+          ],
+          "rank": 3,
+          "wall_ms": 135.4729209999732,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 3,
+          "ids": [
+            "TS-005",
+            "TS-008",
+            "s12-01-01",
+            "s12-03-01",
+            "TS-003",
+            "TS-006",
+            "s12-05-01",
+            "TS-010"
+          ],
+          "rank": 1,
+          "wall_ms": 106.95141099995453,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 4,
+          "ids": [
+            "TS-006",
+            "s12-01-01",
+            "s09-01-04",
+            "s12-02-01",
+            "TS-008",
+            "TS-010",
+            "s12-04-01",
+            "s33-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 86.41799099996206,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 5,
+          "ids": [
+            "TR-008",
+            "EN-008",
+            "EN-006",
+            "EN-007",
+            "EN-001",
+            "EN-016",
+            "EN-021",
+            "EN-015"
+          ],
+          "rank": 5,
+          "wall_ms": 52.13689099991825,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 6,
+          "ids": [
+            "EN-021",
+            "EN-019",
+            "EN-029",
+            "s08-03-01",
+            "TR-010",
+            "O09",
+            "EN-020",
+            "EN-011"
+          ],
+          "rank": 2,
+          "wall_ms": 107.77395399986744,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 7,
+          "ids": [
+            "s27-01-07",
+            "s30-05-01",
+            "s30-02-01",
+            "s36-04-01",
+            "TR-022",
+            "TR-023",
+            "s31-04-01",
+            "s30-01-01"
+          ],
+          "rank": 3,
+          "wall_ms": 88.16376799995851,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 8,
+          "ids": [
+            "TR-011",
+            "s30-04-01",
+            "s31-02-01",
+            "s28-03-01",
+            "s35-01-10",
+            "s35-01-08",
+            "TR-010",
+            "s27-01-10"
+          ],
+          "rank": 1,
+          "wall_ms": 56.832426000028136,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 9,
+          "ids": [
+            "AG-010",
+            "s15-02-01",
+            "s14-06-01",
+            "AG-020",
+            "s34-01-06",
+            "s11-04-01",
+            "territorio-20261019-z2",
+            "s08-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 111.94272999978239,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 10,
+          "ids": [
+            "AG-015",
+            "s11-04-01",
+            "s14-06-01",
+            "s34-02-01",
+            "s15-05-01",
+            "s11-03-01",
+            "AG-014",
+            "s05-03-01"
+          ],
+          "rank": 1,
+          "wall_ms": 92.49466799997208,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 11,
+          "ids": [
+            "s14-02-01",
+            "s09-01-06",
+            "s08-03-01",
+            "s14-01-01",
+            "s14-03-01",
+            "territorio-20261019-z5",
+            "s14-06-01",
+            "AG-014"
+          ],
+          "rank": 1,
+          "wall_ms": 64.0528720000475,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 12,
+          "ids": [
+            "AG-017",
+            "AG-032",
+            "s16-04-01",
+            "AG-021",
+            "EN-011",
+            "AG-024",
+            "consulta-predial-20261019",
+            "s13-05-01"
+          ],
+          "rank": 1,
+          "wall_ms": 114.04182299997956,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 13,
+          "ids": [
+            "AG-024",
+            "AG-015",
+            "AG-035",
+            "s29-01-10",
+            "TR-007",
+            "TR-008",
+            "AG-026",
+            "AG-030"
+          ],
+          "rank": 1,
+          "wall_ms": 70.61313700000937,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 14,
+          "ids": [
+            "TS-031",
+            "s12-03-01",
+            "s06-03-01",
+            "s02-01-05",
+            "s11-05-01",
+            "AG-021",
+            "s34-01-03",
+            "TS-030"
+          ],
+          "rank": 1,
+          "wall_ms": 94.47044600005938,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 15,
+          "ids": [
+            "s36-05-01",
+            "consulta-predial-20261019",
+            "TR-001",
+            "TR-008",
+            "TS-011",
+            "EN-011",
+            "TR-009",
+            "AG-030"
+          ],
+          "rank": null,
+          "wall_ms": 84.03521000013825,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 16,
+          "ids": [
+            "s36-03-01",
+            "s31-03-01",
+            "s26-01-01",
+            "s34-03-01",
+            "s27-02-01",
+            "s27-03-01",
+            "TR-001",
+            "TS-023"
+          ],
+          "rank": 1,
+          "wall_ms": 60.370010000042384,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 17,
+          "ids": [
+            "s36-09-01",
+            "s30-05-01",
+            "s32-02-02",
+            "s33-01-06",
+            "s15-01-01",
+            "s33-01-11",
+            "s05-02-01",
+            "s13-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 105.39130600000135,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 18,
+          "ids": [
+            "s36-06-01",
+            "TR-001",
+            "s36-03-01",
+            "s27-01-10",
+            "EN-006",
+            "consulta-predial-20261019",
+            "s07-02-01",
+            "s04-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 101.69412699997338,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 19,
+          "ids": [
+            "s28-03-01",
+            "s28-04-01",
+            "s33-01-11",
+            "s28-05-01",
+            "TR-011",
+            "s30-04-01",
+            "s10-04-01",
+            "O16"
+          ],
+          "rank": 1,
+          "wall_ms": 62.38977800012435,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 20,
+          "ids": [
+            "TR-010",
+            "s10-02-01",
+            "O08",
+            "s36-02-01",
+            "s04-03-01",
+            "s09-01-02",
+            "TR-011",
+            "s17-01-02"
+          ],
+          "rank": 1,
+          "wall_ms": 81.62654900002053,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 21,
+          "ids": [
+            "s16-03-01",
+            "s35-01-09",
+            "EN-004",
+            "s16-04-01",
+            "TR-024",
+            "territorio-20261019-z7",
+            "s16-05-01",
+            "s16-06-01"
+          ],
+          "rank": 3,
+          "wall_ms": 110.31776100003299,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 22,
+          "ids": [
+            "s36-02-01",
+            "s11-04-01",
+            "s02-02-01",
+            "s11-06-01",
+            "s11-01-01",
+            "s15-06-01",
+            "s34-02-01",
+            "s02-01-01"
+          ],
+          "rank": null,
+          "wall_ms": 87.64534800002366,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 23,
+          "ids": [
+            "TR-020",
+            "TR-019",
+            "TS-026",
+            "AG-014",
+            "AG-015",
+            "O10",
+            "EN-012",
+            "EN-011"
+          ],
+          "rank": 1,
+          "wall_ms": 67.20106399984616,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 24,
+          "ids": [
+            "TR-016",
+            "TR-017",
+            "s13-02-01",
+            "s08-02-01",
+            "s26-01-02",
+            "AG-004",
+            "AG-029",
+            "AG-015"
+          ],
+          "rank": 1,
+          "wall_ms": 62.258153999891874,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 25,
+          "ids": [
+            "TR-018",
+            "TR-001",
+            "s16-05-01",
+            "s16-06-01",
+            "s32-02-01",
+            "AG-014",
+            "s34-01-06",
+            "s16-04-01"
+          ],
+          "rank": 1,
+          "wall_ms": 103.00041200002852,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 26,
+          "ids": [
+            "s06-02-01",
+            "s05-01-07",
+            "s36-07-01",
+            "TS-008",
+            "TS-016",
+            "s12-05-01",
+            "TS-010",
+            "TS-026"
+          ],
+          "rank": 3,
+          "wall_ms": 81.89217700009976,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 27,
+          "ids": [
+            "s12-03-01",
+            "AG-013",
+            "s11-04-01",
+            "s12-01-01",
+            "s16-05-01",
+            "TS-013",
+            "s12-02-01",
+            "s33-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 123.47262899993439,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 28,
+          "ids": [
+            "s05-01-05",
+            "s27-01-10",
+            "TR-008",
+            "s07-04-01",
+            "s36-08-01",
+            "s07-02-01",
+            "s35-01-12",
+            "s10-01-01"
+          ],
+          "rank": 6,
+          "wall_ms": 92.95634799991603,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 29,
+          "ids": [
+            "s02-02-01",
+            "s17-02-01",
+            "s17-03-01",
+            "s02-01-03",
+            "s27-01-09",
+            "s33-01-05",
+            "TR-005",
+            "s09-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 70.01683199996478,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 30,
+          "ids": [
+            "TR-006",
+            "AG-030",
+            "AG-020",
+            "s08-02-01",
+            "s10-02-01",
+            "TR-007",
+            "AG-025",
+            "s11-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 103.87498899990533,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 31,
+          "ids": [
+            "EN-030",
+            "EN-011",
+            "EN-031",
+            "s15-05-01",
+            "s07-01-01",
+            "s11-06-01",
+            "s10-05-01",
+            "EN-028"
+          ],
+          "rank": 1,
+          "wall_ms": 51.59306999985347,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 32,
+          "ids": [
+            "TR-009",
+            "s10-05-01",
+            "s13-03-01",
+            "s10-02-01",
+            "s10-03-01",
+            "AG-025",
+            "AG-020",
+            "TR-005"
+          ],
+          "rank": 1,
+          "wall_ms": 72.83449300007305,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 33,
+          "ids": [
+            "AG-027",
+            "AG-015",
+            "AG-029",
+            "AG-028",
+            "TR-009",
+            "AG-035",
+            "s29-01-10",
+            "s29-01-05"
+          ],
+          "rank": 1,
+          "wall_ms": 57.13063300004251,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 34,
+          "ids": [
+            "TS-014",
+            "s29-01-08",
+            "s16-05-01",
+            "TS-011",
+            "s35-01-04",
+            "TS-013",
+            "TS-018",
+            "s09-01-03"
+          ],
+          "rank": 1,
+          "wall_ms": 89.07462000001942,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 35,
+          "ids": [
+            "s36-04-01",
+            "s05-01-02",
+            "s02-02-01",
+            "TR-001",
+            "s04-01-01",
+            "s34-03-01",
+            "s36-05-01",
+            "s34-02-01"
+          ],
+          "rank": 6,
+          "wall_ms": 109.8725970000487,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 36,
+          "ids": [
+            "EN-025",
+            "TR-007",
+            "AG-029",
+            "AG-033",
+            "TS-004",
+            "s36-07-01",
+            "AG-025",
+            "AG-035"
+          ],
+          "rank": 1,
+          "wall_ms": 92.15422900001613,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 37,
+          "ids": [
+            "s10-03-01",
+            "s36-08-01",
+            "s28-04-01",
+            "s10-02-01",
+            "O16",
+            "O14",
+            "s08-02-01",
+            "s07-04-01"
+          ],
+          "rank": 5,
+          "wall_ms": 112.66772799990576,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 38,
+          "ids": [
+            "TR-001",
+            "TR-005",
+            "TR-002",
+            "AG-026",
+            "AG-004",
+            "O10",
+            "s29-01-04",
+            "TR-018"
+          ],
+          "rank": 1,
+          "wall_ms": 55.13064199999462,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 39,
+          "ids": [
+            "s07-02-01",
+            "s05-01-05",
+            "s05-01-03",
+            "s36-05-01",
+            "s35-01-02",
+            "EN-006",
+            "EN-027",
+            "s13-04-01"
+          ],
+          "rank": null,
+          "wall_ms": 109.27928499995687,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 40,
+          "ids": [
+            "TS-027",
+            "TS-029",
+            "s15-05-01",
+            "territorio-20261019-z5",
+            "s27-01-02",
+            "TS-028",
+            "s02-02-01",
+            "s27-01-05"
+          ],
+          "rank": 1,
+          "wall_ms": 87.03454200008309,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 41,
+          "ids": [
+            "s05-01-03",
+            "s05-01-04",
+            "s05-01-07",
+            "s05-02-01",
+            "s09-01-04",
+            "s05-03-01",
+            "s31-02-01",
+            "s09-01-05"
+          ],
+          "rank": null,
+          "wall_ms": 57.42421400009334,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 42,
+          "ids": [
+            "TR-008",
+            "s31-03-01",
+            "s12-03-01",
+            "s10-02-01",
+            "O13",
+            "s04-03-01",
+            "EN-011",
+            "TR-009"
+          ],
+          "rank": 1,
+          "wall_ms": 85.52579499996682,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 43,
+          "ids": [
+            "AG-019",
+            "AG-023",
+            "s35-01-03",
+            "s26-01-02",
+            "EN-001",
+            "TS-012",
+            "s26-01-03",
+            "AG-002"
+          ],
+          "rank": 2,
+          "wall_ms": 107.98271399994519,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 44,
+          "ids": [
+            "s33-01-04",
+            "AG-035",
+            "s17-02-01",
+            "s33-01-05",
+            "O07",
+            "s02-01-03",
+            "s08-02-01",
+            "s33-01-06"
+          ],
+          "rank": 2,
+          "wall_ms": 62.20904200017685,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 45,
+          "ids": [
+            "EN-026",
+            "EN-006",
+            "EN-027",
+            "s16-05-01",
+            "TR-005",
+            "s32-02-01",
+            "s34-01-06",
+            "s28-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 62.24240100004863,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 46,
+          "ids": [
+            "s35-01-04",
+            "AG-009",
+            "TR-003",
+            "s35-01-07",
+            "EN-025",
+            "s35-01-05",
+            "EN-024",
+            "s33-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 79.21269000007669,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 47,
+          "ids": [
+            "TS-013",
+            "s29-01-08",
+            "TS-011",
+            "TS-031",
+            "TS-014",
+            "TS-012",
+            "s29-01-06",
+            "s35-01-04"
+          ],
+          "rank": 1,
+          "wall_ms": 98.47650300002897,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 48,
+          "ids": [
+            "TR-009",
+            "AG-030",
+            "AG-017",
+            "TR-001",
+            "TR-006",
+            "AG-024",
+            "consulta-predial-20261019",
+            "TR-004"
+          ],
+          "rank": 8,
+          "wall_ms": 85.32702799993785,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 49,
+          "ids": [
+            "AG-034",
+            "s12-03-01",
+            "s12-02-01",
+            "s33-01-04",
+            "s12-04-01",
+            "s12-01-01",
+            "s15-01-01",
+            "AG-002"
+          ],
+          "rank": 1,
+          "wall_ms": 106.21790699997291,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        },
+        {
+          "case": 50,
+          "ids": [
+            "s10-02-01",
+            "s15-02-01",
+            "s13-02-01",
+            "s16-02-01",
+            "s11-02-01",
+            "s14-02-01",
+            "s04-04-01",
+            "s11-03-01"
+          ],
+          "rank": 2,
+          "wall_ms": 63.94377600008738,
+          "rerank": {
+            "state": "skipped",
+            "reason": "disabled",
+            "ms": 0.0,
+            "candidates": 0,
+            "applied": false
+          }
+        }
+      ],
+      "bounded_cold": [
+        {
+          "case": 0,
+          "ids": [
+            "TS-011",
+            "TS-013",
+            "TS-031",
+            "s36-07-01",
+            "EN-022",
+            "TS-012",
+            "s29-01-08",
+            "s35-01-04"
+          ],
+          "rank": 1,
+          "wall_ms": 148.70785500011152,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 1,
+          "ids": [
+            "TS-013",
+            "TS-011",
+            "s11-02-01",
+            "s16-01-01",
+            "s29-01-06",
+            "s35-01-04",
+            "s16-02-01",
+            "O12"
+          ],
+          "rank": 1,
+          "wall_ms": 335.4189609999594,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 277.58,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 2,
+          "ids": [
+            "s12-01-01",
+            "TS-006",
+            "s12-04-01",
+            "TS-010",
+            "TS-005",
+            "s09-01-04",
+            "s12-03-01",
+            "TS-009"
+          ],
+          "rank": 3,
+          "wall_ms": 82.20460000006824,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 3,
+          "ids": [
+            "TS-005",
+            "TS-008",
+            "s12-01-01",
+            "s12-03-01",
+            "TS-003",
+            "TS-006",
+            "s12-05-01",
+            "TS-010"
+          ],
+          "rank": 1,
+          "wall_ms": 118.47369199995228,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 4,
+          "ids": [
+            "TS-006",
+            "s12-01-01",
+            "s09-01-04",
+            "s12-02-01",
+            "TS-008",
+            "TS-010",
+            "s12-04-01",
+            "s33-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 137.45225100001335,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 5,
+          "ids": [
+            "EN-001",
+            "EN-006",
+            "EN-016",
+            "EN-008",
+            "TR-008",
+            "EN-007",
+            "EN-021",
+            "EN-015"
+          ],
+          "rank": 1,
+          "wall_ms": 321.5262300000177,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 265.97,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 6,
+          "ids": [
+            "EN-029",
+            "TR-010",
+            "EN-019",
+            "O09",
+            "s08-03-01",
+            "EN-021",
+            "EN-020",
+            "EN-011"
+          ],
+          "rank": 3,
+          "wall_ms": 339.90522299995973,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 253.39,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 7,
+          "ids": [
+            "s27-01-07",
+            "s30-05-01",
+            "s30-02-01",
+            "s36-04-01",
+            "TR-022",
+            "TR-023",
+            "s31-04-01",
+            "s30-01-01"
+          ],
+          "rank": 3,
+          "wall_ms": 182.50686800001859,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 8,
+          "ids": [
+            "TR-011",
+            "s30-04-01",
+            "s31-02-01",
+            "s28-03-01",
+            "s35-01-10",
+            "s35-01-08",
+            "TR-010",
+            "s27-01-10"
+          ],
+          "rank": 1,
+          "wall_ms": 114.64127299996107,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 9,
+          "ids": [
+            "AG-010",
+            "s15-02-01",
+            "s14-06-01",
+            "AG-020",
+            "s34-01-06",
+            "s11-04-01",
+            "territorio-20261019-z2",
+            "s08-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 91.99677900005554,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 10,
+          "ids": [
+            "AG-015",
+            "s11-04-01",
+            "s14-06-01",
+            "s34-02-01",
+            "s15-05-01",
+            "s11-03-01",
+            "AG-014",
+            "s05-03-01"
+          ],
+          "rank": 1,
+          "wall_ms": 157.24608899995474,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 11,
+          "ids": [
+            "s14-02-01",
+            "s08-03-01",
+            "s14-01-01",
+            "s09-01-06",
+            "s14-03-01",
+            "territorio-20261019-z5",
+            "s14-06-01",
+            "AG-014"
+          ],
+          "rank": 1,
+          "wall_ms": 347.3479029998998,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 276.67,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 12,
+          "ids": [
+            "AG-017",
+            "AG-032",
+            "s16-04-01",
+            "AG-021",
+            "EN-011",
+            "AG-024",
+            "consulta-predial-20261019",
+            "s13-05-01"
+          ],
+          "rank": 1,
+          "wall_ms": 139.9944150000465,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 13,
+          "ids": [
+            "AG-024",
+            "AG-035",
+            "AG-015",
+            "TR-008",
+            "TR-007",
+            "s29-01-10",
+            "AG-026",
+            "AG-030"
+          ],
+          "rank": 1,
+          "wall_ms": 327.579157999935,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 272.17,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 14,
+          "ids": [
+            "TS-031",
+            "s12-03-01",
+            "s06-03-01",
+            "s02-01-05",
+            "s11-05-01",
+            "AG-021",
+            "s34-01-03",
+            "TS-030"
+          ],
+          "rank": 1,
+          "wall_ms": 114.6535949999361,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.28,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 15,
+          "ids": [
+            "s36-05-01",
+            "consulta-predial-20261019",
+            "TR-001",
+            "TR-008",
+            "TS-011",
+            "EN-011",
+            "TR-009",
+            "AG-030"
+          ],
+          "rank": null,
+          "wall_ms": 170.33602199990128,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 16,
+          "ids": [
+            "s36-03-01",
+            "s31-03-01",
+            "s26-01-01",
+            "s34-03-01",
+            "s27-02-01",
+            "s27-03-01",
+            "TR-001",
+            "TS-023"
+          ],
+          "rank": 1,
+          "wall_ms": 103.37557999991986,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 17,
+          "ids": [
+            "s36-09-01",
+            "s33-01-06",
+            "s33-01-11",
+            "s32-02-02",
+            "s15-01-01",
+            "s30-05-01",
+            "s05-02-01",
+            "s13-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 322.6647970000158,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 243.62,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 18,
+          "ids": [
+            "s36-06-01",
+            "TR-001",
+            "s36-03-01",
+            "s27-01-10",
+            "EN-006",
+            "consulta-predial-20261019",
+            "s07-02-01",
+            "s04-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 190.48167799996918,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.14,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 19,
+          "ids": [
+            "s28-03-01",
+            "TR-011",
+            "s33-01-11",
+            "s28-05-01",
+            "s30-04-01",
+            "s28-04-01",
+            "s10-04-01",
+            "O16"
+          ],
+          "rank": 1,
+          "wall_ms": 394.22110800001064,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 321.54,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 20,
+          "ids": [
+            "TR-010",
+            "s10-02-01",
+            "O08",
+            "s36-02-01",
+            "s04-03-01",
+            "s09-01-02",
+            "TR-011",
+            "s17-01-02"
+          ],
+          "rank": 1,
+          "wall_ms": 97.84613800002262,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 21,
+          "ids": [
+            "s16-03-01",
+            "s35-01-09",
+            "EN-004",
+            "s16-04-01",
+            "TR-024",
+            "territorio-20261019-z7",
+            "s16-05-01",
+            "s16-06-01"
+          ],
+          "rank": 3,
+          "wall_ms": 174.0427939998881,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.11,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 22,
+          "ids": [
+            "s02-02-01",
+            "s11-06-01",
+            "s11-01-01",
+            "s36-02-01",
+            "s11-04-01",
+            "s15-06-01",
+            "s34-02-01",
+            "s02-01-01"
+          ],
+          "rank": null,
+          "wall_ms": 359.80328499999814,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 283.94,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 23,
+          "ids": [
+            "TR-020",
+            "TR-019",
+            "TS-026",
+            "AG-014",
+            "AG-015",
+            "O10",
+            "EN-012",
+            "EN-011"
+          ],
+          "rank": 1,
+          "wall_ms": 102.68557500012321,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.13,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 24,
+          "ids": [
+            "TR-016",
+            "TR-017",
+            "s13-02-01",
+            "s08-02-01",
+            "s26-01-02",
+            "AG-004",
+            "AG-029",
+            "AG-015"
+          ],
+          "rank": 1,
+          "wall_ms": 117.99182200002178,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.11,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 25,
+          "ids": [
+            "TR-018",
+            "TR-001",
+            "s16-05-01",
+            "s16-06-01",
+            "s32-02-01",
+            "AG-014",
+            "s34-01-06",
+            "s16-04-01"
+          ],
+          "rank": 1,
+          "wall_ms": 190.81727700017836,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 26,
+          "ids": [
+            "s06-02-01",
+            "TS-016",
+            "s05-01-07",
+            "TS-008",
+            "s36-07-01",
+            "s12-05-01",
+            "TS-010",
+            "TS-026"
+          ],
+          "rank": 2,
+          "wall_ms": 349.56061599996247,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 293.25,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 27,
+          "ids": [
+            "s12-03-01",
+            "AG-013",
+            "s11-04-01",
+            "s12-01-01",
+            "s16-05-01",
+            "TS-013",
+            "s12-02-01",
+            "s33-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 97.26256800013289,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 28,
+          "ids": [
+            "s07-04-01",
+            "s27-01-10",
+            "s07-02-01",
+            "TR-008",
+            "s05-01-05",
+            "s36-08-01",
+            "s35-01-12",
+            "s10-01-01"
+          ],
+          "rank": 3,
+          "wall_ms": 342.93149500012987,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 273.35,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 29,
+          "ids": [
+            "s02-02-01",
+            "s17-02-01",
+            "s17-03-01",
+            "s02-01-03",
+            "s27-01-09",
+            "s33-01-05",
+            "TR-005",
+            "s09-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 163.9429150000069,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 30,
+          "ids": [
+            "TR-006",
+            "AG-030",
+            "s10-02-01",
+            "TR-007",
+            "AG-020",
+            "s08-02-01",
+            "AG-025",
+            "s11-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 358.762994000017,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 261.78,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 31,
+          "ids": [
+            "EN-030",
+            "EN-011",
+            "EN-031",
+            "s15-05-01",
+            "s07-01-01",
+            "s11-06-01",
+            "s10-05-01",
+            "EN-028"
+          ],
+          "rank": 1,
+          "wall_ms": 123.22339000002103,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.11,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 32,
+          "ids": [
+            "TR-009",
+            "s10-05-01",
+            "s13-03-01",
+            "s10-02-01",
+            "s10-03-01",
+            "AG-025",
+            "AG-020",
+            "TR-005"
+          ],
+          "rank": 1,
+          "wall_ms": 150.16391900007875,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 33,
+          "ids": [
+            "AG-027",
+            "AG-015",
+            "AG-029",
+            "AG-028",
+            "TR-009",
+            "AG-035",
+            "s29-01-10",
+            "s29-01-05"
+          ],
+          "rank": 1,
+          "wall_ms": 155.30526500015185,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 34,
+          "ids": [
+            "TS-014",
+            "s29-01-08",
+            "s16-05-01",
+            "TS-011",
+            "s35-01-04",
+            "TS-013",
+            "TS-018",
+            "s09-01-03"
+          ],
+          "rank": 1,
+          "wall_ms": 85.81581999987975,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 35,
+          "ids": [
+            "s02-02-01",
+            "s36-04-01",
+            "TR-001",
+            "s04-01-01",
+            "s05-01-02",
+            "s34-03-01",
+            "s36-05-01",
+            "s34-02-01"
+          ],
+          "rank": 6,
+          "wall_ms": 336.97378700003355,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 274.53,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 36,
+          "ids": [
+            "EN-025",
+            "TR-007",
+            "AG-029",
+            "AG-033",
+            "TS-004",
+            "s36-07-01",
+            "AG-025",
+            "AG-035"
+          ],
+          "rank": 1,
+          "wall_ms": 118.45001300002878,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 37,
+          "ids": [
+            "s10-03-01",
+            "s36-08-01",
+            "s28-04-01",
+            "s10-02-01",
+            "O16",
+            "O14",
+            "s08-02-01",
+            "s07-04-01"
+          ],
+          "rank": 5,
+          "wall_ms": 140.0275949999923,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 38,
+          "ids": [
+            "TR-002",
+            "AG-004",
+            "TR-001",
+            "AG-026",
+            "TR-005",
+            "O10",
+            "s29-01-04",
+            "TR-018"
+          ],
+          "rank": 1,
+          "wall_ms": 333.4882510000625,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 273.23,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 39,
+          "ids": [
+            "s07-02-01",
+            "s35-01-02",
+            "s05-01-03",
+            "EN-006",
+            "s36-05-01",
+            "s05-01-05",
+            "EN-027",
+            "s13-04-01"
+          ],
+          "rank": null,
+          "wall_ms": 355.9756550000657,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 277.14,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 40,
+          "ids": [
+            "TS-027",
+            "TS-029",
+            "s15-05-01",
+            "territorio-20261019-z5",
+            "s27-01-02",
+            "TS-028",
+            "s02-02-01",
+            "s27-01-05"
+          ],
+          "rank": 1,
+          "wall_ms": 108.56180300015694,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.09,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 41,
+          "ids": [
+            "s05-01-03",
+            "s05-01-04",
+            "s05-01-07",
+            "s05-02-01",
+            "s09-01-04",
+            "s05-03-01",
+            "s31-02-01",
+            "s09-01-05"
+          ],
+          "rank": null,
+          "wall_ms": 182.05579499999658,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 42,
+          "ids": [
+            "TR-008",
+            "s31-03-01",
+            "s10-02-01",
+            "s04-03-01",
+            "s12-03-01",
+            "O13",
+            "EN-011",
+            "TR-009"
+          ],
+          "rank": 1,
+          "wall_ms": 346.371506999958,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 288.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 43,
+          "ids": [
+            "AG-019",
+            "AG-023",
+            "s35-01-03",
+            "s26-01-02",
+            "EN-001",
+            "TS-012",
+            "s26-01-03",
+            "AG-002"
+          ],
+          "rank": 2,
+          "wall_ms": 148.51530500004628,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 44,
+          "ids": [
+            "s33-01-04",
+            "AG-035",
+            "s17-02-01",
+            "s33-01-05",
+            "O07",
+            "s02-01-03",
+            "s08-02-01",
+            "s33-01-06"
+          ],
+          "rank": 2,
+          "wall_ms": 124.25772799997503,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 45,
+          "ids": [
+            "EN-026",
+            "EN-006",
+            "EN-027",
+            "s16-05-01",
+            "TR-005",
+            "s32-02-01",
+            "s34-01-06",
+            "s28-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 114.37110199995004,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.21,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 46,
+          "ids": [
+            "TR-003",
+            "EN-025",
+            "AG-009",
+            "s35-01-07",
+            "s35-01-04",
+            "s35-01-05",
+            "EN-024",
+            "s33-01-04"
+          ],
+          "rank": 3,
+          "wall_ms": 366.07159000004685,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 285.5,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 47,
+          "ids": [
+            "TS-013",
+            "s29-01-08",
+            "TS-011",
+            "TS-031",
+            "TS-014",
+            "TS-012",
+            "s29-01-06",
+            "s35-01-04"
+          ],
+          "rank": 1,
+          "wall_ms": 181.04837900000348,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.14,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 48,
+          "ids": [
+            "TR-009",
+            "AG-030",
+            "AG-017",
+            "TR-001",
+            "TR-006",
+            "AG-024",
+            "consulta-predial-20261019",
+            "TR-004"
+          ],
+          "rank": 8,
+          "wall_ms": 125.25733400002537,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        },
+        {
+          "case": 49,
+          "ids": [
+            "AG-034",
+            "s12-04-01",
+            "s12-03-01",
+            "s12-02-01",
+            "s12-01-01",
+            "s33-01-04",
+            "s15-01-01",
+            "AG-002"
+          ],
+          "rank": 1,
+          "wall_ms": 365.3655319999416,
+          "rerank": {
+            "state": "applied",
+            "reason": "scored",
+            "ms": 266.53,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 50,
+          "ids": [
+            "s10-02-01",
+            "s15-02-01",
+            "s13-02-01",
+            "s16-02-01",
+            "s11-02-01",
+            "s14-02-01",
+            "s04-04-01",
+            "s11-03-01"
+          ],
+          "rank": 2,
+          "wall_ms": 147.57677199986574,
+          "rerank": {
+            "state": "fallback",
+            "reason": "busy",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": false,
+            "reordered": false
+          }
+        }
+      ],
+      "bounded_warm": [
+        {
+          "case": 0,
+          "ids": [
+            "TS-013",
+            "TS-011",
+            "TS-031",
+            "TS-012",
+            "EN-022",
+            "s36-07-01",
+            "s29-01-08",
+            "s35-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 121.97898299996268,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 1,
+          "ids": [
+            "TS-013",
+            "TS-011",
+            "s11-02-01",
+            "s16-01-01",
+            "s29-01-06",
+            "s35-01-04",
+            "s16-02-01",
+            "O12"
+          ],
+          "rank": 1,
+          "wall_ms": 102.81960099996468,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 2,
+          "ids": [
+            "TS-006",
+            "TS-010",
+            "TS-005",
+            "s12-01-01",
+            "s12-04-01",
+            "s09-01-04",
+            "s12-03-01",
+            "TS-009"
+          ],
+          "rank": 5,
+          "wall_ms": 52.950816000020495,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 3,
+          "ids": [
+            "TS-005",
+            "TS-003",
+            "TS-008",
+            "TS-006",
+            "s12-03-01",
+            "s12-01-01",
+            "s12-05-01",
+            "TS-010"
+          ],
+          "rank": 1,
+          "wall_ms": 58.71430100000907,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 4,
+          "ids": [
+            "TS-006",
+            "TS-008",
+            "s09-01-04",
+            "s12-02-01",
+            "s12-01-01",
+            "TS-010",
+            "s12-04-01",
+            "s33-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 113.16931500005012,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 5,
+          "ids": [
+            "EN-001",
+            "EN-006",
+            "EN-016",
+            "EN-008",
+            "TR-008",
+            "EN-007",
+            "EN-021",
+            "EN-015"
+          ],
+          "rank": 1,
+          "wall_ms": 93.93142199996873,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.11,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 6,
+          "ids": [
+            "EN-029",
+            "TR-010",
+            "EN-019",
+            "O09",
+            "s08-03-01",
+            "EN-021",
+            "EN-020",
+            "EN-011"
+          ],
+          "rank": 3,
+          "wall_ms": 62.85259199989923,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 7,
+          "ids": [
+            "TR-022",
+            "s27-01-07",
+            "s30-02-01",
+            "TR-023",
+            "s30-05-01",
+            "s36-04-01",
+            "s31-04-01",
+            "s30-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 104.83342900010939,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 8,
+          "ids": [
+            "TR-011",
+            "s30-04-01",
+            "s31-02-01",
+            "s28-03-01",
+            "s35-01-08",
+            "s35-01-10",
+            "TR-010",
+            "s27-01-10"
+          ],
+          "rank": 1,
+          "wall_ms": 83.05824499984737,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 9,
+          "ids": [
+            "AG-010",
+            "s15-02-01",
+            "s14-06-01",
+            "AG-020",
+            "s11-04-01",
+            "s34-01-06",
+            "territorio-20261019-z2",
+            "s08-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 104.7158369999579,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 10,
+          "ids": [
+            "AG-015",
+            "s14-06-01",
+            "s11-03-01",
+            "s34-02-01",
+            "s15-05-01",
+            "s11-04-01",
+            "AG-014",
+            "s05-03-01"
+          ],
+          "rank": 1,
+          "wall_ms": 87.82895600006668,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 11,
+          "ids": [
+            "s14-02-01",
+            "s08-03-01",
+            "s14-01-01",
+            "s09-01-06",
+            "s14-03-01",
+            "territorio-20261019-z5",
+            "s14-06-01",
+            "AG-014"
+          ],
+          "rank": 1,
+          "wall_ms": 66.14550900007998,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 12,
+          "ids": [
+            "AG-017",
+            "AG-032",
+            "s16-04-01",
+            "AG-021",
+            "AG-024",
+            "EN-011",
+            "consulta-predial-20261019",
+            "s13-05-01"
+          ],
+          "rank": 1,
+          "wall_ms": 63.31879799995477,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 13,
+          "ids": [
+            "AG-024",
+            "AG-035",
+            "AG-015",
+            "TR-008",
+            "TR-007",
+            "s29-01-10",
+            "AG-026",
+            "AG-030"
+          ],
+          "rank": 1,
+          "wall_ms": 89.88265800007866,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 14,
+          "ids": [
+            "TS-031",
+            "s12-03-01",
+            "s11-05-01",
+            "s02-01-05",
+            "AG-021",
+            "s06-03-01",
+            "s34-01-03",
+            "TS-030"
+          ],
+          "rank": 1,
+          "wall_ms": 113.7583040001573,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 15,
+          "ids": [
+            "s36-05-01",
+            "consulta-predial-20261019",
+            "TS-011",
+            "TR-001",
+            "TR-008",
+            "EN-011",
+            "TR-009",
+            "AG-030"
+          ],
+          "rank": null,
+          "wall_ms": 159.48451700000987,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 16,
+          "ids": [
+            "s36-03-01",
+            "s31-03-01",
+            "s26-01-01",
+            "s27-02-01",
+            "s34-03-01",
+            "s27-03-01",
+            "TR-001",
+            "TS-023"
+          ],
+          "rank": 1,
+          "wall_ms": 89.93069399980413,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 17,
+          "ids": [
+            "s36-09-01",
+            "s33-01-06",
+            "s33-01-11",
+            "s32-02-02",
+            "s15-01-01",
+            "s30-05-01",
+            "s05-02-01",
+            "s13-01-01"
+          ],
+          "rank": 1,
+          "wall_ms": 136.97488599996177,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 18,
+          "ids": [
+            "s27-01-10",
+            "TR-001",
+            "s36-06-01",
+            "EN-006",
+            "consulta-predial-20261019",
+            "s36-03-01",
+            "s07-02-01",
+            "s04-01-01"
+          ],
+          "rank": 3,
+          "wall_ms": 74.64364499992371,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.09,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 19,
+          "ids": [
+            "s28-03-01",
+            "TR-011",
+            "s33-01-11",
+            "s28-05-01",
+            "s30-04-01",
+            "s28-04-01",
+            "s10-04-01",
+            "O16"
+          ],
+          "rank": 1,
+          "wall_ms": 118.87288399998397,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 20,
+          "ids": [
+            "TR-010",
+            "s09-01-02",
+            "O08",
+            "s10-02-01",
+            "s36-02-01",
+            "s04-03-01",
+            "TR-011",
+            "s17-01-02"
+          ],
+          "rank": 1,
+          "wall_ms": 99.25765999992109,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 21,
+          "ids": [
+            "TR-024",
+            "territorio-20261019-z7",
+            "EN-004",
+            "s35-01-09",
+            "s16-04-01",
+            "s16-03-01",
+            "s16-05-01",
+            "s16-06-01"
+          ],
+          "rank": 1,
+          "wall_ms": 100.23718100001133,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 22,
+          "ids": [
+            "s02-02-01",
+            "s11-06-01",
+            "s11-01-01",
+            "s36-02-01",
+            "s11-04-01",
+            "s15-06-01",
+            "s34-02-01",
+            "s02-01-01"
+          ],
+          "rank": null,
+          "wall_ms": 80.82442299996728,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 23,
+          "ids": [
+            "TR-020",
+            "TR-019",
+            "TS-026",
+            "O10",
+            "AG-014",
+            "AG-015",
+            "EN-012",
+            "EN-011"
+          ],
+          "rank": 1,
+          "wall_ms": 61.04282199999034,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 24,
+          "ids": [
+            "TR-016",
+            "TR-017",
+            "s08-02-01",
+            "s26-01-02",
+            "AG-004",
+            "s13-02-01",
+            "AG-029",
+            "AG-015"
+          ],
+          "rank": 1,
+          "wall_ms": 87.76648699995349,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 25,
+          "ids": [
+            "TR-018",
+            "AG-014",
+            "TR-001",
+            "s16-06-01",
+            "s32-02-01",
+            "s16-05-01",
+            "s34-01-06",
+            "s16-04-01"
+          ],
+          "rank": 1,
+          "wall_ms": 66.67520199994215,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 26,
+          "ids": [
+            "s06-02-01",
+            "TS-016",
+            "s05-01-07",
+            "TS-008",
+            "s36-07-01",
+            "s12-05-01",
+            "TS-010",
+            "TS-026"
+          ],
+          "rank": 2,
+          "wall_ms": 107.73463400005312,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 27,
+          "ids": [
+            "AG-013",
+            "TS-013",
+            "s16-05-01",
+            "s12-03-01",
+            "s12-01-01",
+            "s11-04-01",
+            "s12-02-01",
+            "s33-01-04"
+          ],
+          "rank": 1,
+          "wall_ms": 75.46353300017472,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 28,
+          "ids": [
+            "s07-04-01",
+            "s27-01-10",
+            "s07-02-01",
+            "TR-008",
+            "s05-01-05",
+            "s36-08-01",
+            "s35-01-12",
+            "s10-01-01"
+          ],
+          "rank": 3,
+          "wall_ms": 122.2101500000008,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 29,
+          "ids": [
+            "s02-02-01",
+            "s17-02-01",
+            "s27-01-09",
+            "s17-03-01",
+            "s33-01-05",
+            "s02-01-03",
+            "TR-005",
+            "s09-01-04"
+          ],
+          "rank": 2,
+          "wall_ms": 98.58279399986714,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 30,
+          "ids": [
+            "TR-006",
+            "AG-030",
+            "s10-02-01",
+            "TR-007",
+            "AG-020",
+            "s08-02-01",
+            "AG-025",
+            "s11-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 81.91305299988016,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 31,
+          "ids": [
+            "EN-030",
+            "EN-031",
+            "EN-011",
+            "s07-01-01",
+            "s11-06-01",
+            "s15-05-01",
+            "s10-05-01",
+            "EN-028"
+          ],
+          "rank": 1,
+          "wall_ms": 102.42837900000268,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 32,
+          "ids": [
+            "TR-009",
+            "s10-05-01",
+            "s10-03-01",
+            "s10-02-01",
+            "AG-025",
+            "s13-03-01",
+            "AG-020",
+            "TR-005"
+          ],
+          "rank": 1,
+          "wall_ms": 60.34787699991284,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 33,
+          "ids": [
+            "AG-029",
+            "AG-027",
+            "AG-035",
+            "AG-028",
+            "AG-015",
+            "TR-009",
+            "s29-01-10",
+            "s29-01-05"
+          ],
+          "rank": 2,
+          "wall_ms": 76.25415799998336,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.1,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 34,
+          "ids": [
+            "TS-014",
+            "TS-013",
+            "s16-05-01",
+            "TS-011",
+            "s29-01-08",
+            "s35-01-04",
+            "TS-018",
+            "s09-01-03"
+          ],
+          "rank": 1,
+          "wall_ms": 130.90816699991592,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 35,
+          "ids": [
+            "s02-02-01",
+            "s36-04-01",
+            "TR-001",
+            "s04-01-01",
+            "s05-01-02",
+            "s34-03-01",
+            "s36-05-01",
+            "s34-02-01"
+          ],
+          "rank": 6,
+          "wall_ms": 98.63502600001084,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 36,
+          "ids": [
+            "AG-033",
+            "AG-029",
+            "EN-025",
+            "TS-004",
+            "TR-007",
+            "s36-07-01",
+            "AG-025",
+            "AG-035"
+          ],
+          "rank": 3,
+          "wall_ms": 52.338204999841764,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 37,
+          "ids": [
+            "O16",
+            "O14",
+            "s10-03-01",
+            "s10-02-01",
+            "s28-04-01",
+            "s36-08-01",
+            "s08-02-01",
+            "s07-04-01"
+          ],
+          "rank": 1,
+          "wall_ms": 106.87240900006145,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 38,
+          "ids": [
+            "TR-002",
+            "AG-004",
+            "TR-001",
+            "AG-026",
+            "TR-005",
+            "O10",
+            "s29-01-04",
+            "TR-018"
+          ],
+          "rank": 1,
+          "wall_ms": 74.9449380000442,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 39,
+          "ids": [
+            "s07-02-01",
+            "s35-01-02",
+            "s05-01-03",
+            "EN-006",
+            "s36-05-01",
+            "s05-01-05",
+            "EN-027",
+            "s13-04-01"
+          ],
+          "rank": null,
+          "wall_ms": 117.64174199993249,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.05,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 40,
+          "ids": [
+            "TS-027",
+            "s27-01-02",
+            "s15-05-01",
+            "TS-028",
+            "TS-029",
+            "territorio-20261019-z5",
+            "s02-02-01",
+            "s27-01-05"
+          ],
+          "rank": 1,
+          "wall_ms": 97.76494500010813,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 41,
+          "ids": [
+            "s05-01-03",
+            "s05-01-04",
+            "s05-01-07",
+            "s05-03-01",
+            "s05-02-01",
+            "s09-01-04",
+            "s31-02-01",
+            "s09-01-05"
+          ],
+          "rank": null,
+          "wall_ms": 58.99582000006376,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.08,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 42,
+          "ids": [
+            "TR-008",
+            "s31-03-01",
+            "s10-02-01",
+            "s04-03-01",
+            "s12-03-01",
+            "O13",
+            "EN-011",
+            "TR-009"
+          ],
+          "rank": 1,
+          "wall_ms": 79.21712000006664,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 43,
+          "ids": [
+            "AG-019",
+            "AG-023",
+            "TS-012",
+            "s35-01-03",
+            "s26-01-02",
+            "EN-001",
+            "s26-01-03",
+            "AG-002"
+          ],
+          "rank": 2,
+          "wall_ms": 100.25467100012975,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 44,
+          "ids": [
+            "AG-035",
+            "s17-02-01",
+            "s33-01-04",
+            "s33-01-05",
+            "s02-01-03",
+            "O07",
+            "s08-02-01",
+            "s33-01-06"
+          ],
+          "rank": 1,
+          "wall_ms": 49.363578999873425,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 45,
+          "ids": [
+            "EN-026",
+            "EN-006",
+            "TR-005",
+            "s16-05-01",
+            "s32-02-01",
+            "EN-027",
+            "s34-01-06",
+            "s28-02-01"
+          ],
+          "rank": 1,
+          "wall_ms": 88.50123799993526,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 46,
+          "ids": [
+            "TR-003",
+            "EN-025",
+            "AG-009",
+            "s35-01-07",
+            "s35-01-04",
+            "s35-01-05",
+            "EN-024",
+            "s33-01-04"
+          ],
+          "rank": 3,
+          "wall_ms": 64.64694099986446,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.07,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 47,
+          "ids": [
+            "TS-013",
+            "TS-014",
+            "TS-012",
+            "TS-011",
+            "TS-031",
+            "s29-01-08",
+            "s29-01-06",
+            "s35-01-04"
+          ],
+          "rank": 1,
+          "wall_ms": 108.57764299998962,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 48,
+          "ids": [
+            "AG-017",
+            "AG-030",
+            "TR-006",
+            "AG-024",
+            "TR-009",
+            "TR-001",
+            "consulta-predial-20261019",
+            "TR-004"
+          ],
+          "rank": 8,
+          "wall_ms": 60.038820000045234,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 49,
+          "ids": [
+            "AG-034",
+            "s12-04-01",
+            "s12-03-01",
+            "s12-02-01",
+            "s12-01-01",
+            "s33-01-04",
+            "s15-01-01",
+            "AG-002"
+          ],
+          "rank": 1,
+          "wall_ms": 81.02459999986422,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        },
+        {
+          "case": 50,
+          "ids": [
+            "s10-02-01",
+            "s15-02-01",
+            "s13-02-01",
+            "s16-02-01",
+            "s14-02-01",
+            "s11-02-01",
+            "s04-04-01",
+            "s11-03-01"
+          ],
+          "rank": 2,
+          "wall_ms": 102.71986499992636,
+          "rerank": {
+            "state": "cache_hit",
+            "reason": "cached",
+            "ms": 0.06,
+            "budget_ms": 400,
+            "candidates": 6,
+            "applied": true,
+            "reordered": true
+          }
+        }
+      ]
+    }
+  },
+  "thresholds": {
+    "concurrent_cold_p95_extra_ms": 400,
+    "concurrent_warm_p95_max_ms": 143.8624625001239,
+    "quality_strict_improvement": [
+      "hit@1",
+      "mrr"
+    ],
+    "quality_nonregression": [
+      "hit@3",
+      "hit@5",
+      "hit@8"
+    ],
+    "holdout_nonregression": [
+      "hit@1",
+      "hit@3",
+      "hit@5",
+      "hit@8",
+      "mrr"
+    ]
+  },
+  "gates": {
+    "quality_improvement_on_this_gold_set": true,
+    "concurrent_p95_overhead_within_budget": true,
+    "concurrent_cached_p95_near_baseline": true,
+    "all_controls": true,
+    "cached_quality": true,
+    "cache_hit_fraction_at_least_95_percent": true,
+    "predeclared_holdout_nonregression": true
+  },
+  "limitations": {
+    "production_deployment_tested": false,
+    "answers_evaluated": false,
+    "semantic_safety_evaluated": false,
+    "independent_holdout": false,
+    "latency_is_environment_specific": true,
+    "holdout_externally_curated": false,
+    "controlled_contention_is_instrumented": true
+  },
+  "passed": true
+}

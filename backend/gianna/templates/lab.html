@@ -8,7 +8,7 @@
   <label>Versión<select name="version_id"><option value="">Versión pública actual</option>{% for v in versions %}<option value="{{ v.id }}" {% if selected==v.id %}selected{% endif %}>{{ v.name }} · revisión {{ v.revision }} · {{ v.id[:8] }}</option>{% endfor %}</select></label>
   <label>Pregunta<textarea name="question" rows="4" maxlength="2500" required placeholder="¿Qué tendría que comprobar antes de abrir un alojamiento en Villa Serrana?">{{ question }}</textarea></label>
   <div class="actions"><button class="button" name="mode" value="retrieve">Buscar fichas (sin modelo)</button><button class="primary" name="mode" value="answer">Generar respuesta con Ollama</button></div>
-  <small>La primera opción ejecuta solo la búsqueda híbrida (vectorial + BM25 en español + reranker), sin llamar a Ollama. La segunda ejecuta el agente completo: búsqueda inicial, herramientas de consulta y respuesta con citas. Las pruebas se excluyen de la analítica pública.</small>
+  <small>La primera opción busca fichas con el mismo reordenamiento acotado y retorno al híbrido que el chat, según Personalización, sin llamar a Ollama. La segunda ejecuta el agente completo: búsqueda inicial, herramientas de consulta y respuesta con citas. Las pruebas se excluyen de la analítica pública.</small>
 </form>
 {% if result %}
   {% if result.answer %}
@@ -18,7 +18,7 @@
   {% else %}
   <section class="card"><h2>Búsqueda y reordenamiento · {{ result.ms }} ms</h2>
     <p class="muted">Las puntuaciones comparan relevancia entre candidatos; no son probabilidades de certeza ni verificaciones factuales.</p>
-    {% if result.trace %}<details><summary>Ver recorrido de búsqueda</summary><p>Consulta efectiva: {{ result.trace.get('query','') }}</p><p>Candidatos evaluados: {{ result.trace.get('candidates',0) }}</p></details>{% endif %}
+    {% if result.trace %}<details><summary>Ver recorrido de búsqueda</summary><p>Consulta efectiva: {{ result.trace.get('query','') }}</p><p>Candidatos evaluados: {{ result.trace.get('candidates',0) }}</p>{% if result.trace.get('rerank') %}{% set rr = result.trace.rerank %}<p>Reranker: {{ {'applied':'Aplicado', 'cache_hit':'Puntuaciones reutilizadas de caché', 'fallback':'Se conservó el orden híbrido', 'skipped':'Sin reordenamiento'}.get(rr.state, rr.state) }} · {{ rr.ms }} ms{% if rr.reason %} · motivo: {{ rr.reason }}{% endif %}</p>{% if rr.reordered %}<p>Orden híbrido de la ventana: {{ rr.before_ids|join(', ') }}</p><p>Orden reordenado: {{ rr.after_ids|join(', ') }}</p>{% endif %}{% endif %}</details>{% endif %}
     {% for hit in result.hits %}
     <details class="chunk" {% if loop.first %}open{% endif %}><summary><strong>{{ loop.index }}. {{ hit.title }}</strong><span>puntaje {{ hit.score }} · {{ hit.channels|join('+') }}</span></summary><p class="answer-text">{{ hit.text }}</p><small>{{ hit.record_id }} · {{ hit.topic }} · {{ hit.evidence_type }}</small><h3>Condiciones preservadas</h3>{% for condition in hit.conditions %}<p>{{ condition }}</p>{% endfor %}</details>
     {% else %}<p>No se recuperaron fragmentos.</p>{% endfor %}

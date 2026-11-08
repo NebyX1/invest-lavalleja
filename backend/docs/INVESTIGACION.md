@@ -11,7 +11,7 @@
 | Datos | MariaDB | 10.6 o posterior | Usuarios, sesiones, corpus, versiones, métricas |
 | Vectores | LanceDB embebido | 0.40.0 | Coseno exacto + FTS español sin servidor aparte |
 | Embedding | `ibm-granite/granite-embedding-97m-multilingual-r2` | `835ad140…` | Multilingüe, 384 dim, CPU |
-| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | Comparación en evaluación; no se usa en el chat |
+| Reranker | `cross-encoder/mmarco-mMiniLMv2-L12-H384-v1` | `1427fd65…` | Serving acotado y evaluación explícita |
 | Inferencia local | ONNX Runtime | 1.31.0 | CPU, sin GPU ni OpenVINO |
 | Tokenizador | `tokenizers` | 0.23.3 | Conteo exacto de tokens para el chunking |
 | Generación | Ollama Cloud `/api/chat` | catálogo `/api/tags` | Modelo con herramientas nativas, sin descargar pesos |
@@ -32,7 +32,7 @@ Referencia: <https://huggingface.co/ibm-granite/granite-embedding-97m-multilingu
 
 Se conserva **mMARCO MiniLM** (`cross-encoder/mmarco-mMiniLMv2-L12-H384-v1`), también en ONNX cuantizado para CPU, con pares de hasta 512 tokens y puntaje sigmoide.
 
-No participa del camino de la consulta. Se evaluó contra el conjunto de oro y no mejoró el resultado híbrido:
+La siguiente evaluación histórica usaba el cross-encoder completo y motivó excluirlo entonces del chat:
 
 | Modo | hit@8 | MRR | ms por búsqueda |
 | --- | --- | --- | --- |
@@ -40,7 +40,7 @@ No participa del camino de la consulta. Se evaluó contra el conjunto de oro y n
 | Híbrido + cross-encoder | 0,941 | 0,825 | 6.023 |
 | Solo cross-encoder | 0,922 | 0,841 | 6.571 |
 
-Por eso se usa solo en dos lugares: la verificación de `scripts/prepare_models.py` y la comparación de `scripts/evaluate_retrieval.py --modes fused rerank`. El laboratorio del panel y el chat usan búsqueda híbrida sin reranker.
+Desde rc5 el chat y el laboratorio usan reordenamiento acotado, con presupuesto por respuesta, caché y fallback. Los ensayos actuales se registran por separado de esta tabla histórica: [contrato de servicio](RERANKING_ACOTADO.md) y `reports/VALIDACION.md`.
 
 Referencia: <https://huggingface.co/cross-encoder/mmarco-mMiniLMv2-L12-H384-v1>
 

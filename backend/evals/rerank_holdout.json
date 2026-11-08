@@ -1,0 +1,14 @@
+[
+  {"q":"Estoy estudiando una posada en Villa Serrana. ¿Cuántas plazas de estacionamiento por habitación habría que prever?", "any":["TS-006"]},
+  {"q":"Para un alojamiento turístico que todavía no abrió, ¿qué inscripción sectorial debería consultar antes de iniciar la actividad?", "any":["TS-011","TS-012","s29-01"]},
+  {"q":"Mi empresa quiere generar energía solar para consumir y entregar el sobrante a la red. ¿Qué información hay sobre ese esquema?", "any":["EN-017","EN-018","EN-019","EN-020"]},
+  {"q":"Estoy pensando en desarrollar software desde Lavalleja. ¿La guía dice algo de la exoneración del IRAE para ese rubro?", "any":["TR-011"]},
+  {"q":"Quiero elaborar quesos a pequeña escala y venderlos. ¿Qué ficha trata específicamente la quesería artesanal?", "any":["AG-010"]},
+  {"q":"Ya tengo interés en la apicultura. ¿Qué debería revisar si quiero producir y comercializar miel?", "any":["AG-014","AG-015"]},
+  {"q":"Tengo un campo y estoy estudiando plantar 60 hectáreas de árboles. ¿Qué frente ambiental tendría que consultar para forestar?", "any":["AG-017","AG-016","AG-018"]},
+  {"q":"Para abrir una residencia de larga estadía para personas mayores, ¿qué requisitos documenta la guía?", "any":["TS-031","TS-030"]},
+  {"q":"Me interesa un servicio con drones para aplicar productos fitosanitarios. ¿Qué reglas o restricciones tendría que verificar?", "any":["TR-020","TR-019"]},
+  {"q":"Quiero combinar una bodega con visitas turísticas y venta de vino. ¿Qué información hay para evaluar ese proyecto?", "any":["AG-013","TS-013"]},
+  {"q":"Estoy evaluando un negocio vinculado al tratamiento o aprovechamiento de residuos industriales. ¿Qué oportunidades documentadas debería mirar?", "any":["TR-006","TR-007","AG-030","O11"]},
+  {"q":"Estoy estudiando un emprendimiento de cría de ovejas y comercialización de lana. ¿Qué ficha específica debería revisar?", "any":["AG-034"]}
+]
