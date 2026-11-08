@@ -17,6 +17,7 @@ from ..errors import DomainError
 from .conversation import fold, is_social
 from .prompts import CITATION_NUDGE, FINAL_NUDGE, TOOLS, system_prompt
 from .safety import MESSAGES, hard_gate
+from .risk import assess as assess_risk
 
 MAX_STEPS = 4
 DEADLINE_SECONDS = 100
@@ -121,16 +122,29 @@ class Agent:
         _, outline = self.retriever.outline(version_id)
         return system_prompt(settings, ZONES, outline)
 
-    def run(self, question, settings, history, version_id=None):
-        started = time.monotonic()
+    def assess(self, question, settings, history):
         gate = hard_gate(question, history)
         if gate:
-            return Result(MESSAGES[gate], gate, [], {'gate': gate}, {})
+            return Result(MESSAGES[gate], gate, [], {'gate': gate, 'safety':{
+                'policy':'semantic-safety-v1', 'source':'hard_block', 'decision':gate,
+                'model_evaluated':False, 'requests':0}}, {})
+        assessment = assess_risk(self.ollama, question, history, settings)
+        if assessment.decision != 'allow':
+            return Result(assessment.message(), assessment.decision, [],
+                          {'gate':assessment.decision, 'safety':assessment.trace()},
+                          assessment.usage, assessment.requests)
+        return assessment
+
+    def run(self, question, settings, history, version_id=None, *, assessment=None):
+        assessment = assessment if assessment is not None else self.assess(question, settings, history)
+        if isinstance(assessment, Result):
+            return assessment
+        started = assessment.started
         social = is_social(question)
         evidence = Evidence()
-        trace = {'searches': [], 'steps': 0}
-        usage = {'prompt_tokens': 0, 'output_tokens': 0}
-        requests = 0
+        trace = {'searches': [], 'steps': 0, 'safety':assessment.trace()}
+        usage = {key:assessment.usage.get(key) or 0 for key in ('prompt_tokens','output_tokens')}
+        requests = assessment.requests
         messages = [{'role': 'system', 'content': self.prompt(settings, version_id)},
                     *({'role': m['role'], 'content': m['content']} for m in history),
                     {'role': 'user', 'content': question}]
@@ -147,6 +161,8 @@ class Agent:
         try:
             for step in range(MAX_STEPS):
                 remaining = DEADLINE_SECONDS - (time.monotonic() - started)
+                if remaining <= 0:
+                    raise DomainError('Se agotó el tiempo para procesar la consulta.',503,'ollama_unavailable')
                 final = step == MAX_STEPS - 1 or remaining < 25 or evidence.chars > MAX_EVIDENCE_CHARS
                 message, part, model = self.ollama.chat(
                     messages, settings, tools=None if final or social else TOOLS, timeout=max(10, min(75, remaining)))

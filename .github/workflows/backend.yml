@@ -25,6 +25,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
       - run: pip install -r requirements-test.txt
       - run: python -m compileall -q gianna scripts
+      - run: python -m scripts.evaluate_safety --dry-run --output reports/safety/ci-corpus.json
       # Guide content is intentionally not versioned. Generic/unit/web tests run without that private package.
       - run: pytest --junitxml=reports/ci-tests.xml
       - uses: actions/upload-artifact@v4

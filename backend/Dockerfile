@@ -8,7 +8,7 @@ COPY requirements.txt /build/requirements.txt
 RUN pip install --prefix=/install -r /build/requirements.txt
 
 FROM python:3.12-slim
-LABEL org.opencontainers.image.version="1.0.0-rc3"
+LABEL org.opencontainers.image.version="1.0.0-rc4"
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     DATA_DIR=/app/data \
     OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false \

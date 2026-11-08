@@ -1,6 +1,10 @@
 # Diseño del agente conversacional
 
-**Estado: 6 de noviembre de 2026.** Gianna es un agente con herramientas sobre la versión pública publicada. No tiene planificador de reglas, catálogo de rubros ni contrato JSON intermedio.
+**Candidata rc4:** el flujo de seguridad previo al RAG se describe en
+[Seguridad de consultas](SEGURIDAD_CONSULTAS.md). Sustituye las aclaraciones
+automáticas por términos de menores/locales descritas en versiones anteriores.
+
+**Estado: candidata del 7 de noviembre de 2026.** Gianna es un agente con herramientas sobre la versión pública publicada. La evaluación de seguridad previa produce un veredicto estructurado; la respuesta empresarial continúa usando evidencia y herramientas, sin un catálogo de rubros.
 
 ## Qué hace
 

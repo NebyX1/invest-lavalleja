@@ -1,5 +1,51 @@
 # Validación del agente RAG
 
+## Candidata de seguridad semántica · 07/11/2026 · 1.0.0-rc4
+
+**Estado: requiere validación con el modelo configurado antes de liberar.** La
+implementación está preparada en `codex/evaluacion-riesgo-consultas`; `main`
+conserva la entrega rc3 mientras se solicita autorización para evaluar el
+proveedor de pago. No se modificó la configuración ni el contenido productivo.
+
+La captura reproducía una salida `clarify` determinista sin modelo. Se eliminó
+esa ruta y su plantilla empresarial. El nuevo control semántico corre antes
+de publicación/índice, mapa de guía, búsqueda, herramientas y fallback. El
+veredicto debe ser completo, coherente y tipado; errores, duplicados JSON y
+prosa contradictoria no autorizan orientación. Se preservan rechazos seguros
+de daño explícito y las anclas cifradas de contexto pendiente, incluso tras
+errores del proveedor o recorte del historial.
+
+| Comprobación | Resultado |
+| --- | --- |
+| Suite con MariaDB y MinIO reales | **544 passed, 8 skipped**, 87,82 s; `safety/full-suite.xml` y `.log` |
+| Foco agente, público HTTP, protocolo y evaluador (incluye última prueba del modelo seleccionado en panel) | **163 passed**, 14,32 s; `safety/flow.xml` y `.log` |
+| Frontend | ESLint del componente y `npm run check`: 42 archivos, cero errores/avisos |
+| Runtime | Imagen Docker construida, contrato de esquema comprobado dentro de ella sin red; `safety/image-build.log` |
+| Corpus sintético | 20 casos, `safety/corpus-dry-run.json`; dry-run no evalúa un modelo |
+
+La suite de código usa modelos guionados para verificar orden y cierre seguro;
+no mide comprensión semántica. Las ocho omisiones corresponden a corpus
+privado y opt-in de navegador/recuperación de contenedores ya documentados.
+
+Se probó adicionalmente el protocolo real contra modelos **locales ya
+instalados**, sin cambiar los modelos productivos ni usar cloud. Los informes
+rojos se conservan: Qwen3:4b falló por tiempo/salida incompleta o libre; Phi4-mini
+incumplió campos/etiquetas y alcanzó **3/20** criterios en el ensayo con esquema
+explícito (`safety/local-phi4-corpus-final.json`). En los tres casos equivalentes
+a la captura ese último ensayo rechazó orientación, pero sus etiquetas no
+cumplieron todos los criterios del corpus. Los casos legítimos también tuvieron
+errores, por lo que no es una evaluación satisfactoria ni acredita producción.
+Los primeros informes de protocolo contaban sólo solicitudes completadas; se
+corrigió el evaluador para contar también las solicitudes de evaluaciones
+fallidas. Esos informes históricos no se reescribieron.
+
+**No hay una evaluación satisfactoria del modelo productivo en esta entrega.**
+El evaluador opt-in usa la selección real del panel, registra únicamente IDs y
+etiquetas, y no aplica migraciones ni publica datos. La solicitud de autorización
+para esos 20 casos sigue pendiente; no se hicieron llamadas de pago.
+
+Procedimiento y límites: [Seguridad de consultas](../docs/SEGURIDAD_CONSULTAS.md).
+
 ## Persistencia MinIO · 07/11/2026 · 1.0.0-rc3
 
 Destino: **`NebyX1/invest-lavalleja`, rama `main`, `backend/`**. Producción usa

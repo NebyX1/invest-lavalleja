@@ -67,9 +67,6 @@ MESSAGES = {
                    'Puedo ayudarte con consultas sobre inversiones en Lavalleja.'),
     'refuse': ('No puedo ayudar a planificar ni facilitar la explotación o el abuso de menores ni otras actividades que causen daño. '
                'Si se trata de un proyecto diferente y legítimo, describilo y puedo orientar la consulta.'),
-    'clarify': ('Para orientarte, ¿se trata de un evento juvenil o de un local nocturno? Indicá las edades previstas, '
-                'los horarios y si habrá venta de alcohol. Las condiciones aplicables deben confirmarse con la Intendencia '
-                'y los organismos competentes.'),
     'deescalate': ('Estoy para ayudarte con información sobre inversiones en Lavalleja, pero no voy a responder a insultos. '
                    'Si querés, reformulá la consulta y seguimos.'),
 }
@@ -84,8 +81,6 @@ def hard_gate(question: str, history=None) -> Action | None:
                 break
             if explicit_minor_exploitation(previous) or explicit_minor_exploitation(previous + ' ' + text):
                 return 'refuse'
-            if MINORS.search(previous) and NIGHTLIFE.search(previous):
-                return 'clarify'
             if not (FOLLOWUP.search(previous) or COURTESY.search(previous)):
                 break
     if DIRECT_ALLEGATION.search(text) or ALLEGATION_REQUEST.search(text):
@@ -95,8 +90,6 @@ def hard_gate(question: str, history=None) -> Action | None:
             return 'refuse'
         if (ILLICIT.search(text) or SEXUAL_EXPLOIT.search(text)) and WANT_ACTION.search(text):
             return 'refuse'
-    if MINORS.search(text) and NIGHTLIFE.search(text):
-        return 'clarify'
     if INSULT.search(text) and (
         re.search(r'\b(?:sos|eres|vos|tu|gianna|chatbot|bot|asistente|no serv\w*)\b', text)
         or len(text.split()) <= 5

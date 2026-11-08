@@ -103,13 +103,38 @@ def chat():
         stored=json.loads(s.security.unseal(current['history_encrypted'])) if current['history_encrypted'] else []
         history=stored['messages'] if isinstance(stored,dict) else stored
         history=retain_history(history,settings.model)
+        safety_context=stored.get('safety_context') if isinstance(stored,dict) else None
+        if isinstance(safety_context,dict):
+            anchors=[]
+            for value in (safety_context.get('question'),safety_context.get('latest')):
+                if (isinstance(value,str) and value and value not in anchors
+                        and not any(m.get('role')=='user' and m.get('content')==value for m in history)):
+                    anchors.append(value[:2500])
+            history=[*({'role':'user','content':value} for value in anchors), *history]
     try:
         result=s.rag.answer(question,settings,history=history,session_hash=row['id_hash'])
+        safety=result.pop('_safety',{})
+        if safety.get('decision') in {'refuse','clarify'}:
+            safety_context=safety_context or {'question':question[:2500]}
+            if question[:2500]!=safety_context['question']:
+                safety_context={**safety_context,'latest':question[:2500]}
+        elif safety.get('decision')=='allow':
+            from ..services.conversation import is_social
+            if not is_social(question):safety_context=None
         assistant={'role':'assistant','content':result['answer'],'mode':result.get('mode','knowledge')}
         updated=retain_history(history+[{'role':'user','content':question},assistant],settings.model)
         s.db.execute('UPDATE chat_sessions SET history_encrypted=? WHERE id_hash=?',
-            (s.security.seal(dumps({'messages':updated})),row['id_hash']))
+            (s.security.seal(dumps({'messages':updated,'safety_context':safety_context})),row['id_hash']))
         return jsonify(result)
+    except DomainError as exc:
+        if exc.code in {'safety_assessment_unavailable','safety_assessment_invalid','safety_assessment_inconsistent'}:
+            safety_context=safety_context or {'question':question[:2500]}
+            if question[:2500]!=safety_context['question']:
+                safety_context={**safety_context,'latest':question[:2500]}
+            s.db.execute('UPDATE chat_sessions SET history_encrypted=? WHERE id_hash=?',
+                (s.security.seal(dumps({'messages':retain_history(history,settings.model),
+                                       'safety_context':safety_context})),row['id_hash']))
+        raise
     finally:s.db.execute('UPDATE chat_sessions SET busy_until=0 WHERE id_hash=?',(row['id_hash'],))
 
 

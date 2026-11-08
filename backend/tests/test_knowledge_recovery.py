@@ -107,6 +107,11 @@ def test_missing_collection_and_loaded_models_never_report_ready_or_http500(phys
     p=physical;p.engine.load()
     app=create_app(p.cfg);s=app.extensions['gianna']
     s.rag=RAG(p.db,p.cfg,p.knowledge,p.engine,p.store,s.ollama,s.security)
+    # Isolate physical readiness AFTER a valid semantic verdict; never call a
+    # paid provider from this storage regression.
+    from test_agent import ScriptedOllama
+    evaluator=ScriptedOllama()
+    s.rag.agent.ollama=evaluator
     client=app.test_client()
     response=client.get('/api/config')
     assert response.status_code==200 and response.json['available'] is False
@@ -118,6 +123,7 @@ def test_missing_collection_and_loaded_models_never_report_ready_or_http500(phys
     token=client.post('/api/sessions',json={'captcha_id':captcha['id'],'captcha_answer':str(a+b)}).json['token']
     result=client.post('/api/chat',json={'message':'¿Qué condiciones tiene la oportunidad?'},headers={'Authorization':'Bearer '+token})
     assert result.status_code==503 and result.json['error']['code']=='index_missing'
+    assert len(evaluator.semantic_calls)==1 and not evaluator.calls
     # The health endpoint closes over the original RAG, so test the new service directly too.
     assert s.rag.recovery.status()['available'] is False
     assert client.get('/health/live').status_code==200

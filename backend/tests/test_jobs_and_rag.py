@@ -106,9 +106,14 @@ class FakeOllama:
         self.answer = answer
         self.responses = []
         self.calls = []
+        self.semantic_calls = []
         self.fail = False
 
-    def chat(self, messages, settings, tools=None, timeout=None):
+    def chat(self, messages, settings, tools=None, timeout=None, **kwargs):
+        if tools and tools[0]['function']['name']=='evaluar_seguridad':
+            self.semantic_calls.append(messages)
+            return {'content':'','tool_calls':[{'function':{'name':'evaluar_seguridad','arguments':{
+                'decision':'allow','risk':'none','minors':'not_relevant','adult_access':'not_relevant'}}}]}, {}, 'mock'
         self.calls.append({'messages': messages, 'tools': tools, 'timeout': timeout})
         if self.fail:
             raise DomainError('Proveedor no disponible.', 503, 'ollama_unavailable')
@@ -215,7 +220,7 @@ def test_agent_can_call_the_search_tool_and_cite_new_evidence(db, cfg, knowledge
     ]
     result = rag.answer('¿Qué información hay sobre poscosecha?', Settings(model='mock'))
     assert result['status'] == 'answered'
-    assert result['citations'] and result['timings']['model_requests'] == 2
+    assert result['citations'] and result['timings']['model_requests'] == 3
     assert len(ollama.calls) == 2
 
 

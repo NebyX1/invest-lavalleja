@@ -1,5 +1,9 @@
 # Arquitectura RAG y del agente
 
+**Candidata rc4:** el flujo de seguridad previo al RAG se describe en
+[Seguridad de consultas](SEGURIDAD_CONSULTAS.md). Sustituye las aclaraciones
+automáticas por términos de menores/locales descritas en versiones anteriores.
+
 **Estado verificado el 06/11/2026** contra el código de `main` y la versión activa de la base local (`ca5f61b7…`, 262 fragmentos, motor `granite-mmarco-lance-v3`, representación `cards-context-v5`).
 
 Actualización de persistencia del 07/11/2026: [arranque, integridad y recuperación](RECUPERACION.md). `KnowledgeRecovery` prepara en el worker el perfil de la fotografía activa y valida su huella y colección antes de habilitar consultas. Restaurar el índice utiliza sus vectores y texto lexical originales, sin cambiar la semántica del agente ni publicar otra versión. Los resultados de calidad anteriores no se atribuyen a las nuevas pruebas de persistencia.

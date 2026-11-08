@@ -279,6 +279,6 @@ export default function GiannaChat({ apiBase }: { apiBase: string }) {
       <div className="gianna-composer-row"><textarea id={inputId} ref={field} aria-describedby={hintId} value={question} onChange={(event) => setQuestion(event.target.value)} onKeyDown={onQuestionKeyDown} placeholder="¿Qué información necesitás sobre inversiones en Lavalleja?" maxLength={2500} rows={2} required disabled={!available || busy} /><button type="submit" disabled={!available || busy || !question.trim()}>{busy ? 'Consultando…' : token.current ? 'Enviar' : challenge ? 'Verificar y enviar' : 'Iniciar consulta'}</button></div>
       <small id={hintId}>Enter para enviar · Shift+Enter para otra línea. Evitá compartir datos confidenciales.</small>
     </form>
-    <p className="gianna-data-note">Tu pregunta se envía a nuestro modelo de IA para generar la respuesta. La conversación visible se conserva solo mientras esta página está abierta.</p>
+    <p className="gianna-data-note">Gianna aplica controles de seguridad y evalúa las consultas con IA antes de orientar. La conversación visible se conserva solo mientras esta página está abierta.</p>
   </section>;
 }

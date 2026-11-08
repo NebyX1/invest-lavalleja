@@ -21,8 +21,13 @@ Gianna no es un buscador de palabras ni una lista de respuestas fijas. Es un **a
 Cuando un inversor escribe una pregunta, ocurre lo siguiente:
 
 ```text
-pregunta ─► seguridad determinista ─► (acusaciones, insultos, delitos: respuesta fija, sin modelo)
+pregunta ─► rechazo temprano de daño explícito
    │
+   ▼
+evaluación semántica de seguridad (modelo, sin búsquedas)
+   ├─ riesgo o duda: protección/aclaración, sin orientación empresarial
+   ├─ fallo o veredicto inválido: cierre con error, sin fichas
+   └─ autorización válida
    ▼
 búsqueda híbrida inicial: vectores (Granite) + palabras clave (BM25 español), fusión RRF, ≈145 ms medidos
    │      un seguimiento corto ("¿y en Varela?") se busca junto con la pregunta anterior
