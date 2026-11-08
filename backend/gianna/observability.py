@@ -233,7 +233,8 @@ def configure_logging(cfg=None):
     global _SECRETS
     with _LOCK:
         if cfg is not None:
-            names = ('secret_key', 'encryption_key', 'database_url', 'ollama_api_key', 'smtp_password', 'smtp_username')
+            names = ('secret_key', 'encryption_key', 'database_url', 'ollama_api_key', 'smtp_password', 'smtp_username',
+                     'minio_access_key', 'minio_secret_key')
             _SECRETS = _SECRETS | frozenset(
                 value for name in names if isinstance((value := getattr(cfg, name, None)), str) and len(value) >= 4)
         factory = logging.getLogRecordFactory()

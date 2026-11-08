@@ -2,7 +2,7 @@
   "test": "real MariaDB + LanceDB + pinned ONNX, no generation",
   "data_dir": "/app/data/runtime",
   "mountpoint": "/app/data",
-  "runtime_events": 457,
+  "runtime_events": 471,
   "scenarios": [
     {
       "scenario": "real_build_and_publication",
@@ -14,7 +14,7 @@
       "scenario": "automatic_startup",
       "passed": true,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
@@ -27,20 +27,20 @@
       "scenario": "process_restart",
       "passed": true,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
       "scenario": "container_replacement_same_volume",
       "passed": true,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
       "scenario": "missing_volume_actionable_preflight",
       "passed": true,
-      "job_id": "4546526dd37841b59287dbaddbcaf3f4",
+      "job_id": "cef95065536744d083166674ad6d9d8c",
       "attempts": 0,
       "code": "storage_not_mounted",
       "editorial_unchanged": true,
@@ -49,11 +49,11 @@
     {
       "scenario": "same_job_automatic_recovery_after_mount_repair",
       "passed": true,
-      "job_id": "4546526dd37841b59287dbaddbcaf3f4",
+      "job_id": "cef95065536744d083166674ad6d9d8c",
       "attempts": 1,
       "correlated_across_redeploy": true,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
@@ -61,7 +61,7 @@
       "passed": true,
       "controlled_http_status": 503,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
@@ -69,21 +69,21 @@
       "passed": true,
       "controlled_http_status": 503,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
       "scenario": "missing_models_auto_recovery",
       "passed": true,
       "editorial_unchanged": true,
-      "version_id": "dd5dcf26f0c8492398793396583c81c4",
+      "version_id": "f5272874607048e28c3b3f393d784ee7",
       "vectors": 2
     },
     {
       "scenario": "bounded_resources",
       "passed": true,
-      "memory": "1.232GiB / 2GiB",
-      "cpu": "0.02%"
+      "memory": "1.229GiB / 2GiB",
+      "cpu": "1.74%"
     }
   ]
 }

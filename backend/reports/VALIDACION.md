@@ -1,5 +1,58 @@
 # Validación del agente RAG
 
+## Persistencia MinIO · 07/11/2026 · 1.0.0-rc3
+
+Destino: **`NebyX1/invest-lavalleja`, rama `main`, `backend/`**. Producción usa
+MinIO de forma predeterminada con `MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`,
+`MINIO_SECRET_KEY`, `MINIO_SECURE`, `MINIO_BUCKET_NAME` y `MINIO_PUBLIC_URL`.
+No se solicita otra variable para elegir el motor. MariaDB conserva contenido,
+permisos, fotografías y puntero; MinIO conserva importaciones, respaldo técnico
+y modelos verificados. `/app/data` es caché reconstruible y su montaje local no
+es un requisito del arranque productivo.
+
+La integración incluye inspección de bucket privado, creación por el worker si
+falta, vínculo de identidad SQL/MinIO reanudable, namespace propio, transferencias
+con SHA-256 y streaming de ONNX, recuperación de importaciones pendientes y
+rechazo de buckets/objetos ajenos. Un alias distinto del endpoint se acepta si
+el marcador verifica la misma identidad. No se modifica una política ajena,
+publicación, perfil de modelos ni el almacenamiento local anterior.
+
+Procedimiento vigente: [MinIO y redeploy](../docs/MINIO_PERSISTENCIA.md).
+
+| Verificación final | Resultado y evidencia |
+| --- | --- |
+| Suite completa, MariaDB y MinIO reales | **464 passed, 8 skipped**, 107,30 s; `minio/full-suite.xml` y `.log` |
+| Almacenamiento/configuración/fuentes/artefactos focalizados | **88 passed**; `minio/storage.xml` y `.log`, incluidos 20 casos MinIO/configuración |
+| Panel y observabilidad, Chromium/WebKit | **22 passed**, 45,43 s; `minio/browser.xml` y `.log` |
+| MinIO + MariaDB + LanceDB + ONNX reales | **1 passed, 6 escenarios**, 90,14 s; `minio/redeploy.xml`, `.log`, `redeploy.json` y `redeploy-events.jsonl` |
+| Compatibilidad local anterior explícita | **1 passed, 11 escenarios**, 240,46 s; `minio/legacy-recovery.xml` y `.log`; inventario/eventos en `persistence/` |
+| Imagen productiva | Docker multietapa, UID/GID 10001, versión 1.0.0-rc3; `minio/image-build.log` |
+| Dependencias | Gate correcto con RAW preservado y una clasificación medida del Connector/C; `minio/security/20261108T002452Z-86d2b7ee/decision.json` |
+
+La prueba MinIO creó exclusivamente dos fichas públicas y una interna. Se
+eliminó el contenedor de la API y se levantaron **dos contenedores nuevos, con
+cero montajes**, recuperando modelos desde MinIO e índices desde la fotografía
+verificada. `/health/installation` y `/health/knowledge` devolvieron 200. La
+misma publicación, vectores y digest editorial se conservaron; no hubo
+`storage_not_mounted` ni claves/sesiones en sus registros. No se llamó al
+generador. Se registraron eventos JSON correlacionados entre arranques.
+
+Las ocho omisiones generales son cinco casos de corpus privado y tres opt-in;
+los tres opt-in se ejecutaron aparte y pasaron. El corpus privado y la
+instalación productiva de la IDL no se presentan como comprobados. No se leyeron
+credenciales de MinIO de otros proyectos ni se intervino el servidor productivo.
+
+La auditoría conserva el aviso RAW de MariaDB `PYSEC-2026-217` y verifica por
+separado el Connector/C 3.4.9 de la imagen Linux. No hay hallazgos sin resolver
+según ese gate; no se afirma que el RAW esté vacío ni que sea una auditoría de
+todo el sistema operativo. La auditoría local corre en Windows y registra esa
+plataforma; la clasificación corresponde únicamente al cliente de la imagen.
+
+La CI del repositorio central ejecuta las regresiones reales de MinIO y ambos
+caminos de recuperación de contenedores, además de sus comprobaciones anteriores.
+Las secciones siguientes conservan el historial de las entregas previas y sus
+límites; los requisitos de volumen local de rc2 quedan sustituidos en producción.
+
 ## Integración en el repositorio central · 07/11/2026
 
 Destino de esta entrega: **`NebyX1/invest-lavalleja`, rama `main`, directorio

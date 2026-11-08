@@ -7,6 +7,12 @@ services:
     environment:
       FLASK_ENV: ${FLASK_ENV:-production}
       DATABASE_URL: ${DATABASE_URL:?Define DATABASE_URL para el esquema MariaDB de Gianna}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-}
+      MINIO_SECURE: ${MINIO_SECURE:-True}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-}
       SECRET_KEY: ${SECRET_KEY:?Define SECRET_KEY}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Define ENCRYPTION_KEY}
       CORS_ORIGINS: ${CORS_ORIGINS:?Define CORS_ORIGINS con los origenes del portal y la API}

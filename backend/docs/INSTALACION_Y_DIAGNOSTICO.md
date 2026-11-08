@@ -1,5 +1,10 @@
 # Arranque, reconciliación y diagnóstico
 
+**Producción 1.0.0-rc3:** la persistencia usa MinIO y MariaDB; `/app/data` es
+caché reconstruible. Seguir [el procedimiento MinIO](MINIO_PERSISTENCIA.md).
+Las secciones de volúmenes locales siguientes documentan el modo anterior y
+su mantenimiento, no un requisito del arranque productivo actual.
+
 El backend inspecciona una instalación antes de permitir que el worker procese
 escrituras. MariaDB conserva la autoridad editorial: publicación, versiones,
 fotografías, fuentes y vectores. LanceDB es una representación física que puede

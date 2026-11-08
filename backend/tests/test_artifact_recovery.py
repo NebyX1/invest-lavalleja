@@ -31,7 +31,7 @@ def transport(tmp_path,monkeypatch):
     monkeypatch.setattr(artifacts,'artifact_specs',lambda engine:[('fixture',model,revision,list(content))])
     monkeypatch.setattr(artifacts.urllib.request,'urlopen',open_url)
     monkeypatch.setattr(artifacts.time,'sleep',sleeps.append)
-    return SimpleNamespace(cfg=SimpleNamespace(model_dir=tmp_path/'models'),folder=tmp_path/'models'/'fixture'/revision,
+    return SimpleNamespace(cfg=SimpleNamespace(model_dir=tmp_path/'models',storage_backend='local'),folder=tmp_path/'models'/'fixture'/revision,
                            calls=calls,content=content,metadata=metadata,sleeps=sleeps)
 
 

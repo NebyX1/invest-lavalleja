@@ -58,6 +58,13 @@ class Config:
     max_records: int = 10000
     max_concurrent_chat: int = 3
     worker_enabled: bool = True
+    storage_backend: str = 'local'
+    minio_endpoint: str = ''
+    minio_access_key: str = field(default='', repr=False)
+    minio_secret_key: str = field(default='', repr=False)
+    minio_bucket_name: str = ''
+    minio_secure: bool = True
+    minio_public_url: str = ''
 
     @property
     def db_path(self):
@@ -121,6 +128,13 @@ class Config:
             max_records=int(env.get('MAX_RECORDS','10000')),
             max_concurrent_chat=int(env.get('MAX_CONCURRENT_CHAT','3')),
             worker_enabled=truth('WORKER_ENABLED'),
+            storage_backend='minio' if profile.production or env.get('MINIO_ENDPOINT') else 'local',
+            minio_endpoint=env.get('MINIO_ENDPOINT', '').strip(),
+            minio_access_key=env.get('MINIO_ACCESS_KEY', ''),
+            minio_secret_key=env.get('MINIO_SECRET_KEY', ''),
+            minio_bucket_name=env.get('MINIO_BUCKET_NAME', '').strip(),
+            minio_secure=truth('MINIO_SECURE'),
+            minio_public_url=env.get('MINIO_PUBLIC_URL', '').strip().rstrip('/'),
         )
         data.update(overrides or {})
         cfg = cls(**data)

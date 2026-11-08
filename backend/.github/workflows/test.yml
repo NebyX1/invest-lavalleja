@@ -84,6 +84,23 @@ jobs:
         with:
           name: mariadb-regression
           path: reports/ci-mariadb.xml
+  minio-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
+      - run: pip install -r requirements-test.txt
+      - name: Real private MinIO, identities, import recovery and cached artifacts
+        run: pytest tests/test_minio_storage.py --minio-docker --junitxml=reports/minio/ci-storage.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: minio-regression
+          path: reports/minio/ci-storage.xml
   container-recovery:
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -95,7 +112,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmariadb-dev pkg-config
       - run: pip install -r requirements-test.txt
       - name: Reconcile and recover real containers, volumes, SQL, LanceDB and pinned ONNX
-        run: pytest tests/test_recovery_docker.py --recovery-docker -s --junitxml=reports/ci-recovery.xml
+        run: pytest tests/test_recovery_docker.py tests/test_minio_redeploy_docker.py --recovery-docker -s --junitxml=reports/ci-recovery.xml
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -104,6 +121,7 @@ jobs:
             reports/ci-recovery.xml
             reports/persistence/recovery-docker.json
             reports/persistence/recovery-docker-events.jsonl
+            reports/minio/
   dependency-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 25

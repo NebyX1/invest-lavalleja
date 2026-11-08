@@ -1,0 +1,13 @@
+Container regression passed: real_build_and_publication
+Container regression passed: automatic_startup
+Container regression passed: durable_parent_mount
+Container regression passed: process_restart
+Container regression passed: container_replacement_same_volume
+Container regression passed: missing_volume_actionable_preflight
+Container regression passed: same_job_automatic_recovery_after_mount_repair
+Container regression passed: missing_collection
+Container regression passed: incomplete_collection
+Container regression passed: missing_models_auto_recovery
+Container regression passed: bounded_resources
+.
+1 passed in 240.46s (0:04:00)

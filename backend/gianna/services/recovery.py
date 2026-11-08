@@ -108,9 +108,17 @@ def snapshot(db, cfg, version):
         metadata = digest({'version_id':version['id'],'profile':profile,'chunks':chunks,'records':records,'sources':sources})
         backup_path = cfg.data_dir / 'recovery' / 'backups' / (version['id']+'.json')
         backup = None
+        readers = []
         if backup_path.exists():
+            readers.append(lambda: json.loads(backup_path.read_text(encoding='utf-8')))
+        if cfg.storage_backend == 'minio':
+            from .objects import objects
+            candidate = objects(cfg).read_json('recovery/backups/'+version['id']+'.json')
+            if candidate is not None:
+                readers.append(lambda candidate=candidate: candidate)
+        for candidate_reader in readers:
             try:
-                candidate = json.loads(backup_path.read_text(encoding='utf-8'))
+                candidate = candidate_reader()
                 if not (candidate['version_id'] == version['id'] and candidate['metadata'] == metadata
                         and candidate['fingerprint'] == profile['fingerprint']
                         and isinstance(candidate['rows'], list) and len(candidate['rows']) == len(chunks)
@@ -126,9 +134,14 @@ def snapshot(db, cfg, version):
                     if physical_row(chunk, dense) != proposed:
                         raise ValueError('backup row metadata')
                     validated[chunk['id']] = dense
+                if backup is not None and backup != validated:
+                    reason = 'vector_sources_disagree'
+                    raise ValueError('backup sources disagree')
                 backup = validated
             except (OSError, ValueError, KeyError, TypeError, OverflowError, struct.error) as exc:
-                invalid_sources['backup'] = 1
+                if reason == 'vector_sources_disagree':
+                    raise
+                invalid_sources['backup'] += 1
                 event(LOG, 'recovery.backup_rejected', level=logging.WARNING,
                       version_id=version['id'], code='backup_invalid', exception=safe_exception(exc))
         restored = []
@@ -232,7 +245,7 @@ class KnowledgeRecovery:
             if state == 'initializing':
                 last = self.db.one("SELECT status,attempts FROM jobs WHERE kind='warmup' AND version_id=? ORDER BY created_at DESC LIMIT 1",(version['id'],))
                 if last and last['status'] == 'failed' and last['attempts'] >= 3:state='failed'
-            if exc.code.startswith('storage_') or exc.code in {'snapshot_invalid','embedding_mismatch','database_unavailable'}:
+            if exc.code.startswith(('storage_', 'minio_', 'cache_')) or exc.code in {'snapshot_invalid','embedding_mismatch','database_unavailable'}:
                 state = 'failed'
             return {'state': state, 'code': code, 'available': False, 'message': MESSAGES.get(state, MESSAGES['failed'])}
         except Exception as exc:
@@ -368,4 +381,8 @@ class KnowledgeRecovery:
             except (OSError, ValueError, KeyError, TypeError):
                 pass
             path.rename(path.with_name(path.name + '.' + uuid.uuid4().hex + '.previous'))
-        atomic_json(path, {k: v for k, v in data.items() if k not in {'profile', 'backup_used'}})
+        document = {k: v for k, v in data.items() if k not in {'profile', 'backup_used', 'source_counts', 'invalid_sources'}}
+        if self.cfg.storage_backend == 'minio':
+            from .objects import objects
+            objects(self.cfg).put_json('recovery/backups/'+data['version_id']+'.json', document)
+        atomic_json(path, document)

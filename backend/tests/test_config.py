@@ -203,7 +203,7 @@ def test_migration_keeps_keys_model_mail_and_effective_settings(env, tmp_path):
     plan = migrate(path)
     assert not plan['applied'] and path.read_bytes() == original
     result = migrate(path, apply=True)
-    assert result['variables_after'] == 15 and result['effective_config_unchanged']
+    assert result['variables_after'] == 21 and result['effective_config_unchanged']
     assert (tmp_path / result['backup']).read_bytes() == original
     after = dict(dotenv_values(path))
     assert set(after) == set(FIELDS)
@@ -228,7 +228,7 @@ def test_migration_does_not_silently_discard_custom_settings(env, tmp_path, extr
 def test_migration_roundtrip_is_idempotent(env):
     compact, _, _ = prepare(legacy_text(env).encode())
     again, old_count, new_count = prepare(compact)
-    assert compact == again and old_count == new_count == 15
+    assert compact == again and old_count == new_count == 21
 
 
 def test_migration_simulation_does_not_create_a_storage_directory(env, tmp_path, monkeypatch):

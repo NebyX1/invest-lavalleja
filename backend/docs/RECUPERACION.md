@@ -1,5 +1,10 @@
 # Persistencia, recuperación y despliegue seguro
 
+**Producción 1.0.0-rc3:** la persistencia usa MinIO y MariaDB; `/app/data` es
+caché reconstruible. Seguir [el procedimiento MinIO](MINIO_PERSISTENCIA.md).
+Las secciones de volúmenes locales siguientes documentan el modo anterior y
+su mantenimiento, no un requisito del arranque productivo actual.
+
 Aplicable al backend institucional, MariaDB y LanceDB local. No cambia modelos,
 prompts, versiones publicadas ni permisos. No ejecuta generación automáticamente.
 El despliegue en producción necesita la autorización del responsable; este trabajo

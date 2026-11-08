@@ -2,4 +2,5 @@
 reports/*.log -whitespace
 reports/**/*.log -whitespace
 reports/security/**/pip-audit.json -text -whitespace
+reports/**/pip-audit.json -text -whitespace
 reports/security/historical-*.json -text -whitespace

@@ -82,6 +82,7 @@ def create_app(overrides=None):
         embeddings=embeddings,vector_store=vector_store,ollama=ollama,rag=rag,jobs=jobs,installation=installation)
     event(LOG, 'application.bootstrap_completed', version=__version__, worker_enabled=cfg.worker_enabled,
           data_dir=str(cfg.data_dir), database_engine='mariadb' if db.is_mariadb else 'sqlite',
+          storage_backend=cfg.storage_backend,
           next_stage='installation_preflight')
 
     @app.before_request

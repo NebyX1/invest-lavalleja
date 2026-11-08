@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import re
 import secrets
+import shlex
 import subprocess
 import tempfile
 import time
@@ -119,7 +120,10 @@ def test_real_redeploy_and_incident_recovery(request):
         docker('build','--tag',image,ROOT)
         with tempfile.TemporaryDirectory(prefix='gianna-recovery-build-') as directory:
             definition=Path(directory)/'Dockerfile'
-            definition.write_text('FROM '+image+'\nCOPY --chown=10001:10001 tests /app/tests\n',encoding='utf-8')
+            legacy_wsgi="from gianna.config import Config\nfrom gianna import create_app\napp=create_app(Config.from_env({'storage_backend':'local'},initialize_storage=False))\n"
+            initialize="from pathlib import Path; Path('/app/wsgi.py').write_text("+repr(legacy_wsgi)+")"
+            definition.write_text('FROM '+image+'\nCOPY --chown=10001:10001 tests /app/tests\n'+
+                                  'RUN python -c '+shlex.quote(initialize)+'\n',encoding='utf-8')
             docker('build','--file',definition,'--tag',image,ROOT)
         docker('network','create','--label','gianna.test=recovery',network);network_created=True
         docker('volume','create','--label','gianna.test=recovery',volume);volume_created=True

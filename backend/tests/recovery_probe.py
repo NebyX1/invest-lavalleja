@@ -27,7 +27,9 @@ def editorial(db):
 def main():
     if os.environ.get('GIANNA_RECOVERY_REGRESSION')!='isolated':
         raise SystemExit('Only a disposable regression environment is allowed.')
-    action=sys.argv[1];cfg=Config.from_env(initialize_storage=action=='seed')
+    action=sys.argv[1]
+    overrides = {} if os.environ.get('MINIO_ENDPOINT') else {'storage_backend':'local'}
+    cfg=Config.from_env(overrides,initialize_storage=action=='seed')
     database=urlparse(cfg.database_url)
     if database.hostname!='maria' or database.path!='/gianna_recovery':
         raise SystemExit('Only the disposable regression database is allowed.')
@@ -35,6 +37,7 @@ def main():
     if action=='seed':
         folder.mkdir(exist_ok=True)
         app=create_app(cfg);s=app.extensions['gianna']
+        assert s.installation.reconcile(force=True)['state'] != 'blocked'
         corpus=Corpus(document=DocumentInfo(id='recovery-test',title='Prueba de persistencia'),records=[
             Record(id='persist-1',title='Evidencia de persistencia',topic='Prueba',audience='public',
                    text='Evidencia local de recuperación territorial: código PINO-314. Los proyectos deben verificar sus permisos.'),
@@ -55,6 +58,9 @@ def main():
         expected={'editorial_digest':editorial(s.db),'version_id':vid,'fingerprint':s.embeddings.profile['fingerprint'],
                   'chunks':s.knowledge.active()['chunk_count']}
         (folder/'expected.json').write_text(dumps(expected))
+        if cfg.storage_backend=='minio':
+            from gianna.services.objects import objects
+            objects(cfg).put_json('regression/expected.json',expected)
         print(dumps(expected))
         return
     db=Database(cfg.database_target);knowledge=Knowledge(db,cfg);version=knowledge.active()
@@ -73,7 +79,11 @@ def main():
                    (time.time(),identifier))
         print(dumps(db.one('SELECT id,status,attempts FROM jobs WHERE id=?',(identifier,))))
     elif action=='assert':
-        expected=json.loads((folder/'expected.json').read_text())
+        if cfg.storage_backend=='minio':
+            from gianna.services.objects import objects
+            expected=objects(cfg).read_json('regression/expected.json')
+        else:
+            expected=json.loads((folder/'expected.json').read_text())
         assert expected['editorial_digest']==editorial(db)
         assert expected['version_id']==version['id']
         store=LanceStore(cfg)

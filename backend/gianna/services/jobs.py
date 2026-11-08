@@ -19,11 +19,15 @@ LOG = logging.getLogger(__name__)
 MAX_ATTEMPTS = 3
 LEASE_SECONDS = 120
 TRANSIENT_CODES = {
+    'minio_unavailable',
     'database_unavailable', 'database_busy', 'recovery_busy', 'models_recovery_failed',
     'model_download_timeout', 'model_download_unavailable', 'index_unavailable',
     'network_unavailable', 'download_interrupted', 'recovery_interrupted',
 }
 ENVIRONMENT_CODES = TRANSIENT_CODES | {
+    'minio_configuration_missing', 'minio_configuration_invalid', 'minio_access_denied',
+    'minio_bucket_not_private', 'minio_identity_invalid', 'minio_identity_mismatch',
+    'minio_storage_missing', 'minio_namespace_unbound', 'cache_not_writable', 'cache_full',
     'storage_not_mounted', 'storage_not_writable', 'storage_read_only',
     'storage_space_low', 'schema_not_ready', 'schema_migration_failed',
     'storage_permission_denied', 'storage_full', 'storage_mount_unknown',
@@ -503,9 +507,25 @@ class Jobs:
                 if existing:
                     self._complete(job, {'base_id': identifier, 'recovered': True}, 'Importación recuperada sin duplicar la base')
                     return
-                path = Path(payload['path']).resolve()
+                if self.cfg.storage_backend == 'minio' and payload.get('object_name'):
+                    from .objects import objects
+                    name = payload['object_name']
+                    if (not isinstance(name, str) or Path(name).name != name or '/' in name or '\\' in name
+                            or name in {'.', '..'}):
+                        raise DomainError('Referencia de importación inválida.', 409, 'invalid_job_payload')
+                    path = (self.cfg.data_dir/'uploads'/name).resolve()
+                    objects(self.cfg).restore_upload(name, path, payload.get('object_sha256'))
+                else:
+                    path = Path(payload['path']).resolve()
                 if not path.is_relative_to((self.cfg.data_dir/'uploads').resolve()):
                     raise DomainError('Ruta de importación inválida.', 409, 'invalid_job_payload')
+                if self.cfg.storage_backend == 'minio' and not payload.get('object_name'):
+                    from .objects import objects
+                    if not path.is_file():
+                        failure=DomainError('El archivo de una importación anterior no está disponible.',503,'legacy_upload_missing')
+                        failure.details={'action':'Recuperá el archivo original o volvé a cargarlo; no se modificó ningún borrador ni publicación.'}
+                        raise failure
+                    objects(self.cfg).put('uploads/'+path.name,path.read_bytes())
                 corpus = load_corpus(path, payload.get('audience', 'internal'), payload.get('cutoff_date'))
                 corpus.document.filename = payload.get('filename', path.name)
                 self.progress(identifier, 'Guardando borrador; no se publicará automáticamente', len(corpus.records), len(corpus.records), stage='import_draft')

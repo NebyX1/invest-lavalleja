@@ -1,9 +1,12 @@
 # Invest Lavalleja
 
+La versión **1.0.0-rc3** integra persistencia MinIO con recuperación automática
+después de reemplazar el contenedor. [Configuración y pruebas](backend/docs/MINIO_PERSISTENCIA.md).
+
 Invest Lavalleja es un portal de información para inversores interesados en el departamento de Lavalleja (Uruguay). Reúne zonas, sectores, datos, casos, pasos y preguntas frecuentes, y tiene un asistente conversacional llamado **Gianna Invest** que responde preguntas usando solo la base de conocimiento del proyecto.
 
 Este repositorio central reúne el portal y el backend de Gianna. La reestructura
-de arranque, recuperación y logs `1.0.0-rc2` está en `backend/`, con su
+de arranque, recuperación y logs `1.0.0-rc3` está en `backend/`, con su
 [informe de validación](backend/reports/VALIDACION.md) y su
 [procedimiento de diagnóstico](backend/docs/INSTALACION_Y_DIAGNOSTICO.md).
 También existen repositorios institucionales independientes de frontend y backend:

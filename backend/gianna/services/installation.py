@@ -79,7 +79,8 @@ class Installation:
         report['storage'] = storage
         checks.append(_check('storage', 'ok' if storage['ok'] else 'blocked', storage['code'],
                              storage['message'], storage.get('action', ''), path=storage.get('path'),
-                             mount=storage.get('mount'), identity=storage.get('identity')))
+                             mount=storage.get('mount'), identity=storage.get('identity'),
+                             backend=storage.get('backend'), bucket=storage.get('bucket')))
         # Inventory existing names even when an identity mismatch blocks writes.
         # Files are not opened through LanceDB until persistence passes.
         try:
@@ -127,7 +128,9 @@ class Installation:
                                  count=len(report['lance']['orphans'])))
         if storage['ok'] and not storage.get('identity', {}).get('initialized'):
             report['plan'].append(dict(action='initialize_identity', automatic=True,
-                                       message='Vincular el volumen sólo después de validar la instalación; no adoptar otro UUID.'))
+                                       message=('Vincular el bucket privado de MinIO tras verificar SQL y su identidad; conservar el almacenamiento anterior.'
+                                                if self.cfg.storage_backend == 'minio' else
+                                                'Vincular el volumen sólo después de validar la instalación; no adoptar otro UUID.')))
         return self._finish(report, started)
 
     def _database(self):
@@ -278,7 +281,7 @@ class Installation:
                                      stage='storage', report_id=report['report_id'])
                 except DomainError as exc:
                     report.update(state='blocked', code=exc.code, message=exc.message,
-                                  action='Revisá el diagnóstico del volumen antes de procesar trabajos.')
+                                  action=getattr(exc, 'details', {}).get('action', 'Revisá el diagnóstico de almacenamiento antes de procesar trabajos.'))
                 except OSError as exc:
                     report.update(state='blocked', code='storage_permission_denied',
                                   message='No se pudieron inicializar los directorios del volumen.',

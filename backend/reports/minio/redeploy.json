@@ -1,0 +1,39 @@
+{
+  "scenarios": [
+    {
+      "scenario": "real_build_and_private_minio_persistence",
+      "passed": true,
+      "chunks": 2
+    },
+    {
+      "scenario": "fresh_cache_restored_without_volume",
+      "passed": true,
+      "editorial_unchanged": true,
+      "version_id": "7ac66d61de8f4cea833d9413dc23ecdf",
+      "vectors": 2
+    },
+    {
+      "scenario": "installation_and_knowledge_healthy",
+      "passed": true
+    },
+    {
+      "scenario": "second_replacement_preserves_publication_and_evidence",
+      "passed": true,
+      "editorial_unchanged": true,
+      "version_id": "7ac66d61de8f4cea833d9413dc23ecdf",
+      "vectors": 2
+    },
+    {
+      "scenario": "pinned_models_restored_from_minio",
+      "passed": true
+    },
+    {
+      "scenario": "correlated_logs_across_replacements_without_secrets",
+      "passed": true
+    }
+  ],
+  "api_persistent_mounts": 0,
+  "generator_calls": 0,
+  "editorial_unchanged": true,
+  "events": 164
+}

@@ -1,0 +1,62 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.53kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 1.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 159B done
+#3 DONE 0.0s
+
+#4 [dependencies 1/5] FROM docker.io/library/python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54
+#4 resolve docker.io/library/python:3.12-slim@sha256:4840d514c583a4d3d8cad3940e68dee6f0f6f3635c12fcd0a3d74c21a5b93a54 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 567.26kB 0.1s done
+#5 DONE 0.1s
+
+#6 [stage-1 2/7] WORKDIR /app
+#6 CACHED
+
+#7 [dependencies 4/5] COPY requirements.txt /build/requirements.txt
+#7 CACHED
+
+#8 [stage-1 3/7] RUN apt-get update && apt-get install -y --no-install-recommends     libmariadb3 mariadb-client libgomp1 ca-certificates curl     && rm -rf /var/lib/apt/lists/*     && groupadd --gid 10001 gianna && useradd --uid 10001 --gid 10001 --create-home gianna     && mkdir -p /app/data && chown -R gianna:gianna /app
+#8 CACHED
+
+#9 [dependencies 2/5] WORKDIR /build
+#9 CACHED
+
+#10 [dependencies 3/5] RUN apt-get update && apt-get install -y --no-install-recommends     build-essential libmariadb-dev pkg-config     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [dependencies 5/5] RUN pip install --prefix=/install -r /build/requirements.txt
+#11 CACHED
+
+#12 [stage-1 4/7] COPY --from=dependencies /install /usr/local
+#12 CACHED
+
+#13 [stage-1 5/7] COPY --chown=gianna:gianna gianna /app/gianna
+#13 DONE 0.1s
+
+#14 [stage-1 6/7] COPY --chown=gianna:gianna scripts /app/scripts
+#14 DONE 0.1s
+
+#15 [stage-1 7/7] COPY --chown=gianna:gianna wsgi.py gunicorn.conf.py /app/
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.1s done
+#16 exporting manifest sha256:e453d992d32a374398f9d763c719ad17eaee39bac1e8a595bcde5a3bf5cdf4e3 0.0s done
+#16 exporting config sha256:58af08ed26286a8ebf3250e7d7ed07521eb4b09fb827e099c8a2eb013e493ced 0.0s done
+#16 exporting attestation manifest sha256:a8da360cb25b8cfdc34807c7978509d7846eec66214fb482350986573b6928f8 0.0s done
+#16 exporting manifest list sha256:a0d89b6daca934d696dfa80fd4cc0ecfbe090e3ff51ede566c4092a8c3d710bd
+#16 exporting manifest list sha256:a0d89b6daca934d696dfa80fd4cc0ecfbe090e3ff51ede566c4092a8c3d710bd 0.0s done
+#16 naming to docker.io/library/gianna-minio:validation done
+#16 unpacking to docker.io/library/gianna-minio:validation 0.1s done
+#16 DONE 0.4s

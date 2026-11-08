@@ -1,0 +1,8 @@
+MinIO regression passed: real_build_and_private_minio_persistence
+MinIO regression passed: fresh_cache_restored_without_volume
+MinIO regression passed: installation_and_knowledge_healthy
+MinIO regression passed: second_replacement_preserves_publication_and_evidence
+MinIO regression passed: pinned_models_restored_from_minio
+MinIO regression passed: correlated_logs_across_replacements_without_secrets
+.
+1 passed in 90.14s (0:01:30)

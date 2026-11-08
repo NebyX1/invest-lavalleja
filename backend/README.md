@@ -1,6 +1,9 @@
 # Gianna · Invest Lavalleja
 
-**Versión 1.0.0-rc2 · 7 de noviembre de 2026 · Candidata para validación.**
+La versión **1.0.0-rc3** integra persistencia MinIO con recuperación automática
+después de reemplazar el contenedor. [Configuración y pruebas](docs/MINIO_PERSISTENCIA.md).
+
+**Versión 1.0.0-rc3 · 7 de noviembre de 2026 · Candidata para validación.**
 
 El arranque inspecciona la instalación existente antes de ejecutar trabajos. El panel **Diagnóstico** informa esquema SQL, volumen/identidad, colecciones, modelos, publicación y plan de recuperación. La cola conserva causas, intentos, esperas y eventos correlacionados con logs JSON. Ver [arranque y diagnóstico](docs/INSTALACION_Y_DIAGNOSTICO.md), [procedimiento de recuperación](docs/RECUPERACION.md) y los resultados reales en [validación](reports/VALIDACION.md). No requiere agregar variables para el despliegue habitual.
 

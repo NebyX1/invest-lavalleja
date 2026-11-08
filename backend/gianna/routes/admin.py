@@ -59,8 +59,13 @@ def import_base():
     try:
         upload.save(path);path.chmod(0o600)
         if not path.stat().st_size:raise DomainError('El archivo está vacío.')
+        durable = {}
+        if s.cfg.storage_backend == 'minio':
+            from ..services.objects import objects
+            checksum = objects(s.cfg).put('uploads/'+path.name, path.read_bytes())
+            durable = {'object_name':path.name, 'object_sha256':checksum}
         job=s.jobs.enqueue('import',{'path':str(path),'filename':Path(upload.filename.replace('\\','/')).name[:250],
-            'name':request.form.get('name','').strip()[:150],'audience':'internal','actor':g.user['id']})
+            'name':request.form.get('name','').strip()[:150],'audience':'internal','actor':g.user['id'], **durable})
     except Exception:
         path.unlink(missing_ok=True);raise
     s.db.audit(g.user['id'],'IMPORT_QUEUED',job,{'format':suffix})

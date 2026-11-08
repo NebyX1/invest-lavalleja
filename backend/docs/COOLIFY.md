@@ -1,36 +1,17 @@
 # Despliegue con Coolify
 
-## Verificación de la instalación existente
+## Persistencia de producción: MinIO
 
-La candidata `1.0.0-rc2` incorpora inventario previo a la cola, revisión del esquema
-físico y recuperación de la publicación existente. Antes de cambiar un recurso,
-conservar el respaldo y los montajes descritos en [recuperación](RECUPERACION.md).
-La estructura y la matriz de decisiones están en [arranque y diagnóstico](INSTALACION_Y_DIAGNOSTICO.md).
+La versión 1.0.0-rc3 utiliza MinIO con las seis variables institucionales
+`MINIO_ENDPOINT`, `MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_SECURE`,
+`MINIO_BUCKET_NAME` y `MINIO_PUBLIC_URL`. El procedimiento vigente es
+[Persistencia en MinIO](MINIO_PERSISTENCIA.md). `/app/data` es caché local
+reconstruible y no requiere agregar un volumen persistente en Coolify.
 
-`DATA_DIR` no necesita agregarse al entorno habitual: su destino predeterminado es
-`/app/data`. Si el recurso usa Dockerfile, debe tener el volumen persistente
-configurado en Coolify; Dockerfile por sí solo no lo crea. Un montaje ausente
-ahora permite abrir Diagnóstico y consultar su causa, pero mantiene bloqueadas
-las escrituras. El programa no puede crear por sí mismo un volumen en el VPS.
-
-Verificar la imagen por commit y su CI completo antes de habilitar un despliegue.
-Los jobs de pruebas incluyen MariaDB real, recuperación de contenedores y los dos
-motores de navegador para el panel. No confundir `/health/live` con recuperación
-del conocimiento: revisar también `/health/installation` y `/health/knowledge`.
-
-En `NebyX1/invest-lavalleja`, el backend está en `backend/`. Para construir la API
-desde este repositorio, usar `backend/` como contexto de construcción y su
-`Dockerfile`: el comando equivalente es `docker build -f backend/Dockerfile backend`
-desde la raíz. El Dockerfile de la raíz construye el portal. Los comandos Python
-y Compose de este documento se ejecutan desde `backend/`.
-
-Los repositorios independientes `invest-lavalleja-frontend` e
-`invest-lavalleja-backend` tienen su propio historial; una publicación en uno no
-actualiza automáticamente los otros. Esta configuración está preparada para un
-único VPS y una instancia de API; debe validarse en Coolify antes de abrir el
-servicio al público.
-
-Para una instalación existente, seguir primero [persistencia, recuperación y rollback](RECUPERACION.md). No cambiar el nombre del volumen ni el build pack sin inspeccionar y respaldar los datos. La declaración de un volumen en el repositorio no acredita que el recurso productivo lo esté utilizando.
+Desde `NebyX1/invest-lavalleja`, la API se construye con
+`docker build -f backend/Dockerfile backend`. Los comandos Python/Compose de
+este documento se ejecutan en `backend/`. El Dockerfile de la raíz construye
+el portal.
 
 ## Preparar el repositorio y los secretos
 
@@ -64,7 +45,7 @@ MAIL_PASSWORD=
 MAIL_DEFAULT_SENDER=
 ```
 
-Son 15 campos de configuración de producción. `DATABASE_URL` debe señalar a un esquema y una cuenta exclusivos de Gianna; no reutilizar la URL `buzon-ciudadano` de `sample-backend`. Los dominios son ejemplos, no direcciones ya creadas. `CORS_ORIGINS` incluye el portal y la propia API: de ellos se obtienen también los hosts permitidos. Usar esquema y host exactos, con puerto solo cuando forma parte del origen, sin rutas ni `*`. Los ajustes técnicos de los modelos y LanceDB, CPU, límites y almacenamiento tienen valores predeterminados en el código; no se copian a Coolify.
+Son 21 campos incluyendo las seis variables de MinIO descritas arriba. `DATABASE_URL` debe señalar a un esquema y una cuenta exclusivos de Gianna; no reutilizar la URL `buzon-ciudadano` de `sample-backend`. Los dominios son ejemplos, no direcciones ya creadas. `CORS_ORIGINS` incluye el portal y la propia API: de ellos se obtienen también los hosts permitidos. Usar esquema y host exactos, con puerto solo cuando forma parte del origen, sin rutas ni `*`. Los ajustes técnicos de los modelos y LanceDB, CPU, límites y almacenamiento tienen valores predeterminados en el código; no se copian a Coolify.
 
 Para ordenar un `.env` anterior, ejecutar primero `python -m scripts.simplify_env` y después `python -m scripts.simplify_env --apply`. Se conserva un respaldo y se verifica que las claves, URLs de base, el modelo, el correo y las demás opciones efectivas no cambien. No ejecutar el generador de claves para reemplazar una instalación existente. Antes del primer arranque, configurar el esquema MariaDB y sus credenciales en Coolify; la aplicación aplica las migraciones al iniciar.
 

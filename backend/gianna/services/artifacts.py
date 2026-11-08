@@ -51,18 +51,40 @@ def ensure_models(cfg, engine_version, progress=None):
             folder = cfg.model_dir / kind / revision
             try:
                 manifest = verified_manifest(folder, model_id, revision, files)
+            except DomainError:
+                manifest = None
+            if manifest is not None:
+                _persist_models(cfg, folder, kind, revision, files, manifest)
                 event(LOG, 'artifacts.verified', model_id=model_id, offline=True,
                       verified_bytes=sum(manifest['files'][name]['bytes'] for name in files),
                       duration_ms=round((time.monotonic()-began)*1000, 2))
                 continue  # Verified offline path never contacts the model hub.
-            except DomainError:
-                pass
+            if cfg.storage_backend == 'minio':
+                from .objects import objects
+                remote = objects(cfg).read_json(f'models/{kind}/{revision}/manifest.json')
+                if remote is not None:
+                    if remote.get('model_id') != model_id or remote.get('revision') != revision or not set(files) <= set(remote.get('files', {})):
+                        raise DomainError('El manifiesto remoto no coincide con el modelo fijado.', 503, 'object_checksum_invalid')
+                    complete = True
+                    for name in files:
+                        info = remote['files'][name]
+                        if (not isinstance(info, dict) or not isinstance(info.get('bytes'), int) or info['bytes'] < 1
+                                or not isinstance(info.get('sha256'), str) or len(info['sha256']) != 64):
+                            raise DomainError('El manifiesto remoto de artefactos no es válido.', 503, 'object_checksum_invalid')
+                        complete = objects(cfg).restore_file(f'models/{kind}/{revision}/{name}', folder/name,
+                                                             info['sha256'], info['bytes'], progress) and complete
+                    if complete:
+                        atomic_json(folder/'manifest.json', remote)
+                        verified_manifest(folder, model_id, revision, files)
+                        event(LOG, 'artifacts.restored_from_minio', model_id=model_id)
+                        continue
             failure = None
             for attempt in range(3):
                 try:
                     with bind_context(download_attempt=attempt+1):
                         _prepare(folder, model_id, revision, files, progress)
                     manifest = verified_manifest(folder, model_id, revision, files)
+                    _persist_models(cfg, folder, kind, revision, files, manifest)
                     event(LOG, 'artifacts.verified', model_id=model_id, offline=False,
                           verified_bytes=sum(manifest['files'][name]['bytes'] for name in files),
                           duration_ms=round((time.monotonic()-began)*1000, 2))
@@ -89,6 +111,15 @@ def ensure_models(cfg, engine_version, progress=None):
                 error.details = {'cause_code': failure_code(failure), 'profile': engine_version,
                                  'artifact_kind': kind, 'revision': revision}
                 raise error from failure
+
+
+def _persist_models(cfg, folder, kind, revision, files, manifest):
+    if cfg.storage_backend != 'minio':
+        return
+    from .objects import objects
+    for name in files:
+        objects(cfg).persist_file(f'models/{kind}/{revision}/{name}', folder/name, manifest['files'][name]['sha256'])
+    objects(cfg).put_json(f'models/{kind}/{revision}/manifest.json', manifest)
 
 
 def _download(path, model_id, revision, name, expected_bytes, verify, deadline, headers, progress):

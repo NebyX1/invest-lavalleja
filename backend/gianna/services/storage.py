@@ -102,6 +102,8 @@ def inspect_storage(db, cfg):
     The result is safe for authenticated diagnostics and CLI JSON. It never
     returns database URLs, mount sources, environment values or file contents.
     """
+    if cfg.storage_backend == 'minio':
+        return inspect_minio(db, cfg)
     path = Path(cfg.data_dir).resolve()
     issues = []
     def issue(code, message, action, retryable=False):
@@ -193,7 +195,7 @@ def inspect_storage(db, cfg):
                 'initialized': bool(expected)}
     first = issues[0] if issues else {'code': None, 'message': 'Almacenamiento disponible para verificar el conocimiento.',
                                       'action': '', 'retryable': False}
-    return {'ok': not issues, **first, 'path': str(path), 'exists': exists,
+    return {'backend': 'local', 'ok': not issues, **first, 'path': str(path), 'exists': exists,
             'writable': writable, 'mount': mount, 'identity': identity, 'issues': issues, 'disk': disk,
             'uid': os.getuid() if hasattr(os, 'getuid') else None,
             'gid': os.getgid() if hasattr(os, 'getgid') else None}
@@ -209,6 +211,11 @@ def storage_identity(db, cfg, *, adopt=False, write=False):
                          'path': inspection['path'], 'mount': inspection['mount'],
                          'identity': inspection['identity']}
         raise error
+    if cfg.storage_backend == 'minio':
+        if write:
+            from .objects import objects
+            return objects(cfg).initialize(db)
+        return {key: inspection['identity'][key] for key in ('matched', 'initialized')}
     path = cfg.data_dir / '.gianna-storage.json'
     expected = inspection['identity']['expected']
     actual = inspection['identity']['actual']
@@ -226,3 +233,38 @@ def storage_identity(db, cfg, *, adopt=False, write=False):
             connection.execute('INSERT INTO settings(`key`,value) VALUES(?,?) ON CONFLICT(`key`) DO UPDATE SET value=excluded.value',
                                ('physical_storage_identity', json.dumps(identity)))
     return {'matched': True, 'initialized': True}
+
+
+def inspect_minio(db, cfg):
+    """MinIO is durable; DATA_DIR only needs capacity and access for its cache."""
+    from .objects import objects
+    path = Path(cfg.data_dir).resolve()
+    report = dict(backend='minio', ok=True, code=None, retryable=False, issues=[],
+                  message='Persistencia en MinIO y caché local inspeccionadas.', action='',
+                  path=str(path), exists=path.is_dir(), writable=False, disk={'available':False},
+                  identity={'state':'unknown', 'matched':False, 'initialized':False},
+                  mount={'required':False, 'durable':None, 'observed':False},
+                  uid=os.getuid() if hasattr(os, 'getuid') else None,
+                  gid=os.getgid() if hasattr(os, 'getgid') else None)
+    try:
+        report.update(objects(cfg).inspect(db))
+    except DomainError as exc:
+        report['issues'].append(dict(code=exc.code, message=exc.message, **getattr(exc, 'details', {})))
+    try:
+        parent = path
+        while not parent.exists() and parent.parent != parent:
+            parent = parent.parent
+        report['writable'] = (not path.exists() or path.is_dir()) and os.access(parent, os.W_OK | os.X_OK)
+        if not report['writable']:
+            raise PermissionError()
+        usage = shutil.disk_usage(parent)
+        report['disk'] = dict(available=True, total_bytes=usage.total, free_bytes=usage.free)
+        if usage.free == 0:
+            report['issues'].append(dict(code='cache_full', message='La caché local no tiene espacio.',
+                                        action='Ampliá el espacio temporal del contenedor; los objetos permanecen en MinIO.', retryable=False))
+    except OSError:
+        report['issues'].append(dict(code='cache_not_writable', message='El proceso no puede utilizar la caché local.',
+                                    action='Revisá permisos de DATA_DIR para UID/GID 10001; no necesita un volumen persistente.', retryable=False))
+    if report['issues']:
+        report.update(ok=False, **report['issues'][0])
+    return report

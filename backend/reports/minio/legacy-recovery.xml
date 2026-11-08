@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="240.465" timestamp="2026-11-07T21:19:56.881618-03:00" hostname="Moltker"><testcase classname="tests.test_recovery_docker" name="test_real_redeploy_and_incident_recovery" time="240.193" /></testsuite></testsuites>

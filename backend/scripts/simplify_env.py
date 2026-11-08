@@ -19,6 +19,8 @@ from gianna.config import BACKEND_ROOT, Config
 SECTIONS = (
     ('Flask y seguridad', ('FLASK_ENV', 'SECRET_KEY', 'ENCRYPTION_KEY')),
     ('Base MariaDB', ('DATABASE_URL',)),
+    ('Almacenamiento MinIO', ('MINIO_ENDPOINT', 'MINIO_ACCESS_KEY', 'MINIO_SECRET_KEY',
+                             'MINIO_SECURE', 'MINIO_BUCKET_NAME', 'MINIO_PUBLIC_URL')),
     ('Portal y API: origenes exactos separados por coma', ('CORS_ORIGINS',)),
     ('Ollama Cloud', ('OLLAMA_HOST', 'OLLAMA_API_KEY', 'OLLAMA_MODEL')),
     ('Correo SMTP', ('MAIL_SERVER', 'MAIL_PORT', 'MAIL_USE_TLS', 'MAIL_USE_SSL',
@@ -56,13 +58,18 @@ def prepare(original, replacements=None):
     if any(str(old.get(key, default)).lower() != default for key, default in CPU_DEFAULTS.items()):
         raise ValueError('Hay límites CPU personalizados; no se eliminaron silenciosamente.')
     cfg = Config.from_env(environ=old, initialize_storage=False)
-    values = dict(zip(FIELDS, (
-        'production' if cfg.production else ('testing' if old.get('FLASK_ENV') == 'testing' else 'development'),
-        cfg.secret_key, cfg.encryption_key, old.get('DATABASE_URL', ''), ','.join(cfg.public_origins),
-        cfg.ollama_url, cfg.ollama_api_key, cfg.ollama_model,
-        cfg.smtp_host, str(cfg.smtp_port), str(cfg.smtp_mode == 'starttls'),
-        str(cfg.smtp_mode == 'ssl'), cfg.smtp_username, cfg.smtp_password, cfg.smtp_from,
-    )))
+    values = {
+        'FLASK_ENV':'production' if cfg.production else ('testing' if old.get('FLASK_ENV') == 'testing' else 'development'),
+        'SECRET_KEY':cfg.secret_key, 'ENCRYPTION_KEY':cfg.encryption_key, 'DATABASE_URL':old.get('DATABASE_URL', ''),
+        'CORS_ORIGINS':','.join(cfg.public_origins), 'OLLAMA_HOST':cfg.ollama_url,
+        'OLLAMA_API_KEY':cfg.ollama_api_key, 'OLLAMA_MODEL':cfg.ollama_model,
+        'MAIL_SERVER':cfg.smtp_host, 'MAIL_PORT':str(cfg.smtp_port), 'MAIL_USE_TLS':str(cfg.smtp_mode == 'starttls'),
+        'MAIL_USE_SSL':str(cfg.smtp_mode == 'ssl'), 'MAIL_USERNAME':cfg.smtp_username,
+        'MAIL_PASSWORD':cfg.smtp_password, 'MAIL_DEFAULT_SENDER':cfg.smtp_from,
+        'MINIO_ENDPOINT':cfg.minio_endpoint, 'MINIO_ACCESS_KEY':cfg.minio_access_key,
+        'MINIO_SECRET_KEY':cfg.minio_secret_key, 'MINIO_SECURE':str(cfg.minio_secure),
+        'MINIO_BUCKET_NAME':cfg.minio_bucket_name, 'MINIO_PUBLIC_URL':cfg.minio_public_url,
+    }
     newline = '\r\n' if '\r\n' in text else '\n'
     lines = ['# Configuracion de Gianna Invest. No subir este archivo a Git.']
     for title, section_keys in SECTIONS:
