@@ -1,50 +1,69 @@
 # Validación del agente RAG
 
-## Candidata de seguridad semántica · 07/11/2026 · 1.0.0-rc4
+## Seguridad semántica · 07/11/2026 · 1.0.0-rc4
 
-**Estado: requiere validación con el modelo configurado antes de liberar.** La
-implementación está preparada en `codex/evaluacion-riesgo-consultas`; `main`
-conserva la entrega rc3 mientras se solicita autorización para evaluar el
-proveedor de pago. No se modificó la configuración ni el contenido productivo.
+**Componente validado con el proveedor y modelo de la configuración local:**
+Ollama Cloud, `deepseek-v4.1-flash`, política `semantic-safety-v3`, **20/20 casos**.
+Destino de publicación: `NebyX1/invest-lavalleja`, rama `main`, `backend/`.
+La instancia productiva de la IDL y su selección actual del panel no se presentan
+como verificadas: la configuración local disponible no tiene `DATABASE_URL`.
+No se modificaron secretos, configuración, datos ni contenido productivo.
 
 La captura reproducía una salida `clarify` determinista sin modelo. Se eliminó
-esa ruta y su plantilla empresarial. El nuevo control semántico corre antes
-de publicación/índice, mapa de guía, búsqueda, herramientas y fallback. El
-veredicto debe ser completo, coherente y tipado; errores, duplicados JSON y
-prosa contradictoria no autorizan orientación. Se preservan rechazos seguros
-de daño explícito y las anclas cifradas de contexto pendiente, incluso tras
-errores del proveedor o recorte del historial.
+esa ruta y su plantilla empresarial. El control semántico corre antes de revisar
+publicación/índice, mapa de guía, búsqueda, herramientas y fallback. Pregunta e
+historial se revisan como un expediente JSON, sin reproducir los roles como una
+conversación abierta. El resultado debe ser completo, coherente y tipado;
+errores, claves duplicadas y prosa junto a herramientas no autorizan orientación.
+Las anclas de riesgo pendientes permanecen cifradas, incluso si falla el
+proveedor o se recorta el historial. Los rechazos técnicos registran causa
+controlada, sin preguntas, historial ni prosa del proveedor.
 
-| Comprobación | Resultado |
+| Comprobación final | Resultado y evidencia |
 | --- | --- |
-| Suite con MariaDB y MinIO reales | **544 passed, 8 skipped**, 87,82 s; `safety/full-suite.xml` y `.log` |
-| Foco agente, público HTTP, protocolo y evaluador (incluye última prueba del modelo seleccionado en panel) | **163 passed**, 14,32 s; `safety/flow.xml` y `.log` |
-| Frontend | ESLint del componente y `npm run check`: 42 archivos, cero errores/avisos |
-| Runtime | Imagen Docker construida, contrato de esquema comprobado dentro de ella sin red; `safety/image-build.log` |
-| Corpus sintético | 20 casos, `safety/corpus-dry-run.json`; dry-run no evalúa un modelo |
+| Suite completa con MariaDB y MinIO reales | **571 passed, 8 skipped**, 88,22 s; `safety/full-suite-final.xml` y `.log` |
+| Evaluador offline, incluido provider-env, límites, procedencia y cierre | **68 passed**, incluidos en la suite completa |
+| Evaluación semántica real autorizada | **20/20**, 20 despachos HTTP; `safety/configured-model-v3.json` y `.log` |
+| Frontend | `npm run check`: 42 archivos, cero errores, avisos e indicios; `safety/frontend-final.log`. ESLint del componente aprobado antes de esta evaluación; el componente no cambió desde entonces |
+| Runtime | Imagen final construida como usuario 10001; prompt/código coinciden por SHA-256 con el modelo evaluado; contrato de esquema correcto sin red y en modo sólo lectura; `safety/image-validation-final.json` y `image-build-final.log` |
 
-La suite de código usa modelos guionados para verificar orden y cierre seguro;
-no mide comprensión semántica. Las ocho omisiones corresponden a corpus
-privado y opt-in de navegador/recuperación de contenedores ya documentados.
+En la política final las tres variantes de la captura producen `clarify` con
+`minor_safeguarding`: bloquean orientación empresarial y preguntan por la
+protección de menores. No solicitan horarios ni alcohol ni ofrecen ubicaciones.
+Los casos explícitos de explotación y sus seguimientos se rechazan; los ocho
+controles legítimos se permiten. La coacción laboral se rechaza como `other_harm`
+sin inventar una dimensión sexual ni menores. Los criterios originales del
+corpus no se modificaron. La mediana fue 734,5 ms y el máximo 890 ms en esta
+corrida; no son garantías de latencia del servicio.
 
-Se probó adicionalmente el protocolo real contra modelos **locales ya
-instalados**, sin cambiar los modelos productivos ni usar cloud. Los informes
-rojos se conservan: Qwen3:4b falló por tiempo/salida incompleta o libre; Phi4-mini
-incumplió campos/etiquetas y alcanzó **3/20** criterios en el ensayo con esquema
-explícito (`safety/local-phi4-corpus-final.json`). En los tres casos equivalentes
-a la captura ese último ensayo rechazó orientación, pero sus etiquetas no
-cumplieron todos los criterios del corpus. Los casos legítimos también tuvieron
-errores, por lo que no es una evaluación satisfactoria ni acredita producción.
-Los primeros informes de protocolo contaban sólo solicitudes completadas; se
-corrigió el evaluador para contar también las solicitudes de evaluaciones
-fallidas. Esos informes históricos no se reescribieron.
+Se conservan **todos los informes fallidos**. La primera corrida cloud v1 logró
+19/20: un historial largo produjo herramienta más prosa; su único reintento
+acotado también falló y el flujo quedó cerrado (`configured-model.json`,
+`configured-model-retry.json` y su `.provenance.json`). V2 cambió la entrada a un
+expediente y logró 19/20, con rechazo correcto pero etiquetas erróneas de coacción
+laboral (`configured-model-v2.json`). V3 precisó categorías generales y separó
+las dimensiones de menores/acceso adulto; aprobó los mismos 20 criterios sin
+relajar el parser. La autorización cubrió esos **20 casos distintos con
+reintentos acotados: 61 despachos HTTP en total**, incluidas tres corridas y el
+reintento de diagnóstico. No se harán nuevas llamadas de pago para esta entrega.
 
-**No hay una evaluación satisfactoria del modelo productivo en esta entrega.**
-El evaluador opt-in usa la selección real del panel, registra únicamente IDs y
-etiquetas, y no aplica migraciones ni publica datos. La solicitud de autorización
-para esos 20 casos sigue pendiente; no se hicieron llamadas de pago.
+Los ensayos anteriores con Qwen3:4b y Phi4-mini locales también quedan como
+fallidos. Phi4-mini alcanzó 3/20 en `safety/local-phi4-corpus-final.json`; sus
+resultados no acreditan producción. Los primeros informes locales contaban
+sólo solicitudes completadas; el evaluador actual cuenta también las fallidas
+y separa invocaciones de evaluación de despachos HTTP, sin afirmar facturación.
 
-Procedimiento y límites: [Seguridad de consultas](../docs/SEGURIDAD_CONSULTAS.md).
+**Límites:** es un corpus sintético acotado del componente semántico, con el
+modelo del entorno existente; no es un ensayo completo del chat productivo ni
+una garantía de ausencia de errores. El informe declara
+`production_runtime_unverified:true` y conserva hashes de prompt, esquema,
+`risk.py`, `runtime.py` y corpus. No se accedió al panel ni al servidor de la IDL.
+Las ocho omisiones de la suite corresponden a cinco casos de documentación
+privada ausente y tres opt-in de navegador/recuperación de contenedores. Las
+pruebas reales de recuperación y navegador de rc3 siguen en `minio/` y no se
+atribuyen a una nueva ejecución. No se modificó persistencia en esta entrega.
+
+Procedimiento: [Seguridad de consultas](../docs/SEGURIDAD_CONSULTAS.md).
 
 ## Persistencia MinIO · 07/11/2026 · 1.0.0-rc3
 

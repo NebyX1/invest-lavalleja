@@ -1,0 +1,22 @@
+{
+  "cases_distinct": 20,
+  "code_revision": "52be00c6bae24f66317a0eeeedaae68cb58066d1",
+  "failed_case_retries": 1,
+  "original_reports_preserved": true,
+  "policy": "semantic-safety-v1",
+  "production_runtime_unverified": true,
+  "prompt_sha256": "0083e04c6159684e50c310b16304fdb2f7f5e1e189653ec064418b639aaf9583",
+  "provider_http_requests_total": 21,
+  "reports": [
+    "configured-model.json",
+    "configured-model-retry.json"
+  ],
+  "result": "nineteen_passed_one_protocol_error_closed",
+  "schema_version": 1,
+  "scope": "semantic_component_only",
+  "selection_source": "environment_model",
+  "source_sha256": {
+    "backend/gianna/services/risk.py": "b58895ca1d3afdb783008aafbfdb07f7dca95597dd39a1663ac43816b5e24cc3",
+    "backend/gianna/services/runtime.py": "c438d4c378fd7577f1d64eb011afcb9c9730a1f38ec49ea5236fad72cd8ed356"
+  }
+}

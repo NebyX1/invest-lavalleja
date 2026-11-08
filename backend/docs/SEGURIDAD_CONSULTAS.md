@@ -10,9 +10,13 @@ expectativa de producto incorrecta.
 1. Se conservan rechazos tempranos para pedidos explícitos de daño, acusaciones
    personales e insultos. Nunca habilitan orientación ni búsqueda.
 2. Toda consulta restante pasa por `services/risk.py`, usando el modelo
-   seleccionado, temperatura cero y la política `semantic-safety-v1`. No recibe
+   seleccionado, temperatura cero y la política `semantic-safety-v3`. No recibe
    el tono editable, la guía ni herramientas de negocio.
-3. El evaluador recibe pregunta e historial y debe producir cuatro etiquetas
+3. El evaluador recibe un expediente JSON con `history` y `current_message`
+   como datos en un único mensaje de usuario, después de la política fija.
+   Los roles del historial no se reproducen como una conversación abierta:
+   una respuesta anterior del bot no cambia el rol del evaluador ni autoriza
+   el proyecto. Debe producir cuatro etiquetas
    enumeradas: `decision`, `risk`, `minors`, `adult_access`. Se aceptan la llamada
    a `evaluar_seguridad` o el mismo objeto JSON válido. No se impone `format`
    de JSON Schema al proveedor: Ollama Cloud no lo soporta actualmente.
@@ -46,7 +50,9 @@ política y fase. La métrica SQL registra fuente de decisión, modelo, etiqueta
 tiempo y cantidad de solicitudes lógicas; no guarda preguntas, historial,
 explicaciones libres ni respuestas del evaluador en claro. El conteo total
 incluye la evaluación de seguridad. Los reintentos HTTP del transporte son
-eventos distintos.
+eventos distintos. Un rechazo de protocolo incluye una causa enumerada, por
+ejemplo `unexpected_prose`, `invalid_json`, `duplicate_fields`, `schema_mismatch`
+o `unknown_label`. Nunca incluye la prosa o valores desconocidos del proveedor.
 
 La evaluación tiene hasta 25 segundos y 400 tokens de salida; no utiliza la
 aleatoriedad del tono empresarial ni cambia silenciosamente a otro modelo. El
@@ -67,16 +73,34 @@ python -m scripts.evaluate_safety --dry-run
 # Evaluación real explícita: consume cuota del proveedor configurado.
 python -m scripts.evaluate_safety --run-model --output /tmp/safety-evaluation.json
 
+# Si sólo se dispone de la configuración del proveedor, sin conexión SQL:
+# el archivo es explícito; sólo se leen URL, clave y modelo, sin modificarlo.
+python -m scripts.evaluate_safety --run-model --provider-env /ruta/backend/.env --output /tmp/provider-safety.json
+
 # Opcional, sólo un modelo LOCAL ya instalado; no sustituye validar producción.
 python -m scripts.evaluate_safety --run-model --local-model phi4-mini:3.8b --output /tmp/local-safety.json
 ```
 
 Un informe con `passed:false` se conserva como fallo. No se publica como
 validación satisfactoria ni se relajan las expectativas para hacerlo verde.
-Los modelos locales probados no cumplieron todos los casos y el protocolo;
-el flujo cerró sin permitir RAG. La candidata debe evaluarse con el proveedor y
-modelo efectivamente usados en producción antes de declararla apta para liberar.
-Los modelos locales, la evidencia simulada y una CI estructural verde no
-reemplazan esa comprobación. Este cambio no convierte el sistema en infalible.
+El modo predeterminado con `--run-model` lee la selección del panel sin migrar
+ni escribir SQL. `--provider-env` es una evaluación del componente con el modelo
+de ese archivo; no acredita la selección actual del panel productivo. No hereda
+otras variables ni activa modelos alternativos. Ambos requieren autorización
+para consumir cuota. Los informes registran hashes de prompt, esquema y código,
+fuente de selección y despachos HTTP, separados de las evaluaciones lógicas.
+
+La política v3 aprobó **20/20** con `deepseek-v4.1-flash` en Ollama Cloud y la
+configuración local existente: [informe](../reports/safety/configured-model-v3.json).
+Las corridas previas v1/v2 y los modelos locales fallidos se conservan como
+fallos; sus criterios no se relajaron. En v3, la captura y sus variantes requieren
+aclaración de protección de menores, sin orientación empresarial; la explotación
+explícita se rechaza y los controles legítimos del corpus se permiten.
+
+El informe declara `production_runtime_unverified:true`: no se accedió a la
+selección del panel ni se evaluó de extremo a extremo la instancia de la IDL.
+Antes de declarar verificada esa instancia debe contrastarse su modelo efectivo
+y su despliegue. Los modelos locales, la evidencia simulada y una CI estructural
+verde no reemplazan esa comprobación. Este cambio no vuelve infalible al sistema.
 
 Referencia técnica: [Structured Outputs de Ollama](https://docs.ollama.com/capabilities/structured-outputs).

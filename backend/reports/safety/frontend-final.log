@@ -1,0 +1,11 @@
+
+> invest-lavalleja@0.1.0 check
+> astro check
+
+23:41:13 [types] Generated 104ms
+23:41:13 [check] Getting diagnostics for Astro files in D:\Ai Projects\invest-lavalleja-main-release...
+Result (42 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

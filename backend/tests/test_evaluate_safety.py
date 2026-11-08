@@ -255,6 +255,149 @@ def test_local_report_is_clearly_distinguished_from_production(monkeypatch,capsy
     assert report['local_model_only'] and report['not_production_model']
 
 
+def provider_file(tmp_path, **updates):
+    values={'OLLAMA_HOST':'https://provider.example.test','OLLAMA_API_KEY':'sentinel-provider-secret',
+            'OLLAMA_MODEL':'unit-model:1','MINIO_SECRET_KEY':'sentinel-unrelated-storage-secret',
+            'DATABASE_URL':'sentinel-unrelated-database-secret'}
+    values.update(updates)
+    path=tmp_path/'explicit-provider.env'
+    path.write_text('\n'.join(key+'='+value for key,value in values.items() if value is not None)+'\n',encoding='utf-8')
+    return path
+
+
+def test_provider_env_requires_run_and_excludes_local_without_reading_file(monkeypatch,tmp_path):
+    def forbidden(*args,**kwargs):pytest.fail('Invalid source flags must not read secrets or initialize a model')
+    monkeypatch.setattr(evaluation,'_model_runner',forbidden)
+    monkeypatch.setattr(evaluation,'_provider_configuration',forbidden)
+    path=tmp_path/'must-not-read.env'
+    for flags in (['--provider-env',str(path)],
+                  ['--dry-run','--provider-env',str(path)],
+                  ['--run-model','--local-model','qwen3:4b','--provider-env',str(path)]):
+        with pytest.raises(SystemExit) as caught:evaluation.main(flags)
+        assert caught.value.code==2
+
+
+def test_explicit_provider_env_uses_no_config_database_storage_or_discovered_env(monkeypatch,tmp_path):
+    from gianna.db import Database
+    from gianna.services import risk
+    path=provider_file(tmp_path)
+    captured={}
+    def forbidden(*args,**kwargs):pytest.fail('Provider-only evaluation must not initialize application configuration/DB/storage')
+    monkeypatch.setattr(Config,'from_env',forbidden)
+    monkeypatch.setattr(Database,'__init__',forbidden)
+    monkeypatch.setattr(dotenv,'load_dotenv',forbidden)
+    monkeypatch.setattr(socket,'create_connection',forbidden)
+    def initialize(self,cfg):
+        captured['cfg']=cfg
+        self.client=SimpleNamespace(close=lambda:captured.update(closed=True))
+    monkeypatch.setattr(Ollama,'__init__',initialize)
+    def assess(transport,question,history,settings):
+        captured['settings']=settings
+        return assessment(model=settings.model)
+    monkeypatch.setattr(risk,'assess',assess)
+    runner=evaluation._model_runner(provider_env=path)
+    runner('synthetic question',[])
+    assert vars(captured['cfg'])=={'ollama_url':'https://provider.example.test',
+                                  'ollama_api_key':'sentinel-provider-secret','ollama_fallback_models':()}
+    assert captured['settings'].model=='unit-model:1' and captured['settings'].temperature==0
+    metadata=evaluation._runner_metadata(runner)
+    assert metadata['selection_source']=='environment_model'
+    assert metadata['production_runtime_unverified'] is True
+    assert metadata['provider_origin']=='https://provider.example.test'
+    assert 'sentinel' not in json.dumps(metadata)
+    runner.close()
+    assert captured['closed']
+
+
+def test_provider_env_supports_legacy_origin_but_never_inherits_env(monkeypatch,tmp_path):
+    path=provider_file(tmp_path,OLLAMA_HOST=None,OLLAMA_BASE_URL='https://legacy.example.test/')
+    cfg,model=evaluation._provider_configuration(path)
+    assert cfg.ollama_url=='https://legacy.example.test' and model=='unit-model:1'
+    assert cfg.ollama_fallback_models==()
+    monkeypatch.setenv('OLLAMA_API_KEY','external-secret-that-must-not-be-inherited')
+    path=provider_file(tmp_path,OLLAMA_API_KEY=None)
+    with pytest.raises(ValueError):evaluation._provider_configuration(path)
+
+
+def test_explicit_provider_values_are_not_interpolated(monkeypatch,tmp_path):
+    monkeypatch.setenv('PRIVATE_VARIABLE','must-not-read-this-external-secret')
+    cfg,_=evaluation._provider_configuration(provider_file(tmp_path,OLLAMA_API_KEY='literal-${PRIVATE_VARIABLE}'))
+    assert cfg.ollama_api_key=='literal-${PRIVATE_VARIABLE}'
+
+
+@pytest.mark.parametrize('origin', [
+    'http://provider.example.test','https://user:secret@provider.example.test',
+    'https://@provider.example.test','https://provider.example.test/path',
+    'https://provider.example.test?api_key=secret','https://provider.example.test#secret',
+    'https://provider.example.test:wrong','https://provider.example.test:0',
+    'https://provider.example.test:99999','https://provider.example.test trailing',
+    '', 'provider.example.test',
+])
+def test_provider_env_rejects_unsafe_origins_before_client(origin,monkeypatch,tmp_path):
+    monkeypatch.setattr(Ollama,'__init__',lambda *args,**kwargs:pytest.fail('Invalid origins must never reach transport'))
+    with pytest.raises(ValueError):
+        evaluation._provider_configuration(provider_file(tmp_path,OLLAMA_HOST=origin))
+
+
+@pytest.mark.parametrize('model',['','model with spaces','model?secret=value','model\nsecret','model'*50])
+def test_provider_model_uses_settings_validation(model,tmp_path):
+    # A newline inside the VALUE must be quoted; otherwise dotenv correctly
+    # interprets it as a separate unrelated binding rather than part of the tag.
+    value=json.dumps(model) if '\n' in model else model
+    with pytest.raises(ValueError):evaluation._provider_configuration(provider_file(tmp_path,OLLAMA_MODEL=value))
+
+
+def test_duplicate_provider_fields_are_rejected(tmp_path):
+    path=provider_file(tmp_path)
+    path.write_text(path.read_text()+'OLLAMA_MODEL=other-model\n')
+    with pytest.raises(ValueError):evaluation._provider_configuration(path)
+
+
+def test_all_model_reports_identify_policy_and_code_hashes(monkeypatch,capsys,tmp_path):
+    monkeypatch.setattr(evaluation,'_model_runner',lambda:lambda question,history:assessment())
+    path=corpus_file(tmp_path,[case()])
+    assert evaluation.main(['--run-model','--cases',str(path)])==0
+    report=json.loads(capsys.readouterr().out)
+    assert report['policy'].startswith('semantic-safety-')
+    for field in ('policy_prompt_sha256','policy_schema_sha256','risk_code_sha256','runtime_code_sha256'):
+        assert len(report[field])==64 and set(report[field]) <= set('0123456789abcdef')
+
+
+def test_provider_cli_counts_http_dispatches_and_closes_client_even_on_assessment_error(monkeypatch,capsys,tmp_path):
+    from gianna.services.settings import Settings
+    client=httpx.Client(transport=httpx.MockTransport(lambda request:httpx.Response(200,json={})))
+    def assess(transport,question,history,settings):
+        transport.client.post('https://provider.example.test/api/chat',json={'question':'sentinel-request-body'})
+        transport.client.post('https://provider.example.test/api/chat',json={'question':'sentinel-request-body'})
+        failure=DomainError('sentinel-error-prose',503,'safety_assessment_invalid')
+        failure.safety_trace={'requests':1}
+        raise failure
+    runner=evaluation.ModelRunner(SimpleNamespace(client=client),Settings(model='unit-model'),assess,
+                                  'https://provider.example.test','environment_model')
+    monkeypatch.setattr(evaluation,'_model_runner',lambda provider_env:runner)
+    path=corpus_file(tmp_path,[case()]);env_path=provider_file(tmp_path)
+    assert evaluation.main(['--run-model','--provider-env',str(env_path),'--cases',str(path)])==1
+    report=json.loads(capsys.readouterr().out)
+    assert report['provider_http_requests']==2 and report['model_requests_reported']==1
+    assert report['provider_http_requests_scope']=='httpx_request_dispatches_not_billing'
+    assert report['production_runtime_unverified'] and report['selection_source']=='environment_model'
+    assert client.is_closed
+    assert 'sentinel' not in json.dumps(report)
+
+
+def test_client_also_closes_if_metadata_collection_fails(monkeypatch,capsys,tmp_path):
+    captured={}
+    class Runner:
+        def __call__(self,*args):return assessment()
+        def metadata(self):raise RuntimeError('sentinel-metadata-exception')
+        def close(self):captured['closed']=True
+    monkeypatch.setattr(evaluation,'_model_runner',Runner)
+    assert evaluation.main(['--run-model','--cases',str(corpus_file(tmp_path,[case()]))])==1
+    raw=capsys.readouterr().out;report=json.loads(raw)
+    assert captured['closed'] and report['metadata_collection_failed']
+    assert 'sentinel' not in raw and report['passed'] is False
+
+
 def test_configured_runner_uses_panel_model_read_only(monkeypatch):
     from gianna import db as database
     from gianna.services import risk,settings as configuration

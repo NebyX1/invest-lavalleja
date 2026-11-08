@@ -1,0 +1,11 @@
+{
+  "matches_evaluated_source": true,
+  "network": "none",
+  "policy": "semantic-safety-v3",
+  "prompt_sha256": "2aa9e1f27ff8ea83bc49b11deb28d927e9cdce34150017711b239664abf60a06",
+  "read_only": true,
+  "risk_sha256": "56adc802247f0d402c7a240d2045a77c6cfcc993e7aea5aba4d7399514cf0358",
+  "runtime_sha256": "c438d4c378fd7577f1d64eb011afcb9c9730a1f38ec49ea5236fad72cd8ed356",
+  "schema_contract": "passed",
+  "uid": 10001
+}
